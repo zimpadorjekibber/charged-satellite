@@ -60,12 +60,7 @@ export default function CustomerLayout({
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setShowInfo(true)}
-                        className="p-2 rounded-full bg-white/10 text-tashi-accent hover:bg-white/20 border border-white/5 transition-colors"
-                    >
-                        <Info size={20} />
-                    </button>
+                    {/* Info Button Removed */}
 
                     <Link href="/customer/cart" className="relative p-2 rounded-full bg-tashi-primary text-white hover:bg-tashi-primary-light transition-colors">
                         <ShoppingCart size={20} />

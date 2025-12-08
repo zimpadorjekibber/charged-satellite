@@ -87,6 +87,12 @@ export interface ValleyUpdate {
     mediaType?: 'image' | 'video'; // New field for type
 }
 
+export interface ContactSettings {
+    phone: string;
+    whatsapp: string;
+    mapsLocation: string;
+}
+
 export interface MediaItem {
     id: string;
     url: string;
@@ -106,6 +112,7 @@ interface AppState {
     valleyUpdates: ValleyUpdate[];
     media: MediaItem[]; // New media gallery
     geoRadius: number;
+    contactInfo: ContactSettings;
 
     initialize: () => void;
 
@@ -135,6 +142,7 @@ interface AppState {
 
     login: (username: string, password: string) => Promise<boolean>;
     updateSettings: (settings: any) => Promise<void>;
+    updateContactSettings: (contact: ContactSettings) => Promise<void>;
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
     addMediaItem: (url: string, name: string) => Promise<void>;
     deleteMedia: (id: string) => Promise<void>;
@@ -156,6 +164,11 @@ export const useStore = create<AppState>()(
             valleyUpdates: [],
             media: [],
             geoRadius: 5,
+            contactInfo: {
+                phone: '+919876543210',
+                whatsapp: '+919876543210',
+                mapsLocation: 'TashiZom+Resort'
+            },
 
             initialize: () => {
                 // Real-time Listeners
@@ -209,6 +222,13 @@ export const useStore = create<AppState>()(
                 onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
                     if (doc.exists()) {
                         set({ valleyUpdates: doc.data().list || [] });
+                    }
+                });
+
+                // Contact Settings
+                onSnapshot(doc(db, 'settings', 'contact'), (doc) => {
+                    if (doc.exists()) {
+                        set({ contactInfo: doc.data() as ContactSettings });
                     }
                 });
             },
@@ -323,6 +343,10 @@ export const useStore = create<AppState>()(
 
             updateSettings: async (settings) => {
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
+            },
+
+            updateContactSettings: async (contact: ContactSettings) => {
+                await setDoc(doc(db, 'settings', 'contact'), contact);
             },
 
             uploadImage: async (file: File, saveToGallery = false) => {

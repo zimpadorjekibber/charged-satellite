@@ -93,20 +93,22 @@ export default function StaffDashboard() {
             osc.start(now);
             osc.stop(now + 0.5);
 
-            // Double beep
-            setTimeout(() => {
-                const osc2 = ctx.createOscillator();
-                const gain2 = ctx.createGain();
-                osc2.type = 'triangle';
-                osc2.frequency.setValueAtTime(800, ctx.currentTime);
-                osc2.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.5);
-                gain2.gain.setValueAtTime(1, ctx.currentTime);
-                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                osc2.connect(gain2);
-                gain2.connect(ctx.destination);
-                osc2.start(ctx.currentTime);
-                osc2.stop(ctx.currentTime + 0.5);
-            }, 600);
+            // Loop the beep 4 more times (5 total) for noisy kitchen environment
+            for (let i = 1; i < 5; i++) {
+                setTimeout(() => {
+                    const oscLoop = ctx.createOscillator();
+                    const gainLoop = ctx.createGain();
+                    oscLoop.type = 'triangle';
+                    oscLoop.frequency.setValueAtTime(800, ctx.currentTime);
+                    oscLoop.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.5);
+                    gainLoop.gain.setValueAtTime(1, ctx.currentTime);
+                    gainLoop.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    oscLoop.connect(gainLoop);
+                    gainLoop.connect(ctx.destination);
+                    oscLoop.start(ctx.currentTime);
+                    oscLoop.stop(ctx.currentTime + 0.5);
+                }, i * 700);
+            }
 
         } catch (e) {
             console.error("Audio play failed", e);

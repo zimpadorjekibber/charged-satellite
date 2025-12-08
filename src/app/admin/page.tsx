@@ -498,6 +498,70 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
+                            {/* Contact Settings */}
+                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
+                                <h2 className="text-xl font-bold text-white mb-6">Contact Information</h2>
+                                <p className="text-sm text-gray-400 mb-6">Update your restaurant contact details that appear in the customer menu.</p>
+                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-400 mb-2">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.phone}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        phone: val
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-400 mb-2">WhatsApp Number</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.whatsapp}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        whatsapp: val
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +91 for India)</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-400 mb-2">Google Maps Location</label>
+                                        <input
+                                            type="text"
+                                            defaultValue={useStore.getState().contactInfo.mapsLocation}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        mapsLocation: val
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="TashiZom+Resort or Coordinates"
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Enter your business name or exact location (use + for spaces)</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Table Management */}
                             <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
                                 <h2 className="text-xl font-bold text-white mb-6">Table Management</h2>

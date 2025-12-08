@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Bell, Newspaper, Leaf, Drumstick, Phone, X } from 'lucide-react';
+import { Plus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ export default function MenuPage() {
     const addNotification = useStore((state) => state.addNotification);
     const cancelNotification = useStore((state) => state.cancelNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
+    const contactInfo = useStore((state) => state.contactInfo);
 
     // Dynamic Categories derived from Menu
     const allCategories = Array.from(new Set(menu.map(item => item.category)));
@@ -49,6 +50,7 @@ export default function MenuPage() {
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
     const [showAllUpdates, setShowAllUpdates] = useState(false);
+    const [showContactInfo, setShowContactInfo] = useState(false);
 
     // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
     useEffect(() => {
@@ -96,6 +98,22 @@ export default function MenuPage() {
                 </Link>
                 <span className="text-[10px] uppercase tracking-wider font-bold bg-black/80 text-white px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
                     Rate Us
+                </span>
+            </div>
+
+            {/* Contact Us Button */}
+            <div className="fixed bottom-64 left-6 z-[100] flex flex-col items-center gap-2 pointer-events-auto">
+                <motion.button
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowContactInfo(true)}
+                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-xl border border-white/10 bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/40"
+                >
+                    <Info size={20} />
+                </motion.button>
+                <span className="text-[10px] uppercase tracking-wider font-bold bg-black/80 text-white px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
+                    Contact
                 </span>
             </div>
 
@@ -322,6 +340,53 @@ export default function MenuPage() {
                         </button>
                     )}
                     <p className="text-[10px] text-gray-600 text-center mt-2 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
+                </div>
+            )}
+
+            {/* Contact Info Modal */}
+            {showContactInfo && (
+                <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
+                    <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-xl font-bold text-white font-serif">Contact Us</h3>
+                                <p className="text-sm text-gray-400">We are here to help!</p>
+                            </div>
+                            <button onClick={() => setShowContactInfo(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                        </div>
+
+                        <div className="space-y-3 pt-2">
+                            <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                                    <Phone size={24} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-200">Call Us</p>
+                                    <p className="text-xs text-gray-500">{contactInfo.phone}</p>
+                                </div>
+                            </a>
+
+                            <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                    <MessageCircle size={24} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-200">WhatsApp</p>
+                                    <p className="text-xs text-gray-500">Chat with us</p>
+                                </div>
+                            </a>
+
+                            <a href={`https://maps.google.com/?q=${contactInfo.mapsLocation}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                    <MapPin size={24} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-200">Get Directions</p>
+                                    <p className="text-xs text-gray-500">Locate us on Maps</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
