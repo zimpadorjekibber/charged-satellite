@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
@@ -7,9 +6,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect } from 'react';
-
-// Group items by category
-const CATEGORIES: Category[] = ['Starters', 'Main Course', 'Beverages', 'Dessert'];
 
 // Animation Variants
 const containerVariants = {
@@ -37,10 +33,29 @@ export default function MenuPage() {
     const cancelNotification = useStore((state) => state.cancelNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
 
+    // Dynamic Categories derived from Menu
+    const allCategories = Array.from(new Set(menu.map(item => item.category)));
+
+    // Define a preferred order for standard categories
+    const PREFERRED_ORDER = ['Starters', 'Main Course', 'Beverages', 'Dessert'];
+
+    // Sort categories: Preferred ones first, then alphabetical for the rest
+    const CATEGORIES = [
+        ...PREFERRED_ORDER.filter(c => allCategories.includes(c)),
+        ...allCategories.filter(c => !PREFERRED_ORDER.includes(c)).sort()
+    ];
+
     const [activeCategory, setActiveCategory] = useState<Category>('Starters');
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
     const [showAllUpdates, setShowAllUpdates] = useState(false);
+
+    // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
+    useEffect(() => {
+        if (CATEGORIES.length > 0 && !CATEGORIES.includes(activeCategory)) {
+            setActiveCategory(CATEGORIES[0]);
+        }
+    }, [CATEGORIES, activeCategory]);
 
     const filteredItems = menu.filter((item) => {
         if (item.category !== activeCategory) return false;
@@ -67,8 +82,7 @@ export default function MenuPage() {
 
     return (
         <div className="pb-24 pointer-events-auto">
-            {/* Call Staff Button */}
-            {/* Feedback Button */}
+            {/* Call Staff Button & Feedback... (rest of the component structure remains similar) */}
             <div className="fixed bottom-44 left-6 z-[100] flex flex-col items-center gap-2 pointer-events-auto">
                 <Link href="/customer/feedback">
                     <motion.button
@@ -153,6 +167,9 @@ export default function MenuPage() {
                             <span className="relative z-10">{cat}</span>
                         </button>
                     ))}
+                    {CATEGORIES.length === 0 && (
+                        <div className="px-4 py-2 text-gray-500 text-sm italic">Loading categories...</div>
+                    )}
                 </div>
             </div>
 
@@ -279,9 +296,20 @@ export default function MenuPage() {
                                 }`}>
                                 <div className="flex justify-between items-start mb-1">
                                     <span className="text-gray-300 font-bold text-sm">{update.title}</span>
-                                    <span className={`bg-${update.statusColor}-500/20 text-${update.statusColor}-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase`}>{update.status}</span>
+                                    {update.status && update.status.toLowerCase() !== 'create' && (
+                                        <span className={`bg-${update.statusColor}-500/20 text-${update.statusColor}-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase`}>{update.status}</span>
+                                    )}
                                 </div>
                                 <p className="text-xs text-gray-500">{update.description}</p>
+                                {update.mediaUrl && (
+                                    <div className="mt-3 mb-2 rounded-lg overflow-hidden border border-white/5 bg-black">
+                                        {update.mediaType === 'video' ? (
+                                            <video src={update.mediaUrl} controls className="w-full max-h-64 object-cover" />
+                                        ) : (
+                                            <img src={update.mediaUrl} alt={update.title} className="w-full max-h-64 object-cover" />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

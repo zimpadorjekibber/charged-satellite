@@ -59,6 +59,7 @@ export interface Order {
     createdAt: string; // Firestore stores dates as timestamps, we convert to string/date in app usually, simplified to string for ISO
     acceptedAt?: string;
     customerName?: string;
+    customerPhone?: string;
 }
 
 export interface Notification {
@@ -77,6 +78,22 @@ export interface Review {
     createdAt: string;
 }
 
+export interface ValleyUpdate {
+    title: string;
+    description: string;
+    status: string;
+    statusColor: string;
+    mediaUrl?: string; // New field for Image/Video URL
+    mediaType?: 'image' | 'video'; // New field for type
+}
+
+export interface MediaItem {
+    id: string;
+    url: string;
+    name: string;
+    createdAt: string;
+}
+
 interface AppState {
     tables: Table[];
     menu: MenuItem[];
@@ -86,10 +103,11 @@ interface AppState {
     currentTableId: string | null;
     currentUser: User | null;
     reviews: Review[];
-    valleyUpdates: any[];
+    valleyUpdates: ValleyUpdate[];
+    media: MediaItem[]; // New media gallery
     geoRadius: number;
 
-    initialize: () => void; // Changed from Promise<void> to void as listeners are sync setup
+    initialize: () => void;
 
     setTableId: (id: string) => void;
     addTable: (name: string) => Promise<void>;
@@ -104,7 +122,7 @@ interface AppState {
     removeFromCart: (itemId: string) => void;
     clearCart: () => void;
 
-    placeOrder: (customerName: string, tableId?: string) => Promise<void>;
+    placeOrder: (customerName: string, customerPhone: string, tableId?: string) => Promise<void>;
     updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
 
     addNotification: (tableId: string, type: 'call_staff' | 'bill_request') => void;
@@ -117,6 +135,9 @@ interface AppState {
 
     login: (username: string, password: string) => Promise<boolean>;
     updateSettings: (settings: any) => Promise<void>;
+    uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
+    addMediaItem: (url: string, name: string) => Promise<void>;
+    deleteMedia: (id: string) => Promise<void>;
 
     logout: () => void;
 }
@@ -133,6 +154,7 @@ export const useStore = create<AppState>()(
             currentUser: null,
             reviews: [],
             valleyUpdates: [],
+            media: [],
             geoRadius: 5,
 
             initialize: () => {
@@ -171,14 +193,19 @@ export const useStore = create<AppState>()(
                     set({ reviews });
                 });
 
-                // Settings (GeoRadius)
+                // Media Gallery
+                const mediaQuery = query(collection(db, 'settings', 'media', 'library'), orderBy('createdAt', 'desc'));
+                onSnapshot(mediaQuery, (snap) => {
+                    const media = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MediaItem[];
+                    set({ media });
+                });
+
+                // Updates & Global Settings
                 onSnapshot(doc(db, 'settings', 'global'), (doc) => {
                     if (doc.exists()) {
                         set({ geoRadius: doc.data().geoRadius || 5 });
                     }
                 });
-
-                // Valley Updates
                 onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
                     if (doc.exists()) {
                         set({ valleyUpdates: doc.data().list || [] });
@@ -226,7 +253,7 @@ export const useStore = create<AppState>()(
             })),
             clearCart: () => set({ cart: [] }),
 
-            placeOrder: async (customerName, tableId) => {
+            placeOrder: async (customerName, customerPhone, tableId) => {
                 const state = get();
                 const activeTableId = tableId || state.currentTableId;
                 if (state.cart.length === 0 || !activeTableId) return;
@@ -235,6 +262,7 @@ export const useStore = create<AppState>()(
                 const orderData = {
                     tableId: activeTableId,
                     customerName,
+                    customerPhone,
                     items: state.cart,
                     totalAmount: total,
                     status: 'Pending',
@@ -295,6 +323,38 @@ export const useStore = create<AppState>()(
 
             updateSettings: async (settings) => {
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
+            },
+
+            uploadImage: async (file: File, saveToGallery = false) => {
+                // Dynamic import to avoid SSR issues with some firebase modules if any
+                const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+                const { storage } = await import('./firebase');
+
+                const fileRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
+                await uploadBytes(fileRef, file);
+                const url = await getDownloadURL(fileRef);
+
+                if (saveToGallery) {
+                    await addDoc(collection(db, 'settings', 'media', 'library'), {
+                        url,
+                        name: file.name,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                return url;
+            },
+
+            addMediaItem: async (url: string, name: string) => {
+                await addDoc(collection(db, 'settings', 'media', 'library'), {
+                    url,
+                    name,
+                    createdAt: new Date().toISOString()
+                });
+            },
+
+            deleteMedia: async (id: string) => {
+                await deleteDoc(doc(db, 'settings', 'media', 'library', id));
             },
 
             login: async (username, password) => {

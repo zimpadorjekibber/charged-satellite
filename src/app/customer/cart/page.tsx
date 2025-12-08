@@ -55,7 +55,7 @@ export default function CartPage() {
                 useStore.getState().setTableId(tableId);
             }
 
-            await placeOrder(customerName, tableId);
+            await placeOrder(customerName, customerPhone, tableId);
 
             // Verify order was placed (Cart should be empty)
             if (useStore.getState().cart.length === 0) {

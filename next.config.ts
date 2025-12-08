@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'export',
+  trailingSlash: true,
   // @ts-ignore
   turbopack: {
     root: 'c:\\Users\\Asus\\.gemini\\antigravity\\playground\\charged-satellite'

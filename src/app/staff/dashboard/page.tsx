@@ -191,7 +191,8 @@ export default function StaffDashboard() {
                     </div>
                     <div class="meta">
                         KOT #: ${order.id.slice(0, 6)}<br>
-                        Time: ${new Date(order.createdAt).toLocaleString()}
+                        Time: ${new Date(order.createdAt).toLocaleString()}<br>
+                        ${order.customerName ? `Guest: ${order.customerName} ${order.customerPhone ? `<br>Phone: ${order.customerPhone}` : ''}` : ''}
                     </div>
                     <div class="items">
                         ${order.items.map(item => `
@@ -237,7 +238,9 @@ export default function StaffDashboard() {
                         <div style="font-size: 12px; margin-top: 5px;">
                             Date: ${new Date().toLocaleDateString()}<br>
                             Order #: ${order.id.slice(0, 8)}<br>
-                            Table: ${order.tableId}
+                            Table: ${order.tableId}<br>
+                            ${order.customerName ? `Guest: ${order.customerName}<br>` : ''}
+                            ${order.customerPhone ? `Phone: ${order.customerPhone}` : ''}
                         </div>
                     </div>
                     <div class="items">
@@ -532,9 +535,13 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill }: { or
         >
             <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h4 className="font-bold text-white text-xl flex items-center gap-2">
+                    <h4 className="font-bold text-white text-xl flex flex-col sm:flex-row sm:items-center sm:gap-2">
                         {tables.find(t => t.id === order.tableId)?.name || order.tableId}
-                        {order.customerName && <span className="text-sm font-normal text-gray-400">({order.customerName})</span>}
+                        {(order.customerName || order.customerPhone) && (
+                            <span className="text-sm font-normal text-gray-400">
+                                ({order.customerName} {order.customerPhone && <>• {order.customerPhone}</>})
+                            </span>
+                        )}
                     </h4>
                     <p className="text-xs text-gray-500 font-mono mt-1">#{order.id.slice(0, 4)} • {new Date(order.createdAt).toLocaleTimeString()}</p>
                 </div>

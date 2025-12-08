@@ -1,8 +1,7 @@
-
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -27,7 +26,7 @@ export default function AdminDashboard() {
         ? (window.location.hostname === 'localhost' ? 'http://192.168.1.109:3000' : window.location.origin)
         : '';
 
-    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings'>('live');
+    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media'>('live');
 
     // Auth Login State
     const [username, setUsername] = useState('');
@@ -131,9 +130,11 @@ export default function AdminDashboard() {
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => setActiveTab('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => setActiveTab('reviews')} />
                         <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => setActiveTab('settings')} />
+                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('media')} />
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <DbStatusIndicator />
                         {/* ... (Kitchen View and Logout) */}
                         <Link
                             href="/staff/dashboard"
@@ -250,6 +251,87 @@ export default function AdminDashboard() {
                         <AnalyticsView orders={orders} menu={menu} />
                     )}
 
+                    {/* MEDIA GALLERY VIEW */}
+                    {activeTab === 'media' && (
+                        <motion.div
+                            key="media"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                            className="bg-neutral-800 rounded-xl border border-white/5 p-6"
+                        >
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-white">Media Gallery</h2>
+                                    <p className="text-gray-400 text-sm">Upload and manage photos for your menu and updates.</p>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        const url = prompt("Paste the image URL here:");
+                                        if (url) {
+                                            const name = prompt("Give this image a name (optional):") || 'Saved Image';
+                                            // Directly save to firestore "gallery" equivalent
+                                            // We need a store function for this or just hack it here, but store is cleaner.
+                                            // Since we haven't exposed 'addMedia' helper, I'll assume we can call the firestore methods or mock 'upload' for now,
+                                            // BUT wait, we modified 'uploadImage' to SAVE if flag is true.
+                                            // However, 'uploadImage' expects a FILE.
+                                            // We should add a new store method `addMediaLink`.
+                                            // For now, let's just inline the addDoc call since we have imports elsewhere or just add method to store quickly.
+                                            // Actually I can't easily add method to store without reading it again.
+
+                                            // Let's us use the 'uploadImage' but we can't because it takes File.
+                                            // I will instruct user I will add `addMediaItem` to store first.
+                                            // WAIT - I can just use `addDoc` if I import it? No, imports are not top level here.
+                                            // I will just modify the label to be a button that calls a new Store method I will create in next step.
+
+                                            await useStore.getState().addMediaItem(url, name);
+                                        }
+                                    }}
+                                    className="bg-tashi-primary hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center gap-2 transition-colors font-bold shadow-lg"
+                                >
+                                    <Plus size={20} /> Save New Link
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {useStore.getState().media?.length === 0 ? (
+                                    <div className="col-span-full py-20 text-center border-2 border-dashed border-white/10 rounded-xl">
+                                        <p className="text-gray-500 mb-2">No photos in gallery yet.</p>
+                                        <p className="text-xs text-gray-600">Upload photos to use them in your app.</p>
+                                    </div>
+                                ) : (
+                                    useStore.getState().media?.map((item) => (
+                                        <div key={item.id} className="group relative bg-black/20 rounded-lg overflow-hidden border border-white/5 aspect-square">
+                                            <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                                <button
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(item.url);
+                                                        alert('URL Copied!');
+                                                    }}
+                                                    className="bg-white text-black text-xs font-bold px-3 py-2 rounded full-width hover:bg-gray-200"
+                                                >
+                                                    Copy URL
+                                                </button>
+                                                <button
+                                                    onClick={async () => {
+                                                        if (confirm('Delete this image from gallery list? (File remains in storage)')) {
+                                                            await useStore.getState().deleteMedia(item.id);
+                                                        }
+                                                    }}
+                                                    className="bg-red-500/20 text-red-400 border border-red-500/50 p-2 rounded hover:bg-red-500 hover:text-white"
+                                                >
+                                                    <Trash size={16} />
+                                                </button>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1">
+                                                <p className="text-[10px] text-gray-400 truncate">{item.name}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+
                     {/* REVIEWS VIEW (New) */}
                     {activeTab === 'reviews' && (
                         <ReviewsView />
@@ -323,6 +405,43 @@ export default function AdminDashboard() {
                                                     }}
                                                     className="w-full bg-transparent text-xs text-gray-500 focus:outline-none border border-transparent focus:border-white/10 rounded p-1 resize-none h-16"
                                                 />
+                                                {/* Media Inputs */}
+                                                <div className="flex gap-2 items-center border-t border-white/5 pt-2">
+                                                    <select
+                                                        defaultValue={update.mediaType || 'image'}
+                                                        onChange={(e) => {
+                                                            const newUpdates = [...useStore.getState().valleyUpdates];
+                                                            newUpdates[idx].mediaType = e.target.value as any;
+                                                            useStore.getState().saveValleyUpdates(newUpdates);
+                                                        }}
+                                                        className="bg-white/5 text-[10px] text-gray-400 rounded p-1 border border-white/10 w-20"
+                                                    >
+                                                        <option value="image">Image</option>
+                                                        <option value="video">Video</option>
+                                                    </select>
+                                                    <div className="flex-1">
+                                                        <input
+                                                            placeholder="Paste Media Link (URL)..."
+                                                            defaultValue={update.mediaUrl || ''}
+                                                            onBlur={(e) => {
+                                                                const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                newUpdates[idx].mediaUrl = e.target.value;
+                                                                useStore.getState().saveValleyUpdates(newUpdates);
+                                                            }}
+                                                            className="bg-transparent text-[10px] text-blue-400 w-full focus:outline-none focus:border-b border-blue-500"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                {/* Media Preview */}
+                                                {update.mediaUrl && (
+                                                    <div className="w-full h-32 rounded bg-black flex items-center justify-center overflow-hidden">
+                                                        {update.mediaType === 'video' ? (
+                                                            <video src={update.mediaUrl} controls className="h-full max-w-full" />
+                                                        ) : (
+                                                            <img src={update.mediaUrl} className="h-full object-cover" alt="Preview" />
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
 
@@ -335,7 +454,9 @@ export default function AdminDashboard() {
                                                     title: 'New Update',
                                                     status: 'Create',
                                                     statusColor: 'blue',
-                                                    description: 'Description here...'
+                                                    description: 'Description here...',
+                                                    mediaType: 'image',
+                                                    mediaUrl: ''
                                                 };
                                                 useStore.getState().saveValleyUpdates([...currentUpdates, newUpdate]);
                                             }}
@@ -442,6 +563,61 @@ export default function AdminDashboard() {
                             {/* Menu Management */}
                             <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
                                 <h2 className="text-xl font-bold text-white mb-6">Menu Management</h2>
+
+                                {/* Category Management */}
+                                <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-8">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Manage Categories</h3>
+                                            <p className="text-xs text-gray-600 mt-1">Categories are created automatically when you add an item to them.</p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                const cat = prompt("Enter name for new category:");
+                                                if (cat) {
+                                                    const form = document.querySelector('form') as HTMLFormElement; // refined selector if needed
+                                                    if (form) {
+                                                        const catInput = form.elements.namedItem('category') as HTMLInputElement;
+                                                        const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+                                                        if (catInput) catInput.value = cat;
+                                                        if (nameInput) nameInput.focus();
+                                                        alert(`Category "${cat}" selected! Now add the first item below to create it.`);
+                                                        form.scrollIntoView({ behavior: 'smooth' });
+                                                    }
+                                                }
+                                            }}
+                                            className="text-xs bg-tashi-accent text-tashi-dark font-bold px-3 py-2 rounded hover:bg-yellow-400 flex items-center gap-2"
+                                        >
+                                            <Plus size={14} /> Create Category
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        {Array.from(new Set(menu.map(i => i.category))).sort().map(cat => (
+                                            <div key={cat} className="group bg-white/5 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-3">
+                                                <span className="text-white font-bold text-sm">{cat}</span>
+                                                <button
+                                                    onClick={async () => {
+                                                        const newName = prompt(`Rename category "${cat}" to:`, cat);
+                                                        if (!newName || newName === cat) return;
+
+                                                        const itemsToUpdate = menu.filter(i => i.category === cat);
+                                                        if (confirm(`This will move ${itemsToUpdate.length} items from "${cat}" to "${newName}". Continue?`)) {
+                                                            for (const item of itemsToUpdate) {
+                                                                await useStore.getState().updateMenuItem(item.id, { category: newName });
+                                                            }
+                                                            alert('Categories updated!');
+                                                        }
+                                                    }}
+                                                    className="text-xs text-blue-400 hover:text-white px-2 py-1 bg-blue-500/10 hover:bg-blue-500 rounded transition-colors"
+                                                >
+                                                    Rename
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {menu.length === 0 && <span className="text-gray-500 text-sm">No items added yet.</span>}
+                                    </div>
+                                </div>
+
                                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
                                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Add Item</h3>
                                     <form
@@ -457,22 +633,37 @@ export default function AdminDashboard() {
                                                 }
 
                                                 const formData = new FormData(form);
-                                                await useStore.getState().addMenuItem({
-                                                    name: formData.get('name') as string,
-                                                    description: formData.get('description') as string,
-                                                    price: Number(formData.get('price')),
-                                                    category: formData.get('category') as any,
+                                                const priceRaw = formData.get('price');
+                                                const price = priceRaw ? Number(priceRaw) : 0;
+
+                                                // Handle Empty Image URL
+                                                // Handle Image URL - ONLY add if present
+                                                const rawImage = formData.get('image') as string;
+                                                const image = rawImage && rawImage.trim() !== '' ? rawImage.trim() : null;
+
+                                                const newItem: any = {
+                                                    name: (formData.get('name') as string) || 'Unnamed Item',
+                                                    description: (formData.get('description') as string) || '',
+                                                    price: price,
+                                                    category: (formData.get('category') as any) || 'Main Course',
                                                     isVegetarian: formData.get('isVegetarian') === 'on',
                                                     isSpicy: formData.get('isSpicy') === 'on',
-                                                    image: formData.get('image') as string || undefined,
-                                                    available: true // Default to true
-                                                });
+                                                    available: true
+                                                };
+
+                                                if (image) {
+                                                    newItem.image = image;
+                                                }
+
+                                                console.log("Attempting to add item:", newItem); // Debug Log
+
+                                                await useStore.getState().addMenuItem(newItem);
 
                                                 form.reset();
                                                 alert("Item added successfully!");
                                             } catch (err: any) {
                                                 console.error("Add item failed:", err);
-                                                alert("Failed to add item. Please try again. Error: " + err.message);
+                                                alert("Failed to add item. Error: " + err.message);
                                             } finally {
                                                 if (submitBtn) {
                                                     submitBtn.disabled = false;
@@ -498,7 +689,10 @@ export default function AdminDashboard() {
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
                                         </div>
-                                        <input name="image" placeholder="Image URL" className="md:col-span-3 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <div className="md:col-span-3">
+                                            <input name="image" placeholder="Paste Image Link (URL)..." className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                            <p className="text-[10px] text-gray-500 mt-1">Paste a link from Google Drive, Imgur, or another site.</p>
+                                        </div>
                                         <input name="description" required placeholder="Description" className="md:col-span-4 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
                                         <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
                                     </form>
@@ -544,11 +738,13 @@ export default function AdminDashboard() {
                     )}
                 </AnimatePresence>
             </div>
-        </div >
+        </div>
     );
 }
 
-// ... (Other components: TabButton, StatCard, TrashIcon can remain, but I'll add ReviewsView)
+// ----------------------------------------------------------------------
+// HELPER COMPONENTS
+// ----------------------------------------------------------------------
 
 function ReviewsView() {
     const reviews = useStore((state) => state.reviews);
@@ -628,7 +824,6 @@ function ReviewsView() {
         </motion.div>
     );
 }
-
 
 function TabButton({ active, label, icon, onClick }: any) {
     return (
@@ -765,28 +960,28 @@ const handlePrintKOT = (order: any) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`
-            <html>
-            <head>
-                <style>
-                    body { font-family: monospace; padding: 20px; max-width: 300px; margin: 0 auto; background: #fff; }
-                    @media print { .no-print { display: none; } }
-                    .btn { display: block; width: 100%; padding: 10px; margin-top: 10px; text-align: center; border: none; cursor: pointer; font-weight: bold; }
-                    .btn-print { bg-black; color: white; background: #000; }
-                    .btn-close { background: #eee; color: #333; }
-                </style>
-            </head>
-            <body>
-                <div style="text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;"><h2>KOT</h2><h3>${order.tableId}</h3></div>
-                <p>Order #${order.id.slice(0, 6)}<br>${new Date().toLocaleString()}</p>
-                ${order.items.map((i: any) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span><b>${i.quantity}x</b> ${i.name}</span></div>`).join('')}
-                
-                <div class="no-print" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
-                    <button class="btn btn-print" onclick="window.print()">Print Ticket</button>
-                    <button class="btn btn-close" onclick="window.close()">Close Window</button>
-                </div>
-            </body>
-            </html>
-            `);
+    <html>
+        <head>
+            <style>
+                body { font-family: monospace; padding: 20px; max-width: 300px; margin: 0 auto; background: #fff; }
+                @media print { .no-print { display: none; } }
+                .btn { display: block; width: 100%; padding: 10px; margin-top: 10px; text-align: center; border: none; cursor: pointer; font-weight: bold; }
+                .btn-print { background: #000; color: white; }
+                .btn-close { background: #eee; color: #333; }
+            </style>
+        </head>
+        <body>
+            <div style="text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;"><h2>KOT</h2><h3>${order.tableId}</h3></div>
+            <p>Order #${order.id.slice(0, 6)}<br>${new Date().toLocaleString()}</p>
+            ${order.items.map((i: any) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span><b>${i.quantity}x</b> ${i.name}</span></div>`).join('')}
+
+            <div class="no-print" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+                <button class="btn btn-print" onclick="window.print()">Print Ticket</button>
+                <button class="btn btn-close" onclick="window.close()">Close Window</button>
+            </div>
+        </body>
+    </html>
+    `);
     printWindow.document.close();
 };
 
@@ -796,34 +991,61 @@ const handlePrintBill = (order: any) => {
     const total = order.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
 
     printWindow.document.write(`
-            <html>
-            <head>
-                <style>
-                    body { font-family: sans-serif; padding: 20px; max-width: 300px; margin: 0 auto; background: #fff; }
-                    @media print { .no-print { display: none; } }
-                    .btn { display: block; width: 100%; padding: 10px; margin-top: 10px; text-align: center; border: none; cursor: pointer; font-weight: bold; }
-                    .btn-print { bg-black; color: white; background: #000; }
-                    .btn-close { background: #eee; color: #333; }
-                </style>
-            </head>
-            <body>
-                <div style="text-align:center;border-bottom:1px solid #ccc;padding-bottom:10px;"><h2>TashiZom</h2><p>Bill #${order.id.slice(0, 6)}</p></div>
-                <div style="margin:20px 0;">
-                    ${order.items.map((i: any) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${i.quantity}x ${i.name}</span><span>₹${i.price * i.quantity}</span></div>`).join('')}
-                </div>
-                <div style="border-top:1px solid #000;padding-top:10px;">
-                    <div style="display:flex;justify-content:space-between;font-weight:bold;margin-top:10px;"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
-                </div>
+    <html>
+        <head>
+            <style>
+                body { font-family: sans-serif; padding: 20px; max-width: 300px; margin: 0 auto; background: #fff; }
+                @media print { .no-print { display: none; } }
+                .btn { display: block; width: 100%; padding: 10px; margin-top: 10px; text-align: center; border: none; cursor: pointer; font-weight: bold; }
+                .btn-print { background: #000; color: white; }
+                .btn-close { background: #eee; color: #333; }
+            </style>
+        </head>
+        <body>
+            <div style="text-align:center;border-bottom:1px solid #ccc;padding-bottom:10px;"><h2>TashiZom</h2><p>Bill #${order.id.slice(0, 6)}</p></div>
+            <div style="margin:20px 0;">
+                ${order.items.map((i: any) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${i.quantity}x ${i.name}</span><span>₹${i.price * i.quantity}</span></div>`).join('')}
+            </div>
+            <div style="border-top:1px solid #000;padding-top:10px;display:flex;justify-content:space-between;font-weight:bold;font-size:18px;"><span>Total</span><span>₹${total}</span></div>
+            <p style="text-align:center;margin-top:20px;font-size:12px;">Thank you for dining with us!</p>
 
-                <div class="no-print" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
-                    <button class="btn btn-print" onclick="window.print()">Print Bill</button>
-                    <button class="btn btn-close" onclick="window.close()">Close Window</button>
-                </div>
-            </body>
-            </html>
-            `);
+            <div class="no-print" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+                <button class="btn btn-print" onclick="window.print()">Print Bill</button>
+                <button class="btn btn-close" onclick="window.close()">Close Window</button>
+            </div>
+        </body>
+    </html>
+    `);
     printWindow.document.close();
 };
+
+const DbStatusIndicator = () => {
+    const [status, setStatus] = useState<'checking' | 'connected' | 'error'>('checking');
+    const [msg, setMsg] = useState('');
+
+    useEffect(() => {
+        const check = async () => {
+            try {
+                // Try writing a dummy doc
+                const { collection, addDoc, deleteDoc } = await import('firebase/firestore');
+                const { db } = await import('@/lib/firebase');
+                const ref = await addDoc(collection(db, '_health'), { t: Date.now() });
+                await deleteDoc(ref);
+                setStatus('connected');
+            } catch (e: any) {
+                console.error(e);
+                setStatus('error');
+                setMsg(e.message);
+            }
+        };
+        check();
+    }, []);
+
+    if (status === 'connected') return <div className="text-green-500 text-xs font-bold flex items-center gap-1">● DB Online</div>;
+    if (status === 'error') return <div title={msg} className="text-red-500 text-xs font-bold flex items-center gap-1 cursor-help">● DB Error</div>;
+    return <div className="text-yellow-500 text-xs font-bold flex items-center gap-1">● Checking DB...</div>;
+};
+
 
 function AdminOrderCard({ order }: { order: any }) {
     const tables = useStore((state) => state.tables);
@@ -831,11 +1053,18 @@ function AdminOrderCard({ order }: { order: any }) {
 
     return (
         <div className="bg-neutral-800 p-4 rounded-xl border border-white/5">
-            <div className="flex justify-between mb-4">
-                <h4 className="font-bold text-white text-lg">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</h4>
+            <div className="flex justify-between mb-2">
+                <div>
+                    <h4 className="font-bold text-white text-lg">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</h4>
+                    {(order.customerName || order.customerPhone) && (
+                        <p className="text-xs text-tashi-accent font-mono">
+                            {order.customerName} {order.customerPhone && `• ${order.customerPhone}`}
+                        </p>
+                    )}
+                </div>
                 <StatusBadge status={order.status} />
             </div>
-            <div className="space-y-1 mb-4">
+            <div className="space-y-1 mb-4 border-t border-white/5 pt-2 mt-2">
                 {order.items.map((item: any, idx: number) => (
                     <div key={idx} className="flex justify-between text-gray-300 text-sm">
                         <span>{item.quantity}x {item.name}</span>
