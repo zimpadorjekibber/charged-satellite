@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "title": "Road Status: Check Post",
+    "status": "Closed",
+    "statusColor": "red",
+    "description": "Manali to Kaza road is now closed for all types of vehicles"
+  },
+  {
+    "id": "2",
+    "title": "Wildlife Alert",
+    "status": "Sighting",
+    "statusColor": "blue",
+    "description": "Snow Leopard Sighting operation will start from January to March End.. "
+  }
+]

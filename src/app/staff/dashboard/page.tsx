@@ -1,0 +1,604 @@
+'use client';
+
+import { useStore, Order, OrderStatus } from '@/lib/store';
+import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+
+export default function StaffDashboard() {
+    const orders = useStore((state) => state.orders);
+    const tables = useStore((state) => state.tables);
+    const notifications = useStore((state) => state.notifications);
+    const updateOrderStatus = useStore((state) => state.updateOrderStatus);
+    const resolveNotification = useStore((state) => state.resolveNotification);
+
+    // Auth
+    const currentUser = useStore((state) => state.currentUser);
+    const login = useStore((state) => state.login);
+    const logout = useStore((state) => state.logout);
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    // Sound & Visual Notification Logic
+    const [prevPendingCount, setPrevPendingCount] = useState(0);
+    const [showVisualAlert, setShowVisualAlert] = useState(false);
+
+    // Filter unresolved notifications
+    const activeNotifications = (notifications || []).filter((n) => n.status === 'pending');
+    // Sort orders: Newest first
+    const activeOrders = [...(orders || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Calculate Daily Stats
+    const today = new Date().toDateString();
+    const todaysOrders = (orders || []).filter(o => new Date(o.createdAt).toDateString() === today);
+    const dailyRevenue = todaysOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    const pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending').length;
+
+    const audioCtxRef = useRef<any>(null);
+
+    // Initialize Audio Context on user interaction
+    useEffect(() => {
+        const initAudio = () => {
+            if (!audioCtxRef.current) {
+                const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+                if (AudioContext) {
+                    audioCtxRef.current = new AudioContext();
+                }
+            }
+            if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+                audioCtxRef.current.resume().catch(console.error);
+            }
+        };
+
+        window.addEventListener('click', initAudio);
+        window.addEventListener('keydown', initAudio);
+        return () => {
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
+    }, []);
+
+    const playNotificationSound = () => {
+        try {
+            if (!audioCtxRef.current) {
+                const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+                if (AudioContext) audioCtxRef.current = new AudioContext();
+            }
+
+            const ctx = audioCtxRef.current;
+            if (!ctx) return;
+
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+
+            // Simple robust beep pattern
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.5);
+
+            gain.gain.setValueAtTime(1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.5);
+
+            // Double beep
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(800, ctx.currentTime);
+                osc2.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.5);
+                gain2.gain.setValueAtTime(1, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.5);
+            }, 600);
+
+        } catch (e) {
+            console.error("Audio play failed", e);
+        }
+    };
+
+    const isFirstMountOrders = useRef(true);
+    // Monitor for new pending orders
+    useEffect(() => {
+        if (isFirstMountOrders.current) {
+            isFirstMountOrders.current = false;
+            setPrevPendingCount(pendingOrdersCount);
+            return;
+        }
+
+        if (pendingOrdersCount > prevPendingCount) {
+            playNotificationSound();
+            setShowVisualAlert(true);
+            setTimeout(() => setShowVisualAlert(false), 3000);
+        }
+        setPrevPendingCount(pendingOrdersCount);
+    }, [pendingOrdersCount]);
+
+    // Monitor for new notifications
+    const [prevNotifCount, setPrevNotifCount] = useState(0);
+    const activeNotifCount = activeNotifications.length;
+    const isFirstMountNotifs = useRef(true);
+
+    useEffect(() => {
+        if (isFirstMountNotifs.current) {
+            isFirstMountNotifs.current = false;
+            setPrevNotifCount(activeNotifCount);
+            return;
+        }
+
+        if (activeNotifCount > prevNotifCount) {
+            playNotificationSound();
+        }
+        setPrevNotifCount(activeNotifCount);
+    }, [activeNotifCount]);
+
+    const initialize = useStore((state) => state.initialize);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            initialize();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [initialize]);
+
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        const success = await login(username, password);
+        if (success) {
+            // Logged in
+        } else {
+            setError('Invalid credentials');
+        }
+    };
+
+    const handlePrintKOT = (order: Order) => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <style>
+                        body { font-family: monospace; width: 300px; margin: 0 auto; padding: 20px; }
+                        .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+                        .item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+                        .meta { font-size: 12px; margin-bottom: 15px; }
+                        .qty { font-weight: bold; margin-right: 10px; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>KOT</h2>
+                        <h3>${order.tableId}</h3>
+                    </div>
+                    <div class="meta">
+                        KOT #: ${order.id.slice(0, 6)}<br>
+                        Time: ${new Date(order.createdAt).toLocaleString()}
+                    </div>
+                    <div class="items">
+                        ${order.items.map(item => `
+                    <div class="item">
+                        <span><span class="qty">${item.quantity}x</span> ${item.name}</span>
+                    </div>
+                `).join('')}
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); window.close(); }
+                    </script>
+                </body>
+            </html>
+            `);
+        printWindow.document.close();
+    };
+
+    const handlePrintBill = (order: Order) => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const rawTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+        const finalTotal = rawTotal;
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <style>
+                        body { font-family: sans-serif; width: 300px; margin: 0 auto; padding: 20px; }
+                        .header { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+                        .store-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+                        .totals { margin-top: 15px; border-top: 1px solid #000; padding-top: 10px; }
+                        .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+                        .grand { font-weight: bold; font-size: 16px; margin-top: 10px; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="store-name">TashiZom</div>
+                        <div style="font-size: 12px;">Multi-Cuisine Restaurant</div>
+                        <div style="font-size: 12px; margin-top: 5px;">
+                            Date: ${new Date().toLocaleDateString()}<br>
+                            Order #: ${order.id.slice(0, 8)}<br>
+                            Table: ${order.tableId}
+                        </div>
+                    </div>
+                    <div class="items">
+                        ${order.items.map(item => `
+                    <div class="item">
+                        <span>${item.quantity} x ${item.name}</span>
+                        <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                    </div>
+                    <div class="totals">
+                        <div class="row grand"><span>Total</span><span>₹${finalTotal.toFixed(2)}</span></div>
+                    </div>
+                    <div class="footer">
+                        Thank you for visiting!<br>
+                        Please come again.
+                    </div>
+                    <script>
+                        // Auto print
+                        setTimeout(() => { window.print(); }, 500);
+                    </script>
+                </body>
+            </html>
+            `);
+        printWindow.document.close();
+    };
+
+    if (!currentUser || (currentUser.role !== 'staff' && currentUser.role !== 'admin')) {
+        return (
+            <div className="min-h-screen bg-tashi-darker flex flex-col items-center justify-center p-6">
+                <Link href="/" className="absolute top-8 left-8 text-gray-500 hover:text-white transition-colors flex items-center gap-2">
+                    <ArrowLeft size={20} /> Back
+                </Link>
+                <div className="w-full max-w-md bg-white/5 border border-white/5 p-8 rounded-2xl backdrop-blur-xl">
+                    <div className="flex justify-center mb-6">
+                        <div className="p-4 bg-blue-500/20 rounded-full text-blue-400">
+                            <ChefHat size={32} />
+                        </div>
+                    </div>
+                    <h1 className="text-2xl font-bold text-white text-center mb-2">Staff Portal</h1>
+                    <p className="text-gray-400 text-center mb-8 text-sm">Kitchen & Service Access</p>
+
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Staff ID</label>
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                placeholder="e.g. tenzin"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                placeholder="••••••••"
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all active:scale-95 shadow-lg shadow-blue-900/20"
+                        >
+                            Login
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                const s = await useStore.getState().login(username, password);
+                                if (s) window.location.reload();
+                                else setError("Manual Login Failed");
+                            }}
+                            className="w-full bg-gray-700 text-white text-xs py-2 rounded mt-2"
+                        >
+                            Force Login (Debug)
+                        </button>
+                    </form>
+
+                    <div className="mt-8 pt-6 border-t border-white/5 text-center">
+                        <p className="text-xs text-gray-500">Authorized Personnel Only</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+
+    return (
+        <div className="space-y-8 max-w-[1600px] mx-auto relative px-6 py-6 text-white min-h-screen">
+            <AnimatePresence>
+                {showVisualAlert && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-tashi-accent/20 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.5 }}
+                            animate={{ scale: 1.2 }}
+                            exit={{ scale: 0.5 }}
+                            transition={{ type: 'spring', damping: 10 }}
+                            className="bg-tashi-accent text-tashi-dark font-black text-6xl md:text-8xl px-12 py-8 rounded-3xl shadow-2xl border-4 border-white transform rotate-[-5deg]"
+                        >
+                            NEW ORDER!
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div className="flex flex-col md:flex-row justify-between items-center bg-white/5 p-4 rounded-2xl backdrop-blur-md border border-white/5 mx-1 gap-4 md:gap-0">
+                <h1 className="text-2xl font-bold text-white font-serif flex items-center gap-3">
+                    <div className="p-2 bg-tashi-accent/20 rounded-lg text-tashi-accent">
+                        <ChefHat size={24} />
+                    </div>
+                    Kitchen Display System
+                </h1>
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold border border-tashi-accent bg-tashi-accent/10 text-tashi-accent select-none cursor-default">
+                        <Bell size={16} className="animate-pulse" />
+                        <span>Sound ACTIVE</span>
+                    </div>
+
+                    <div className="flex gap-4 text-sm font-mono bg-black/20 px-4 py-2 rounded-lg border border-white/5">
+                        <span className="text-gray-400">
+                            Today's Orders: <strong className="text-white">{todaysOrders.length}</strong>
+                        </span>
+                        <div className="w-px h-4 bg-white/10" />
+                        <span className="text-gray-400">
+                            Sales: <strong className="text-tashi-accent">₹{dailyRevenue.toLocaleString()}</strong>
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 pl-6 border-l border-white/10">
+                        <div className="flex flex-col items-end mr-2">
+                            <span className="text-sm font-bold text-white hidden sm:inline">{currentUser?.name}</span>
+                            {currentUser?.serialNumber && (
+                                <span className="text-[10px] bg-white/10 px-1.5 rounded text-tashi-accent font-mono">{currentUser.serialNumber}</span>
+                            )}
+                        </div>
+                    </div>
+                    <button
+                        onClick={logout}
+                        className="p-2 bg-white/5 hover:bg-red-900/40 text-gray-400 hover:text-red-400 rounded-lg transition-colors"
+                        title="Logout"
+                    >
+                        <LogOut size={18} />
+                    </button>
+                </div>
+            </div>
+
+            <AnimatePresence>
+                {activeNotifications.length > 0 && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
+                        <h2 className="text-red-400 font-bold flex items-center gap-2 mb-4 text-lg">
+                            <Bell className="animate-bounce" /> Attention Required ({activeNotifications.length})
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {activeNotifications.map((notif) => (
+                                <motion.div
+                                    key={notif.id}
+                                    layout
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0.9, opacity: 0 }}
+                                    className="bg-neutral-900 border border-red-500/50 p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/10 group"
+                                >
+                                    <div>
+                                        <p className="font-bold text-white text-xl">{notif.tableId}</p>
+                                        <p className="text-red-400 text-sm uppercase font-bold tracking-wide">
+                                            {notif.type === 'call_staff' ? 'Call Service' : 'Bill Request'}
+                                        </p>
+                                        <p className="text-gray-500 text-xs mt-1 font-mono">{new Date(notif.createdAt).toLocaleTimeString()}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => resolveNotification(notif.id)}
+                                        className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg transition-all shadow-md active:scale-95"
+                                    >
+                                        <Check size={24} />
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-280px)] overflow-hidden">
+                <StatusColumn
+                    title="Pending"
+                    icon={<Clock size={20} />}
+                    color="text-yellow-400"
+                    bgColor="bg-yellow-400/5"
+                    borderColor="border-yellow-400/20"
+                    orders={activeOrders.filter(o => o.status === 'Pending')}
+                    onUpdateStatus={updateOrderStatus}
+                    handlePrintKOT={handlePrintKOT}
+                    handlePrintBill={handlePrintBill}
+                />
+                <StatusColumn
+                    title="Cooking"
+                    icon={<Utensils size={20} />}
+                    color="text-blue-400"
+                    bgColor="bg-blue-400/5"
+                    borderColor="border-blue-400/20"
+                    orders={activeOrders.filter(o => o.status === 'Preparing')}
+                    onUpdateStatus={updateOrderStatus}
+                    handlePrintKOT={handlePrintKOT}
+                    handlePrintBill={handlePrintBill}
+                />
+                <StatusColumn
+                    title="Ready to Serve"
+                    icon={<CheckCircle2 size={20} />}
+                    color="text-green-400"
+                    bgColor="bg-green-400/5"
+                    borderColor="border-green-400/20"
+                    orders={activeOrders.filter(o => o.status === 'Served')}
+                    onUpdateStatus={updateOrderStatus}
+                    handlePrintKOT={handlePrintKOT}
+                    handlePrintBill={handlePrintBill}
+                />
+            </div>
+        </div>
+    );
+}
+
+function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill }: any) {
+    return (
+        <div className={`glass-card rounded-2xl flex flex-col h-full border ${borderColor} ${bgColor}`}>
+            <div className={`flex items-center gap-3 p-4 border-b ${borderColor} ${color}`}>
+                {icon}
+                <h3 className="font-bold text-lg tracking-wide uppercase">{title}</h3>
+                <span className="ml-auto bg-white/10 px-3 py-1 rounded-full text-sm font-mono text-white">
+                    {orders.length}
+                </span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <AnimatePresence mode="popLayout">
+                    {orders.map((order: Order) => (
+                        <StaffOrderCard
+                            key={order.id}
+                            order={order}
+                            onUpdateStatus={(s) => onUpdateStatus(order.id, s)}
+                            onPrintKOT={() => handlePrintKOT(order)}
+                            onPrintBill={() => handlePrintBill(order)}
+                        />
+                    ))}
+                </AnimatePresence>
+
+                {orders.length === 0 && (
+                    <div className="text-center py-10 opacity-30">
+                        <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            {icon}
+                        </div>
+                        <p className="font-mono text-sm">No orders</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void }) {
+    const tables = useStore((state) => state.tables);
+
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-neutral-800 p-5 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group"
+        >
+            <div className="flex justify-between items-start mb-4">
+                <div>
+                    <h4 className="font-bold text-white text-xl flex items-center gap-2">
+                        {tables.find(t => t.id === order.tableId)?.name || order.tableId}
+                        {order.customerName && <span className="text-sm font-normal text-gray-400">({order.customerName})</span>}
+                    </h4>
+                    <p className="text-xs text-gray-500 font-mono mt-1">#{order.id.slice(0, 4)} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-tashi-accent font-bold text-lg">₹{order.totalAmount}</p>
+                </div>
+            </div>
+
+            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 -mx-5 px-5">
+                {order.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-base text-gray-300 items-center">
+                        <span className="flex items-center gap-2">
+                            <span className="flex items-center justify-center w-6 h-6 bg-white/10 rounded text-xs font-bold text-white">{item.quantity}</span>
+                            {item.name}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                    <button
+                        onClick={onPrintKOT}
+                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all"
+                    >
+                        🖨️ KOT
+                    </button>
+                    <button
+                        onClick={onPrintBill}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-purple-900/20 active:scale-95 transition-all"
+                    >
+                        🧾 Bill
+                    </button>
+                </div>
+
+                <div className="flex gap-2">
+                    {order.status === 'Pending' && (
+                        <div className="flex gap-2 flex-1">
+                            <button
+                                onClick={() => onUpdateStatus('Rejected')}
+                                className="flex-1 bg-red-900/40 hover:bg-red-900/60 border border-red-900 text-red-400 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95"
+                            >
+                                Reject
+                            </button>
+                            <button
+                                onClick={() => onUpdateStatus('Preparing')}
+                                className="flex-[2] bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-green-900/20"
+                            >
+                                Accept Order
+                            </button>
+                        </div>
+                    )}
+                    {order.status === 'Preparing' && (
+                        <button onClick={() => onUpdateStatus('Served')} className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-green-900/20">
+                            Mark Ready
+                        </button>
+                    )}
+                    {order.status === 'Served' && (
+                        <button onClick={() => onUpdateStatus('Paid')} className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95">
+                            Close Order
+                        </button>
+                    )}
+                </div>
+            </div>
+        </motion.div>
+    );
+}
