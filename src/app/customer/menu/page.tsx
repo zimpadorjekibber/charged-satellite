@@ -84,56 +84,55 @@ export default function MenuPage() {
 
     return (
         <div className="pb-24 pointer-events-auto">
-            {/* Call Staff Button & Feedback... (rest of the component structure remains similar) */}
-            <div className="fixed bottom-44 left-6 z-[100] flex flex-col items-center gap-2 pointer-events-auto">
-                <Link href="/customer/feedback">
+            {/* Bottom Action Bar - Horizontal */}
+            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl border-t border-white/10 pointer-events-auto">
+                <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
+                    {/* Call Staff Button */}
                     <motion.button
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="w-12 h-12 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-xl border border-white/10 bg-neutral-800 text-white hover:bg-neutral-700 shadow-black/50"
+                        onClick={handleCallStaff}
+                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all ${hasPendingCall
+                            ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/40'
+                            : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
+                            }`}
                     >
-                        <Newspaper size={20} />
+                        {hasPendingCall ? <X size={24} /> : <Phone size={24} />}
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            {hasPendingCall ? 'Cancel' : 'Call Staff'}
+                        </span>
                     </motion.button>
-                </Link>
-                <span className="text-[10px] uppercase tracking-wider font-bold bg-black/80 text-white px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
-                    Rate Us
-                </span>
-            </div>
 
-            {/* Contact Us Button */}
-            <div className="fixed bottom-64 left-6 z-[100] flex flex-col items-center gap-2 pointer-events-auto">
-                <motion.button
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setShowContactInfo(true)}
-                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-xl border border-white/10 bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/40"
-                >
-                    <Info size={20} />
-                </motion.button>
-                <span className="text-[10px] uppercase tracking-wider font-bold bg-black/80 text-white px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
-                    Contact
-                </span>
-            </div>
+                    {/* Contact Button */}
+                    <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowContactInfo(true)}
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 border border-blue-400/30 shadow-lg shadow-blue-500/40 transition-all"
+                    >
+                        <Info size={24} />
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            Contact
+                        </span>
+                    </motion.button>
 
-            {/* Call Staff Button */}
-            <div className="fixed bottom-24 left-6 z-[100] flex flex-col items-center gap-2 pointer-events-auto">
-                <motion.button
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={handleCallStaff}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-xl border border-white/10 transition-all ${hasPendingCall
-                        ? 'bg-red-500 text-white animate-pulse shadow-red-500/40' // Red for Cancel
-                        : 'bg-neutral-800 text-white hover:bg-neutral-700 shadow-black/50'
-                        }`}
-                >
-                    {hasPendingCall ? <div className="font-bold text-xs">X</div> : <Phone size={24} />}
-                </motion.button>
-                <span className="text-[10px] uppercase tracking-wider font-bold bg-black/80 text-white px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
-                    {hasPendingCall ? 'Cancel Call' : 'Call Staff'}
-                </span>
+                    {/* Rate Us Button */}
+                    <Link href="/customer/feedback">
+                        <motion.button
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 transition-all"
+                        >
+                            <Newspaper size={24} />
+                            <span className="text-[10px] uppercase tracking-wider font-bold">
+                                Rate Us
+                            </span>
+                        </motion.button>
+                    </Link>
+                </div>
             </div>
 
             {/* Mini Timer for Active Orders */}
