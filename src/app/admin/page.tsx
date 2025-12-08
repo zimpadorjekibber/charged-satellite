@@ -445,21 +445,40 @@ export default function AdminDashboard() {
                                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
                                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Add Item</h3>
                                     <form
-                                        onSubmit={(e) => {
+                                        onSubmit={async (e) => {
                                             e.preventDefault();
                                             const form = e.target as HTMLFormElement;
-                                            const formData = new FormData(form);
-                                            useStore.getState().addMenuItem({
-                                                name: formData.get('name') as string,
-                                                description: formData.get('description') as string,
-                                                price: Number(formData.get('price')),
-                                                category: formData.get('category') as any,
-                                                isVegetarian: formData.get('isVegetarian') === 'on',
-                                                isSpicy: formData.get('isSpicy') === 'on',
-                                                image: formData.get('image') as string || undefined,
-                                                available: true // Default to true
-                                            });
-                                            form.reset();
+                                            const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+                                            try {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = true;
+                                                    submitBtn.textContent = 'Adding...';
+                                                }
+
+                                                const formData = new FormData(form);
+                                                await useStore.getState().addMenuItem({
+                                                    name: formData.get('name') as string,
+                                                    description: formData.get('description') as string,
+                                                    price: Number(formData.get('price')),
+                                                    category: formData.get('category') as any,
+                                                    isVegetarian: formData.get('isVegetarian') === 'on',
+                                                    isSpicy: formData.get('isSpicy') === 'on',
+                                                    image: formData.get('image') as string || undefined,
+                                                    available: true // Default to true
+                                                });
+
+                                                form.reset();
+                                                alert("Item added successfully!");
+                                            } catch (err: any) {
+                                                console.error("Add item failed:", err);
+                                                alert("Failed to add item. Please try again. Error: " + err.message);
+                                            } finally {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = false;
+                                                    submitBtn.textContent = 'Add Item';
+                                                }
+                                            }
                                         }}
                                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
                                     >
