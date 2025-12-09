@@ -323,31 +323,6 @@ export default function MenuPage() {
                             </div>
                         </div>
 
-                        {/* Scrolling News Ticker */}
-                        <div className="bg-gradient-to-r from-red-900/20 via-red-800/20 to-red-900/20 rounded-xl mb-4 overflow-hidden border border-red-500/20 relative">
-                            <div className="flex items-center py-2 px-3">
-                                <div className="bg-red-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded flex-shrink-0 mr-3 shadow-lg">
-                                    Breaking
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                    <div className="animate-marquee whitespace-nowrap inline-block">
-                                        {valleyUpdates.map((update, idx) => (
-                                            <span key={idx} className="text-sm text-gray-200 font-medium mr-12">
-                                                <span className="text-tashi-accent font-bold">•</span> {update.title}
-                                                {update.description && <span className="text-gray-400"> - {update.description}</span>}
-                                            </span>
-                                        ))}
-                                        {/* Duplicate for seamless loop */}
-                                        {valleyUpdates.map((update, idx) => (
-                                            <span key={`dup-${idx}`} className="text-sm text-gray-200 font-medium mr-12">
-                                                <span className="text-tashi-accent font-bold">•</span> {update.title}
-                                                {update.description && <span className="text-gray-400"> - {update.description}</span>}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Consolidated card with all updates as bullets */}
                         <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
@@ -381,9 +356,9 @@ export default function MenuPage() {
                                                 animate={{ scale: [1, 1.3, 1] }}
                                                 transition={{ duration: 2, repeat: Infinity, delay: idx * 0.2 }}
                                                 className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
-                                                        update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
-                                                            update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
-                                                                'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
+                                                    update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
+                                                        update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
+                                                            'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
                                                     }`}
                                             />
                                         </div>
@@ -397,9 +372,9 @@ export default function MenuPage() {
                                                 </p>
                                                 {update.status && update.status.toLowerCase() !== 'create' && (
                                                     <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
-                                                            update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-                                                                update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
-                                                                    'bg-gray-500/20 text-gray-400'
+                                                        update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                                                            update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
+                                                                'bg-gray-500/20 text-gray-400'
                                                         }`}>
                                                         {update.status}
                                                     </span>
