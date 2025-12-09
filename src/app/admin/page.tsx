@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -32,6 +32,7 @@ export default function AdminDashboard() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [editingItem, setEditingItem] = useState<any>(null); // State for editing item
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -792,11 +793,99 @@ export default function AdminDashboard() {
                                                 >
                                                     {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
                                                 </button>
+                                                <button onClick={() => setEditingItem(item)} className="text-blue-400 hover:text-white hover:bg-blue-500/20 p-2 rounded transition-colors"><Pencil size={16} /></button>
                                                 <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors"><TrashIcon /></button>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* EDIT ITEM MODAL */}
+                                {editingItem && (
+                                    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                            <button
+                                                onClick={() => setEditingItem(null)}
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                                            >
+                                                <X size={24} />
+                                            </button>
+
+                                            <h2 className="text-xl font-bold text-white mb-6">Edit Item</h2>
+
+                                            <form
+                                                onSubmit={async (e) => {
+                                                    e.preventDefault();
+                                                    const form = e.target as HTMLFormElement;
+                                                    const formData = new FormData(form);
+
+                                                    const updates: any = {
+                                                        name: formData.get('name'),
+                                                        price: Number(formData.get('price')),
+                                                        category: formData.get('category'),
+                                                        description: formData.get('description'),
+                                                        image: formData.get('image'),
+                                                        isVegetarian: formData.get('isVegetarian') === 'on',
+                                                        isSpicy: formData.get('isSpicy') === 'on',
+                                                    };
+
+                                                    await useStore.getState().updateMenuItem(editingItem.id, updates);
+                                                    setEditingItem(null);
+                                                    alert('Item updated successfully!');
+                                                }}
+                                                className="space-y-4"
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
+                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price</label>
+                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
+                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    <datalist id="category-list-edit">
+                                                        {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                            <option key={c} value={c} />
+                                                        ))}
+                                                    </datalist>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
+                                                    <input name="image" defaultValue={editingItem.image} placeholder="Paste new image URL here to fix mismatch" className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    <p className="text-[10px] text-yellow-500/70 mt-1">💡 To fix a mismatched image, paste the correct Unsplash or Google image link here.</p>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
+                                                </div>
+
+                                                <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
+                                                        <span>Vegetarian</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
+                                                        <span>Spicy</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
+                                                    <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     )}

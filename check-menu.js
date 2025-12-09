@@ -3,13 +3,12 @@ const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs } = require('firebase/firestore');
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCW1Vb_w8tAqbCNlbYR2WHZLdqLYWs-dvY",
-    authDomain: "tashizom.firebaseapp.com",
-    projectId: "tashizom",
-    storageBucket: "tashizom.firebasestorage.app",
-    messagingSenderId: "1059551779677",
-    appId: "1:1059551779677:web:67e12f3c8fdd6c29071d21",
-    measurementId: "G-HQHVZHMWZR"
+    apiKey: "AIzaSyAi2CbAp5-FvhVZ0FT5pVL4vXc5q4xK-W0",
+    authDomain: "charged-satellite-zimpad.firebaseapp.com",
+    projectId: "charged-satellite-zimpad",
+    storageBucket: "charged-satellite-zimpad.firebasestorage.app",
+    messagingSenderId: "410941736916",
+    appId: "1:410941736916:web:c1727d34a3ef71c3a93841"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -22,6 +21,7 @@ async function checkMenu() {
         let totalItems = 0;
         let itemsWithImages = 0;
         const categories = {};
+        const imageUsage = {}; // Track image usage
 
         menuSnapshot.forEach(doc => {
             const data = doc.data();
@@ -29,6 +29,11 @@ async function checkMenu() {
 
             if (data.image && data.image.length > 0) {
                 itemsWithImages++;
+                // Track duplicate images
+                if (!imageUsage[data.image]) {
+                    imageUsage[data.image] = [];
+                }
+                imageUsage[data.image].push(data.name);
             }
 
             if (!categories[data.category]) {
@@ -47,7 +52,17 @@ async function checkMenu() {
         console.log(`🖼️  Items with Images: ${itemsWithImages}`);
         console.log(`📦 Items without Images: ${totalItems - itemsWithImages}\n`);
 
-        console.log('📂 BY CATEGORY:');
+        console.log('⚠️  POTENTIAL MISMATCHES (Duplicate Images):');
+        let mismatchCount = 0;
+        Object.entries(imageUsage).forEach(([url, items]) => {
+            if (items.length > 1) {
+                mismatchCount++;
+                console.log(`   🔸 Image used by ${items.length} items: ${items.join(', ')}`);
+            }
+        });
+        if (mismatchCount === 0) console.log('   ✅ No duplicate images found.');
+
+        console.log('\n📂 BY CATEGORY:');
         console.log('-'.repeat(70));
 
         Object.keys(categories).sort().forEach(cat => {

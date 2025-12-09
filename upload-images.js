@@ -7,13 +7,12 @@ const path = require('path');
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCW1Vb_w8tAqbCNlbYR2WHZLdqLYWs-dvY",
-    authDomain: "tashizom.firebaseapp.com",
-    projectId: "tashizom",
-    storageBucket: "tashizom.firebasestorage.app",
-    messagingSenderId: "1059551779677",
-    appId: "1:1059551779677:web:67e12f3c8fdd6c29071d21",
-    measurementId: "G-HQHVZHMWZR"
+    apiKey: "AIzaSyAi2CbAp5-FvhVZ0FT5pVL4vXc5q4xK-W0",
+    authDomain: "charged-satellite-zimpad.firebaseapp.com",
+    projectId: "charged-satellite-zimpad",
+    storageBucket: "charged-satellite-zimpad.firebasestorage.app",
+    messagingSenderId: "410941736916",
+    appId: "1:410941736916:web:c1727d34a3ef71c3a93841"
 };
 
 // Initialize Firebase
@@ -22,7 +21,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Image directory (update this path to where your images are saved)
-const IMAGE_DIR = 'C:/Users/Asus/.gemini/antigravity/brain/f29d6c12-c89f-4e6c-a3ae-aabbe3622a22';
+const IMAGE_DIR = path.join(__dirname, 'public', 'gallery');
 
 // Mapping of image files to menu item names
 const imageMapping = {
