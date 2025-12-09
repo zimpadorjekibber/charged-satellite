@@ -35,7 +35,6 @@ export default function BulkImportPage() {
                     category: item.category,
                     isVegetarian: item.isVegetarian,
                     available: item.available,
-                    image: item.image || ''
                 });
 
                 setSuccess(prev => prev + 1);
