@@ -17,6 +17,7 @@ import { StateInitializer } from '@/components/StateInitializer';
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tashizomcafe.in'),
   title: "TashiZom | Digital Dining",
   description: "Experience the taste of high altitude.",
 };

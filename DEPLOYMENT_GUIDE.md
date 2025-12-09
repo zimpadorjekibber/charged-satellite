@@ -68,20 +68,20 @@ Once deployed, your app will be available at:
 
 ### **Primary URL:**
 ```
-https://charged-satellite.vercel.app
+https://tashizomcafe.in
 ```
 
-### **Or Your Custom Domain (if configured):**
+### **Fallback URL:**
 ```
-https://tashizomcafe.in
+https://charged-satellite.vercel.app
 ```
 
 ### **Customer Access:**
 ```
-Menu: https://charged-satellite.vercel.app/customer/menu
-Cart: https://charged-satellite.vercel.app/customer/cart
-Status: https://charged-satellite.vercel.app/customer/status
-Feedback: https://charged-satellite.vercel.app/customer/feedback
+Menu: https://tashizomcafe.in/customer/menu
+Cart: https://tashizomcafe.in/customer/cart
+Status: https://tashizomcafe.in/customer/status
+Feedback: https://tashizomcafe.in/customer/feedback
 ```
 
 ### **Admin Access:**

@@ -2,7 +2,11 @@
 
 ## 🚀 Your App URLs
 
-### Customer-Facing:
+### Production (Live):
+- **Website**: https://tashizomcafe.in
+- **Customer Menu**: https://tashizomcafe.in/customer/menu
+
+### Customer-Facing (Local):
 - **Landing Page**: http://localhost:3000
 - **Customer Menu**: http://localhost:3000/customer/menu
 - **Cart**: http://localhost:3000/customer/cart
