@@ -173,21 +173,19 @@ service cloud.firestore {
 
 **Update Storage Rules:**
 ```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /menu-images/{allPaths=**} {
-      allow read: true; // Public read for menu images
-      allow write: if request.auth != null; // Only authenticated users can upload
-    }
-    
-    match /uploads/{allPaths=**} {
-      allow read: true;
-      allow write: if request.auth != null;
-    }
-  }
+}
 }
 ```
+
+### 4. **Firebase Authentication (CRITICAL!)** ⚠️
+For login to work on your custom domain, you MUST add it to Firebase:
+1. Go to **Firebase Console** -> **Authentication** -> **Settings** tab.
+2. Click **Authorized Domains**.
+3. Click **Add Domain**.
+4. Enter `tashizomcafe.in`.
+5. Click **Add**.
+
+*If you skip this, Admin and Staff login will fail on the new website.*
 
 ---
 
