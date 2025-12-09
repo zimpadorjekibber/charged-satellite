@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export', // Removed for standard dynamic deployment
-  // trailingSlash: true, // Removed for standard routing
+  output: 'export', // Restored static export for stability
+  trailingSlash: true, // Restored for consistent routing
   // @ts-ignore
   turbopack: {
     root: 'c:\\Users\\Asus\\.gemini\\antigravity\\playground\\charged-satellite'
