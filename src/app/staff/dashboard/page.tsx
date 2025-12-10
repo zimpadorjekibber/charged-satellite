@@ -609,7 +609,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 </div>
             </div>
 
-            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 -mx-5 px-5">
+            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 -mx-5 px-5 max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
                 {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-base text-gray-300 items-center">
                         <span className="flex items-center gap-2">
