@@ -16,7 +16,8 @@ export default function OrderStatusPage() {
     // We only show orders created by THIS device (sessionId match)
     const myOrders = orders.filter(o =>
         o.tableId === currentTableId &&
-        (o.sessionId === sessionId)
+        (o.sessionId === sessionId) &&
+        o.status !== 'Rejected' // User Request: Immediately disappear if rejected
     );
 
     // Polling to keep orders updated
