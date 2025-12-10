@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
         ? (window.location.hostname === 'localhost' ? 'http://192.168.1.109:3000' : window.location.origin)
         : '';
 
-    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media'>('live');
+    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media' | 'storage'>('live');
 
     // Auth Login State
     const [username, setUsername] = useState('');
@@ -205,6 +205,7 @@ export default function AdminDashboard() {
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => setActiveTab('reviews')} />
                         <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => setActiveTab('settings')} />
                         <TabButton active={activeTab === 'media'} label="Gallery" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('media')} />
+                        <TabButton active={activeTab === 'storage'} label="Storage" icon={<FolderOpen size={16} />} onClick={() => setActiveTab('storage')} />
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -401,6 +402,95 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
                                     ))
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* STORAGE MANAGER VIEW */}
+                    {activeTab === 'storage' && (
+                        <motion.div
+                            key="storage"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                            className="bg-neutral-800 rounded-xl border border-white/5 p-6"
+                        >
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold text-white mb-2">Storage Manager</h2>
+                                <p className="text-gray-400 text-sm">View all image URLs currently used in your menu items. To delete images from Firebase Storage, use the Firebase Console.</p>
+                            </div>
+
+                            <div className="bg-neutral-900 rounded-xl p-6 border border-white/5 mb-6">
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">How to Delete Firebase Storage Files:</h3>
+                                <ol className="space-y-2 text-sm text-gray-300">
+                                    <li className="flex gap-3">
+                                        <span className="text-tashi-accent font-bold">1.</span>
+                                        <span>Go to <a href="https://console.firebase.google.com" target="_blank" className="text-blue-400 hover:underline">Firebase Console</a> and sign in</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="text-tashi-accent font-bold">2.</span>
+                                        <span>Select your project: <span className="text-white font-mono bg-black/40 px-2 py-0.5 rounded">charged-satellite-zimpad</span></span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="text-tashi-accent font-bold">3.</span>
+                                        <span>Click <span className="text-white font-bold">"Build"</span> → <span className="text-white font-bold">"Storage"</span> in the left sidebar</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="text-tashi-accent font-bold">4.</span>
+                                        <span>Browse the <span className="text-white font-mono">uploads/</span> folder to see all your images</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="text-tashi-accent font-bold">5.</span>
+                                        <span>Select unwanted images and click the <span className="text-red-400">trash icon</span> to delete</span>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div className="bg-neutral-900 rounded-xl p-6 border border-white/5">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-bold text-white">Images Currently Used in Menu ({menu.filter(m => m.image).length} items with images)</h3>
+                                    <span className="text-xs text-gray-500">✓ = In Use, Safe to Keep</span>
+                                </div>
+
+                                {menu.filter(m => m.image).length === 0 ? (
+                                    <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-xl">
+                                        <p className="text-gray-500">No menu items have images yet.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {menu.filter(m => m.image).map((item) => (
+                                            <div key={item.id} className="bg-black/40 rounded-lg border border-white/5 overflow-hidden">
+                                                <div className="aspect-square bg-neutral-900 relative">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23333" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23666"%3E%E2%9C%96%3C/text%3E%3C/svg%3E';
+                                                        }}
+                                                    />
+                                                    <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                                                        <span>✓</span> IN USE
+                                                    </div>
+                                                </div>
+                                                <div className="p-3">
+                                                    <p className="font-bold text-white text-sm mb-1">{item.name}</p>
+                                                    <p className="text-xs text-gray-500 mb-2">{item.category}</p>
+                                                    <div className="bg-black/40 rounded p-2">
+                                                        <p className="text-[10px] text-gray-400 font-mono break-all">{item.image}</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(item.image || '');
+                                                            alert('URL copied!');
+                                                        }}
+                                                        className="mt-2 w-full bg-white/5 hover:bg-white/10 text-white text-xs font-bold py-2 rounded transition-colors"
+                                                    >
+                                                        Copy URL
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
                         </motion.div>
@@ -902,8 +992,8 @@ export default function AdminDashboard() {
                                                 key={cat}
                                                 onClick={() => setMenuCategoryFilter(cat)}
                                                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
-                                                        ? 'bg-tashi-accent text-tashi-dark shadow-lg'
-                                                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                                                    ? 'bg-tashi-accent text-tashi-dark shadow-lg'
+                                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
                                                     }`}
                                             >
                                                 {cat}
