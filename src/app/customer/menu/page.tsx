@@ -419,7 +419,7 @@ export default function MenuPage() {
                                     <Phone size={24} />
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-200">Call Us</p>
+                                    <p className="font-bold text-gray-200">Call Staffs</p>
                                     <p className="text-xs text-gray-500">{contactInfo.phone}</p>
                                 </div>
                             </a>
@@ -430,7 +430,7 @@ export default function MenuPage() {
                                         <Phone size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Alternative Number</p>
+                                        <p className="font-bold text-gray-200">Call Owner</p>
                                         <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
                                     </div>
                                 </a>
