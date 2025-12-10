@@ -191,24 +191,48 @@ export default function MenuPage() {
             </div>
 
             {/* Menu Grid */}
-            <div className="mt-6">
-                <motion.div
-                    key={activeCategory}
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 gap-5"
-                >
-                    {filteredItems.map((item) => (
-                        <MenuItemCard
-                            key={item.id}
-                            item={item}
-                            quantity={getQuantity(item.id)}
-                            onAdd={() => addToCart(item)}
-                            onSelect={() => setSelectedItem(item)}
-                        />
-                    ))}
-                </motion.div>
+            <div className="mt-6 space-y-6">
+                {/* Items WITH images - Display as cards */}
+                {filteredItems.filter(item => item.image).length > 0 && (
+                    <motion.div
+                        key={`${activeCategory}-with-images`}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="grid grid-cols-1 md:grid-cols-2 gap-5"
+                    >
+                        {filteredItems.filter(item => item.image).map((item) => (
+                            <MenuItemCard
+                                key={item.id}
+                                item={item}
+                                quantity={getQuantity(item.id)}
+                                onAdd={() => addToCart(item)}
+                                onSelect={() => setSelectedItem(item)}
+                            />
+                        ))}
+                    </motion.div>
+                )}
+
+                {/* Items WITHOUT images - Display as compact list */}
+                {filteredItems.filter(item => !item.image).length > 0 && (
+                    <motion.div
+                        key={`${activeCategory}-no-images`}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="space-y-2"
+                    >
+                        {filteredItems.filter(item => !item.image).map((item) => (
+                            <MenuItemListRow
+                                key={item.id}
+                                item={item}
+                                quantity={getQuantity(item.id)}
+                                onAdd={() => addToCart(item)}
+                                onSelect={() => setSelectedItem(item)}
+                            />
+                        ))}
+                    </motion.div>
+                )}
 
                 {filteredItems.length === 0 && (
                     <div className="text-center py-20 text-gray-500 italic">
@@ -558,6 +582,71 @@ function MenuItemCard({ item, quantity, onAdd, onSelect }: { item: MenuItem; qua
                         </div>
                     )}
                 </div>
+            </div>
+        </motion.div>
+    );
+}
+
+function MenuItemListRow({ item, quantity, onAdd, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onSelect: () => void }) {
+    const isAvailable = item.available !== false;
+
+    return (
+        <motion.div
+            variants={itemVariants}
+            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-pointer ${!isAvailable ? 'opacity-60' : ''}`}
+            onClick={onSelect}
+        >
+            {/* Veg/Non-Veg small indicator */}
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.isVegetarian
+                    ? 'bg-green-500/20 border border-green-500/30'
+                    : 'bg-red-500/20 border border-red-500/30'
+                }`}>
+                {item.isVegetarian ? (
+                    <Leaf size={12} className="text-green-400" />
+                ) : (
+                    <Drumstick size={12} className="text-red-400" />
+                )}
+            </div>
+
+            {/* Name and Price */}
+            <div className="flex-1">
+                <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className="font-serif text-lg text-tashi-accent">₹{item.price}</span>
+                    {!isAvailable && (
+                        <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Add button */}
+            <div onClick={(e) => e.stopPropagation()}>
+                {quantity === 0 ? (
+                    <motion.button
+                        whileHover={isAvailable ? { scale: 1.1 } : {}}
+                        whileTap={isAvailable ? { scale: 0.9 } : {}}
+                        onClick={isAvailable ? onAdd : undefined}
+                        disabled={!isAvailable}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
+                                ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                                : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                            }`}
+                    >
+                        <Plus size={18} />
+                    </motion.button>
+                ) : (
+                    <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                        <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onAdd}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white"
+                        >
+                            <Plus size={16} />
+                        </motion.button>
+                    </div>
+                )}
             </div>
         </motion.div>
     );
