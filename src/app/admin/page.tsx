@@ -606,6 +606,23 @@ export default function AdminDashboard() {
                                         />
                                     </div>
                                     <div>
+                                        <label className="block text-sm font-bold text-gray-400 mb-2">Owner Phone (Alternate)</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.secondaryPhone}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                // Allow empty string to clear it
+                                                useStore.getState().updateContactSettings({
+                                                    ...useStore.getState().contactInfo,
+                                                    secondaryPhone: val
+                                                });
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                        />
+                                    </div>
+                                    <div>
                                         <label className="block text-sm font-bold text-gray-400 mb-2">WhatsApp Number</label>
                                         <input
                                             type="tel"
