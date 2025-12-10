@@ -446,7 +446,7 @@ export default function MenuPage() {
                                 </div>
                             </a>
 
-                            <a href={`https://maps.google.com/?q=${contactInfo.mapsLocation}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
                                 <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                                     <MapPin size={24} />
                                 </div>
