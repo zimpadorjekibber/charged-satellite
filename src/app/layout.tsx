@@ -20,6 +20,20 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://tashizomcafe.in'),
   title: "TashiZom | Digital Dining",
   description: "Experience the taste of high altitude.",
+  manifest: '/manifest.webmanifest', // Next.js will serve the manifest from the generated route
+  icons: {
+    icon: '/tashi-corner.png',
+    apple: '/tashi-corner.png', // Uses the same logo for Apple home screen
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'TashiZom',
+  },
+};
+
+export const viewport = {
+  themeColor: '#DAA520', // Tashi Accent Gold
 };
 
 export default function RootLayout({
