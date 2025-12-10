@@ -17,7 +17,8 @@ export default function OrderStatusPage() {
     const myOrders = orders.filter(o =>
         o.tableId === currentTableId &&
         (o.sessionId === sessionId) &&
-        o.status !== 'Rejected' // User Request: Immediately disappear if rejected
+        o.status !== 'Rejected' && // User Request: Immediately disappear if rejected
+        o.status !== 'Paid' // User Request: Immediately disappear if paid
     );
 
     // Polling to keep orders updated
