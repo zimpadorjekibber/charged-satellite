@@ -40,20 +40,29 @@ export default function StaffDashboard() {
 
     const audioCtxRef = useRef<any>(null);
 
-    // Initialize Audio Context on user interaction
-    useEffect(() => {
-        const initAudio = () => {
-            if (!audioCtxRef.current) {
-                const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-                if (AudioContext) {
-                    audioCtxRef.current = new AudioContext();
-                }
-            }
-            if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-                audioCtxRef.current.resume().catch(console.error);
-            }
-        };
+    const [audioReady, setAudioReady] = useState(false);
 
+    // Initialize Audio Context on user interaction
+    const initAudio = () => {
+        if (!audioCtxRef.current) {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (AudioContext) {
+                audioCtxRef.current = new AudioContext();
+            }
+        }
+        if (audioCtxRef.current) {
+            if (audioCtxRef.current.state === 'suspended') {
+                audioCtxRef.current.resume().then(() => {
+                    console.log("Audio Context Resumed");
+                    setAudioReady(true);
+                }).catch(console.error);
+            } else if (audioCtxRef.current.state === 'running') {
+                setAudioReady(true);
+            }
+        }
+    };
+
+    useEffect(() => {
         window.addEventListener('click', initAudio);
         window.addEventListener('keydown', initAudio);
         return () => {
@@ -149,6 +158,7 @@ export default function StaffDashboard() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        initAudio(); // Initialize audio on login click
         setError('');
         const success = await login(username, password);
         if (success) {
@@ -333,6 +343,29 @@ export default function StaffDashboard() {
     return (
         <div className="space-y-8 max-w-[1600px] mx-auto relative px-6 py-6 text-white min-h-screen">
             <AnimatePresence>
+                {!audioReady && currentUser && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-6 text-center"
+                        onClick={initAudio}
+                    >
+                        <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ repeat: Infinity, duration: 1.5 }}
+                            className="bg-tashi-accent text-tashi-dark p-6 rounded-full mb-6 cursor-pointer shadow-[0_0_50px_rgba(255,255,255,0.3)]"
+                        >
+                            <Bell size={64} />
+                        </motion.div>
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Tap Anywhere to Start</h2>
+                        <p className="text-xl text-gray-400 max-w-md">
+                            Kitchen Sound System needs activation.
+                            <br />
+                            <span className="text-tashi-accent text-sm font-bold mt-2 block">(Browser Security Requirement)</span>
+                        </p>
+                    </motion.div>
+                )}
                 {showVisualAlert && (
                     <motion.div
                         initial={{ opacity: 0 }}
