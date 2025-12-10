@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -52,6 +52,77 @@ export default function AdminDashboard() {
             console.error(err);
             setError('Login error occurred');
         }
+    };
+
+    const handlePrintAllQRs = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        // chunk tables into groups of 2
+        const chunkedTables = [];
+        for (let i = 0; i < tables.length; i += 2) {
+            chunkedTables.push(tables.slice(i, i + 2));
+        }
+
+        printWindow.document.write(`
+        <html>
+            <head>
+                <style>
+                    @page { size: A4; margin: 0; }
+                    body { margin: 0; padding: 0; font-family: sans-serif; background: white; }
+                    .page {
+                        width: 210mm;
+                        height: 297mm;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: space-around;
+                        page-break-after: always;
+                        padding: 10mm;
+                        box-sizing: border-box;
+                    }
+                    .qr-container {
+                        text-align: center;
+                        border: 2px solid #000;
+                        padding: 20px;
+                        border-radius: 20px;
+                        width: 80%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        height: 40%;
+                        justify-content: center;
+                    }
+                    .qr-image {
+                        width: 300px;
+                        height: 300px;
+                        margin: 20px 0;
+                    }
+                    h1 { margin: 0; font-size: 3em; font-weight: 800; }
+                    p { color: #000; margin-top: 10px; font-size: 1.5em; }
+                </style>
+            </head>
+            <body>
+                ${chunkedTables.map(chunk => `
+                    <div class="page">
+                        ${chunk.map(table => `
+                            <div class="qr-container">
+                                <h1>${table.name}</h1>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`${HOST_URL}/scan?tableId=${table.id}`)}" class="qr-image" />
+                                <p>Scan to View Menu</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+                <script>
+                    window.onload = () => {
+                        setTimeout(() => window.print(), 1000);
+                    }
+                </script>
+            </body>
+        </html>
+        `);
+        printWindow.document.close();
     };
 
     if (!currentUser || currentUser.role !== 'admin') {
@@ -483,18 +554,30 @@ export default function AdminDashboard() {
                                     <div className="flex items-center gap-4">
                                         <div className="relative">
                                             <input
+                                                id="geo-radius-input"
                                                 type="number"
                                                 defaultValue={useStore.getState().geoRadius || 5}
-                                                onBlur={(e) => {
-                                                    const val = parseFloat(e.target.value);
-                                                    if (!isNaN(val) && val > 0) {
-                                                        useStore.getState().updateSettings({ geoRadius: val });
-                                                    }
-                                                }}
                                                 className="bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
                                             />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">km</span>
                                         </div>
+                                        <button
+                                            onClick={() => {
+                                                const input = document.getElementById('geo-radius-input') as HTMLInputElement;
+                                                if (input) {
+                                                    const val = parseFloat(input.value);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        useStore.getState().updateSettings({ geoRadius: val });
+                                                        alert("Geo-radius updated successfully!");
+                                                    } else {
+                                                        alert("Please enter a valid number greater than 0.");
+                                                    }
+                                                }
+                                            }}
+                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        >
+                                            Update
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -565,7 +648,15 @@ export default function AdminDashboard() {
 
                             {/* Table Management */}
                             <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <h2 className="text-xl font-bold text-white mb-6">Table Management</h2>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold text-white">Table Management</h2>
+                                    <button
+                                        onClick={handlePrintAllQRs}
+                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm"
+                                    >
+                                        <Printer size={16} /> Print All QRs (A4)
+                                    </button>
+                                </div>
                                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
                                     <form
                                         onSubmit={async (e) => {

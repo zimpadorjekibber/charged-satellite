@@ -8,8 +8,8 @@ import { Loader2, MapPinOff } from 'lucide-react';
 
 // Coordinates for TashiZom, Kibber (Approximate for demo)
 const RESTAURANT_LOCATION = {
-    lat: 32.2882, // Replace with exact Kibber restaurant lat
-    lng: 78.0010  // Replace with exact Kibber restaurant lng
+    lat: 32.329112,
+    lng: 78.0080953
 };
 const MAX_DISTANCE_KM = 50000; // Increased for testing
 
@@ -36,6 +36,8 @@ function ScanPageContent() {
     const tableId = searchParams.get('tableId');
     const setTableId = useStore((state) => state.setTableId);
 
+    const geoRadius = useStore((state) => state.geoRadius);
+
     const [status, setStatus] = useState<string>('Verifying location...');
     const [error, setError] = useState<string | null>(null);
 
@@ -45,11 +47,15 @@ function ScanPageContent() {
             return;
         }
 
-        // Bypass Geolocation for Development/HTTP
-        // Browsers block Geolocation on non-secure (HTTP) connections except localhost.
-        proceed();
+        // Check if Geolocation is supported
+        if (!navigator.geolocation) {
+            console.warn("Geolocation not supported. Proceeding...");
+            proceed();
+            return;
+        }
 
-        /*
+        setStatus('Checking distance...');
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const dist = calculateDistance(
@@ -59,23 +65,32 @@ function ScanPageContent() {
                     RESTAURANT_LOCATION.lng
                 );
 
-                console.log(`User distance: ${dist.toFixed(2)}km`);
+                console.log(`User distance: ${dist.toFixed(2)}km, Allowed: ${geoRadius}km`);
 
-                if (dist > MAX_DISTANCE_KM) {
-                    setError(`You are ${dist.toFixed(1)}km away. digital ordering is only available at the restaurant.`);
+                if (dist > geoRadius) {
+                    setError(`You are ${dist.toFixed(2)}km away. Orders are restricted to within ${geoRadius}km of the restaurant.`);
                     setStatus('');
                 } else {
                     proceed();
                 }
             },
             (err) => {
-                console.error(err);
-                // On HTTP, this will likely fail. Proceed anyway for dev.
-                console.warn("Geolocation failed, proceeding anyway for dev...");
-                proceed();
-            }
+                console.error("Geolocation Error:", err);
+                // If denied or error, we might want to block or allow. 
+                // Currently blocking if we can't verify location for strict mode.
+                // But for better UX on random devices/errors, we might show a warning.
+                // However, user asked for restriction. Let's block if we can't verify, or ask to retry.
+                if (err.code === 1) { // PERMISSION_DENIED
+                    setError("Location permission denied. Please enable location services to place an order.");
+                } else {
+                    // Position unavailable or timeout
+                    // Ideally we should block, but in dev it might be annoying. 
+                    // Let's block but offer a 'retry' which reloads.
+                    setError("Unable to retrieve location. Please ensure GPS is on.");
+                }
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
-        */
 
         async function proceed() {
             if (tableId) {
@@ -85,7 +100,7 @@ function ScanPageContent() {
                 router.replace('/customer/menu');
             }
         }
-    }, [tableId, router, setTableId]);
+    }, [tableId, router, setTableId, geoRadius]);
 
     if (error) {
         return (
@@ -102,17 +117,7 @@ function ScanPageContent() {
                     >
                         Retry Location
                     </button>
-                    {tableId && (
-                        <button
-                            onClick={() => {
-                                setTableId(tableId);
-                                router.replace('/customer/menu');
-                            }}
-                            className="w-full px-6 py-3 bg-red-900/10 text-red-400 border border-red-900/30 rounded-lg hover:bg-red-900/20 text-xs"
-                        >
-                            Continue Anyway (Dev Bypass)
-                        </button>
-                    )}
+
                 </div>
             </div>
         );
