@@ -313,6 +313,7 @@ export default function AdminDashboard() {
                                             <th className="p-4">Items</th>
                                             <th className="p-4 text-right">Total</th>
                                             <th className="p-4 text-center">Status</th>
+                                            <th className="p-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
@@ -327,7 +328,20 @@ export default function AdminDashboard() {
                                                     <td className="p-4">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
                                                     <td className="p-4 text-right font-bold text-tashi-accent">₹{order.totalAmount}</td>
                                                     <td className="p-4 text-center">
-                                                        <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs font-bold">PAID</span>
+                                                        <StatusBadge status={order.status} />
+                                                    </td>
+                                                    <td className="p-4 text-center">
+                                                        <button
+                                                            onClick={async () => {
+                                                                if (confirm('Permanently delete this order record?')) {
+                                                                    await useStore.getState().deleteOrder(order.id);
+                                                                }
+                                                            }}
+                                                            className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
+                                                            title="Delete Order Record"
+                                                        >
+                                                            <Trash size={16} />
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))
