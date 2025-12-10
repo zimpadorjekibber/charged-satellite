@@ -553,7 +553,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
                 </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent pb-32">
                 <AnimatePresence mode="popLayout">
                     {orders.map((order: Order) => (
                         <StaffOrderCard
@@ -590,9 +590,9 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-neutral-800 p-5 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group"
+            className="bg-neutral-800 p-5 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group flex flex-col"
         >
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-2">
                 <div>
                     <h4 className="font-bold text-white text-xl flex flex-col sm:flex-row sm:items-center sm:gap-2">
                         {tables.find(t => t.id === order.tableId)?.name || order.tableId}
@@ -609,7 +609,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 </div>
             </div>
 
-            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 rounded-xl px-4 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            <div className="space-y-2 my-3 border-t border-b border-white/5 py-3 bg-black/20 rounded-xl px-4 max-h-[150px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
                 {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-base text-gray-300 items-center">
                         <span className="flex items-center gap-2">
@@ -620,7 +620,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 ))}
             </div>
 
-            <div className="flex flex-col gap-3 relative z-10 shrink-0 mt-auto">
+            <div className="flex flex-col gap-3 relative z-10 shrink-0 mt-auto pt-2">
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={onPrintKOT}
