@@ -227,11 +227,19 @@ export const useStore = create<AppState>()(
                             await deleteDoc(doc(db, 'orders', order.id));
                         }
 
-                        // Condition 2: Old Orders (Previous Days)
-                        // We keep only orders from TODAY (since 00:00)
+                        // Condition 2: Old Orders (Previous Days) -> ARCHIVE
+                        // We keep orders from today in active view. Yesterday and older go to archive.
+                        // EXCEPT 'Pending' ones that are old (they are just abandoned junk, so we skip archiving them or archive them as abandoned? User wants total sales, so only Paid/Served matters really, but let's archive everything for safety).
                         if (orderDate < todayStart) {
-                            console.log('Cleaning up old order:', order.id);
-                            await deleteDoc(doc(db, 'orders', order.id));
+                            // Only archive if it was at least Accepted (Preparing/Served/Paid) OR if user really wants EVERYTHING.
+                            // Let's archive ALL valid orders to be safe.
+                            console.log('Archiving old order:', order.id);
+                            try {
+                                await setDoc(doc(db, 'archived_orders', order.id), order);
+                                await deleteDoc(doc(db, 'orders', order.id));
+                            } catch (err) {
+                                console.error("Failed to archive/delete", err);
+                            }
                         }
                     });
                 }));
