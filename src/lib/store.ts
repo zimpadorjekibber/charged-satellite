@@ -178,7 +178,7 @@ export const useStore = create<AppState>()(
                 phone: '+919876543210',
                 secondaryPhone: '+919418612295',
                 whatsapp: '+919876543210',
-                mapsLocation: 'TashiZom+Resort'
+                mapsLocation: 'TashiZom+Restaurant,+Kibber'
             },
 
             initialize: () => {
