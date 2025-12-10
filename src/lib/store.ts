@@ -232,15 +232,18 @@ export const useStore = create<AppState>()(
                         // Condition 2: Old Orders (Previous Days) -> ARCHIVE
                         // We keep orders from today in active view. Yesterday and older go to archive.
                         // EXCEPT 'Pending' ones that are old (they are just abandoned junk, so we skip archiving them or archive them as abandoned? User wants total sales, so only Paid/Served matters really, but let's archive everything for safety).
+                        // Condition 2: Old Orders (Previous Days) -> ARCHIVE
+                        // Only archive if the order is FINALIZED (Paid or Rejected).
+                        // Ongoing orders (Preparing, Served) should remain on the board (e.g. post-midnight).
                         if (orderDate < todayStart) {
-                            // Only archive if it was at least Accepted (Preparing/Served/Paid) OR if user really wants EVERYTHING.
-                            // Let's archive ALL valid orders to be safe.
-                            console.log('Archiving old order:', order.id);
-                            try {
-                                await setDoc(doc(db, 'archived_orders', order.id), order);
-                                await deleteDoc(doc(db, 'orders', order.id));
-                            } catch (err) {
-                                console.error("Failed to archive/delete", err);
+                            if (order.status === 'Paid' || order.status === 'Rejected') {
+                                console.log('Archiving old finished order:', order.id);
+                                try {
+                                    await setDoc(doc(db, 'archived_orders', order.id), order);
+                                    await deleteDoc(doc(db, 'orders', order.id));
+                                } catch (err) {
+                                    console.error("Failed to archive/delete", err);
+                                }
                             }
                         }
                     });
