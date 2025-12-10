@@ -342,9 +342,21 @@ export const useStore = create<AppState>()(
                     cart: [...state.cart, { menuItemId: item.id, quantity: 1, name: item.name, price: item.price }],
                 };
             }),
-            removeFromCart: (itemId) => set((state) => ({
-                cart: state.cart.filter((i) => i.menuItemId !== itemId),
-            })),
+            removeFromCart: (itemId) => set((state) => {
+                const existing = state.cart.find((i) => i.menuItemId === itemId);
+                if (existing && existing.quantity > 1) {
+                    // Decrease quantity by 1
+                    return {
+                        cart: state.cart.map((i) =>
+                            i.menuItemId === itemId ? { ...i, quantity: i.quantity - 1 } : i
+                        ),
+                    };
+                }
+                // Remove item completely if quantity is 1 or less
+                return {
+                    cart: state.cart.filter((i) => i.menuItemId !== itemId),
+                };
+            }),
             clearCart: () => set({ cart: [] }),
 
             placeOrder: async (customerName, customerPhone, tableId) => {

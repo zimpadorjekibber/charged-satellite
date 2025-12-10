@@ -94,16 +94,32 @@ export default function MenuPage() {
             }
         }
 
-        // 12 PM onwards: Main Course
+        // 12 PM onwards (Afternoon/Evening/Night): Main Course or Starters
         if (hour >= 12) {
             if (seasonalCategories.includes('Main Course')) {
-                console.log('✅ Showing: Main Course (Afternoon/Evening)');
+                console.log('✅ Showing: Main Course (Afternoon/Evening/Night)');
                 return 'Main Course';
+            }
+            // If Main Course doesn't exist, try Starters instead of falling back to first
+            if (seasonalCategories.includes('Starters')) {
+                console.log('✅ Showing: Starters (Main Course not available)');
+                return 'Starters';
             }
         }
 
-        // Fallback to first available category
-        console.log('⚠️ Fallback to first category:', CATEGORIES[0]);
+        // Smart Fallback: Avoid showing Breakfast at night
+        // Prefer Main Course > Starters > anything else
+        if (seasonalCategories.includes('Main Course')) {
+            console.log('⚠️ Fallback to: Main Course');
+            return 'Main Course';
+        }
+        if (seasonalCategories.includes('Starters')) {
+            console.log('⚠️ Fallback to: Starters');
+            return 'Starters';
+        }
+
+        // Last resort - first category
+        console.log('⚠️ Final fallback to first category:', CATEGORIES[0]);
         return CATEGORIES[0] || 'Starters';
     };
 
