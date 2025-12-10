@@ -41,6 +41,7 @@ export interface MenuItem {
     isVegetarian: boolean;
     isSpicy?: boolean;
     available: boolean;
+    sortOrder?: number; // For drag-and-drop ordering
 }
 
 export interface OrderItem {
@@ -131,6 +132,7 @@ interface AppState {
     addMenuItem: (item: Omit<MenuItem, 'id'>) => Promise<void>;
     updateMenuItem: (id: string, updates: Partial<MenuItem>) => void;
     removeMenuItem: (id: string) => void;
+    reorderMenuItems: (items: MenuItem[]) => Promise<void>;
 
     addToCart: (item: MenuItem) => void;
     removeFromCart: (itemId: string) => void;
@@ -318,6 +320,13 @@ export const useStore = create<AppState>()(
             },
             removeMenuItem: async (id) => {
                 await deleteDoc(doc(db, 'menu', id));
+            },
+            reorderMenuItems: async (items) => {
+                // Batch update sortOrder for all items
+                const batch = items.map((item, index) =>
+                    updateDoc(doc(db, 'menu', item.id), { sortOrder: index })
+                );
+                await Promise.all(batch);
             },
 
             addToCart: (item) => set((state) => {
