@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -27,6 +27,7 @@ export default function MenuPage() {
     const menu = useStore((state) => state.menu);
     const cart = useStore((state) => state.cart);
     const addToCart = useStore((state) => state.addToCart);
+    const removeFromCart = useStore((state) => state.removeFromCart);
     const currentTableId = useStore((state) => state.currentTableId);
     const notifications = useStore((state) => state.notifications);
     const addNotification = useStore((state) => state.addNotification);
@@ -267,6 +268,7 @@ export default function MenuPage() {
                                 item={item}
                                 quantity={getQuantity(item.id)}
                                 onAdd={() => addToCart(item)}
+                                onRemove={() => removeFromCart(item.id)}
                                 onSelect={() => setSelectedItem(item)}
                             />
                         ))}
@@ -288,6 +290,7 @@ export default function MenuPage() {
                                 item={item}
                                 quantity={getQuantity(item.id)}
                                 onAdd={() => addToCart(item)}
+                                onRemove={() => removeFromCart(item.id)}
                                 onSelect={() => setSelectedItem(item)}
                             />
                         ))}
@@ -549,7 +552,7 @@ export default function MenuPage() {
 
 
 
-function MenuItemCard({ item, quantity, onAdd, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onSelect: () => void }) {
+function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
     const isAvailable = item.available !== false;
 
     return (
@@ -631,11 +634,18 @@ function MenuItemCard({ item, quantity, onAdd, onSelect }: { item: MenuItem; qua
                         </motion.button>
                     ) : (
                         <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onRemove}
+                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                            >
+                                <Minus size={16} />
+                            </motion.button>
                             <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={onAdd}
-                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white"
+                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
                             >
                                 <Plus size={16} />
                             </motion.button>
@@ -647,7 +657,7 @@ function MenuItemCard({ item, quantity, onAdd, onSelect }: { item: MenuItem; qua
     );
 }
 
-function MenuItemListRow({ item, quantity, onAdd, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onSelect: () => void }) {
+function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
     const isAvailable = item.available !== false;
 
     return (
@@ -697,11 +707,18 @@ function MenuItemListRow({ item, quantity, onAdd, onSelect }: { item: MenuItem; 
                     </motion.button>
                 ) : (
                     <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onRemove}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                        >
+                            <Minus size={16} />
+                        </motion.button>
                         <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
                         <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={onAdd}
-                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white"
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
                         >
                             <Plus size={16} />
                         </motion.button>
