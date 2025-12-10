@@ -210,6 +210,30 @@ export const useStore = create<AppState>()(
                 unsubscribers.push(onSnapshot(ordersQuery, (snap) => {
                     const orders = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Order[];
                     set({ orders });
+
+                    // AUTOMATIC CLEANUP LOGIC
+                    // 1. Unattended Pending Orders (> 10 mins)
+                    // 2. Previous Day Orders
+                    const now = new Date();
+                    const tenMinsAgo = new Date(now.getTime() - 10 * 60 * 1000);
+                    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+
+                    orders.forEach(async (order) => {
+                        const orderDate = new Date(order.createdAt);
+
+                        // Condition 1: Pending > 10 mins
+                        if (order.status === 'Pending' && orderDate < tenMinsAgo) {
+                            console.log('Auto-deleting abandoned order:', order.id);
+                            await deleteDoc(doc(db, 'orders', order.id));
+                        }
+
+                        // Condition 2: Old Orders (Previous Days)
+                        // We keep only orders from TODAY (since 00:00)
+                        if (orderDate < todayStart) {
+                            console.log('Cleaning up old order:', order.id);
+                            await deleteDoc(doc(db, 'orders', order.id));
+                        }
+                    });
                 }));
 
                 // Notifications
