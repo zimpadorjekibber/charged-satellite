@@ -2,25 +2,24 @@
 
 ## 🚀 Your App URLs
 
-### Production (Live):
+### Production (Live) - ✅ ACTIVE:
 - **Website**: https://tashizomcafe.in
 - **Customer Menu**: https://tashizomcafe.in/customer/menu
+- **Admin Portal**: https://tashizomcafe.in/admin
+- **Staff Dashboard**: https://tashizomcafe.in/staff
 
-### Customer-Facing (Local):
-- **Landing Page**: http://localhost:3000
-- **Customer Menu**: http://localhost:3000/customer/menu
-- **Cart**: http://localhost:3000/customer/cart
-- **Order Status**: http://localhost:3000/customer/status
-- **Feedback**: http://localhost:3000/customer/feedback
+### Admin Credentials:
+- **Username**: `admin`
+- **Password**: `admin123`
 
-### Admin & Staff:
-- **Admin Portal**: http://localhost:3000/admin
-  - Username: `admin`
-  - Password: `admin123`
-  
-- **Staff Dashboard**: http://localhost:3000/staff
-  - Username: `staff`
-  - Password: `staff123`
+### Staff Credentials:
+- **Usernames**: `staff1`, `staff2`, `staff3`
+- **Password**: `staff123` (Same for all)
+
+***
+
+
+
 
 ---
 
@@ -151,13 +150,12 @@
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Maintenance & Usage
 
-1. **Wait for upload to complete** (currently processing)
-2. **Refresh menu page** to see all items
-3. **Add remaining images** via Admin Portal
-4. **Test ordering flow**
-5. **Deploy to production** when ready
+1. **Morning Routine**: Login to Admin -> Check Menu Availability.
+2. **Printing QR Codes**: Go to Admin -> Tables -> Download QR for each table.
+3. **Updating Menu**: Use Admin Portal to add photos or change prices instantly.
+4. **Staff Training**: Show staff `tashizomcafe.in/staff` to manage orders.
 
 ---
 

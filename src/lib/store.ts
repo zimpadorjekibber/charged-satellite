@@ -384,14 +384,19 @@ export const useStore = create<AppState>()(
             login: async (username, password) => {
                 // Mock Auth for simplicity as requested 'quick fix'
                 // In real app, use Firebase Auth
+                // Admin Login
                 if (username === 'admin' && password === 'admin123') {
                     set({ currentUser: { id: 'admin', name: 'Admin User', username: 'admin', role: 'admin' } });
                     return true;
                 }
-                if (username === 'staff' && password === 'staff123') {
-                    set({ currentUser: { id: 'staff', name: 'Staff User', username: 'staff', role: 'staff' } });
+
+                // Staff Logins (Multiple)
+                const validStaff = ['staff', 'staff1', 'staff2', 'staff3'];
+                if (validStaff.includes(username) && password === 'staff123') {
+                    set({ currentUser: { id: username, name: `Staff Member (${username})`, username: username, role: 'staff' } });
                     return true;
                 }
+
                 return false;
             },
 
