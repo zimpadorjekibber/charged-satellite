@@ -70,6 +70,7 @@ export default function StaffDashboard() {
 
     const playNotificationSound = () => {
         try {
+            // Audio context setup...
             if (!audioCtxRef.current) {
                 const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
                 if (AudioContext) audioCtxRef.current = new AudioContext();
@@ -77,43 +78,33 @@ export default function StaffDashboard() {
 
             const ctx = audioCtxRef.current;
             if (!ctx) return;
-
             if (ctx.state === 'suspended') ctx.resume();
 
+            // Function to play a single loud siren blast
+            const playBlast = (startTime: number) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sawtooth'; // Piercing sound
+                osc.frequency.setValueAtTime(900, startTime); // Start High
+                osc.frequency.linearRampToValueAtTime(500, startTime + 0.4); // Drop Low (Siren)
+
+                // MAX VOLUME
+                gain.gain.setValueAtTime(1.0, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + 0.5);
+            };
+
+            // Loop 8 times for noisy kitchen
             const now = ctx.currentTime;
-
-            // LOUD ALARM: Sawtooth wave (sharper sound)
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-
-            osc.type = 'sawtooth'; // Sharper, louder perception than triangle
-            osc.frequency.setValueAtTime(880, now); // A5 (High pitch)
-            osc.frequency.linearRampToValueAtTime(440, now + 0.3); // Drop pitch (Siren effect)
-
-            // High Gain
-            gain.gain.setValueAtTime(0.3, now); // Start loud
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-
-            osc.start(now);
-            osc.stop(now + 0.5);
-
-            // Repeat for urgency (Double Beep)
-            setTimeout(() => {
-                const osc2 = ctx.createOscillator();
-                const gain2 = ctx.createGain();
-                osc2.type = 'sawtooth';
-                osc2.frequency.setValueAtTime(880, ctx.currentTime);
-                osc2.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.3);
-                gain2.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                osc2.connect(gain2);
-                gain2.connect(ctx.destination);
-                osc2.start(ctx.currentTime);
-                osc2.stop(ctx.currentTime + 0.5);
-            }, 400);
+            for (let i = 0; i < 8; i++) {
+                playBlast(now + (i * 0.6)); // Play every 600ms
+            }
 
         } catch (e) {
             console.error("Audio play failed", e);
