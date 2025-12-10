@@ -1,0 +1,21 @@
+{
+    "name": "TashiZom Staff",
+    "short_name": "Tashi Staff",
+    "description": "Staff Portal for TashiZom",
+    "start_url": "/staff/dashboard",
+    "display": "standalone",
+    "background_color": "#111111",
+    "theme_color": "#3B82F6",
+    "icons": [
+        {
+            "src": "/tashizom-logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/tashizom-logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "name": "TashiZom Admin",
+    "short_name": "Tashi Admin",
+    "description": "Admin Portal for TashiZom",
+    "start_url": "/admin",
+    "display": "standalone",
+    "background_color": "#111111",
+    "theme_color": "#DAA520",
+    "icons": [
+        {
+            "src": "/tashizom-logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/tashizom-logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

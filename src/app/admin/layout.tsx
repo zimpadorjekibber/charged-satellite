@@ -1,0 +1,14 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'TashiZom Admin Portal',
+    manifest: '/admin-manifest.json',
+};
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return <>{children}</>;
+}
