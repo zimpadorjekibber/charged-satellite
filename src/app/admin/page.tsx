@@ -962,10 +962,16 @@ export default function AdminDashboard() {
                                             {Array.from(new Set(menu.map(i => i.category))).map(c => (
                                                 <option key={c} value={c} />
                                             ))}
-                                            <option value="Starters" />
-                                            <option value="Main Course" />
-                                            <option value="Beverages" />
-                                            <option value="Dessert" />
+                                            <option value="Soups & Salads" />
+                                            <option value="Snacks & Starters" />
+                                            <option value="Main Course (Vegetarian)" />
+                                            <option value="Main Course (Non-Vegetarian)" />
+                                            <option value="Rice & Biryani" />
+                                            <option value="Indian Breads" />
+                                            <option value="Chinese" />
+                                            <option value="Pizza & Pasta" />
+                                            <option value="Beverages & Shakes" />
+                                            <option value="Desserts" />
                                         </datalist>
                                         <div className="flex gap-4 items-center">
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
