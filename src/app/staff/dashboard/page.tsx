@@ -29,7 +29,10 @@ export default function StaffDashboard() {
     // Filter unresolved notifications
     const activeNotifications = (notifications || []).filter((n) => n.status === 'pending');
     // Sort orders: Newest first
-    const activeOrders = [...(orders || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Sort orders: Newest first, exclude rejected/cancelled from active processing view
+    const activeOrders = [...(orders || [])]
+        .filter(o => o.status !== 'Rejected' && o.status !== 'Cancelled')
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Calculate Daily Stats
     const today = new Date().toDateString();
