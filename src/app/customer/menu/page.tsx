@@ -72,54 +72,38 @@ export default function MenuPage() {
     // Time-based default category
     const getDefaultCategory = (): Category => {
         const hour = new Date().getHours();
-        console.log('🕐 Current hour:', hour, '| Available categories:', seasonalCategories);
 
-        // 5 AM - 9 AM: Hot Beverages
-        if (hour >= 5 && hour < 9) {
-            if (seasonalCategories.includes('Hot Beverages')) {
-                console.log('✅ Showing: Hot Beverages (Morning Time)');
-                return 'Hot Beverages';
-            }
-            if (seasonalCategories.includes('Beverages')) {
-                console.log('✅ Showing: Beverages (Morning Time)');
-                return 'Beverages';
-            }
-        }
+        const hasMainCourse = seasonalCategories.includes('Main Course');
+        const hasStarters = seasonalCategories.includes('Starters');
+        const hasBreakfast = seasonalCategories.includes('Breakfast');
+        const hasBeverages = seasonalCategories.includes('Beverages');
 
-        // 9 AM - 12 PM: Breakfast
-        if (hour >= 9 && hour < 12) {
-            if (seasonalCategories.includes('Breakfast')) {
-                console.log('✅ Showing: Breakfast (Late Morning)');
-                return 'Breakfast';
-            }
-        }
+        console.log('Category Check:', { hour, hasMainCourse, hasStarters, hasBreakfast });
 
-        // 12 PM onwards (Afternoon/Evening/Night): Main Course or Starters
+        // NIGHT / EVENING / AFTERNOON (12 PM onwards)
         if (hour >= 12) {
-            if (seasonalCategories.includes('Main Course')) {
-                console.log('✅ Showing: Main Course (Afternoon/Evening/Night)');
-                return 'Main Course';
-            }
-            // If Main Course doesn't exist, try Starters instead of falling back to first
-            if (seasonalCategories.includes('Starters')) {
-                console.log('✅ Showing: Starters (Main Course not available)');
-                return 'Starters';
-            }
+            if (hasMainCourse) return 'Main Course';
+            if (hasStarters) return 'Starters';
+            // Only show breakfast if NOTHING else is available
         }
 
-        // Smart Fallback: Avoid showing Breakfast at night
-        // Prefer Main Course > Starters > anything else
-        if (seasonalCategories.includes('Main Course')) {
-            console.log('⚠️ Fallback to: Main Course');
-            return 'Main Course';
-        }
-        if (seasonalCategories.includes('Starters')) {
-            console.log('⚠️ Fallback to: Starters');
-            return 'Starters';
+        // MORNING (5 AM - 12 PM)
+        if (hour >= 5 && hour < 12) {
+            if (hasBreakfast) return 'Breakfast';
+            if (hasBeverages) return 'Beverages';
+            if (seasonalCategories.includes('Hot Beverages')) return 'Hot Beverages';
         }
 
-        // Last resort - first category
-        console.log('⚠️ Final fallback to first category:', CATEGORIES[0]);
+        // LATE NIGHT (12 AM - 5 AM) - Show Starters or Beverages
+        if (hour < 5) {
+            if (hasStarters) return 'Starters';
+            if (hasBeverages) return 'Beverages';
+        }
+
+        // Fallbacks if preferred time-based category is missing
+        if (hasMainCourse) return 'Main Course';
+        if (hasStarters) return 'Starters';
+
         return CATEGORIES[0] || 'Starters';
     };
 
@@ -130,16 +114,27 @@ export default function MenuPage() {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // Initial load correction: When categories load, ensure we snap to the correct time-based category
+    // FIX: Force switch to correct category when data loads
     useEffect(() => {
-        if (CATEGORIES.length > 0 && !dataLoaded) {
-            const timeBasedCat = getDefaultCategory();
-            if (timeBasedCat && CATEGORIES.includes(timeBasedCat)) {
-                setActiveCategory(timeBasedCat);
+        if (CATEGORIES.length > 0) {
+            const correctCategory = getDefaultCategory();
+
+            // If we are currently on Breakfast, but it's evening, FORCE switch
+            const hour = new Date().getHours();
+            const isEvening = hour >= 17; // 5 PM onwards
+
+            if (isEvening && activeCategory === 'Breakfast' && CATEGORIES.includes('Main Course')) {
+                console.log('FORCE SWITCHING FROM BREAKFAST TO MAIN COURSE');
+                setActiveCategory('Main Course');
+            } else if (!dataLoaded) {
+                // Initial load snap
+                if (correctCategory && CATEGORIES.includes(correctCategory)) {
+                    setActiveCategory(correctCategory);
+                }
+                setDataLoaded(true);
             }
-            setDataLoaded(true);
         }
-    }, [CATEGORIES, dataLoaded]);
+    }, [CATEGORIES, dataLoaded, activeCategory]);
 
     // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
     useEffect(() => {
