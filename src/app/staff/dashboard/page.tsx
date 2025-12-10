@@ -500,7 +500,7 @@ export default function StaffDashboard() {
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[calc(100vh-280px)] lg:overflow-hidden pb-10 lg:pb-0">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[calc(100vh-280px)] lg:overflow-hidden pb-32 lg:pb-0">
                 <StatusColumn
                     title="Pending"
                     icon={<Clock size={20} />}
@@ -609,7 +609,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 </div>
             </div>
 
-            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 rounded-xl px-4 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            <div className="space-y-2 mb-4 border-t border-b border-white/5 py-3 bg-black/20 rounded-xl px-4 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
                 {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-base text-gray-300 items-center">
                         <span className="flex items-center gap-2">
@@ -620,7 +620,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 ))}
             </div>
 
-            <div className="flex flex-col gap-3 relative z-10">
+            <div className="flex flex-col gap-3 relative z-10 shrink-0 mt-auto">
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={onPrintKOT}
