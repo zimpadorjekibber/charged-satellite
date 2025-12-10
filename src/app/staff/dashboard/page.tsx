@@ -542,7 +542,7 @@ export default function StaffDashboard() {
     );
 }
 
-function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill, handleShareBill }: any) {
+function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill, handleShareBill, handleShareKOT }: any) {
     return (
         <div className={`glass-card rounded-2xl flex flex-col h-full border ${borderColor} ${bgColor}`}>
             <div className={`flex items-center gap-3 p-4 border-b ${borderColor} ${color}`}>
@@ -563,6 +563,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
                             onPrintKOT={() => handlePrintKOT(order)}
                             onPrintBill={() => handlePrintBill(order)}
                             onShareBill={() => handleShareBill(order)}
+                            onShareKOT={() => handleShareKOT(order)}
                         />
                     ))}
                 </AnimatePresence>
@@ -580,7 +581,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
     )
 }
 
-function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShareBill }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void }) {
+function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
     const tables = useStore((state) => state.tables);
 
     return (
@@ -620,25 +621,31 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
             </div>
 
             <div className="flex flex-col gap-3">
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={onPrintKOT}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all"
+                        className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
                     >
                         🖨️ KOT
                     </button>
                     <button
+                        onClick={onShareKOT}
+                        className="bg-orange-500/80 hover:bg-orange-600/80 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
+                    >
+                        📱 Share KOT
+                    </button>
+
+                    <button
                         onClick={onPrintBill}
-                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-purple-900/20 active:scale-95 transition-all"
+                        className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-purple-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
                     >
                         🧾 Bill
                     </button>
                     <button
                         onClick={onShareBill}
-                        className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-green-900/20 active:scale-95 transition-all"
-                        title="Share Bill via WhatsApp"
+                        className="bg-purple-600/80 hover:bg-purple-700/80 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-green-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
                     >
-                        📱 Share
+                        📱 Share Bill
                     </button>
                 </div>
 
