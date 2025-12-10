@@ -115,8 +115,12 @@ interface AppState {
     media: MediaItem[]; // New media gallery
     geoRadius: number;
     contactInfo: ContactSettings;
+    isListening?: boolean; // Track if listeners are active
 
+    isListening: boolean;
+    unsubscribers: (() => void)[];
     initialize: () => void;
+    cleanup: () => void;
 
     setTableId: (id: string) => void;
     addTable: (name: string) => Promise<void>;
@@ -166,6 +170,8 @@ export const useStore = create<AppState>()(
             reviews: [],
             valleyUpdates: [],
             media: [],
+            isListening: false,
+            unsubscribers: [],
             geoRadius: 5,
             contactInfo: {
                 phone: '+919876543210',
@@ -174,71 +180,85 @@ export const useStore = create<AppState>()(
             },
 
             initialize: () => {
+                const state = get();
+                if (state.isListening) return;
+                set({ isListening: true });
+
                 // Generate Session ID if missing (persisted automatically)
-                if (!get().sessionId) {
+                if (!state.sessionId) {
                     set({ sessionId: Math.random().toString(36).substring(2) + Date.now().toString(36) });
                 }
+
+                const unsubscribers: (() => void)[] = [];
 
                 // Real-time Listeners
 
                 // Menu
-                onSnapshot(collection(db, 'menu'), (snap) => {
+                unsubscribers.push(onSnapshot(collection(db, 'menu'), (snap) => {
                     const menu = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MenuItem[];
                     set({ menu });
-                });
+                }));
 
                 // Tables
-                onSnapshot(collection(db, 'tables'), (snap) => {
+                unsubscribers.push(onSnapshot(collection(db, 'tables'), (snap) => {
                     const tables = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Table[];
                     set({ tables: tables.sort((a, b) => a.name.localeCompare(b.name)) });
-                });
+                }));
 
                 // Orders
                 const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-                onSnapshot(ordersQuery, (snap) => {
+                unsubscribers.push(onSnapshot(ordersQuery, (snap) => {
                     const orders = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Order[];
                     set({ orders });
-                });
+                }));
 
                 // Notifications
                 const notifQuery = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'));
-                onSnapshot(notifQuery, (snap) => {
+                unsubscribers.push(onSnapshot(notifQuery, (snap) => {
                     const notifications = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Notification[];
                     set({ notifications });
-                });
+                }));
 
                 // Reviews
                 const reviewsQuery = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
-                onSnapshot(reviewsQuery, (snap) => {
+                unsubscribers.push(onSnapshot(reviewsQuery, (snap) => {
                     const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Review[];
                     set({ reviews });
-                });
+                }));
 
                 // Media Gallery
                 const mediaQuery = query(collection(db, 'settings', 'media', 'library'), orderBy('createdAt', 'desc'));
-                onSnapshot(mediaQuery, (snap) => {
+                unsubscribers.push(onSnapshot(mediaQuery, (snap) => {
                     const media = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MediaItem[];
                     set({ media });
-                });
+                }));
 
                 // Updates & Global Settings
-                onSnapshot(doc(db, 'settings', 'global'), (doc) => {
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'global'), (doc) => {
                     if (doc.exists()) {
                         set({ geoRadius: doc.data().geoRadius || 5 });
                     }
-                });
-                onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
+                }));
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
                     if (doc.exists()) {
                         set({ valleyUpdates: doc.data().list || [] });
                     }
-                });
+                }));
 
                 // Contact Settings
-                onSnapshot(doc(db, 'settings', 'contact'), (doc) => {
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'contact'), (doc) => {
                     if (doc.exists()) {
                         set({ contactInfo: doc.data() as ContactSettings });
                     }
-                });
+                }));
+
+                set({ isListening: true, unsubscribers });
+            },
+
+            cleanup: () => {
+                const { unsubscribers } = get();
+                unsubscribers.forEach(unsub => unsub());
+                set({ isListening: false, unsubscribers: [] });
             },
 
             setTableId: (id) => set({ currentTableId: id }),

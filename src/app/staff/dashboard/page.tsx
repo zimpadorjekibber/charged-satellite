@@ -62,6 +62,12 @@ export default function StaffDashboard() {
         };
     }, []);
 
+    // Initialize Store (Real-time) - only once
+    const initialize = useStore((state) => state.initialize);
+    useEffect(() => {
+        initialize();
+    }, [initialize]);
+
     const playNotificationSound = () => {
         try {
             if (!audioCtxRef.current) {
@@ -76,15 +82,16 @@ export default function StaffDashboard() {
 
             const now = ctx.currentTime;
 
-            // Simple robust beep pattern
+            // LOUD ALARM: Sawtooth wave (sharper sound)
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(800, now);
-            osc.frequency.exponentialRampToValueAtTime(400, now + 0.5);
+            osc.type = 'sawtooth'; // Sharper, louder perception than triangle
+            osc.frequency.setValueAtTime(880, now); // A5 (High pitch)
+            osc.frequency.linearRampToValueAtTime(440, now + 0.3); // Drop pitch (Siren effect)
 
-            gain.gain.setValueAtTime(1, now);
+            // High Gain
+            gain.gain.setValueAtTime(0.3, now); // Start loud
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
 
             osc.connect(gain);
@@ -93,70 +100,25 @@ export default function StaffDashboard() {
             osc.start(now);
             osc.stop(now + 0.5);
 
-            // Loop the beep 4 more times (5 total) for noisy kitchen environment
-            for (let i = 1; i < 5; i++) {
-                setTimeout(() => {
-                    const oscLoop = ctx.createOscillator();
-                    const gainLoop = ctx.createGain();
-                    oscLoop.type = 'triangle';
-                    oscLoop.frequency.setValueAtTime(800, ctx.currentTime);
-                    oscLoop.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.5);
-                    gainLoop.gain.setValueAtTime(1, ctx.currentTime);
-                    gainLoop.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                    oscLoop.connect(gainLoop);
-                    gainLoop.connect(ctx.destination);
-                    oscLoop.start(ctx.currentTime);
-                    oscLoop.stop(ctx.currentTime + 0.5);
-                }, i * 700);
-            }
+            // Repeat for urgency (Double Beep)
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(880, ctx.currentTime);
+                osc2.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.3);
+                gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.5);
+            }, 400);
 
         } catch (e) {
             console.error("Audio play failed", e);
         }
     };
-
-    const isFirstMountOrders = useRef(true);
-    // Monitor for new pending orders
-    useEffect(() => {
-        if (isFirstMountOrders.current) {
-            isFirstMountOrders.current = false;
-            setPrevPendingCount(pendingOrdersCount);
-            return;
-        }
-
-        if (pendingOrdersCount > prevPendingCount) {
-            playNotificationSound();
-            setShowVisualAlert(true);
-            setTimeout(() => setShowVisualAlert(false), 3000);
-        }
-        setPrevPendingCount(pendingOrdersCount);
-    }, [pendingOrdersCount]);
-
-    // Monitor for new notifications
-    const [prevNotifCount, setPrevNotifCount] = useState(0);
-    const activeNotifCount = activeNotifications.length;
-    const isFirstMountNotifs = useRef(true);
-
-    useEffect(() => {
-        if (isFirstMountNotifs.current) {
-            isFirstMountNotifs.current = false;
-            setPrevNotifCount(activeNotifCount);
-            return;
-        }
-
-        if (activeNotifCount > prevNotifCount) {
-            playNotificationSound();
-        }
-        setPrevNotifCount(activeNotifCount);
-    }, [activeNotifCount]);
-
-    const initialize = useStore((state) => state.initialize);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            initialize();
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [initialize]);
 
 
     const handleLogin = async (e: React.FormEvent) => {
