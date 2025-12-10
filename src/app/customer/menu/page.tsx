@@ -39,7 +39,7 @@ export default function MenuPage() {
     const allCategories = Array.from(new Set(menu.map(item => item.category)));
 
     // Define a preferred order for standard categories
-    const PREFERRED_ORDER = ['Starters', 'Main Course', 'Beverages', 'Dessert'];
+    const PREFERRED_ORDER = ['Starters', 'Main Course', 'Indian Dishes', 'Chinese Dishes', 'Beverages', 'Dessert'];
 
     // Seasonal filtering: Hide cold beverages in winter (Oct-Apr), show only in summer (May-Sep)
     const isSummerSeason = () => {
@@ -64,47 +64,55 @@ export default function MenuPage() {
     });
 
     // Sort categories: Preferred ones first, then alphabetical for the rest
-    const CATEGORIES = [
-        ...PREFERRED_ORDER.filter(c => seasonalCategories.includes(c)),
-        ...seasonalCategories.filter(c => !PREFERRED_ORDER.includes(c)).sort()
-    ];
+    const CATEGORIES = [...seasonalCategories].sort((a, b) => {
+        const aIndex = PREFERRED_ORDER.findIndex(p => a.toLowerCase() === p.toLowerCase());
+        const bIndex = PREFERRED_ORDER.findIndex(p => b.toLowerCase() === p.toLowerCase());
+
+        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+
+        return a.localeCompare(b);
+    });
 
     // Time-based default category
     const getDefaultCategory = (): Category => {
         const hour = new Date().getHours();
 
-        const hasMainCourse = seasonalCategories.includes('Main Course');
-        const hasStarters = seasonalCategories.includes('Starters');
-        const hasBreakfast = seasonalCategories.includes('Breakfast');
-        const hasBeverages = seasonalCategories.includes('Beverages');
+        // Helper to find actual category name (case-insensitive)
+        const findCat = (keywords: string[]) => {
+            for (const keyword of keywords) {
+                const match = CATEGORIES.find(c => c.toLowerCase().includes(keyword.toLowerCase()));
+                if (match) return match;
+            }
+            return undefined;
+        };
 
-        console.log('Category Check:', { hour, hasMainCourse, hasStarters, hasBreakfast });
+        const lunchDinnerOptions = findCat(['main course', 'main', 'indian', 'chinese', 'thali', 'rice', 'dinner', 'lunch']);
+        const starterOptions = findCat(['starter', 'snack', 'tandoor', 'appetizer']);
+        const breakfastOption = findCat(['breakfast', 'morning', 'paratha', 'toast']);
+        const beverageOption = findCat(['beverage', 'drink', 'coffee', 'tea']);
 
         // NIGHT / EVENING / AFTERNOON (12 PM onwards)
         if (hour >= 12) {
-            if (hasMainCourse) return 'Main Course';
-            if (hasStarters) return 'Starters';
-            // Only show breakfast if NOTHING else is available
+            if (lunchDinnerOptions) return lunchDinnerOptions;
+            if (starterOptions) return starterOptions;
         }
 
         // MORNING (5 AM - 12 PM)
         if (hour >= 5 && hour < 12) {
-            if (hasBreakfast) return 'Breakfast';
-            if (hasBeverages) return 'Beverages';
-            if (seasonalCategories.includes('Hot Beverages')) return 'Hot Beverages';
+            if (breakfastOption) return breakfastOption;
+            if (beverageOption) return beverageOption;
         }
 
-        // LATE NIGHT (12 AM - 5 AM) - Show Starters or Beverages
+        // LATE NIGHT (12 AM - 5 AM)
         if (hour < 5) {
-            if (hasStarters) return 'Starters';
-            if (hasBeverages) return 'Beverages';
+            if (starterOptions) return starterOptions;
+            if (beverageOption) return beverageOption;
         }
 
-        // Fallbacks if preferred time-based category is missing
-        if (hasMainCourse) return 'Main Course';
-        if (hasStarters) return 'Starters';
-
-        return CATEGORIES[0] || 'Starters';
+        // Final Fallbacks
+        return lunchDinnerOptions || starterOptions || CATEGORIES[0] || 'Starters';
     };
 
     const [activeCategory, setActiveCategory] = useState<Category>(getDefaultCategory());
@@ -114,18 +122,34 @@ export default function MenuPage() {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // FIX: Force switch to correct category when data loads
+    // FIX: Force switch to correct category when data loads or time mismatch detected
     useEffect(() => {
         if (CATEGORIES.length > 0) {
             const correctCategory = getDefaultCategory();
-
-            // If we are currently on Breakfast, but it's evening, FORCE switch
             const hour = new Date().getHours();
             const isEvening = hour >= 17; // 5 PM onwards
 
-            if (isEvening && activeCategory === 'Breakfast' && CATEGORIES.includes('Main Course')) {
-                console.log('FORCE SWITCHING FROM BREAKFAST TO MAIN COURSE');
-                setActiveCategory('Main Course');
+            // Check if we are stuck on Breakfast in the evening
+            const isBreakfast = activeCategory.toLowerCase().includes('breakfast');
+
+            // Define what constitutes a "Dinner" category
+            const isDinnerCategory = (cat: string) => {
+                const lower = cat.toLowerCase();
+                return lower.includes('main') || lower.includes('indian') || lower.includes('chinese') || lower.includes('starter');
+            };
+
+            const hasDinnerOption = CATEGORIES.some(isDinnerCategory);
+
+            if (isEvening && isBreakfast && hasDinnerOption) {
+                const bestOption = CATEGORIES.find(c => c.toLowerCase().includes('main')) ||
+                    CATEGORIES.find(c => c.toLowerCase().includes('indian')) ||
+                    CATEGORIES.find(c => c.toLowerCase().includes('chinese')) ||
+                    CATEGORIES.find(c => c.toLowerCase().includes('starter'));
+
+                if (bestOption) {
+                    console.log('Fixed: Force switching from Breakfast to', bestOption);
+                    setActiveCategory(bestOption);
+                }
             } else if (!dataLoaded) {
                 // Initial load snap
                 if (correctCategory && CATEGORIES.includes(correctCategory)) {
@@ -139,7 +163,9 @@ export default function MenuPage() {
     // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
     useEffect(() => {
         if (CATEGORIES.length > 0 && !CATEGORIES.includes(activeCategory)) {
-            setActiveCategory(CATEGORIES[0]);
+            // Attempt to find case-insensitive match before falling back entirely
+            const similar = CATEGORIES.find(c => c.toLowerCase() === activeCategory.toLowerCase());
+            setActiveCategory(similar || CATEGORIES[0]);
         }
     }, [CATEGORIES, activeCategory]);
 
