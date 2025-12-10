@@ -424,6 +424,18 @@ export default function MenuPage() {
                                 </div>
                             </a>
 
+                            {contactInfo.secondaryPhone && (
+                                <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                    <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                                        <Phone size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-200">Alternative Number</p>
+                                        <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
+                                    </div>
+                                </a>
+                            )}
+
                             <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
                                 <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                                     <MessageCircle size={24} />

@@ -90,6 +90,7 @@ export interface ValleyUpdate {
 
 export interface ContactSettings {
     phone: string;
+    secondaryPhone?: string;
     whatsapp: string;
     mapsLocation: string;
 }
@@ -175,6 +176,7 @@ export const useStore = create<AppState>()(
             geoRadius: 5,
             contactInfo: {
                 phone: '+919876543210',
+                secondaryPhone: '+919418612295',
                 whatsapp: '+919876543210',
                 mapsLocation: 'TashiZom+Resort'
             },
