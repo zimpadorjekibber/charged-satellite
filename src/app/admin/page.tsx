@@ -199,8 +199,8 @@ export default function AdminDashboard() {
 
     // Computed Stats
     const totalRevenue = (orders || []).reduce((sum, order) => sum + order.totalAmount, 0);
-    const activeOrders = (orders || []).filter(o => o.status !== 'Paid');
-    const pastOrders = (orders || []).filter(o => o.status === 'Paid');
+    const activeOrders = (orders || []).filter(o => o.status !== 'Paid' && o.status !== 'Rejected' && o.status !== 'Cancelled');
+    const pastOrders = (orders || []).filter(o => o.status === 'Paid' || o.status === 'Rejected' || o.status === 'Cancelled');
 
     return (
         <div className="min-h-screen bg-neutral-900 pb-20">
