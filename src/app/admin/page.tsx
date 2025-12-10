@@ -6,6 +6,23 @@ import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function AdminDashboard() {
     const orders = useStore((state) => state.orders);
@@ -1029,49 +1046,20 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
-                                {/* Menu Items List */}
-                                <div className="space-y-2">
-                                    {menu
+                                {/* Menu Items List - Drag and Drop */}
+                                <SortableMenuList
+                                    items={menu
                                         .filter(item => {
                                             const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
                                             const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
                                             return matchesSearch && matchesCategory;
                                         })
-                                        .map((item) => (
-                                            <div key={item.id} className="flex items-center justify-between bg-neutral-800 p-3 rounded-lg border border-white/5 hover:border-white/10">
-                                                <div className="flex items-center gap-4">
-                                                    {item.image && <img src={item.image} className="w-10 h-10 rounded object-cover" />}
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <p className="font-bold text-white">{item.name}</p>
-                                                            {/* Status Indicators */}
-                                                            <span className={`w-2 h-2 rounded-full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'}`} />
-                                                            {item.isVegetarian ? <Leaf size={12} className="text-green-500" /> : <Drumstick size={12} className="text-red-500" />}
-                                                        </div>
-                                                        <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    {/* Toggles */}
-                                                    <button
-                                                        onClick={() => useStore.getState().updateMenuItem(item.id, { available: !(item.available !== false) })}
-                                                        className={`px-2 py-1 rounded text-xs font-bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
-                                                    >
-                                                        {item.available !== false ? 'Active' : 'Sold Out'}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
-                                                        className={`p-1.5 rounded text-xs font-bold flex items-center justify-center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'}`}
-                                                        title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
-                                                    >
-                                                        {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
-                                                    </button>
-                                                    <button onClick={() => setEditingItem(item)} className="text-blue-400 hover:text-white hover:bg-blue-500/20 p-2 rounded transition-colors"><Pencil size={16} /></button>
-                                                    <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors"><TrashIcon /></button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                </div>
+                                        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))}
+                                    onReorder={(newItems) => {
+                                        useStore.getState().reorderMenuItems(newItems);
+                                    }}
+                                    onEdit={setEditingItem}
+                                />
 
                                 {/* EDIT ITEM MODAL */}
                                 {editingItem && (
@@ -1520,3 +1508,144 @@ function StatusBadge({ status }: { status: string }) {
     } as any;
     return <span className={`px-2 py-1 rounded text-xs font-bold ${colors[status] || 'bg-gray-500/20'}`}>{status}</span>;
 }
+
+// Drag and Drop Components
+function SortableMenuList({ items, onReorder, onEdit }: { items: any[]; onReorder: (items: any[]) => void; onEdit: (item: any) => void }) {
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [localItems, setLocalItems] = useState(items);
+
+    useEffect(() => {
+        setLocalItems(items);
+    }, [items]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragStart = (event: DragEndEvent) => {
+        setActiveId(event.active.id as string);
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const oldIndex = localItems.findIndex((item) => item.id === active.id);
+            const newIndex = localItems.findIndex((item) => item.id === over.id);
+
+            const newItems = arrayMove(localItems, oldIndex, newIndex);
+            setLocalItems(newItems);
+            onReorder(newItems);
+        }
+
+        setActiveId(null);
+    };
+
+    if (localItems.length === 0) {
+        return (
+            <div className="text-center py-12 bg-neutral-800/50 rounded-xl border border-dashed border-white/10">
+                <p className="text-gray-500">No menu items found. Add some items or adjust your filters.</p>
+            </div>
+        );
+    }
+
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+        >
+            <SortableContext items={localItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                    {localItems.map((item) => (
+                        <SortableMenuItem key={item.id} item={item} onEdit={onEdit} />
+                    ))}
+                </div>
+            </SortableContext>
+        </DndContext>
+    );
+}
+
+function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => void }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: item.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`flex items-center justify-between bg-neutral-800 p-3 rounded-lg border ${isDragging ? 'border-tashi-accent shadow-lg shadow-tashi-accent/20' : 'border-white/5 hover:border-white/10'
+                }`}
+        >
+            {/* Drag Handle */}
+            <div
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing text-gray-500 hover:text-white p-2 -ml-2"
+                title="Drag to reorder"
+            >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <circle cx="7" cy="5" r="1.5" />
+                    <circle cx="13" cy="5" r="1.5" />
+                    <circle cx="7" cy="10" r="1.5" />
+                    <circle cx="13" cy="10" r="1.5" />
+                    <circle cx="7" cy="15" r="1.5" />
+                    <circle cx="13" cy="15" r="1.5" />
+                </svg>
+            </div>
+
+            {/* Item Info */}
+            <div className="flex items-center gap-4 flex-1">
+                {item.image && <img src={item.image} className="w-10 h-10 rounded object-cover" />}
+                <div>
+                    <div className="flex items-center gap-2">
+                        <p className="font-bold text-white">{item.name}</p>
+                        <span className={`w-2 h-2 rounded-full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'}`} />
+                        {item.isVegetarian ? <Leaf size={12} className="text-green-500" /> : <Drumstick size={12} className="text-red-500" />}
+                    </div>
+                    <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
+                </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+                <button
+                    onClick={() => useStore.getState().updateMenuItem(item.id, { available: !(item.available !== false) })}
+                    className={`px-2 py-1 rounded text-xs font-bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
+                >
+                    {item.available !== false ? 'Active' : 'Sold Out'}
+                </button>
+                <button
+                    onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
+                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'}`}
+                    title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
+                >
+                    {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
+                </button>
+                <button onClick={() => onEdit(item)} className="text-blue-400 hover:text-white hover:bg-blue-500/20 p-2 rounded transition-colors">
+                    <Pencil size={16} />
+                </button>
+                <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors">
+                    <Trash size={16} />
+                </button>
+            </div>
+        </div>
+    );
+}
+```
