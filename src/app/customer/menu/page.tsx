@@ -40,10 +40,32 @@ export default function MenuPage() {
     // Define a preferred order for standard categories
     const PREFERRED_ORDER = ['Starters', 'Main Course', 'Beverages', 'Dessert'];
 
+    // Seasonal filtering: Hide cold beverages in winter (Oct-Apr), show only in summer (May-Sep)
+    const isSummerSeason = () => {
+        const month = new Date().getMonth(); // 0 = January, 11 = December
+        // May = 4, June = 5, July = 6, August = 7, September = 8
+        return month >= 4 && month <= 8;
+    };
+
+    // Summer-only categories
+    const SUMMER_ONLY_CATEGORIES = ['Cold Beverages', 'Shakes', 'Cold Drinks'];
+
+    // Filter categories based on season
+    const seasonalCategories = allCategories.filter(category => {
+        // If it's a summer-only category, only show during summer
+        if (SUMMER_ONLY_CATEGORIES.some(summerCat =>
+            category.toLowerCase().includes(summerCat.toLowerCase())
+        )) {
+            return isSummerSeason();
+        }
+        // Show all other categories year-round
+        return true;
+    });
+
     // Sort categories: Preferred ones first, then alphabetical for the rest
     const CATEGORIES = [
-        ...PREFERRED_ORDER.filter(c => allCategories.includes(c)),
-        ...allCategories.filter(c => !PREFERRED_ORDER.includes(c)).sort()
+        ...PREFERRED_ORDER.filter(c => seasonalCategories.includes(c)),
+        ...seasonalCategories.filter(c => !PREFERRED_ORDER.includes(c)).sort()
     ];
 
     // Time-based default category
