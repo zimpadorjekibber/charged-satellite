@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   description: "Experience the taste of high altitude.",
   manifest: '/manifest.json',
   icons: {
-    icon: '/tashi-corner.png',
-    apple: '/tashi-corner.png', // Uses the same logo for Apple home screen
+    icon: '/tashizom-logo.png',
+    apple: '/tashizom-logo.png', // Uses the same logo for Apple home screen
   },
   appleWebApp: {
     capable: true,
