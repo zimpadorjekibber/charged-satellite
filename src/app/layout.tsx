@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://tashizomcafe.in'),
   title: "TashiZom | Digital Dining",
   description: "Experience the taste of high altitude.",
-  manifest: '/manifest.webmanifest', // Next.js will serve the manifest from the generated route
+  manifest: '/manifest.json',
   icons: {
     icon: '/tashi-corner.png',
     apple: '/tashi-corner.png', // Uses the same logo for Apple home screen
