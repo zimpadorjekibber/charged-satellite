@@ -71,24 +71,38 @@ export default function MenuPage() {
     // Time-based default category
     const getDefaultCategory = (): Category => {
         const hour = new Date().getHours();
+        console.log('🕐 Current hour:', hour, '| Available categories:', seasonalCategories);
 
         // 5 AM - 9 AM: Hot Beverages
         if (hour >= 5 && hour < 9) {
-            if (allCategories.includes('Hot Beverages')) return 'Hot Beverages';
-            if (allCategories.includes('Beverages')) return 'Beverages';
+            if (seasonalCategories.includes('Hot Beverages')) {
+                console.log('✅ Showing: Hot Beverages (Morning Time)');
+                return 'Hot Beverages';
+            }
+            if (seasonalCategories.includes('Beverages')) {
+                console.log('✅ Showing: Beverages (Morning Time)');
+                return 'Beverages';
+            }
         }
 
         // 9 AM - 12 PM: Breakfast
         if (hour >= 9 && hour < 12) {
-            if (allCategories.includes('Breakfast')) return 'Breakfast';
+            if (seasonalCategories.includes('Breakfast')) {
+                console.log('✅ Showing: Breakfast (Late Morning)');
+                return 'Breakfast';
+            }
         }
 
         // 12 PM onwards: Main Course
         if (hour >= 12) {
-            if (allCategories.includes('Main Course')) return 'Main Course';
+            if (seasonalCategories.includes('Main Course')) {
+                console.log('✅ Showing: Main Course (Afternoon/Evening)');
+                return 'Main Course';
+            }
         }
 
         // Fallback to first available category
+        console.log('⚠️ Fallback to first category:', CATEGORIES[0]);
         return CATEGORIES[0] || 'Starters';
     };
 
