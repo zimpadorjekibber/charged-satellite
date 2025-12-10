@@ -39,7 +39,18 @@ export default function MenuPage() {
     const allCategories = Array.from(new Set(menu.map(item => item.category)));
 
     // Define a preferred order for standard categories
-    const PREFERRED_ORDER = ['Starters', 'Main Course', 'Indian Dishes', 'Chinese Dishes', 'Beverages', 'Dessert'];
+    const PREFERRED_ORDER = [
+        'Soups & Salads',
+        'Snacks & Starters',
+        'Main Course (Vegetarian)',
+        'Main Course (Non-Vegetarian)',
+        'Rice & Biryani',
+        'Indian Breads',
+        'Chinese',
+        'Pizza & Pasta',
+        'Desserts',
+        'Beverages & Shakes'
+    ];
 
     // Seasonal filtering: Hide cold beverages in winter (Oct-Apr), show only in summer (May-Sep)
     const isSummerSeason = () => {
@@ -168,6 +179,33 @@ export default function MenuPage() {
             setActiveCategory(similar || CATEGORIES[0]);
         }
     }, [CATEGORIES, activeCategory]);
+
+    // Auto-switch category if filter type (Veg/Non-Veg) excludes all items in current category
+    useEffect(() => {
+        if (filterType === 'all') return;
+
+        // Check if current active category has any items matching the filter
+        const currentHasItems = menu.some(item =>
+            item.category === activeCategory &&
+            (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)
+        );
+
+        if (!currentHasItems) {
+            // Find first category that HAS items of this filter type
+            // We search in the order of CATEGORIES to keep it predictable
+            const nextCategory = CATEGORIES.find(cat =>
+                menu.some(item =>
+                    item.category === cat &&
+                    (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)
+                )
+            );
+
+            if (nextCategory) {
+                console.log(`Auto-switching category to ${nextCategory} for ${filterType} filter`);
+                setActiveCategory(nextCategory);
+            }
+        }
+    }, [filterType, menu]); // Only run when filter or menu changes, NOT when activeCategory changes manually
 
     const filteredItems = menu.filter((item) => {
         if (item.category !== activeCategory) return false;
@@ -386,8 +424,8 @@ export default function MenuPage() {
                                     )}
                                     <div className="absolute top-4 left-4">
                                         <div className={`px-3 py-1.5 rounded-full shadow-lg border backdrop-blur-md flex items-center gap-2 ${selectedItem.isVegetarian
-                                                ? 'bg-green-600/90 border-green-400'
-                                                : 'bg-red-600/90 border-red-400'
+                                            ? 'bg-green-600/90 border-green-400'
+                                            : 'bg-red-600/90 border-red-400'
                                             }`}>
                                             {selectedItem.isVegetarian ? (
                                                 <>
@@ -641,8 +679,8 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                 {/* Veg/Non-Veg Indicator (Icons) */}
                 {/* Veg/Non-Veg Indicator (Icons) */}
                 <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
-                        ? 'bg-green-600 border-green-400'
-                        : 'bg-red-600 border-red-400'
+                    ? 'bg-green-600 border-green-400'
+                    : 'bg-red-600 border-red-400'
                     }`}>
                     {item.isVegetarian ? (
                         <Leaf size={14} className="text-white fill-white" />
