@@ -128,6 +128,18 @@ export default function MenuPage() {
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
     const [showAllUpdates, setShowAllUpdates] = useState(false);
     const [showContactInfo, setShowContactInfo] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    // Initial load correction: When categories load, ensure we snap to the correct time-based category
+    useEffect(() => {
+        if (CATEGORIES.length > 0 && !dataLoaded) {
+            const timeBasedCat = getDefaultCategory();
+            if (timeBasedCat && CATEGORIES.includes(timeBasedCat)) {
+                setActiveCategory(timeBasedCat);
+            }
+            setDataLoaded(true);
+        }
+    }, [CATEGORIES, dataLoaded]);
 
     // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
     useEffect(() => {
