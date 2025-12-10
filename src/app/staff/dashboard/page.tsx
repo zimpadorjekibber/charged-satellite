@@ -175,8 +175,9 @@ export default function StaffDashboard() {
         printWindow.document.write(`
             <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: monospace; width: 300px; margin: 0 auto; padding: 20px; }
+                        body { font-family: monospace; width: 100%; max-width: 300px; margin: 0 auto; padding: 10px; }
                         .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
                         .item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
                         .meta { font-size: 12px; margin-bottom: 15px; }
@@ -220,8 +221,9 @@ export default function StaffDashboard() {
         printWindow.document.write(`
             <html>
                 <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { font-family: sans-serif; width: 300px; margin: 0 auto; padding: 20px; }
+                        body { font-family: sans-serif; width: 100%; max-width: 300px; margin: 0 auto; padding: 20px; }
                         .header { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
                         .store-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
                         .item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
@@ -266,6 +268,35 @@ export default function StaffDashboard() {
             </html>
             `);
         printWindow.document.close();
+    };
+
+    const handleShareBill = async (order: Order) => {
+        const rawTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+        const text = `🧾 *TashiZom Bill*\n\n` +
+            `Order #: ${order.id.slice(0, 4)}\n` +
+            `Table: ${order.tableId}\n` +
+            `Date: ${new Date().toLocaleDateString()}\n\n` +
+            `*Items:*\n` +
+            order.items.map(i => `${i.quantity} x ${i.name} - ₹${i.price * i.quantity}`).join('\n') +
+            `\n\n----------------\n` +
+            `*TOTAL: ₹${rawTotal.toFixed(2)}*\n\n` +
+            `Thank you for visiting!`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'TashiZom Bill',
+                    text: text,
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+                // Fallback to clipboard or whatsapp
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            }
+        } else {
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
     };
 
     if (!currentUser || (currentUser.role !== 'staff' && currentUser.role !== 'admin')) {
@@ -469,7 +500,7 @@ export default function StaffDashboard() {
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-280px)] overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[calc(100vh-280px)] lg:overflow-hidden pb-10 lg:pb-0">
                 <StatusColumn
                     title="Pending"
                     icon={<Clock size={20} />}
@@ -480,6 +511,7 @@ export default function StaffDashboard() {
                     onUpdateStatus={updateOrderStatus}
                     handlePrintKOT={handlePrintKOT}
                     handlePrintBill={handlePrintBill}
+                    handleShareBill={handleShareBill}
                 />
                 <StatusColumn
                     title="Cooking"
@@ -491,6 +523,7 @@ export default function StaffDashboard() {
                     onUpdateStatus={updateOrderStatus}
                     handlePrintKOT={handlePrintKOT}
                     handlePrintBill={handlePrintBill}
+                    handleShareBill={handleShareBill}
                 />
                 <StatusColumn
                     title="Ready to Serve"
@@ -502,13 +535,14 @@ export default function StaffDashboard() {
                     onUpdateStatus={updateOrderStatus}
                     handlePrintKOT={handlePrintKOT}
                     handlePrintBill={handlePrintBill}
+                    handleShareBill={handleShareBill}
                 />
             </div>
         </div>
     );
 }
 
-function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill }: any) {
+function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill, handleShareBill }: any) {
     return (
         <div className={`glass-card rounded-2xl flex flex-col h-full border ${borderColor} ${bgColor}`}>
             <div className={`flex items-center gap-3 p-4 border-b ${borderColor} ${color}`}>
@@ -528,6 +562,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
                             onUpdateStatus={(s) => onUpdateStatus(order.id, s)}
                             onPrintKOT={() => handlePrintKOT(order)}
                             onPrintBill={() => handlePrintBill(order)}
+                            onShareBill={() => handleShareBill(order)}
                         />
                     ))}
                 </AnimatePresence>
@@ -545,7 +580,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
     )
 }
 
-function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void }) {
+function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShareBill }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void }) {
     const tables = useStore((state) => state.tables);
 
     return (
@@ -597,6 +632,13 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill }: { or
                         className="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-purple-900/20 active:scale-95 transition-all"
                     >
                         🧾 Bill
+                    </button>
+                    <button
+                        onClick={onShareBill}
+                        className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded font-bold font-mono shadow-lg shadow-green-900/20 active:scale-95 transition-all"
+                        title="Share Bill via WhatsApp"
+                    >
+                        📱 Share
                     </button>
                 </div>
 

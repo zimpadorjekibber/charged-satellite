@@ -108,7 +108,7 @@ function ScanPageContent() {
                 <div className="w-16 h-16 bg-red-900/20 text-red-500 rounded-full flex items-center justify-center mb-6">
                     <MapPinOff size={32} />
                 </div>
-                <h1 className="text-xl font-bold text-white mb-2">Location Restriction</h1>
+                <h1 className="text-xl font-bold text-white mb-2">Turn On Location please...</h1>
                 <p className="text-gray-400 mb-6">{error}</p>
                 <div className="flex flex-col gap-3 w-full">
                     <button
