@@ -115,7 +115,7 @@ interface AppState {
     media: MediaItem[]; // New media gallery
     geoRadius: number;
     contactInfo: ContactSettings;
-    isListening?: boolean; // Track if listeners are active
+
 
     isListening: boolean;
     unsubscribers: (() => void)[];

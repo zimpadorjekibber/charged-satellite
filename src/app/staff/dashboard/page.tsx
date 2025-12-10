@@ -120,6 +120,41 @@ export default function StaffDashboard() {
         }
     };
 
+    const isFirstMountOrders = useRef(true);
+    // Monitor for new pending orders
+    useEffect(() => {
+        if (isFirstMountOrders.current) {
+            isFirstMountOrders.current = false;
+            setPrevPendingCount(pendingOrdersCount);
+            return;
+        }
+
+        if (pendingOrdersCount > prevPendingCount) {
+            playNotificationSound();
+            setShowVisualAlert(true);
+            setTimeout(() => setShowVisualAlert(false), 3000);
+        }
+        setPrevPendingCount(pendingOrdersCount);
+    }, [pendingOrdersCount]);
+
+    // Monitor for new notifications
+    const [prevNotifCount, setPrevNotifCount] = useState(0);
+    const activeNotifCount = activeNotifications.length;
+    const isFirstMountNotifs = useRef(true);
+
+    useEffect(() => {
+        if (isFirstMountNotifs.current) {
+            isFirstMountNotifs.current = false;
+            setPrevNotifCount(activeNotifCount);
+            return;
+        }
+
+        if (activeNotifCount > prevNotifCount) {
+            playNotificationSound();
+        }
+        setPrevNotifCount(activeNotifCount);
+    }, [activeNotifCount]);
+
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
