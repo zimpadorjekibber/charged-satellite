@@ -46,7 +46,31 @@ export default function MenuPage() {
         ...allCategories.filter(c => !PREFERRED_ORDER.includes(c)).sort()
     ];
 
-    const [activeCategory, setActiveCategory] = useState<Category>('Starters');
+    // Time-based default category
+    const getDefaultCategory = (): Category => {
+        const hour = new Date().getHours();
+
+        // 5 AM - 9 AM: Hot Beverages
+        if (hour >= 5 && hour < 9) {
+            if (allCategories.includes('Hot Beverages')) return 'Hot Beverages';
+            if (allCategories.includes('Beverages')) return 'Beverages';
+        }
+
+        // 9 AM - 12 PM: Breakfast
+        if (hour >= 9 && hour < 12) {
+            if (allCategories.includes('Breakfast')) return 'Breakfast';
+        }
+
+        // 12 PM onwards: Main Course
+        if (hour >= 12) {
+            if (allCategories.includes('Main Course')) return 'Main Course';
+        }
+
+        // Fallback to first available category
+        return CATEGORIES[0] || 'Starters';
+    };
+
+    const [activeCategory, setActiveCategory] = useState<Category>(getDefaultCategory());
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
     const [showAllUpdates, setShowAllUpdates] = useState(false);
@@ -599,8 +623,8 @@ function MenuItemListRow({ item, quantity, onAdd, onSelect }: { item: MenuItem; 
         >
             {/* Veg/Non-Veg small indicator */}
             <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.isVegetarian
-                    ? 'bg-green-500/20 border border-green-500/30'
-                    : 'bg-red-500/20 border border-red-500/30'
+                ? 'bg-green-500/20 border border-green-500/30'
+                : 'bg-red-500/20 border border-red-500/30'
                 }`}>
                 {item.isVegetarian ? (
                     <Leaf size={12} className="text-green-400" />
@@ -629,8 +653,8 @@ function MenuItemListRow({ item, quantity, onAdd, onSelect }: { item: MenuItem; 
                         onClick={isAvailable ? onAdd : undefined}
                         disabled={!isAvailable}
                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
-                                ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
-                                : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                            ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                            : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
                             }`}
                     >
                         <Plus size={18} />
