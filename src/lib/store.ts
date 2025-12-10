@@ -385,7 +385,7 @@ export const useStore = create<AppState>()(
                 // Mock Auth for simplicity as requested 'quick fix'
                 // In real app, use Firebase Auth
                 // Admin Login
-                if (username === 'admin' && password === 'admin123') {
+                if (username === 'admin' && password === 'tashizomcafe@123') {
                     set({ currentUser: { id: 'admin', name: 'Admin User', username: 'admin', role: 'admin' } });
                     return true;
                 }

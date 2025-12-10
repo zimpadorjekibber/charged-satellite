@@ -10,7 +10,7 @@
 
 ### Admin Credentials:
 - **Username**: `admin`
-- **Password**: `admin123`
+- **Password**: `tashizomcafe@123`
 
 ### Staff Credentials:
 - **Usernames**: `staff1`, `staff2`, `staff3`
