@@ -259,15 +259,15 @@ export default function MenuPage() {
                     </button>
                     <button
                         onClick={() => setFilterType('veg')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'veg' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'text-gray-500 hover:text-green-400'}`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'veg' ? 'bg-green-600 text-white shadow-lg shadow-green-900' : 'text-green-500 hover:bg-green-500/10'}`}
                     >
-                        <Leaf size={10} /> Veg
+                        <Leaf size={10} className={filterType === 'veg' ? 'fill-white' : 'fill-green-500/30'} /> Veg
                     </button>
                     <button
                         onClick={() => setFilterType('non-veg')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'non-veg' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'text-gray-500 hover:text-red-400'}`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'non-veg' ? 'bg-red-600 text-white shadow-lg shadow-red-900' : 'text-red-500 hover:bg-red-500/10'}`}
                     >
-                        <Drumstick size={10} /> Non-Veg
+                        <Drumstick size={10} className={filterType === 'non-veg' ? 'fill-white' : 'fill-red-500/30'} /> Non-Veg
                     </button>
                 </div>
             </div>
@@ -385,16 +385,19 @@ export default function MenuPage() {
                                         </div>
                                     )}
                                     <div className="absolute top-4 left-4">
-                                        <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full shadow-lg border border-white/10 flex items-center gap-2">
+                                        <div className={`px-3 py-1.5 rounded-full shadow-lg border backdrop-blur-md flex items-center gap-2 ${selectedItem.isVegetarian
+                                                ? 'bg-green-600/90 border-green-400'
+                                                : 'bg-red-600/90 border-red-400'
+                                            }`}>
                                             {selectedItem.isVegetarian ? (
                                                 <>
-                                                    <Leaf size={14} className="text-green-400 fill-green-400/20" />
-                                                    <span className="text-xs text-green-400 font-bold uppercase">Veg</span>
+                                                    <Leaf size={16} className="text-white fill-white" />
+                                                    <span className="text-xs text-white font-bold uppercase">Veg</span>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Drumstick size={14} className="text-red-400 fill-red-400/20" />
-                                                    <span className="text-xs text-red-400 font-bold uppercase">Non-Veg</span>
+                                                    <Drumstick size={16} className="text-white fill-white" />
+                                                    <span className="text-xs text-white font-bold uppercase">Non-Veg</span>
                                                 </>
                                             )}
                                         </div>
@@ -636,11 +639,15 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                 </div>
 
                 {/* Veg/Non-Veg Indicator (Icons) */}
-                <div className="absolute top-2 left-2 z-10 bg-black/60 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-white/10">
+                {/* Veg/Non-Veg Indicator (Icons) */}
+                <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
+                        ? 'bg-green-600 border-green-400'
+                        : 'bg-red-600 border-red-400'
+                    }`}>
                     {item.isVegetarian ? (
-                        <Leaf size={14} className="text-green-400 fill-green-400/20" />
+                        <Leaf size={14} className="text-white fill-white" />
                     ) : (
-                        <Drumstick size={14} className="text-red-400 fill-red-400/20" />
+                        <Drumstick size={14} className="text-white fill-white" />
                     )}
                 </div>
 
@@ -717,14 +724,15 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
             onClick={onSelect}
         >
             {/* Veg/Non-Veg small indicator */}
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.isVegetarian
-                ? 'bg-green-500/20 border border-green-500/30'
-                : 'bg-red-500/20 border border-red-500/30'
+            {/* Veg/Non-Veg small indicator */}
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${item.isVegetarian
+                ? 'bg-green-600 border-green-400'
+                : 'bg-red-600 border-red-400'
                 }`}>
                 {item.isVegetarian ? (
-                    <Leaf size={12} className="text-green-400" />
+                    <Leaf size={14} className="text-white fill-white" />
                 ) : (
-                    <Drumstick size={12} className="text-red-400" />
+                    <Drumstick size={14} className="text-white fill-white" />
                 )}
             </div>
 
