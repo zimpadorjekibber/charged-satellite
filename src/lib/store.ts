@@ -60,6 +60,7 @@ export interface Order {
     acceptedAt?: string;
     customerName?: string;
     customerPhone?: string;
+    sessionId?: string; // New field for tracking unique customer sessions
 }
 
 export interface Notification {
@@ -107,6 +108,7 @@ interface AppState {
     notifications: Notification[];
     cart: OrderItem[];
     currentTableId: string | null;
+    sessionId: string | null; // Unique session for the device
     currentUser: User | null;
     reviews: Review[];
     valleyUpdates: ValleyUpdate[];
@@ -159,6 +161,7 @@ export const useStore = create<AppState>()(
             notifications: [],
             cart: [],
             currentTableId: null,
+            sessionId: null,
             currentUser: null,
             reviews: [],
             valleyUpdates: [],
@@ -171,6 +174,11 @@ export const useStore = create<AppState>()(
             },
 
             initialize: () => {
+                // Generate Session ID if missing (persisted automatically)
+                if (!get().sessionId) {
+                    set({ sessionId: Math.random().toString(36).substring(2) + Date.now().toString(36) });
+                }
+
                 // Real-time Listeners
 
                 // Menu
@@ -286,7 +294,8 @@ export const useStore = create<AppState>()(
                     items: state.cart,
                     totalAmount: total,
                     status: 'Pending',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    sessionId: state.sessionId || 'legacy'// Attach session ID
                 };
 
                 await addDoc(collection(db, 'orders'), orderData);
@@ -408,6 +417,7 @@ export const useStore = create<AppState>()(
                 currentTableId: state.currentTableId,
                 cart: state.cart,
                 currentUser: state.currentUser,
+                sessionId: state.sessionId, // Persist Session ID across reloads
             }),
         }
     )

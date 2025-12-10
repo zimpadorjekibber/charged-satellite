@@ -554,10 +554,15 @@ function MenuItemCard({ item, quantity, onAdd, onSelect }: { item: MenuItem; qua
 function MiniOrderTimer() {
     const orders = useStore((state) => state.orders);
     const currentTableId = useStore((state) => state.currentTableId);
+    const sessionId = useStore((state) => state.sessionId);
 
-    // Find the latest active order
+    // Find the latest active order for THIS session
     const activeOrder = orders
-        .filter(o => o.tableId === currentTableId && (o.status === 'Pending' || o.status === 'Preparing'))
+        .filter(o =>
+            o.tableId === currentTableId &&
+            o.sessionId === sessionId &&
+            (o.status === 'Pending' || o.status === 'Preparing')
+        )
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
     if (!activeOrder) return null;

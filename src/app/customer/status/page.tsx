@@ -10,9 +10,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function OrderStatusPage() {
     const orders = useStore((state) => state.orders);
     const currentTableId = useStore((state) => state.currentTableId);
+    const sessionId = useStore((state) => state.sessionId);
 
-    // Filter orders for the current table
-    const myOrders = orders.filter(o => o.tableId === currentTableId);
+    // Filter orders: Match Table AND (Session OR Legacy behavior if needed, but strict session is improved privacy)
+    // We only show orders created by THIS device (sessionId match)
+    const myOrders = orders.filter(o =>
+        o.tableId === currentTableId &&
+        (o.sessionId === sessionId)
+    );
 
     // Polling to keep orders updated
     const initialize = useStore((state) => state.initialize);
