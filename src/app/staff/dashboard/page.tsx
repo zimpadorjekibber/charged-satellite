@@ -589,7 +589,7 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-neutral-800 p-5 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group flex flex-col"
+            className="bg-neutral-800 p-4 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group flex flex-col max-h-[85vh]"
         >
             <div className="flex justify-between items-start mb-2">
                 <div>
@@ -608,18 +608,18 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                 </div>
             </div>
 
-            <div className="space-y-2 my-3 border-t border-b border-white/5 py-3 bg-black/20 rounded-xl px-4 max-h-[150px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            <div className="space-y-2 my-2 border-t border-b border-white/5 py-2 bg-black/20 rounded-xl px-4 max-h-[100px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
                 {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-base text-gray-300 items-center">
+                    <div key={idx} className="flex justify-between text-sm text-gray-300 items-center">
                         <span className="flex items-center gap-2">
-                            <span className="flex items-center justify-center w-6 h-6 bg-white/10 rounded text-xs font-bold text-white flex-shrink-0">{item.quantity}</span>
-                            <span>{item.name}</span>
+                            <span className="flex items-center justify-center w-5 h-5 bg-white/10 rounded text-xs font-bold text-white flex-shrink-0">{item.quantity}</span>
+                            <span className="text-sm">{item.name}</span>
                         </span>
                     </div>
                 ))}
             </div>
 
-            <div className="flex flex-col gap-3 relative z-10 shrink-0 mt-auto pt-2">
+            <div className="flex flex-col gap-2 relative z-10 shrink-0 mt-auto pt-1">
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={onPrintKOT}
