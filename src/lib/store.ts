@@ -16,7 +16,7 @@ import {
 
 export type Category = string;
 export type UserRole = 'admin' | 'staff';
-export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Paid' | 'Rejected';
+export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Paid' | 'Rejected' | 'Cancelled';
 
 export interface User {
     id: string;
