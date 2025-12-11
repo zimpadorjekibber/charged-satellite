@@ -50,7 +50,8 @@ export default function MenuPage() {
         'Chinese',
         'Pizza & Pasta',
         'Desserts',
-        'Beverages & Shakes'
+        'Tea & Coffee',
+        'Cold Beverages & Shakes'
     ];
 
     // Seasonal filtering: Hide cold beverages in winter (Oct-Apr), show only in summer (May-Sep)
@@ -61,7 +62,7 @@ export default function MenuPage() {
     };
 
     // Summer-only categories
-    const SUMMER_ONLY_CATEGORIES = ['Cold Beverages', 'Shakes', 'Cold Drinks'];
+    const SUMMER_ONLY_CATEGORIES = ['Cold Beverages & Shakes', 'Cold Beverages', 'Shakes', 'Cold Drinks'];
 
     // Filter categories based on season
     const seasonalCategories = allCategories.filter(category => {
