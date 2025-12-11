@@ -149,109 +149,54 @@ export default function MenuPage() {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // Infinite Scroll / Auto-Switch Category Logic
+    // Scroll Spy & Navigation Logic
     useEffect(() => {
-        const handleScroll = () => {
-            // Check if we are near the bottom of the page
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
-                const currentIndex = CATEGORIES.indexOf(activeCategory);
-                // If it's not the last category, switch to the next one
-                if (currentIndex !== -1 && currentIndex < CATEGORIES.length - 1) {
-                    const nextCat = CATEGORIES[currentIndex + 1];
-                    // Debounce/Check to prevent rapid switching could be good, but for now direct switch
-                    // To avoid instant jumping loop, we might want to verify we are actually scrolling DOWN and interacting
-                    // But simplified: Switch and scroll to top
-                    console.log('Auto-switching to next category:', nextCat);
-                    setActiveCategory(nextCat);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px', // Activate when section is near top/center
+            threshold: 0
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [activeCategory, CATEGORIES]);
+        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveCategory(entry.target.id as Category);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        CATEGORIES.forEach((cat) => {
+            const element = document.getElementById(cat);
+            if (element) observer.observe(element);
+        });
+
+        return () => observer.disconnect();
+    }, [CATEGORIES, dataLoaded]); // Re-attach when categories load
+
+    const scrollToCategory = (cat: string) => {
+        setActiveCategory(cat);
+        const element = document.getElementById(cat);
+        if (element) {
+            // Offset for fixed header (approx 120px)
+            const y = element.getBoundingClientRect().top + window.scrollY - 120;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+    };
 
     // FIX: Force switch to correct category when data loads or time mismatch detected
     useEffect(() => {
-        if (CATEGORIES.length > 0) {
+        if (CATEGORIES.length > 0 && !dataLoaded) {
             const correctCategory = getDefaultCategory();
-            const hour = new Date().getHours();
-            const isEvening = hour >= 17; // 5 PM onwards
-
-            // Check if we are stuck on Breakfast in the evening
-            const isBreakfast = activeCategory.toLowerCase().includes('breakfast') || activeCategory.toLowerCase().includes('tea');
-
-            // Define what constitutes a "Dinner" category
-            const isDinnerCategory = (cat: string) => {
-                const lower = cat.toLowerCase();
-                return lower.includes('main') || lower.includes('indian') || lower.includes('chinese') || lower.includes('starter');
-            };
-
-            const hasDinnerOption = CATEGORIES.some(isDinnerCategory);
-
-            if (isEvening && isBreakfast && hasDinnerOption) {
-                const bestOption = CATEGORIES.find(c => c.toLowerCase().includes('main')) ||
-                    CATEGORIES.find(c => c.toLowerCase().includes('indian')) ||
-                    CATEGORIES.find(c => c.toLowerCase().includes('chinese')) ||
-                    CATEGORIES.find(c => c.toLowerCase().includes('starter'));
-
-                if (bestOption) {
-                    console.log('Fixed: Force switching from Breakfast to', bestOption);
-                    setActiveCategory(bestOption);
-                }
-            } else if (!dataLoaded) {
-                // Initial load snap
-                if (correctCategory && CATEGORIES.includes(correctCategory)) {
-                    setActiveCategory(correctCategory);
-                }
-                setDataLoaded(true);
-            }
+            // Initial scroll to default category
+            setTimeout(() => {
+                scrollToCategory(correctCategory);
+            }, 500);
+            setDataLoaded(true);
         }
-    }, [CATEGORIES, dataLoaded, activeCategory]);
+    }, [CATEGORIES, dataLoaded]);
 
-    // Ensure active category is valid (fallback to first available if current selection is empty/invalid)
-    useEffect(() => {
-        if (CATEGORIES.length > 0 && !CATEGORIES.includes(activeCategory)) {
-            // Attempt to find case-insensitive match before falling back entirely
-            const similar = CATEGORIES.find(c => c.toLowerCase() === activeCategory.toLowerCase());
-            setActiveCategory(similar || CATEGORIES[0]);
-        }
-    }, [CATEGORIES, activeCategory]);
-
-    // Auto-switch category if filter type (Veg/Non-Veg) excludes all items in current category
-    useEffect(() => {
-        if (filterType === 'all') return;
-
-        // Check if current active category has any items matching the filter
-        const currentHasItems = menu.some(item =>
-            item.category === activeCategory &&
-            (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)
-        );
-
-        if (!currentHasItems) {
-            // Find first category that HAS items of this filter type
-            // We search in the order of CATEGORIES to keep it predictable
-            const nextCategory = CATEGORIES.find(cat =>
-                menu.some(item =>
-                    item.category === cat &&
-                    (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)
-                )
-            );
-
-            if (nextCategory) {
-                console.log(`Auto-switching category to ${nextCategory} for ${filterType} filter`);
-                setActiveCategory(nextCategory);
-            }
-        }
-    }, [filterType, menu]); // Only run when filter or menu changes, NOT when activeCategory changes manually
-
-    const filteredItems = menu.filter((item) => {
-        if (item.category !== activeCategory) return false;
-        if (filterType === 'veg') return item.isVegetarian;
-        if (filterType === 'non-veg') return !item.isVegetarian;
-        return true;
-    });
 
     const getQuantity = (id: string) => {
         return cart.find((i) => i.menuItemId === id)?.quantity || 0;
@@ -359,7 +304,7 @@ export default function MenuPage() {
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
-                            onClick={() => setActiveCategory(cat)}
+                            onClick={() => scrollToCategory(cat)}
                             className={`relative whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeCategory === cat
                                 ? 'text-tashi-dark'
                                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
@@ -381,68 +326,79 @@ export default function MenuPage() {
                 </div>
             </div>
 
-            {/* Menu Grid */}
-            <div className="mt-6 space-y-6">
-                {/* Items WITH images - Display as cards */}
-                {filteredItems.filter(item => item.image).length > 0 && (
-                    <motion.div
-                        key={`${activeCategory}-with-images`}
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="show"
-                        className="grid grid-cols-1 md:grid-cols-2 gap-5"
-                    >
-                        {filteredItems.filter(item => item.image).map((item) => (
-                            <MenuItemCard
-                                key={item.id}
-                                item={item}
-                                quantity={getQuantity(item.id)}
-                                onAdd={() => addToCart(item)}
-                                onRemove={() => removeFromCart(item.id)}
-                                onSelect={() => setSelectedItem(item)}
-                            />
-                        ))}
-                    </motion.div>
-                )}
+            {/* Menu Grid - CONTINUOUS SCROLL */}
+            <div className="mt-6 space-y-12">
+                {CATEGORIES.map((cat) => {
+                    // Filter items for this category based on filterType
+                    const categoryItems = menu.filter((item) => {
+                        if (item.category !== cat) return false;
+                        if (filterType === 'veg') return item.isVegetarian;
+                        if (filterType === 'non-veg') return !item.isVegetarian;
+                        return true;
+                    });
 
-                {/* Items WITHOUT images - Display as compact list */}
-                {filteredItems.filter(item => !item.image).length > 0 && (
-                    <motion.div
-                        key={`${activeCategory}-no-images`}
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="show"
-                        className="space-y-2"
-                    >
-                        {filteredItems.filter(item => !item.image).map((item) => (
-                            <MenuItemListRow
-                                key={item.id}
-                                item={item}
-                                quantity={getQuantity(item.id)}
-                                onAdd={() => addToCart(item)}
-                                onRemove={() => removeFromCart(item.id)}
-                                onSelect={() => setSelectedItem(item)}
-                            />
-                        ))}
-                    </motion.div>
-                )}
+                    if (categoryItems.length === 0) return null;
 
-                {filteredItems.length === 0 && (
-                    <div className="text-center py-20 text-gray-500 italic">
-                        No items found in {activeCategory}.
-                    </div>
-                )}
+                    return (
+                        <section key={cat} id={cat} className="scroll-mt-32">
+                            {/* Typewriter Header */}
+                            <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-black via-black/90 to-transparent backdrop-blur-sm -mx-2 px-2">
+                                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/20" />
+                                <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest text-shadow-glow">
+                                    {cat}
+                                </h2>
+                                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/20" />
+                            </div>
 
-                {/* INFINITE SCROLL TIP / BOTTOM SPACER */}
-                <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
-                    {CATEGORIES.indexOf(activeCategory) < CATEGORIES.length - 1 ? (
-                        <>
-                            <div className="animate-bounce"><Minus size={20} className="rotate-90" /></div>
-                            <p className="text-xs font-mono uppercase">Scroll for {CATEGORIES[CATEGORIES.indexOf(activeCategory) + 1]}</p>
-                        </>
-                    ) : (
-                        <p className="text-xs font-mono uppercase">End of Menu</p>
+                            {/* Items WITH images - Display as cards */}
+                            {categoryItems.filter(item => item.image).length > 0 && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                    {categoryItems.filter(item => item.image).map((item) => (
+                                        <MenuItemCard
+                                            key={item.id}
+                                            item={item}
+                                            quantity={getQuantity(item.id)}
+                                            onAdd={() => addToCart(item)}
+                                            onRemove={() => removeFromCart(item.id)}
+                                            onSelect={() => setSelectedItem(item)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Items WITHOUT images - Display as compact list */}
+                            {categoryItems.filter(item => !item.image).length > 0 && (
+                                <div className="space-y-2">
+                                    {categoryItems.filter(item => !item.image).map((item) => (
+                                        <MenuItemListRow
+                                            key={item.id}
+                                            item={item}
+                                            quantity={getQuantity(item.id)}
+                                            onAdd={() => addToCart(item)}
+                                            onRemove={() => removeFromCart(item.id)}
+                                            onSelect={() => setSelectedItem(item)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    );
+                })}
+
+                {/* Empty State if EVERYTHING is filtered out */}
+                {menu.length > 0 && CATEGORIES.every(cat =>
+                    menu.filter(i => i.category === cat &&
+                        (filterType === 'veg' ? i.isVegetarian : filterType === 'non-veg' ? !i.isVegetarian : true)
+                    ).length === 0) && (
+                        <div className="text-center py-20 text-gray-500 italic">
+                            No items match your filter.
+                        </div>
                     )}
+
+                {/* End of Menu Indicator */}
+                <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
+                    <div className="w-16 h-[1px] bg-white/20" />
+                    <p className="text-xs font-mono uppercase">End of Menu</p>
                 </div>
 
                 {/* Item Details Modal */}
