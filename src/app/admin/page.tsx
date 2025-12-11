@@ -20,6 +20,7 @@ import {
     SortableContext,
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
+    rectSortingStrategy,
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -28,6 +29,7 @@ export default function AdminDashboard() {
     const orders = useStore((state) => state.orders);
     const tables = useStore((state) => state.tables);
     const menu = useStore((state) => state.menu);
+    const categoryOrder = useStore((state) => state.categoryOrder);
     const currentUser = useStore((state) => state.currentUser);
     const login = useStore((state) => state.login);
     const logout = useStore((state) => state.logout);
@@ -887,30 +889,20 @@ export default function AdminDashboard() {
                                             <Plus size={14} /> Create Category
                                         </button>
                                     </div>
-                                    <div className="flex flex-wrap gap-3">
-                                        {Array.from(new Set(menu.map(i => i.category))).sort().map(cat => (
-                                            <div key={cat} className="group bg-white/5 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-3">
-                                                <span className="text-white font-bold text-sm">{cat}</span>
-                                                <button
-                                                    onClick={async () => {
-                                                        const newName = prompt(`Rename category "${cat}" to:`, cat);
-                                                        if (!newName || newName === cat) return;
-
-                                                        const itemsToUpdate = menu.filter(i => i.category === cat);
-                                                        if (confirm(`This will move ${itemsToUpdate.length} items from "${cat}" to "${newName}". Continue?`)) {
-                                                            for (const item of itemsToUpdate) {
-                                                                await useStore.getState().updateMenuItem(item.id, { category: newName });
-                                                            }
-                                                            alert('Categories updated!');
-                                                        }
-                                                    }}
-                                                    className="text-xs text-blue-400 hover:text-white px-2 py-1 bg-blue-500/10 hover:bg-blue-500 rounded transition-colors"
-                                                >
-                                                    Rename
-                                                </button>
-                                            </div>
-                                        ))}
-                                        {menu.length === 0 && <span className="text-gray-500 text-sm">No items added yet.</span>}
+                                    <div className="mb-4">
+                                        <SortableCategoryList
+                                            categories={(Array.from(new Set(menu.map(i => i.category))) as string[]).sort((a, b) => {
+                                                const idxA = categoryOrder.indexOf(a);
+                                                const idxB = categoryOrder.indexOf(b);
+                                                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                                                if (idxA !== -1) return -1;
+                                                if (idxB !== -1) return 1;
+                                                return a.localeCompare(b);
+                                            })}
+                                            onReorder={(newOrder) => {
+                                                useStore.getState().updateCategoryOrder(newOrder);
+                                            }}
+                                        />
                                     </div>
                                 </div>
 
@@ -1390,28 +1382,144 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
 }
 
 // Duplicated Printing Logic for reliability
+// Custom KOT Printing Logic (Matching Staff Dashboard for mobile readability)
 const handlePrintKOT = (order: any) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
+
     printWindow.document.write(`
     <html>
         <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            <title>KOT #${order.id.slice(0, 4)}</title>
             <style>
-                body { font-family: monospace; padding: 20px; max-width: 300px; margin: 0 auto; background: #fff; }
-                @media print { .no-print { display: none; } }
-                .btn { display: block; width: 100%; padding: 10px; margin-top: 10px; text-align: center; border: none; cursor: pointer; font-weight: bold; }
-                .btn-print { background: #000; color: white; }
-                .btn-close { background: #eee; color: #333; }
+                * { box-sizing: border-box; }
+                body { 
+                    font-family: 'Courier New', monospace; 
+                    margin: 0; 
+                    padding: 15px; 
+                    background: white; 
+                    color: black;
+                    min-height: 100vh; /* Ensure full height */
+                    display: flex;
+                    flex-direction: column;
+                }
+                .container {
+                    max-width: 100%;
+                    margin: 0 auto;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 3px solid #000; 
+                    padding-bottom: 15px; 
+                    margin-bottom: 20px; 
+                }
+                .header h2 { margin: 0 0 5px 0; font-size: 24px; text-transform: uppercase; }
+                .header h3 { margin: 0; font-size: 42px; font-weight: 900; line-height: 1; }
+                
+                .meta { 
+                    font-size: 16px; 
+                    margin-bottom: 25px; 
+                    padding-bottom: 15px;
+                    border-bottom: 1px dashed #000;
+                    line-height: 1.5;
+                }
+                .items {
+                    flex: 1; /* Pushes actions to bottom if content is short, or flows normally */
+                }
+                .item { 
+                    display: flex; 
+                    align-items: flex-start;
+                    margin-bottom: 15px; 
+                    font-size: 20px; 
+                    font-weight: bold;
+                    line-height: 1.3;
+                }
+                .qty { 
+                    min-width: 45px;
+                    margin-right: 10px; 
+                    font-size: 24px;
+                    display: inline-block;
+                }
+                
+                .actions {
+                    margin-top: 30px;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    padding-top: 20px;
+                    border-top: 2px solid #eee;
+                }
+                
+                .btn {
+                    padding: 20px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    border: none;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    text-transform: uppercase;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                }
+                
+                .print-btn {
+                    background: #000;
+                    color: #fff;
+                    grid-column: span 2;
+                }
+                
+                .close-btn {
+                    background: #e5e5e5;
+                    color: #333;
+                    grid-column: span 2;
+                }
+
+                @media print { 
+                    .no-print { display: none !important; } 
+                    body { padding: 0; }
+                    .header h3 { font-size: 32px; }
+                    .item { font-size: 16px; }
+                    .qty { font-size: 18px; }
+                }
             </style>
         </head>
         <body>
-            <div style="text-align:center;border-bottom:2px dashed #000;padding-bottom:10px;"><h2>KOT</h2><h3>${order.tableId}</h3></div>
-            <p>Order #${order.id.slice(0, 6)}<br>${new Date().toLocaleString()}</p>
-            ${order.items.map((i: any) => `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span><b>${i.quantity}x</b> ${i.name}</span></div>`).join('')}
-
-            <div class="no-print" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
-                <button class="btn btn-print" onclick="window.print()">Print Ticket</button>
-                <button class="btn btn-close" onclick="window.close()">Close Window</button>
+            <div class="container">
+                <div class="header">
+                    <h2>Kitchen Order</h2>
+                    <h3>${order.tableId}</h3>
+                </div>
+                <div class="meta">
+                    <strong>KOT #:</strong> ${order.id.slice(0, 6)}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleTimeString()}<br>
+                    <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+                    ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
+                    ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
+                </div>
+                <div class="items">
+                    ${order.items.map((i: any) => `
+                        <div class="item">
+                            <span class="qty">${i.quantity}</span>
+                            <span>${i.name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="actions no-print">
+                    <button class="btn print-btn" onclick="window.print()">
+                        🖨️ PRINT KOT
+                    </button>
+                    <button class="btn close-btn" onclick="window.close()">
+                        ✖ CLOSE
+                    </button>
+                </div>
             </div>
         </body>
     </html>
@@ -1665,6 +1773,82 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                     <Trash size={16} />
                 </button>
             </div>
+        </div>
+    );
+}
+
+function SortableCategoryList({ categories, onReorder }: { categories: string[]; onReorder: (newOrder: string[]) => void }) {
+    const [localCats, setLocalCats] = useState(categories);
+
+    useEffect(() => {
+        setLocalCats(categories);
+    }, [categories]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = localCats.indexOf(active.id as string);
+            const newIndex = localCats.indexOf(over.id as string);
+            const newOrder = arrayMove(localCats, oldIndex, newIndex);
+            setLocalCats(newOrder);
+            onReorder(newOrder);
+        }
+    };
+
+    return (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={localCats} strategy={rectSortingStrategy}>
+                <div className="flex flex-wrap gap-3">
+                    {localCats.map((cat) => (
+                        <SortableCategoryItem key={cat} category={cat} />
+                    ))}
+                    {localCats.length === 0 && <span className="text-gray-500 text-sm">No items added yet.</span>}
+                </div>
+            </SortableContext>
+        </DndContext>
+    );
+}
+
+function SortableCategoryItem({ category }: { category: string }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: category });
+
+    // Convert transform to CSS string manually if needed or use CSS.Transform
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    const menu = useStore((state) => state.menu);
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="group bg-neutral-800 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-3 cursor-grab active:cursor-grabbing hover:bg-neutral-700 transition-colors select-none">
+            <span className="text-white font-bold text-sm">{category}</span>
+            <button
+                onPointerDown={(e) => e.stopPropagation()} // Prevent drag
+                onClick={async (e) => {
+                    e.stopPropagation();
+                    const newName = prompt(`Rename category "${category}" to:`, category);
+                    if (!newName || newName === category) return;
+
+                    const itemsToUpdate = menu.filter(i => i.category === category);
+                    if (confirm(`This will move ${itemsToUpdate.length} items from "${category}" to "${newName}". Continue?`)) {
+                        for (const item of itemsToUpdate) {
+                            await useStore.getState().updateMenuItem(item.id, { category: newName });
+                        }
+                        alert('Categories updated!');
+                    }
+                }}
+                className="text-xs text-blue-400 hover:text-white px-2 py-1 bg-blue-500/10 hover:bg-blue-500 rounded transition-colors"
+            >
+                Rename
+            </button>
         </div>
     );
 }

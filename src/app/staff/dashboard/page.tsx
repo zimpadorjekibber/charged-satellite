@@ -178,36 +178,137 @@ export default function StaffDashboard() {
         printWindow.document.write(`
             <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <title>KOT #${order.id.slice(0, 4)}</title>
                     <style>
-                        body { font-family: monospace; width: 100%; max-width: 300px; margin: 0 auto; padding: 10px; }
-                        .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-                        .item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-                        .meta { font-size: 12px; margin-bottom: 15px; }
-                        .qty { font-weight: bold; margin-right: 10px; }
-                        @media print { .no-print { display: none; } }
+                        * { box-sizing: border-box; }
+                        body { 
+                            font-family: 'Courier New', monospace; 
+                            margin: 0; 
+                            padding: 15px; 
+                            background: white; 
+                            color: black;
+                            min-height: 100vh;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .container {
+                            max-width: 100%;
+                            margin: 0 auto;
+                            flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .header { 
+                            text-align: center; 
+                            border-bottom: 3px solid #000; 
+                            padding-bottom: 15px; 
+                            margin-bottom: 20px; 
+                        }
+                        .header h2 { margin: 0 0 5px 0; font-size: 24px; text-transform: uppercase; }
+                        .header h3 { margin: 0; font-size: 42px; font-weight: 900; line-height: 1; }
+                        
+                        .meta { 
+                            font-size: 16px; 
+                            margin-bottom: 25px; 
+                            padding-bottom: 15px;
+                            border-bottom: 1px dashed #000;
+                            line-height: 1.5;
+                        }
+                        .items {
+                            flex: 1;
+                        }
+                        .item { 
+                            display: flex; 
+                            align-items: flex-start;
+                            margin-bottom: 15px; 
+                            font-size: 20px; 
+                            font-weight: bold;
+                            line-height: 1.3;
+                        }
+                        .qty { 
+                            min-width: 45px;
+                            margin-right: 10px; 
+                            font-size: 24px;
+                            display: inline-block;
+                        }
+                        
+                        .actions {
+                            margin-top: 30px;
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 15px;
+                            padding-top: 20px;
+                            border-top: 2px solid #eee;
+                        }
+                        
+                        .btn {
+                            padding: 20px;
+                            font-size: 20px;
+                            font-weight: bold;
+                            border: none;
+                            border-radius: 12px;
+                            cursor: pointer;
+                            text-transform: uppercase;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 10px;
+                        }
+                        
+                        .print-btn {
+                            background: #000;
+                            color: #fff;
+                            grid-column: span 2;
+                        }
+                        
+                        .close-btn {
+                            background: #e5e5e5;
+                            color: #333;
+                            grid-column: span 2;
+                        }
+
+                        @media print { 
+                            .no-print { display: none !important; } 
+                            body { padding: 0; }
+                            .header h3 { font-size: 32px; }
+                            .item { font-size: 16px; }
+                            .qty { font-size: 18px; }
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <h2>KOT</h2>
-                        <h3>${order.tableId}</h3>
+                    <div class="container">
+                        <div class="header">
+                            <h2>Kitchen Order</h2>
+                            <h3>${order.tableId}</h3>
+                        </div>
+                        <div class="meta">
+                            <strong>KOT #:</strong> ${order.id.slice(0, 6)}<br>
+                            <strong>Time:</strong> ${new Date(order.createdAt).toLocaleTimeString()}<br>
+                            <strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}<br>
+                            ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
+                            ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
+                        </div>
+                        <div class="items">
+                            ${order.items.map(item => `
+                                <div class="item">
+                                    <span class="qty">${item.quantity}</span>
+                                    <span>${item.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="actions no-print">
+                            <button class="btn print-btn" onclick="window.print()">
+                                🖨️ PRINT KOT
+                            </button>
+                            <button class="btn close-btn" onclick="window.close()">
+                                ✖ CLOSE
+                            </button>
+                        </div>
                     </div>
-                    <div class="meta">
-                        KOT #: ${order.id.slice(0, 6)}<br>
-                        Time: ${new Date(order.createdAt).toLocaleString()}<br>
-                        ${order.customerName ? `Guest: ${order.customerName} ${order.customerPhone ? `<br>Phone: ${order.customerPhone}` : ''}` : ''}
-                    </div>
-                    <div class="items">
-                        ${order.items.map(item => `
-                    <div class="item">
-                        <span><span class="qty">${item.quantity}x</span> ${item.name}</span>
-                    </div>
-                `).join('')}
-                    </div>
-                    <script>
-                        window.onload = function() { window.print(); window.close(); }
-                    </script>
                 </body>
             </html>
             `);
@@ -600,7 +701,18 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
                         {tables.find(t => t.id === order.tableId)?.name || order.tableId}
                         {(order.customerName || order.customerPhone) && (
                             <span className="text-sm font-normal text-gray-400">
-                                ({order.customerName} {order.customerPhone && <>• {order.customerPhone}</>})
+                                ({order.customerName} {order.customerPhone && (
+                                    <>
+                                        • <a
+                                            href={`tel:${order.customerPhone}`}
+                                            className="hover:text-tashi-accent hover:underline transition-colors cursor-pointer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            title="Call Customer"
+                                        >
+                                            {order.customerPhone}
+                                        </a>
+                                    </>
+                                )})
                             </span>
                         )}
                     </h4>

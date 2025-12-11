@@ -78,7 +78,7 @@ export default function CartPage() {
                 } catch (locError: any) {
                     console.error("Geolocation Error:", locError);
                     // If user denies permission or browser error
-                    if (locError instanceof Error && (locError.message.includes('permission') || locError.code === 1)) { // 1 is PERMISSION_DENIED
+                    if (locError instanceof Error && (locError.message.includes('permission') || (locError as any).code === 1)) { // 1 is PERMISSION_DENIED
                         alert("Location access is required to verify you are within our service area. Please allow location access to place an order.");
                     } else {
                         alert("Could not verify your location. Please ensure location services are enabled.");

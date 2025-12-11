@@ -117,6 +117,7 @@ interface AppState {
     media: MediaItem[]; // New media gallery
     geoRadius: number;
     contactInfo: ContactSettings;
+    categoryOrder: string[]; // New: For custom category ordering
 
 
     isListening: boolean;
@@ -133,6 +134,11 @@ interface AppState {
     updateMenuItem: (id: string, updates: Partial<MenuItem>) => void;
     removeMenuItem: (id: string) => void;
     reorderMenuItems: (items: MenuItem[]) => Promise<void>;
+
+
+
+    // New: Reorder categories
+    updateCategoryOrder: (order: string[]) => Promise<void>;
 
     addToCart: (item: MenuItem) => void;
     removeFromCart: (itemId: string) => void;
@@ -177,6 +183,7 @@ export const useStore = create<AppState>()(
             isListening: false,
             unsubscribers: [],
             geoRadius: 5,
+            categoryOrder: [], // Initial empty state
             contactInfo: {
                 phone: '+919876543210',
                 secondaryPhone: '+919418612295',
@@ -276,7 +283,11 @@ export const useStore = create<AppState>()(
                 // Updates & Global Settings
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'global'), (doc) => {
                     if (doc.exists()) {
-                        set({ geoRadius: doc.data().geoRadius || 5 });
+                        const data = doc.data();
+                        set({
+                            geoRadius: data.geoRadius || 5,
+                            categoryOrder: data.categoryOrder || [] // Load category order
+                        });
                     }
                 }));
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
@@ -328,6 +339,11 @@ export const useStore = create<AppState>()(
                     updateDoc(doc(db, 'menu', item.id), { sortOrder: index })
                 );
                 await Promise.all(batch);
+            },
+
+            updateCategoryOrder: async (order) => {
+                await setDoc(doc(db, 'settings', 'global'), { categoryOrder: order }, { merge: true });
+                set({ categoryOrder: order });
             },
 
             addToCart: (item) => set((state) => {

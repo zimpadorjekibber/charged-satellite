@@ -34,9 +34,10 @@ export default function MenuPage() {
     const cancelNotification = useStore((state) => state.cancelNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const contactInfo = useStore((state) => state.contactInfo);
+    const categoryOrder = useStore((state) => state.categoryOrder);
 
     // Dynamic Categories derived from Menu
-    const allCategories = Array.from(new Set(menu.map(item => item.category)));
+    const allCategories = Array.from(new Set(menu.map(item => item.category))) as string[];
 
     // Define a preferred order for standard categories
     const PREFERRED_ORDER = [
@@ -74,8 +75,17 @@ export default function MenuPage() {
         return true;
     });
 
-    // Sort categories: Preferred ones first, then alphabetical for the rest
+    // Sort categories: Custom Admin Order -> Preferred -> Alphabetical
     const CATEGORIES = [...seasonalCategories].sort((a, b) => {
+        // 1. Check Custom Admin Order
+        const aCustom = categoryOrder.indexOf(a);
+        const bCustom = categoryOrder.indexOf(b);
+
+        if (aCustom !== -1 && bCustom !== -1) return aCustom - bCustom;
+        if (aCustom !== -1) return -1;
+        if (bCustom !== -1) return 1;
+
+        // 2. Fallback to Hardcoded Preferred Order
         const aIndex = PREFERRED_ORDER.findIndex(p => a.toLowerCase() === p.toLowerCase());
         const bIndex = PREFERRED_ORDER.findIndex(p => b.toLowerCase() === p.toLowerCase());
 
