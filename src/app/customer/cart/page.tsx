@@ -27,6 +27,7 @@ export default function CartPage() {
     const handlePlaceOrder = async () => {
         let tableId = currentTableId;
 
+        // 1. Table ID Check
         if (!tableId) {
             const manualId = window.prompt("We couldn't detect your Table Number. Please enter it (e.g., 't1' or '1'):");
             if (manualId && manualId.trim()) {
@@ -38,6 +39,7 @@ export default function CartPage() {
             }
         }
 
+        // 2. Personal Info Check
         if (!customerName.trim() || !customerPhone.trim()) {
             alert("Please provide your name and phone number to confirm your order.");
             return;
@@ -46,11 +48,51 @@ export default function CartPage() {
         setIsOrdering(true);
 
         try {
+            // 3. Geofencing Check
+            const state = useStore.getState();
+            const { contactInfo, geoRadius } = state;
+
+            // Only enforce if coordinates are set in admin settings
+            if (contactInfo.mapsLocation && geoRadius > 0) {
+                try {
+                    // Dynamic import to avoid SSR issues with navigator if any (though 'use client' handles it, explicit import of logic is fine)
+                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+
+                    const storeCoords = parseCoordinates(contactInfo.mapsLocation); // "Lat,Lon"
+
+                    if (storeCoords) {
+                        const pos = await getCurrentPosition();
+                        const userLat = pos.coords.latitude;
+                        const userLon = pos.coords.longitude;
+
+                        const distance = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+
+                        console.log(`Geofence Check: User at (${userLat}, ${userLon}), Store at (${storeCoords.lat}, ${storeCoords.lon}), Dist: ${distance.toFixed(3)}km, Limit: ${geoRadius}km`);
+
+                        if (distance > geoRadius) {
+                            alert(`You are out of our service area. \n\nYour distance: ${distance.toFixed(2)}km\nLimit: ${geoRadius}km\n\nYou can still browse our menu, but we cannot accept orders from your current location.`);
+                            setIsOrdering(false);
+                            return; // BLOCK ORDER
+                        }
+                    }
+                } catch (locError: any) {
+                    console.error("Geolocation Error:", locError);
+                    // If user denies permission or browser error
+                    if (locError instanceof Error && (locError.message.includes('permission') || locError.code === 1)) { // 1 is PERMISSION_DENIED
+                        alert("Location access is required to verify you are within our service area. Please allow location access to place an order.");
+                    } else {
+                        alert("Could not verify your location. Please ensure location services are enabled.");
+                    }
+                    setIsOrdering(false);
+                    return; // BLOCK ORDER
+                }
+            }
+
+
             // Fake UX delay if desired
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             // Ensure Table ID matches what acts as source of truth
-            const state = useStore.getState();
             if (!state.currentTableId) {
                 useStore.getState().setTableId(tableId);
             }
