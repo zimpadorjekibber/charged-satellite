@@ -890,23 +890,26 @@ export default function AdminDashboard() {
                                                 <head>
                                                     <title>TashiZom Menu</title>
                                                     <style>
-                                                        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; }
-                                                        h1 { text-align: center; font-size: 36px; margin-bottom: 10px; text-transform: uppercase; }
-                                                        .subtitle { text-align: center; font-size: 14px; color: #666; margin-bottom: 40px; letter-spacing: 2px; }
-                                                        .category-section { margin-bottom: 30px; break-inside: avoid; }
+                                                        @page { size: A4; margin: 20mm; }
+                                                        body { font-family: 'Times New Roman', serif; margin: 0; padding: 0; color: #000; }
+                                                        h1 { text-align: center; font-size: 32px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+                                                        .subtitle { text-align: center; font-size: 12px; color: #444; margin-bottom: 30px; letter-spacing: 4px; text-transform: uppercase; }
+                                                        .category-section { margin-bottom: 25px; break-inside: avoid; page-break-inside: avoid; }
                                                         .category-title { 
-                                                            font-size: 20px; 
+                                                            font-size: 18px; 
                                                             font-weight: bold; 
-                                                            border-bottom: 2px solid #000; 
-                                                            padding-bottom: 5px; 
-                                                            margin-bottom: 15px; 
+                                                            border-bottom: 1px solid #000; 
+                                                            padding-bottom: 2px; 
+                                                            margin-bottom: 10px; 
                                                             text-transform: uppercase;
+                                                            display: inline-block;
+                                                            letter-spacing: 1px;
                                                         }
-                                                        .item-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+                                                        .item-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: baseline; }
                                                         .item-info { flex: 1; margin-right: 20px; }
-                                                        .item-name { font-weight: bold; font-size: 16px; margin-bottom: 2px; }
-                                                        .item-desc { font-size: 12px; color: #555; }
-                                                        .item-price { font-weight: bold; font-size: 16px; }
+                                                        .item-name { font-weight: bold; font-size: 14px; margin-bottom: 1px; }
+                                                        .item-desc { font-size: 11px; color: #444; font-style: italic; }
+                                                        .item-price { font-weight: bold; font-size: 14px; white-space: nowrap; }
                                                     </style>
                                                 </head>
                                                 <body>
