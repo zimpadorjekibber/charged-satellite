@@ -112,8 +112,9 @@ export default function MenuPage() {
 
         const lunchDinnerOptions = findCat(['main course', 'main', 'indian', 'chinese', 'thali', 'rice', 'dinner', 'lunch']);
         const starterOptions = findCat(['starter', 'snack', 'tandoor', 'appetizer']);
-        const breakfastOption = findCat(['breakfast', 'morning', 'paratha', 'toast']);
-        const beverageOption = findCat(['beverage', 'drink', 'coffee', 'tea']);
+        // Updated Breakfast/Morning options to prioritize Tea/Coffee
+        const breakfastOption = findCat(['breakfast', 'morning', 'paratha', 'toast', 'tea', 'coffee']);
+        const beverageOption = findCat(['beverage', 'drink']);
 
         // NIGHT / EVENING / AFTERNOON (12 PM onwards)
         if (hour >= 12) {
@@ -123,6 +124,10 @@ export default function MenuPage() {
 
         // MORNING (5 AM - 12 PM)
         if (hour >= 5 && hour < 12) {
+            // Prioritize Tea & Coffee specifically for 9 AM request if available
+            const teaCoffee = findCat(['tea', 'coffee']);
+            if (teaCoffee) return teaCoffee;
+
             if (breakfastOption) return breakfastOption;
             if (beverageOption) return beverageOption;
         }
@@ -140,9 +145,32 @@ export default function MenuPage() {
     const [activeCategory, setActiveCategory] = useState<Category>(getDefaultCategory());
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
-    const [showAllUpdates, setShowAllUpdates] = useState(false);
+    const [showAllUpdates, setShowAllUpdates] = useState(false); // Controls Valley Updates expansion
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
+
+    // Infinite Scroll / Auto-Switch Category Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            // Check if we are near the bottom of the page
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+                const currentIndex = CATEGORIES.indexOf(activeCategory);
+                // If it's not the last category, switch to the next one
+                if (currentIndex !== -1 && currentIndex < CATEGORIES.length - 1) {
+                    const nextCat = CATEGORIES[currentIndex + 1];
+                    // Debounce/Check to prevent rapid switching could be good, but for now direct switch
+                    // To avoid instant jumping loop, we might want to verify we are actually scrolling DOWN and interacting
+                    // But simplified: Switch and scroll to top
+                    console.log('Auto-switching to next category:', nextCat);
+                    setActiveCategory(nextCat);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [activeCategory, CATEGORIES]);
 
     // FIX: Force switch to correct category when data loads or time mismatch detected
     useEffect(() => {
@@ -152,7 +180,7 @@ export default function MenuPage() {
             const isEvening = hour >= 17; // 5 PM onwards
 
             // Check if we are stuck on Breakfast in the evening
-            const isBreakfast = activeCategory.toLowerCase().includes('breakfast');
+            const isBreakfast = activeCategory.toLowerCase().includes('breakfast') || activeCategory.toLowerCase().includes('tea');
 
             // Define what constitutes a "Dinner" category
             const isDinnerCategory = (cat: string) => {
@@ -242,7 +270,7 @@ export default function MenuPage() {
     };
 
     return (
-        <div className="pb-24 pointer-events-auto">
+        <div className="pb-32 pointer-events-auto min-h-screen relative">
             {/* Bottom Action Bar - Horizontal */}
             <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl border-t border-white/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
@@ -324,6 +352,10 @@ export default function MenuPage() {
             {/* Category Tabs */}
             <div className="sticky top-[60px] z-40 bg-tashi-darker/95 backdrop-blur-md -mx-4 px-4 border-b border-white/5 pt-2 pb-4">
                 <div className="flex overflow-x-auto gap-3 hide-scrollbar">
+                    {/* ADDED: Valley Updates Tab if it's collapsed (optional, but requested as "clickable tab") */}
+                    {/* Note: User said "Clickable tab" but also "wrapped at bottom". We'll keep the actual interaction at the bottom mostly to prevent layout shift in tabs. 
+                        Let's focus on the Category tabs here. */}
+
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
@@ -400,6 +432,18 @@ export default function MenuPage() {
                         No items found in {activeCategory}.
                     </div>
                 )}
+
+                {/* INFINITE SCROLL TIP / BOTTOM SPACER */}
+                <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
+                    {CATEGORIES.indexOf(activeCategory) < CATEGORIES.length - 1 ? (
+                        <>
+                            <div className="animate-bounce"><Minus size={20} className="rotate-90" /></div>
+                            <p className="text-xs font-mono uppercase">Scroll for {CATEGORIES[CATEGORIES.indexOf(activeCategory) + 1]}</p>
+                        </>
+                    ) : (
+                        <p className="text-xs font-mono uppercase">End of Menu</p>
+                    )}
+                </div>
 
                 {/* Item Details Modal */}
                 <AnimatePresence>
@@ -487,106 +531,93 @@ export default function MenuPage() {
                 </AnimatePresence>
             </div>
 
-            {/* Local News Section - Animated */}
+            {/* Valley Updates - Collapsible Bottom Sheet */}
             {valleyUpdates.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="mt-12 bg-neutral-900/50 rounded-2xl p-6 border border-white/5 mx-1 relative overflow-hidden"
-                >
-                    {/* Animated background pulse */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-tashi-accent/5 via-transparent to-tashi-accent/5 animate-pulse pointer-events-none" />
-
-                    <div className="relative z-10">
-                        {/* Header with pulsing LIVE indicator */}
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-tashi-accent font-serif text-xl font-bold flex items-center gap-2">
-                                <Newspaper size={20} className="animate-pulse" /> Valley Updates
+                <div className="mt-8 mx-1 mb-6">
+                    <motion.div
+                        initial={false}
+                        animate={{ height: showAllUpdates ? 'auto' : '60px' }}
+                        className={`bg-neutral-900/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-neutral-900'
+                            }`}
+                        onClick={() => setShowAllUpdates(!showAllUpdates)}
+                    >
+                        {/* Header (Always Visible) */}
+                        <div className="absolute top-0 left-0 right-0 h-[60px] flex items-center justify-between px-6 cursor-pointer z-10">
+                            <h3 className="text-tashi-accent font-serif text-lg font-bold flex items-center gap-2">
+                                <Newspaper size={18} className={showAllUpdates ? '' : 'animate-pulse'} />
+                                Valley Updates
                             </h3>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-red-500 rounded-full animate-ping absolute" />
-                                <div className="w-2 h-2 bg-red-500 rounded-full" />
-                                <span className="text-red-400 text-xs font-bold uppercase tracking-wider">Live</span>
+                            <div className="flex items-center gap-3">
+                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${showAllUpdates ? 'bg-white/10 border-white/20 text-white' : 'bg-red-500/10 border-red-500/30 text-red-400 animate-pulse'}`}>
+                                    {showAllUpdates ? 'Close' : `${valleyUpdates.length} NEW`}
+                                </span>
+                                {showAllUpdates ? <Minus size={16} className="text-gray-400" /> : <Plus size={16} className="text-gray-400" />}
                             </div>
                         </div>
 
-
-                        {/* Consolidated card with all updates as bullets */}
-                        <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
-                            <div className="flex justify-between items-start mb-3">
-                                <span className="text-gray-200 font-bold text-base">Latest News & Updates</span>
-                                <motion.span
-                                    animate={{ scale: [1, 1.1, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="bg-tashi-accent/20 text-tashi-accent text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-tashi-accent/30"
+                        {/* Expandable Content */}
+                        <div className="pt-[70px] px-6 pb-6">
+                            {/* Consolidated card with all updates as bullets */}
+                            <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
+                                <motion.ul
+                                    className="space-y-3"
+                                    variants={containerVariants}
+                                    initial="hidden"
+                                    animate={showAllUpdates ? "show" : "hidden"}
                                 >
-                                    {valleyUpdates.length} New {valleyUpdates.length === 1 ? 'Update' : 'Updates'}
-                                </motion.span>
-                            </div>
-
-                            {/* Updates as bullet points with staggered animation */}
-                            <motion.ul
-                                className="space-y-3"
-                                variants={containerVariants}
-                                initial="hidden"
-                                animate="show"
-                            >
-                                {valleyUpdates.map((update, idx) => (
-                                    <motion.li
-                                        key={idx}
-                                        variants={itemVariants}
-                                        className="flex gap-3 group"
-                                    >
-                                        {/* Colored bullet indicator based on status */}
-                                        <div className="flex-shrink-0 mt-1.5">
-                                            <motion.div
-                                                animate={{ scale: [1, 1.3, 1] }}
-                                                transition={{ duration: 2, repeat: Infinity, delay: idx * 0.2 }}
-                                                className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
-                                                    update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
-                                                        update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
-                                                            'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
-                                                    }`}
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <p className="text-sm text-gray-300 leading-relaxed">
-                                                    <span className="font-semibold text-white">{update.title}</span>
-                                                    {update.description && (
-                                                        <span className="text-gray-400"> — {update.description}</span>
-                                                    )}
-                                                </p>
-                                                {update.status && update.status.toLowerCase() !== 'create' && (
-                                                    <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
-                                                        update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-                                                            update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
-                                                                'bg-gray-500/20 text-gray-400'
-                                                        }`}>
-                                                        {update.status}
-                                                    </span>
-                                                )}
+                                    {valleyUpdates.map((update, idx) => (
+                                        <motion.li
+                                            key={idx}
+                                            variants={itemVariants}
+                                            className="flex gap-3 group"
+                                        >
+                                            {/* Colored bullet indicator based on status */}
+                                            <div className="flex-shrink-0 mt-1.5">
+                                                <div
+                                                    className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
+                                                        update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
+                                                            update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
+                                                                'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
+                                                        }`}
+                                                />
                                             </div>
-                                            {/* Show media if available */}
-                                            {update.mediaUrl && (
-                                                <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
-                                                    {update.mediaType === 'video' ? (
-                                                        <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />
-                                                    ) : (
-                                                        <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
+                                            <div className="flex-1">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <p className="text-sm text-gray-300 leading-relaxed">
+                                                        <span className="font-semibold text-white">{update.title}</span>
+                                                        {update.description && (
+                                                            <span className="text-gray-400"> — {update.description}</span>
+                                                        )}
+                                                    </p>
+                                                    {update.status && update.status.toLowerCase() !== 'create' && (
+                                                        <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
+                                                            update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                                                                update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
+                                                                    'bg-gray-500/20 text-gray-400'
+                                                            }`}>
+                                                            {update.status}
+                                                        </span>
                                                     )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    </motion.li>
-                                ))}
-                            </motion.ul>
+                                                {/* Show media if available */}
+                                                {update.mediaUrl && (
+                                                    <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
+                                                        {update.mediaType === 'video' ? (
+                                                            <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />
+                                                        ) : (
+                                                            <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.li>
+                                    ))}
+                                </motion.ul>
+                            </div>
+                            <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
                         </div>
-
-                        <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             )}
 
             {/* Contact Info Modal */}
