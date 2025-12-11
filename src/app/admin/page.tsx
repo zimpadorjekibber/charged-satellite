@@ -860,33 +860,32 @@ export default function AdminDashboard() {
 
                             {/* Menu Management */}
                             <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl font-bold text-white">Menu Management</h2>
-                                        <button
-                                            onClick={() => {
-                                                const printWindow = window.open('', '_blank');
-                                                if (!printWindow) return;
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold text-white">Menu Management</h2>
+                                    <button
+                                        onClick={() => {
+                                            const printWindow = window.open('', '_blank');
+                                            if (!printWindow) return;
 
-                                                // Group Items by Category
-                                                const groupedMenu: Record<string, any[]> = {};
-                                                // Sort categories by custom order if available
-                                                const sortedCategories = [...Array.from(new Set(menu.map(i => i.category)))].sort((a, b) => {
-                                                    const idxA = categoryOrder.indexOf(a);
-                                                    const idxB = categoryOrder.indexOf(b);
-                                                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                                    // If one is in order list and other isn't, prioritize the one in list?
-                                                    // Or just put ordered ones first.
-                                                    if (idxA !== -1) return -1;
-                                                    if (idxB !== -1) return 1;
-                                                    return a.localeCompare(b);
-                                                });
+                                            // Group Items by Category
+                                            const groupedMenu: Record<string, any[]> = {};
+                                            // Sort categories by custom order if available
+                                            const sortedCategories = [...Array.from(new Set(menu.map(i => i.category)))].sort((a, b) => {
+                                                const idxA = categoryOrder.indexOf(a);
+                                                const idxB = categoryOrder.indexOf(b);
+                                                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                                                // If one is in order list and other isn't, prioritize the one in list?
+                                                // Or just put ordered ones first.
+                                                if (idxA !== -1) return -1;
+                                                if (idxB !== -1) return 1;
+                                                return a.localeCompare(b);
+                                            });
 
-                                                sortedCategories.forEach(cat => {
-                                                    groupedMenu[cat] = menu.filter(i => i.category === cat).sort((a, b) => (a.sortOrder || 999) - (b.sortOrder || 999));
-                                                });
+                                            sortedCategories.forEach(cat => {
+                                                groupedMenu[cat] = menu.filter(i => i.category === cat).sort((a, b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+                                            });
 
-                                                printWindow.document.write(`
+                                            printWindow.document.write(`
                                                 <html>
                                                 <head>
                                                     <title>TashiZom Menu</title>
@@ -935,362 +934,362 @@ export default function AdminDashboard() {
                                                 </body>
                                                 </html>
                                             `);
-                                                printWindow.document.close();
-                                            }}
-                                            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm"
-                                        >
-                                            <Printer size={16} /> Print Full Menu
-                                        </button>
-                                    </div>
+                                            printWindow.document.close();
+                                        }}
+                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm"
+                                    >
+                                        <Printer size={16} /> Print Full Menu
+                                    </button>
+                                </div>
 
-                                    {/* Category Management */}
-                                    <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-8">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Manage Categories</h3>
-                                                <p className="text-xs text-gray-600 mt-1">Categories are created automatically when you add an item to them.</p>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    const cat = prompt("Enter name for new category:");
-                                                    if (cat) {
-                                                        const form = document.querySelector('form') as HTMLFormElement; // refined selector if needed
-                                                        if (form) {
-                                                            const catInput = form.elements.namedItem('category') as HTMLInputElement;
-                                                            const nameInput = form.elements.namedItem('name') as HTMLInputElement;
-                                                            if (catInput) catInput.value = cat;
-                                                            if (nameInput) nameInput.focus();
-                                                            alert(`Category "${cat}" selected! Now add the first item below to create it.`);
-                                                            form.scrollIntoView({ behavior: 'smooth' });
-                                                        }
-                                                    }
-                                                }}
-                                                className="text-xs bg-tashi-accent text-tashi-dark font-bold px-3 py-2 rounded hover:bg-yellow-400 flex items-center gap-2"
-                                            >
-                                                <Plus size={14} /> Create Category
-                                            </button>
+                                {/* Category Management */}
+                                <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-8">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Manage Categories</h3>
+                                            <p className="text-xs text-gray-600 mt-1">Categories are created automatically when you add an item to them.</p>
                                         </div>
-                                        <div className="mb-4">
-                                            <SortableCategoryList
-                                                categories={(Array.from(new Set(menu.map(i => i.category))) as string[]).sort((a, b) => {
-                                                    const idxA = categoryOrder.indexOf(a);
-                                                    const idxB = categoryOrder.indexOf(b);
-                                                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                                    if (idxA !== -1) return -1;
-                                                    if (idxB !== -1) return 1;
-                                                    return a.localeCompare(b);
-                                                })}
-                                                onReorder={(newOrder) => {
-                                                    useStore.getState().updateCategoryOrder(newOrder);
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
-                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Add Item</h3>
-                                        <form
-                                            onSubmit={async (e) => {
-                                                e.preventDefault();
-                                                const form = e.target as HTMLFormElement;
-                                                const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-
-                                                try {
-                                                    if (submitBtn) {
-                                                        submitBtn.disabled = true;
-                                                        submitBtn.textContent = 'Adding...';
-                                                    }
-
-                                                    const formData = new FormData(form);
-                                                    const priceRaw = formData.get('price');
-                                                    const price = priceRaw ? Number(priceRaw) : 0;
-
-                                                    // Handle Empty Image URL
-                                                    // Handle Image URL - ONLY add if present
-                                                    const rawImage = formData.get('image') as string;
-                                                    const image = rawImage && rawImage.trim() !== '' ? rawImage.trim() : null;
-
-                                                    const newItem: any = {
-                                                        name: (formData.get('name') as string) || 'Unnamed Item',
-                                                        description: (formData.get('description') as string) || '',
-                                                        price: price,
-                                                        category: (formData.get('category') as any) || 'Main Course',
-                                                        isVegetarian: formData.get('isVegetarian') === 'on',
-                                                        isSpicy: formData.get('isSpicy') === 'on',
-                                                        available: true
-                                                    };
-
-                                                    if (image) {
-                                                        newItem.image = image;
-                                                    }
-
-                                                    console.log("Attempting to add item:", newItem); // Debug Log
-
-                                                    await useStore.getState().addMenuItem(newItem);
-
-                                                    form.reset();
-                                                    alert("Item added successfully!");
-                                                } catch (err: any) {
-                                                    console.error("Add item failed:", err);
-                                                    alert("Failed to add item. Error: " + err.message);
-                                                } finally {
-                                                    if (submitBtn) {
-                                                        submitBtn.disabled = false;
-                                                        submitBtn.textContent = 'Add Item';
+                                        <button
+                                            onClick={() => {
+                                                const cat = prompt("Enter name for new category:");
+                                                if (cat) {
+                                                    const form = document.querySelector('form') as HTMLFormElement; // refined selector if needed
+                                                    if (form) {
+                                                        const catInput = form.elements.namedItem('category') as HTMLInputElement;
+                                                        const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+                                                        if (catInput) catInput.value = cat;
+                                                        if (nameInput) nameInput.focus();
+                                                        alert(`Category "${cat}" selected! Now add the first item below to create it.`);
+                                                        form.scrollIntoView({ behavior: 'smooth' });
                                                     }
                                                 }
                                             }}
-                                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                            className="text-xs bg-tashi-accent text-tashi-dark font-bold px-3 py-2 rounded hover:bg-yellow-400 flex items-center gap-2"
                                         >
-                                            <input name="name" required placeholder="Name" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                            <input name="price" type="number" required placeholder="Price" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                            <input list="category-list" name="category" required placeholder="Category" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                            <datalist id="category-list">
-                                                {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                    <option key={c} value={c} />
-                                                ))}
-                                                <option value="Soups & Salads" />
-                                                <option value="Snacks & Starters" />
-                                                <option value="Main Course (Vegetarian)" />
-                                                <option value="Main Course (Non-Vegetarian)" />
-                                                <option value="Rice & Biryani" />
-                                                <option value="Indian Breads" />
-                                                <option value="Chinese" />
-                                                <option value="Pizza & Pasta" />
-                                                <option value="Beverages & Shakes" />
-                                                <option value="Desserts" />
-                                            </datalist>
-                                            <div className="flex gap-4 items-center">
-                                                <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
-                                                <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
-                                            </div>
-                                            <div className="md:col-span-3">
-                                                <div className="flex gap-2">
-                                                    <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            className="hidden"
-                                                            onChange={async (e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) {
-                                                                    if (confirm(`Upload ${file.name}?`)) {
-                                                                        try {
-                                                                            const url = await useStore.getState().uploadImage(file, true);
-                                                                            const input = document.getElementById('add-item-image-url') as HTMLInputElement;
-                                                                            if (input) input.value = url;
-                                                                        } catch (err) {
-                                                                            alert('Upload failed');
-                                                                            console.error(err);
-                                                                        }
+                                            <Plus size={14} /> Create Category
+                                        </button>
+                                    </div>
+                                    <div className="mb-4">
+                                        <SortableCategoryList
+                                            categories={(Array.from(new Set(menu.map(i => i.category))) as string[]).sort((a, b) => {
+                                                const idxA = categoryOrder.indexOf(a);
+                                                const idxB = categoryOrder.indexOf(b);
+                                                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                                                if (idxA !== -1) return -1;
+                                                if (idxB !== -1) return 1;
+                                                return a.localeCompare(b);
+                                            })}
+                                            onReorder={(newOrder) => {
+                                                useStore.getState().updateCategoryOrder(newOrder);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
+                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Add Item</h3>
+                                    <form
+                                        onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            const form = e.target as HTMLFormElement;
+                                            const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+                                            try {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = true;
+                                                    submitBtn.textContent = 'Adding...';
+                                                }
+
+                                                const formData = new FormData(form);
+                                                const priceRaw = formData.get('price');
+                                                const price = priceRaw ? Number(priceRaw) : 0;
+
+                                                // Handle Empty Image URL
+                                                // Handle Image URL - ONLY add if present
+                                                const rawImage = formData.get('image') as string;
+                                                const image = rawImage && rawImage.trim() !== '' ? rawImage.trim() : null;
+
+                                                const newItem: any = {
+                                                    name: (formData.get('name') as string) || 'Unnamed Item',
+                                                    description: (formData.get('description') as string) || '',
+                                                    price: price,
+                                                    category: (formData.get('category') as any) || 'Main Course',
+                                                    isVegetarian: formData.get('isVegetarian') === 'on',
+                                                    isSpicy: formData.get('isSpicy') === 'on',
+                                                    available: true
+                                                };
+
+                                                if (image) {
+                                                    newItem.image = image;
+                                                }
+
+                                                console.log("Attempting to add item:", newItem); // Debug Log
+
+                                                await useStore.getState().addMenuItem(newItem);
+
+                                                form.reset();
+                                                alert("Item added successfully!");
+                                            } catch (err: any) {
+                                                console.error("Add item failed:", err);
+                                                alert("Failed to add item. Error: " + err.message);
+                                            } finally {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = false;
+                                                    submitBtn.textContent = 'Add Item';
+                                                }
+                                            }
+                                        }}
+                                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                    >
+                                        <input name="name" required placeholder="Name" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <input name="price" type="number" required placeholder="Price" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <input list="category-list" name="category" required placeholder="Category" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <datalist id="category-list">
+                                            {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                <option key={c} value={c} />
+                                            ))}
+                                            <option value="Soups & Salads" />
+                                            <option value="Snacks & Starters" />
+                                            <option value="Main Course (Vegetarian)" />
+                                            <option value="Main Course (Non-Vegetarian)" />
+                                            <option value="Rice & Biryani" />
+                                            <option value="Indian Breads" />
+                                            <option value="Chinese" />
+                                            <option value="Pizza & Pasta" />
+                                            <option value="Beverages & Shakes" />
+                                            <option value="Desserts" />
+                                        </datalist>
+                                        <div className="flex gap-4 items-center">
+                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
+                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <div className="flex gap-2">
+                                                <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                if (confirm(`Upload ${file.name}?`)) {
+                                                                    try {
+                                                                        const url = await useStore.getState().uploadImage(file, true);
+                                                                        const input = document.getElementById('add-item-image-url') as HTMLInputElement;
+                                                                        if (input) input.value = url;
+                                                                    } catch (err) {
+                                                                        alert('Upload failed');
+                                                                        console.error(err);
                                                                     }
                                                                 }
-                                                            }}
-                                                        />
-                                                        <Upload size={20} />
-                                                    </label>
-                                                </div>
-                                                <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Upload size={20} />
+                                                </label>
                                             </div>
-                                            <input name="description" required placeholder="Description" className="md:col-span-4 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                            <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
-                                        </form>
+                                            <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
+                                        </div>
+                                        <input name="description" required placeholder="Description" className="md:col-span-4 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
+                                    </form>
+                                </div>
+
+                                {/* Search and Filter Section */}
+                                <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-6 space-y-4">
+                                    {/* Search Bar */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="🔍 Search menu items by name..."
+                                            value={menuSearchQuery}
+                                            onChange={(e) => setMenuSearchQuery(e.target.value)}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-tashi-accent transition-colors"
+                                        />
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">🔍</span>
+                                        {menuSearchQuery && (
+                                            <button
+                                                onClick={() => setMenuSearchQuery('')}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                        )}
                                     </div>
 
-                                    {/* Search and Filter Section */}
-                                    <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-6 space-y-4">
-                                        {/* Search Bar */}
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="🔍 Search menu items by name..."
-                                                value={menuSearchQuery}
-                                                onChange={(e) => setMenuSearchQuery(e.target.value)}
-                                                className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-tashi-accent transition-colors"
-                                            />
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">🔍</span>
-                                            {menuSearchQuery && (
-                                                <button
-                                                    onClick={() => setMenuSearchQuery('')}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                                                >
-                                                    <X size={18} />
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {/* Category Filter Tabs */}
-                                        <div className="flex flex-wrap gap-2">
-                                            {['All', ...Array.from(new Set(menu.map(i => i.category))).sort()].map((cat) => (
-                                                <button
-                                                    key={cat}
-                                                    onClick={() => setMenuCategoryFilter(cat)}
-                                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
-                                                        ? 'bg-tashi-accent text-tashi-dark shadow-lg'
-                                                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-                                                        }`}
-                                                >
-                                                    {cat}
-                                                    {cat !== 'All' && (
-                                                        <span className="ml-2 text-xs opacity-60">
-                                                            ({menu.filter(i => i.category === cat).length})
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        {/* Results Count */}
-                                        <div className="text-sm text-gray-400 flex items-center justify-between">
-                                            <span>
-                                                Showing {menu.filter(item => {
-                                                    const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
-                                                    const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
-                                                    return matchesSearch && matchesCategory;
-                                                }).length} of {menu.length} items
-                                            </span>
-                                            {(menuSearchQuery || menuCategoryFilter !== 'All') && (
-                                                <button
-                                                    onClick={() => {
-                                                        setMenuSearchQuery('');
-                                                        setMenuCategoryFilter('All');
-                                                    }}
-                                                    className="text-xs text-tashi-accent hover:text-yellow-400 font-bold"
-                                                >
-                                                    Clear Filters
-                                                </button>
-                                            )}
-                                        </div>
+                                    {/* Category Filter Tabs */}
+                                    <div className="flex flex-wrap gap-2">
+                                        {['All', ...Array.from(new Set(menu.map(i => i.category))).sort()].map((cat) => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => setMenuCategoryFilter(cat)}
+                                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
+                                                    ? 'bg-tashi-accent text-tashi-dark shadow-lg'
+                                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                                                    }`}
+                                            >
+                                                {cat}
+                                                {cat !== 'All' && (
+                                                    <span className="ml-2 text-xs opacity-60">
+                                                        ({menu.filter(i => i.category === cat).length})
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
                                     </div>
 
-                                    {/* Menu Items List - Drag and Drop */}
-                                    <SortableMenuList
-                                        items={menu
-                                            .filter(item => {
+                                    {/* Results Count */}
+                                    <div className="text-sm text-gray-400 flex items-center justify-between">
+                                        <span>
+                                            Showing {menu.filter(item => {
                                                 const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
                                                 const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
                                                 return matchesSearch && matchesCategory;
-                                            })
-                                            .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))}
-                                        onReorder={(newItems) => {
-                                            useStore.getState().reorderMenuItems(newItems);
-                                        }}
-                                        onEdit={setEditingItem}
-                                    />
+                                            }).length} of {menu.length} items
+                                        </span>
+                                        {(menuSearchQuery || menuCategoryFilter !== 'All') && (
+                                            <button
+                                                onClick={() => {
+                                                    setMenuSearchQuery('');
+                                                    setMenuCategoryFilter('All');
+                                                }}
+                                                className="text-xs text-tashi-accent hover:text-yellow-400 font-bold"
+                                            >
+                                                Clear Filters
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
 
-                                    {/* EDIT ITEM MODAL */}
-                                    {editingItem && (
-                                        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                                            <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
-                                                <button
-                                                    onClick={() => setEditingItem(null)}
-                                                    className="absolute top-4 right-4 text-gray-400 hover:text-white"
-                                                >
-                                                    <X size={24} />
-                                                </button>
+                                {/* Menu Items List - Drag and Drop */}
+                                <SortableMenuList
+                                    items={menu
+                                        .filter(item => {
+                                            const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
+                                            const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
+                                            return matchesSearch && matchesCategory;
+                                        })
+                                        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))}
+                                    onReorder={(newItems) => {
+                                        useStore.getState().reorderMenuItems(newItems);
+                                    }}
+                                    onEdit={setEditingItem}
+                                />
 
-                                                <h2 className="text-xl font-bold text-white mb-6">Edit Item</h2>
+                                {/* EDIT ITEM MODAL */}
+                                {editingItem && (
+                                    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                            <button
+                                                onClick={() => setEditingItem(null)}
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                                            >
+                                                <X size={24} />
+                                            </button>
 
-                                                <form
-                                                    onSubmit={async (e) => {
-                                                        e.preventDefault();
-                                                        const form = e.target as HTMLFormElement;
-                                                        const formData = new FormData(form);
+                                            <h2 className="text-xl font-bold text-white mb-6">Edit Item</h2>
 
-                                                        const updates: any = {
-                                                            name: formData.get('name'),
-                                                            price: Number(formData.get('price')),
-                                                            category: formData.get('category'),
-                                                            description: formData.get('description'),
-                                                            image: formData.get('image'),
-                                                            isVegetarian: formData.get('isVegetarian') === 'on',
-                                                            isSpicy: formData.get('isSpicy') === 'on',
-                                                        };
+                                            <form
+                                                onSubmit={async (e) => {
+                                                    e.preventDefault();
+                                                    const form = e.target as HTMLFormElement;
+                                                    const formData = new FormData(form);
 
-                                                        await useStore.getState().updateMenuItem(editingItem.id, updates);
-                                                        setEditingItem(null);
-                                                        alert('Item updated successfully!');
-                                                    }}
-                                                    className="space-y-4"
-                                                >
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
-                                                            <input name="name" defaultValue={editingItem.name} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price</label>
-                                                            <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                        </div>
-                                                    </div>
+                                                    const updates: any = {
+                                                        name: formData.get('name'),
+                                                        price: Number(formData.get('price')),
+                                                        category: formData.get('category'),
+                                                        description: formData.get('description'),
+                                                        image: formData.get('image'),
+                                                        isVegetarian: formData.get('isVegetarian') === 'on',
+                                                        isSpicy: formData.get('isSpicy') === 'on',
+                                                    };
 
+                                                    await useStore.getState().updateMenuItem(editingItem.id, updates);
+                                                    setEditingItem(null);
+                                                    alert('Item updated successfully!');
+                                                }}
+                                                className="space-y-4"
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
-                                                        <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                        <datalist id="category-list-edit">
-                                                            {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                                <option key={c} value={c} />
-                                                            ))}
-                                                        </datalist>
+                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
+                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
                                                     </div>
-
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
-                                                        <div className="flex gap-2">
-                                                            <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                            <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    className="hidden"
-                                                                    onChange={async (e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (file) {
-                                                                            if (confirm(`Upload ${file.name}?`)) {
-                                                                                try {
-                                                                                    const url = await useStore.getState().uploadImage(file, true);
-                                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                    if (input) input.value = url;
-                                                                                } catch (err) {
-                                                                                    alert('Upload failed');
-                                                                                    console.error(err);
-                                                                                }
+                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price</label>
+                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
+                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    <datalist id="category-list-edit">
+                                                        {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                            <option key={c} value={c} />
+                                                        ))}
+                                                    </datalist>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
+                                                    <div className="flex gap-2">
+                                                        <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        if (confirm(`Upload ${file.name}?`)) {
+                                                                            try {
+                                                                                const url = await useStore.getState().uploadImage(file, true);
+                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                if (input) input.value = url;
+                                                                            } catch (err) {
+                                                                                alert('Upload failed');
+                                                                                console.error(err);
                                                                             }
                                                                         }
-                                                                    }}
-                                                                />
-                                                                <Upload size={20} />
-                                                            </label>
-                                                        </div>
-                                                        <p className="text-[10px] text-yellow-500/70 mt-1">💡 Paste a link or click upload icon to pick a file.</p>
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                                                        <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
-                                                    </div>
-
-                                                    <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
-                                                        <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                            <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
-                                                            <span>Vegetarian</span>
-                                                        </label>
-                                                        <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                            <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
-                                                            <span>Spicy</span>
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Upload size={20} />
                                                         </label>
                                                     </div>
+                                                    <p className="text-[10px] text-yellow-500/70 mt-1">💡 Paste a link or click upload icon to pick a file.</p>
+                                                </div>
 
-                                                    <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                                        <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
-                                                        <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
+                                                </div>
+
+                                                <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
+                                                        <span>Vegetarian</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
+                                                        <span>Spicy</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
+                                                    <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
+                                                </div>
+                                            </form>
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
