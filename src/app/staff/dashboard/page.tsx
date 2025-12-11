@@ -325,49 +325,141 @@ export default function StaffDashboard() {
         printWindow.document.write(`
             <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <title>Bill #${order.id.slice(0, 4)}</title>
                     <style>
-                        body { font-family: sans-serif; width: 100%; max-width: 300px; margin: 0 auto; padding: 20px; }
-                        .header { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
-                        .store-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-                        .item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-                        .totals { margin-top: 15px; border-top: 1px solid #000; padding-top: 10px; }
-                        .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-                        .grand { font-weight: bold; font-size: 16px; margin-top: 10px; }
-                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+                        * { box-sizing: border-box; }
+                        body { 
+                            font-family: 'Courier New', monospace; 
+                            margin: 0; 
+                            padding: 15px; 
+                            background: white; 
+                            color: black;
+                            min-height: 100vh;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .container {
+                            max-width: 100%;
+                            margin: 0 auto;
+                            flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .header { 
+                            text-align: center; 
+                            border-bottom: 2px dashed #000; 
+                            padding-bottom: 15px; 
+                            margin-bottom: 20px; 
+                        }
+                        .store-name { font-size: 28px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
+                        .store-subtitle { font-size: 14px; margin-bottom: 10px; }
+                        
+                        .meta { 
+                            font-size: 14px; 
+                            margin-bottom: 20px; 
+                            padding-bottom: 15px;
+                            border-bottom: 1px solid #000;
+                            line-height: 1.4;
+                        }
+                        
+                        .items {
+                            flex: 1;
+                        }
+                        .item { 
+                            display: flex; 
+                            justify-content: space-between;
+                            margin-bottom: 10px; 
+                            font-size: 16px; 
+                            font-weight: bold;
+                        }
+                        .item-name { flex: 1; margin-right: 10px; }
+                        
+                        .totals {
+                            margin-top: 20px;
+                            border-top: 2px solid #000;
+                            padding-top: 15px;
+                        }
+                        .row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 5px; }
+                        .grand { font-size: 24px; font-weight: 900; margin-top: 10px; }
+                        
+                        .footer {
+                            margin-top: 30px;
+                            text-align: center;
+                            font-size: 14px;
+                            margin-bottom: 20px;
+                        }
+
+                        .actions {
+                            margin-top: auto;
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 15px;
+                            padding-top: 20px;
+                            border-top: 2px solid #eee;
+                        }
+                        
+                        .btn {
+                            padding: 15px;
+                            font-size: 18px;
+                            font-weight: bold;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            text-transform: uppercase;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 5px;
+                        }
+                        
+                        .print-btn { background: #000; color: #fff; grid-column: span 2; }
+                        .close-btn { background: #e5e5e5; color: #333; grid-column: span 2; }
+
+                        @media print { 
+                            .no-print { display: none !important; } 
+                            body { padding: 0; }
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <div class="store-name">TashiZom</div>
-                        <div style="font-size: 12px;">Multi-Cuisine Restaurant</div>
-                        <div style="font-size: 12px; margin-top: 5px;">
-                            Date: ${new Date().toLocaleDateString()}<br>
-                            Order #: ${order.id.slice(0, 8)}<br>
-                            Table: ${order.tableId}<br>
-                            ${order.customerName ? `Guest: ${order.customerName}<br>` : ''}
-                            ${order.customerPhone ? `Phone: ${order.customerPhone}` : ''}
+                    <div class="container">
+                        <div class="header">
+                            <div class="store-name">TashiZom</div>
+                            <div class="store-subtitle">Multi-Cuisine Restaurant</div>
+                        </div>
+                        <div class="meta">
+                            <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+                            <strong>Order #:</strong> ${order.id.slice(0, 8)}<br>
+                            <strong>Table:</strong> ${order.tableId}<br>
+                            ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
+                            ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
+                        </div>
+                        <div class="items">
+                            ${order.items.map(item => `
+                                <div class="item">
+                                    <span class="item-name">${item.quantity} x ${item.name}</span>
+                                    <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="totals">
+                            <div class="row grand"><span>TOTAL</span><span>₹${finalTotal.toFixed(2)}</span></div>
+                        </div>
+                        <div class="footer">
+                            Thank you for visiting!<br>Please come again.
+                        </div>
+                        
+                        <div class="actions no-print">
+                            <button class="btn print-btn" onclick="window.print()">
+                                🧾 PRINT BILL
+                            </button>
+                            <button class="btn close-btn" onclick="window.close()">
+                                ✖ CLOSE
+                            </button>
                         </div>
                     </div>
-                    <div class="items">
-                        ${order.items.map(item => `
-                    <div class="item">
-                        <span>${item.quantity} x ${item.name}</span>
-                        <span>₹${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                `).join('')}
-                    </div>
-                    <div class="totals">
-                        <div class="row grand"><span>Total</span><span>₹${finalTotal.toFixed(2)}</span></div>
-                    </div>
-                    <div class="footer">
-                        Thank you for visiting!<br>
-                        Please come again.
-                    </div>
-                    <script>
-                        // Auto print
-                        setTimeout(() => { window.print(); }, 500);
-                    </script>
                 </body>
             </html>
             `);
