@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image, Upload } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -984,8 +984,33 @@ export default function AdminDashboard() {
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
                                         </div>
                                         <div className="md:col-span-3">
-                                            <input name="image" placeholder="Paste Image Link (URL)..." className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                            <p className="text-[10px] text-gray-500 mt-1">Paste a link from Google Drive, Imgur, or another site.</p>
+                                            <div className="flex gap-2">
+                                                <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                if (confirm(`Upload ${file.name}?`)) {
+                                                                    try {
+                                                                        const url = await useStore.getState().uploadImage(file, true);
+                                                                        const input = document.getElementById('add-item-image-url') as HTMLInputElement;
+                                                                        if (input) input.value = url;
+                                                                    } catch (err) {
+                                                                        alert('Upload failed');
+                                                                        console.error(err);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Upload size={20} />
+                                                </label>
+                                            </div>
+                                            <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
                                         </div>
                                         <input name="description" required placeholder="Description" className="md:col-span-4 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
                                         <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
@@ -1131,8 +1156,33 @@ export default function AdminDashboard() {
 
                                                 <div>
                                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
-                                                    <input name="image" defaultValue={editingItem.image} placeholder="Paste new image URL here to fix mismatch" className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                    <p className="text-[10px] text-yellow-500/70 mt-1">💡 To fix a mismatched image, paste the correct Unsplash or Google image link here.</p>
+                                                    <div className="flex gap-2">
+                                                        <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        if (confirm(`Upload ${file.name}?`)) {
+                                                                            try {
+                                                                                const url = await useStore.getState().uploadImage(file, true);
+                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                if (input) input.value = url;
+                                                                            } catch (err) {
+                                                                                alert('Upload failed');
+                                                                                console.error(err);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Upload size={20} />
+                                                        </label>
+                                                    </div>
+                                                    <p className="text-[10px] text-yellow-500/70 mt-1">💡 Paste a link or click upload icon to pick a file.</p>
                                                 </div>
 
                                                 <div>

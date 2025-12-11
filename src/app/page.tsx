@@ -80,8 +80,8 @@ export default function Home() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="flex flex-col items-center gap-6 max-w-md mx-auto"
         >
-          <div className="bg-black/30 p-8 rounded-3xl border border-white/10 backdrop-blur-md text-center shadow-2xl">
-            <div className="w-48 h-48 bg-white/5 rounded-xl mx-auto mb-6 flex items-center justify-center border border-white/10">
+          <div className="p-8 text-center">
+            <div className="w-48 h-48 mx-auto mb-6 flex items-center justify-center">
               <UtensilsCrossed size={48} className="text-gray-300 opacity-80" />
             </div>
             <p className="text-gray-200 mb-6 font-medium">Please scan the QR code on your table to browse the menu and place orders.</p>
