@@ -809,14 +809,22 @@ function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPr
                                         {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                     </select>
                                     <button
-                                        onClick={(e) => {
+                                        type="button"
+                                        onClick={async (e) => {
                                             e.stopPropagation();
-                                            if (selectedTable) onAssignTable(order.id, selectedTable);
+                                            if (selectedTable) {
+                                                setIsUpdating(true);
+                                                try {
+                                                    await onAssignTable(order.id, selectedTable);
+                                                } finally {
+                                                    setIsUpdating(false);
+                                                }
+                                            }
                                         }}
-                                        disabled={!selectedTable}
-                                        className="bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded text-xs font-bold shadow-lg shadow-red-900/30 active:scale-95 transition-all"
+                                        disabled={!selectedTable || isUpdating}
+                                        className={`bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded text-xs font-bold shadow-lg shadow-red-900/30 active:scale-95 transition-all flex items-center gap-1 ${isUpdating ? 'animate-pulse' : ''}`}
                                     >
-                                        UPDATE
+                                        {isUpdating ? '...' : 'UPDATE'}
                                     </button>
                                 </div>
                             </div>
