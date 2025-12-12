@@ -272,8 +272,17 @@ export default function MenuPage() {
             {/* Mini Timer for Active Orders */}
             <MiniOrderTimer />
 
-            {/* Veg/Non-Veg Toggle Filter */}
-            <div className="px-1 mt-6 mb-2 flex justify-end">
+            {/* Top Toolbar: Map Icon & Filters */}
+            <div className="px-1 mt-6 mb-2 flex justify-between items-center">
+                {/* Local Map Shortcut */}
+                <button
+                    onClick={() => setShowNavigationModal(true)}
+                    className="ml-1 bg-neutral-900 border border-white/10 rounded-lg p-2 text-tashi-accent hover:bg-white/10 transition-colors shadow-lg shadow-black/20"
+                    aria-label="View Map"
+                >
+                    <MapPin size={18} />
+                </button>
+
                 <div className="bg-neutral-900 border border-white/10 rounded-lg p-1 flex gap-1">
                     <button
                         onClick={() => setFilterType('all')}
@@ -745,18 +754,7 @@ export default function MenuPage() {
                             </a>
 
                             <div className="flex gap-2 w-full pt-2">
-                                <button
-                                    onClick={() => {
-                                        setShowContactInfo(false);
-                                        setShowMap(true);
-                                    }}
-                                    className="flex-1 bg-black/40 backdrop-blur border border-white/5 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
-                                >
-                                    <span className="bg-blue-500/10 p-2 rounded-full text-blue-400">
-                                        <MapPin size={18} />
-                                    </span>
-                                    <span className="text-[10px] font-bold text-gray-400">VIEW LOCAL MAP</span>
-                                </button>
+
 
                                 <a
                                     href="https://wa.me/918988220022"

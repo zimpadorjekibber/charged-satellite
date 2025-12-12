@@ -1,162 +1,187 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, Info, X } from 'lucide-react';
-import { useState } from 'react';
+import { Navigation } from 'lucide-react';
 
 export default function LocalMapGuide() {
-    const [headerVisible, setHeaderVisible] = useState(true);
-
     return (
-        <div className="bg-neutral-900 border border-white/10 rounded-3xl overflow-hidden relative w-full aspect-square md:aspect-video max-w-3xl mx-auto shadow-2xl">
+        <div className="bg-neutral-900 border border-white/10 rounded-3xl overflow-hidden relative w-full flex flex-col max-w-3xl mx-auto shadow-2xl">
             {/* Map Background Pattern */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
 
-            {/* Header / Legend */}
-            <div className={`absolute top-4 left-4 z-20 transition-all duration-300 ${headerVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <div className="bg-black/60 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-lg">
-                    <h3 className="text-tashi-accent font-serif font-bold text-lg mb-1 flex items-center gap-2">
-                        <Navigation size={18} /> Tourist Loop
-                    </h3>
-                    <p className="text-gray-300 text-xs max-w-[220px] leading-relaxed">
-                        Complete clearer loop:
-                        <br />• <span className="text-white font-bold">TashiZom</span> to <span className="text-white font-bold">Chicham Bridge</span>
-                        <br />• <span className="text-white font-bold">Chicham Bridge</span> to <span className="text-white font-bold">Link Road</span>
-                        <br />• <span className="text-white font-bold">Link Road</span> back to <span className="text-white font-bold">TashiZom</span>
-                    </p>
-                </div>
+            {/* Header / Instructions - Now Relative flow for Mobile */}
+            <div className="bg-black/40 backdrop-blur-md p-4 w-full z-20 border-b border-white/5 relative">
+                <h3 className="text-tashi-accent font-serif font-bold text-lg mb-1 flex items-center gap-2">
+                    <Navigation size={18} /> Tourist Loop
+                </h3>
+                <p className="text-gray-300 text-xs leading-relaxed">
+                    <span className="text-white font-bold">Link Road</span> ➔ <span className="text-white font-bold">TashiZom</span> ➔ <span className="text-white font-bold">Kibber</span> ➔ <span className="text-white font-bold">Chicham Bridge</span>
+                </p>
+                <p className="text-[10px] text-gray-500 mt-1 italic">
+                    Seamless circular drive. No U-Turn needed!
+                </p>
             </div>
 
             {/* Interactive SVG Map */}
-            <svg viewBox="0 0 800 600" className="w-full h-full p-4 md:p-12">
-                <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="#DAA520" />
-                    </marker>
-                    {/* Glow Filter */}
-                    <filter id="glow">
-                        <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
+            <div className="flex-1 w-full aspect-[4/3] md:aspect-video relative">
+                <svg viewBox="0 0 800 600" className="w-full h-full p-2">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
+                        </marker>
+                        <marker id="arrowhead-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#22c55e" />
+                        </marker>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
 
-                {/* Road System - TRIANGULAR LOOP schema */}
-                {/* 
-                   Points:
-                   A: TashiZom (Bottom Right) -> 600, 450
-                   B: Chicham Bridge (Top Center) -> 400, 100
-                   C: Link Road (Bottom Left) -> 200, 450
-                */}
+                    {/* 
+                       UPDATED Topology (Curved Loop):
+                       A: Link Road (Bottom Left) -> 150, 500
+                       B: TashiZom (Bottom Right) -> 650, 500
+                       C: Kibber (Right Middle)  -> 650, 300
+                       D: Chicham (Top Left)     -> 300, 100
+                    */}
 
-                {/* Connectivity Lines (The Roads) */}
+                    {/* ROADS (Base Dark Lines) */}
 
-                {/* 1. TashiZom to Chicham Bridge (Right Leg) */}
-                <path
-                    d="M 600 450 Q 600 250 400 100"
-                    fill="none"
-                    stroke="#333"
-                    strokeWidth="16"
-                    strokeLinecap="round"
-                />
+                    {/* 1. Link Road to TashiZom (Curved Bottom) */}
+                    <path
+                        d="M 150 500 Q 400 580 650 500"
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                    />
 
-                {/* 2. Chicham Bridge to Link Road (Left Leg) */}
-                <path
-                    d="M 400 100 Q 200 250 200 450"
-                    fill="none"
-                    stroke="#333"
-                    strokeWidth="16"
-                    strokeLinecap="round"
-                />
+                    {/* 2. TashiZom to Kibber (Short Upward Curve) */}
+                    <path
+                        d="M 650 500 Q 680 400 650 300"
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                    />
 
-                {/* 3. Link Road to TashiZom (Bottom Connection) */}
-                <path
-                    d="M 200 450 L 600 450"
-                    fill="none"
-                    stroke="#333"
-                    strokeWidth="16"
-                    strokeLinecap="round"
-                />
+                    {/* 3. Kibber to Chicham (Diagonal Top) */}
+                    <path
+                        d="M 650 300 Q 500 150 300 100"
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                    />
 
-                {/* Animated Flows (Golden Arrows) */}
-
-                {/* Flow: TashiZom -> Chicham Bridge */}
-                <motion.path
-                    d="M 600 450 Q 600 250 400 100"
-                    fill="none"
-                    stroke="#DAA520"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                    markerEnd="url(#arrowhead)"
-                />
-
-                {/* Flow: Chicham Bridge -> Link Road */}
-                <motion.path
-                    d="M 400 100 Q 200 250 200 450"
-                    fill="none"
-                    stroke="#DAA520"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 2.5, delay: 2.5, repeat: Infinity, ease: "linear" }}
-                    markerEnd="url(#arrowhead)"
-                />
-
-                {/* Flow: Link Road -> TashiZom */}
-                <motion.path
-                    d="M 200 450 L 600 450"
-                    fill="none"
-                    stroke="#DAA520"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{ duration: 2.5, delay: 5.0, repeat: Infinity, ease: "linear" }}
-                    markerEnd="url(#arrowhead)"
-                />
+                    {/* 4. Chicham to Link Road (Left Down) */}
+                    <path
+                        d="M 300 100 Q 100 250 150 500"
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="16"
+                        strokeLinecap="round"
+                    />
 
 
-                {/* --- NODES / LOCATIONS --- */}
+                    {/* GOLDEN FLOW ANIMATIONS */}
 
-                {/* A. TashiZom (Bottom Right) */}
-                <g transform="translate(600, 450)" onClick={() => setHeaderVisible(prev => !prev)} className="cursor-pointer">
-                    {/* Ripple Effect */}
-                    <circle r="40" fill="#DAA520" opacity="0.2">
-                        <animate attributeName="r" from="20" to="50" dur="1.5s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" from="0.4" to="0" dur="1.5s" repeatCount="indefinite" />
-                    </circle>
-                    <circle r="25" fill="#171717" stroke="#DAA520" strokeWidth="3" />
-                    <text x="35" y="5" fill="#DAA520" fontSize="24" fontWeight="bold" fontFamily="serif" filter="url(#glow)">TashiZom</text>
-                    <text x="35" y="25" fill="#9ca3af" fontSize="12" fontFamily="sans-serif">You are here</text>
-                </g>
+                    <motion.path
+                        d="M 150 500 Q 400 580 650 500"
+                        fill="none"
+                        stroke="#DAA520"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                        markerEnd="url(#arrowhead)"
+                    />
 
-                {/* B. Chicham Bridge (Top Center) */}
-                <g transform="translate(400, 100)" className="cursor-pointer">
-                    <circle r="15" fill="#ef4444" />
-                    <text x="-60" y="-25" fill="white" fontSize="18" fontWeight="bold" fontFamily="sans-serif">Chicham Bridge</text>
-                    <text x="-60" y="-10" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">Tourist Spot</text>
-                </g>
+                    <motion.path
+                        d="M 650 500 Q 680 400 650 300"
+                        fill="none"
+                        stroke="#DAA520"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.5, delay: 2.0, repeat: Infinity, ease: "linear" }}
+                        markerEnd="url(#arrowhead)"
+                    />
 
-                {/* C. Link Road (Bottom Left) */}
-                <g transform="translate(200, 450)" className="cursor-pointer">
-                    <circle r="12" fill="#3b82f6" />
-                    <text x="-40" y="40" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">Link Road</text>
-                    <text x="-40" y="60" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">To Kaza / Main RD</text>
-                </g>
+                    <motion.path
+                        d="M 650 300 Q 500 150 300 100"
+                        fill="none"
+                        stroke="#DAA520"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 2.0, delay: 3.0, repeat: Infinity, ease: "linear" }}
+                        markerEnd="url(#arrowhead)"
+                    />
 
-            </svg>
+                    <motion.path
+                        d="M 300 100 Q 100 250 150 500"
+                        fill="none"
+                        stroke="#DAA520"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 2.5, delay: 4.5, repeat: Infinity, ease: "linear" }}
+                        markerEnd="url(#arrowhead)"
+                    />
 
-            {/* Footer Note */}
-            <div className="absolute bottom-4 right-4 z-20">
-                <span className="bg-black/50 px-3 py-1 rounded-full text-[10px] text-gray-500 border border-white/5 backdrop-blur">
-                    Circular Loop • No Need to U-Turn
-                </span>
+
+                    {/* To Kaza Direction */}
+                    <g transform="translate(150, 500)">
+                        <path d="M 0 20 Q -20 40 -40 60" fill="none" stroke="#22c55e" strokeWidth="6" strokeLinecap="round" markerEnd="url(#arrowhead-green)" />
+                        <text x="-60" y="80" fill="#22c55e" fontSize="16" fontWeight="bold" fontFamily="sans-serif">To Kaza</text>
+                        <text x="-60" y="95" fill="#4ade80" fontSize="10" fontFamily="sans-serif">Main Highway</text>
+                    </g>
+
+                    {/* --- NODES / LOCATIONS --- */}
+
+                    {/* A. Link Road */}
+                    <g transform="translate(150, 500)" className="cursor-pointer">
+                        <circle r="12" fill="#3b82f6" />
+                        <text x="-40" y="40" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">Link Road</text>
+                        <text x="-40" y="55" fill="#94a3b8" fontSize="10" fontFamily="sans-serif">From Kaza</text>
+                    </g>
+
+                    {/* B. TashiZom */}
+                    <g transform="translate(650, 500)" className="cursor-pointer">
+                        {/* Pulse */}
+                        <circle r="40" fill="#DAA520" opacity="0.2">
+                            <animate attributeName="r" from="20" to="50" dur="1.5s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" from="0.4" to="0" dur="1.5s" repeatCount="indefinite" />
+                        </circle>
+                        <circle r="20" fill="#171717" stroke="#DAA520" strokeWidth="3" />
+                        <text x="30" y="10" fill="#DAA520" fontSize="22" fontWeight="bold" fontFamily="serif" filter="url(#glow)">TashiZom</text>
+                        <text x="30" y="25" fill="#9ca3af" fontSize="10" fontFamily="sans-serif">YOU ARE HERE</text>
+                    </g>
+
+                    {/* C. Kibber Village */}
+                    <g transform="translate(650, 300)" className="cursor-pointer">
+                        <circle r="12" fill="#22c55e" />
+                        <text x="20" y="5" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">Kibber</text>
+                        <text x="20" y="20" fill="#94a3b8" fontSize="10" fontFamily="sans-serif">Village</text>
+                    </g>
+
+                    {/* D. Chicham Bridge */}
+                    <g transform="translate(300, 100)" className="cursor-pointer">
+                        <circle r="12" fill="#ef4444" />
+                        <text x="-60" y="-30" fill="white" fontSize="18" fontWeight="bold" fontFamily="sans-serif">Chicham Bridge</text>
+                        <text x="-60" y="-15" fill="#94a3b8" fontSize="10" fontFamily="sans-serif">Highest Bridge</text>
+                    </g>
+
+                </svg>
             </div>
         </div>
     );
