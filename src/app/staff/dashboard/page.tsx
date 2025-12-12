@@ -783,6 +783,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
 function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onAssignTable: (oid: string, tid: string) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
     const tables = useStore((state) => state.tables);
     const [selectedTable, setSelectedTable] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
 
     return (
         <motion.div
