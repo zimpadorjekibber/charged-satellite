@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -36,6 +36,7 @@ export default function MenuPage() {
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const contactInfo = useStore((state) => state.contactInfo);
     const categoryOrder = useStore((state) => state.categoryOrder);
+    const addReview = useStore((state) => state.addReview);
 
     // Dynamic Categories derived from Menu
     const allCategories = Array.from(new Set(menu.map(item => item.category))) as string[];
@@ -151,6 +152,12 @@ export default function MenuPage() {
     const [showNavigationModal, setShowNavigationModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
+
+    // Review Modal State
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState('');
+    const [reviewName, setReviewName] = useState('');
 
     // Scroll Spy & Navigation Logic
     useEffect(() => {
@@ -275,12 +282,13 @@ export default function MenuPage() {
             {/* Top Toolbar: Map Icon & Filters */}
             <div className="px-1 mt-6 mb-2 flex justify-between items-center">
                 {/* Local Map Shortcut */}
+                {/* Review Shortcut */}
                 <button
-                    onClick={() => setShowNavigationModal(true)}
+                    onClick={() => setShowReviewModal(true)}
                     className="ml-1 bg-neutral-900 border border-white/10 rounded-lg p-2 text-tashi-accent hover:bg-white/10 transition-colors shadow-lg shadow-black/20"
-                    aria-label="View Map"
+                    aria-label="Write a Review"
                 >
-                    <MapPin size={18} />
+                    <Star size={18} />
                 </button>
 
                 <div className="bg-neutral-900 border border-white/10 rounded-lg p-1 flex gap-1">
@@ -743,15 +751,7 @@ export default function MenuPage() {
                                 </div>
                             </a>
 
-                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
-                                <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                    <MapPin size={24} />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-200">Get Directions</p>
-                                    <p className="text-xs text-gray-500">Locate us on Maps</p>
-                                </div>
-                            </a>
+
 
                             <div className="flex gap-2 w-full pt-2">
 
@@ -774,6 +774,85 @@ export default function MenuPage() {
                 </div>
             )}
         </div>
+            {/* Review Modal */ }
+    <AnimatePresence>
+        {showReviewModal && (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                onClick={() => setShowReviewModal(false)}
+            >
+                <motion.div
+                    initial={{ scale: 0.9, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: 20 }}
+                    className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+                    onClick={e => e.stopPropagation()}
+                >
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h3 className="text-xl font-bold text-white font-serif">Rate Us</h3>
+                            <p className="text-sm text-gray-400">Tell us about your experience</p>
+                        </div>
+                        <button onClick={() => setShowReviewModal(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                    </div>
+
+                    <div className="space-y-4 pt-2">
+                        {/* Stars */}
+                        <div className="flex justify-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    onClick={() => setReviewRating(star)}
+                                    className={`p-1 transition-all ${reviewRating >= star ? 'text-tashi-accent scale-110' : 'text-gray-600'}`}
+                                >
+                                    <Star size={32} fill={reviewRating >= star ? "currentColor" : "none"} />
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Inputs */}
+                        <input
+                            type="text"
+                            placeholder="Your Name (Optional)"
+                            value={reviewName}
+                            onChange={(e) => setReviewName(e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50"
+                        />
+
+                        <textarea
+                            placeholder="Share your feedback..."
+                            value={reviewComment}
+                            onChange={(e) => setReviewComment(e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
+                        />
+
+                        <button
+                            onClick={() => {
+                                addReview({
+                                    customerName: reviewName || 'Guest',
+                                    rating: reviewRating,
+                                    comment: reviewComment
+                                });
+                                setShowReviewModal(false);
+                                setReviewComment('');
+                                setReviewRating(5);
+                                setReviewName('');
+                            }}
+                            disabled={!reviewComment.trim()}
+                            className="w-full bg-tashi-accent text-tashi-dark font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <Send size={18} />
+                            Submit Review
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        )}
+    </AnimatePresence>
+        </div >
     );
 }
 
