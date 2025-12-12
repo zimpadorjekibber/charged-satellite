@@ -56,40 +56,13 @@ export default function AdminDashboard() {
     const [menuCategoryFilter, setMenuCategoryFilter] = useState<string>('All'); // Category filter
     const [localGallery, setLocalGallery] = useState<any[]>([]);
 
-    const fetchGallery = () => {
-        fetch('/api/admin/gallery')
+    useEffect(() => {
+        // Use static manifest for reliable listing on edge
+        fetch('/gallery-manifest.json')
             .then(res => res.json())
             .then(data => setLocalGallery(data))
-            .catch(err => console.error('Failed to load gallery', err));
-    };
-
-    useEffect(() => {
-        fetchGallery();
+            .catch(err => console.error('Failed to load gallery manifest', err));
     }, []);
-
-    const handleDeleteLocalImage = async (path: string) => {
-        if (!confirm(`Are you sure you want to delete ${path}? This cannot be undone.`)) return;
-
-        try {
-            const res = await fetch('/api/admin/gallery', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filePath: path })
-            });
-
-            if (res.ok) {
-                // Remove from local state immediately
-                setLocalGallery(prev => prev.filter(img => img.path !== path));
-                alert('File deleted successfully.');
-            } else {
-                const err = await res.json();
-                alert('Error deleting file: ' + err.error);
-            }
-        } catch (error) {
-            console.error('Delete error:', error);
-            alert('Failed to delete file.');
-        }
-    };
 
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -585,21 +558,15 @@ export default function AdminDashboard() {
                                                         alt={file.name}
                                                         className="w-full h-full object-cover"
                                                     />
-                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                                                         <button
                                                             onClick={() => {
                                                                 navigator.clipboard.writeText(file.path);
                                                                 alert('Path copied: ' + file.path);
                                                             }}
-                                                            className="bg-white text-black font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-gray-200 w-full"
+                                                            className="bg-white text-black font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transform scale-90 group-hover:scale-100 transition-all"
                                                         >
                                                             Copy Path
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteLocalImage(file.path)}
-                                                            className="bg-red-500/20 border border-red-500/50 text-red-500 font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white w-full flex items-center justify-center gap-2"
-                                                        >
-                                                            <Trash size={14} /> Delete
                                                         </button>
                                                     </div>
                                                 </div>
