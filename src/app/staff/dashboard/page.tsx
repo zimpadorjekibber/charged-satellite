@@ -41,12 +41,8 @@ export default function StaffDashboard() {
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Auto-select first order if none selected
-    useEffect(() => {
-        if (!selectedOrderId && activeOrders.length > 0) {
-            setSelectedOrderId(activeOrders[0].id);
-        }
-    }, [activeOrders.length]);
+    // Auto-select logic removed to ensure mobile users see the list first.
+    // Desktop users will see "Select an Order" placeholder initially.
 
     // Update selected order details when data changes
     const selectedOrder = activeOrders.find(o => o.id === selectedOrderId) || null;
