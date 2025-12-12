@@ -715,7 +715,7 @@ export default function StaffDashboard() {
             <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] overflow-hidden pb-32 lg:pb-0">
 
                 {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
-                <div className="w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 flex flex-col h-full overflow-hidden">
+                <div className={`w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden ${selectedOrderId ? 'hidden lg:flex' : 'flex flex-col'}`}>
                     <div className="p-4 border-b border-white/10 bg-black/20 flex justify-between items-center">
                         <h2 className="font-bold text-gray-400 uppercase tracking-widest text-xs">Active List</h2>
                         <span className="bg-tashi-accent text-tashi-dark text-xs font-bold px-2 py-0.5 rounded-full">{activeOrders.length}</span>
