@@ -30,6 +30,22 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'TashiZom',
   },
+  openGraph: {
+    title: 'TashiZom | Digital Dining',
+    description: 'Experience the taste of high altitude in Spiti Valley.',
+    url: 'https://tashizomcafe.in',
+    siteName: 'TashiZom',
+    images: [
+      {
+        url: '/tashizom-logo.png',
+        width: 512,
+        height: 512,
+        alt: 'TashiZom Logo',
+      },
+    ],
+    locale: 'en_In',
+    type: 'website',
+  },
 };
 
 export const viewport = {
