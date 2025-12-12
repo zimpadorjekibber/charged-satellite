@@ -12,13 +12,11 @@ export default function OrderStatusPage() {
     const currentTableId = useStore((state) => state.currentTableId);
     const sessionId = useStore((state) => state.sessionId);
 
-    // Filter orders: Match Table AND (Session OR Legacy behavior if needed, but strict session is improved privacy)
-    // We only show orders created by THIS device (sessionId match)
+    // Filter orders: Match Session ID primarily
     const myOrders = orders.filter(o =>
-        o.tableId === currentTableId &&
         (o.sessionId === sessionId) &&
-        o.status !== 'Rejected' && // User Request: Immediately disappear if rejected
-        o.status !== 'Paid' // User Request: Immediately disappear if paid
+        o.status !== 'Rejected' &&
+        o.status !== 'Paid'
     );
 
     // Polling to keep orders updated
@@ -63,7 +61,7 @@ export default function OrderStatusPage() {
 
             <div className="space-y-6">
                 {myOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order) => (
-                    <OrderTracker key={order.id} order={order} />
+                    <OrderTracker key={order.id} order={order} isRemote={currentTableId === 'REQUEST'} />
                 ))}
             </div>
 
@@ -76,7 +74,7 @@ export default function OrderStatusPage() {
     );
 }
 
-function OrderTracker({ order }: { order: Order }) {
+function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) {
     const addReview = useStore((state) => state.addReview);
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
@@ -123,7 +121,7 @@ function OrderTracker({ order }: { order: Order }) {
 
             {/* Countdown Timer */}
             {!isCompleted && (
-                <CountdownTimer order={order} />
+                <CountdownTimer order={order} isRemote={isRemote} />
             )}
 
             {/* Progress Bar */}
@@ -216,7 +214,7 @@ function OrderTracker({ order }: { order: Order }) {
 }
 
 
-function CountdownTimer({ order }: { order: Order }) {
+function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }) {
     const startTimeStr = order.acceptedAt || order.createdAt;
     const [elapsedMs, setElapsedMs] = useState(0);
 
@@ -245,6 +243,17 @@ function CountdownTimer({ order }: { order: Order }) {
             <div className="flex flex-col items-center justify-center p-6 bg-red-900/20 rounded-lg border border-red-500/20 mb-4">
                 <p className="text-red-500 font-bold text-lg uppercase tracking-widest text-center">Order Rejected</p>
                 <p className="text-xs text-gray-400 text-center mt-1">We cannot fulfill this order right now. Please check with staff.</p>
+            </div>
+        );
+    }
+
+    if (isRemote && order.status !== 'Served') {
+        return (
+            <div className="flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-lg border border-blue-500/20 mb-4 animate-pulse">
+                <p className="text-blue-400 font-bold text-lg uppercase tracking-widest text-center">Order Accepted</p>
+                <p className="text-xs text-gray-400 text-center mt-1">
+                    Your food will be freshly served after reaching.
+                </p>
             </div>
         );
     }
