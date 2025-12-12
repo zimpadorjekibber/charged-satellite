@@ -2,7 +2,7 @@
 'use client';
 
 import { useStore } from '@/lib/store';
-import { Trash2, ArrowRight, ShoppingBag, Utensils } from 'lucide-react';
+import { Trash2, ArrowRight, ShoppingBag, Utensils, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -18,6 +18,7 @@ export default function CartPage() {
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [showTableModal, setShowTableModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [manualTableInput, setManualTableInput] = useState('');
 
     // Calculate Total
@@ -257,8 +258,8 @@ export default function CartPage() {
 
                                 <button
                                     onClick={() => {
-                                        submitOrder('REQUEST');
                                         setShowTableModal(false);
+                                        setShowPaymentModal(true);
                                     }}
                                     className="w-full bg-tashi-primary hover:bg-red-700 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-red-900/40 flex items-center justify-center gap-2 group"
                                 >
@@ -276,6 +277,81 @@ export default function CartPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div >
+
+            {/* Advance Payment Modal for Remote Orders */}
+            <AnimatePresence>
+                {showPaymentModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+                        onClick={() => setShowPaymentModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 30 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 30 }}
+                            className="bg-neutral-900 border border-tashi-accent/30 rounded-2xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(255,165,0,0.2)] space-y-6 relative overflow-hidden"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* Decorative Background */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-tashi-accent to-transparent" />
+
+                            <div className="text-center">
+                                <h3 className="text-2xl font-bold text-white mb-1 flex justify-center items-center gap-2">
+                                    <span className="text-tashi-accent">50%</span> Advance
+                                </h3>
+                                <p className="text-gray-400 text-xs uppercase tracking-widest font-bold">Payment Required</p>
+                            </div>
+
+                            <div className="bg-white p-4 rounded-xl mx-auto w-48 h-48 flex items-center justify-center shadow-inner">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src="/upi-qr.jpg"
+                                    alt="Payment QR"
+                                    className="w-full h-full object-contain mix-blend-multiply"
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm text-gray-400 border-b border-white/10 pb-2">
+                                    <span>Total Bill Amount</span>
+                                    <span className="font-mono decoration-slate-500">₹{grandTotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-lg font-bold text-white bg-white/5 p-3 rounded-lg border border-white/10">
+                                    <span className="text-tashi-accent">Pay Now (50%)</span>
+                                    <span className="font-mono text-xl">₹{Math.ceil(grandTotal * 0.5)}</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <button
+                                    onClick={() => {
+                                        submitOrder('REQUEST');
+                                        setShowPaymentModal(false);
+                                    }}
+                                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 transition-all active:scale-95"
+                                >
+                                    <Check size={20} /> I Have Paid
+                                </button>
+                                <button
+                                    onClick={() => setShowPaymentModal(false)}
+                                    className="w-full text-gray-500 text-sm hover:text-white py-2"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+
+                            <div className="text-center">
+                                <p className="text-[10px] text-gray-500">
+                                    Show the payment screenshot to staff upon arrival.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }
