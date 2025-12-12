@@ -305,13 +305,40 @@ export default function CartPage() {
                                 <p className="text-gray-400 text-xs uppercase tracking-widest font-bold">Payment Required</p>
                             </div>
 
-                            <div className="bg-white p-4 rounded-xl mx-auto w-48 h-48 flex items-center justify-center shadow-inner">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src="/upi-qr.jpg"
-                                    alt="Payment QR"
-                                    className="w-full h-full object-contain mix-blend-multiply"
-                                />
+                            {/* Payment Details & QR */}
+                            <div className="space-y-4">
+                                <a
+                                    href={`upi://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
+                                    className="block bg-white p-4 rounded-xl mx-auto w-48 h-48 flex items-center justify-center shadow-inner hover:scale-105 transition-transform cursor-pointer relative group"
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src="/upi-qr.jpg"
+                                        alt="Payment QR"
+                                        className="w-full h-full object-contain mix-blend-multiply"
+                                    />
+                                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-black text-xs font-bold bg-white/80 px-2 py-1 rounded-full">Tap to Pay</span>
+                                    </div>
+                                </a>
+
+                                <div className="text-center bg-white/5 p-3 rounded-xl border border-white/10">
+                                    <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">GPay Number</p>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <p className="text-xl font-mono font-bold text-white tracking-wider">8988203683</p>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText('8988203683');
+                                            }}
+                                            className="text-tashi-accent hover:text-white transition-colors"
+                                            title="Copy Number"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-emerald-400 font-medium mt-1">Lalit Kumar</p>
+                                </div>
                             </div>
 
                             <div className="space-y-3">
