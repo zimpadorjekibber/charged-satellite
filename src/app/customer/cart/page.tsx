@@ -329,24 +329,43 @@ export default function CartPage() {
 
                                     <div className="space-y-2">
                                         <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 2: Pay via UPI App</p>
-                                        <div className="grid grid-cols-3 gap-2">
+                                        <div className="grid grid-cols-3 gap-3 mt-4">
+                                            {/* GPay */}
                                             <a
-                                                href={`tez://upi/pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
-                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`}
+                                                className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
-                                                GPay
+                                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden p-1.5">
+                                                    <svg viewBox="0 0 24 24" className="w-full h-full">
+                                                        <path d="M12.42 10.42v3.13h7.24c-.29 1.54-1.18 2.85-2.51 3.74l4.03 3.12c2.37-2.19 3.73-5.42 3.73-9.15 0-.9-.08-1.78-.23-2.63H12.42z" fill="#4285F4" />
+                                                        <path d="M12.42 22c2.68 0 4.93-.89 6.57-2.4l-4.03-3.12c-.89.59-2.03.95-3.32.95-2.58 0-4.77-1.74-5.55-4.08H1.96v3.08C3.59 19.67 8.68 22 12.42 22z" fill="#34A853" />
+                                                        <path d="M6.87 13.35c-.2-.59-.31-1.22-.31-1.87s.11-1.28.31-1.87V6.52H1.96C.71 9.01 0 11.77 0 14.65c0 2.88.71 5.64 1.96 8.13l4.91-3.08z" fill="#FBBC05" />
+                                                        <path d="M12.42 5.25c1.46 0 2.77.5 3.8 1.48l2.84-2.84C17.29 2.22 15.03 1.25 12.42 1.25 8.68 1.25 3.59 3.58 1.96 6.52l4.91 3.08c.78-2.34 2.97-4.08 5.55-4.08z" fill="#EA4335" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-[10px] font-medium text-gray-300">GPay</span>
                                             </a>
+
+                                            {/* PhonePe */}
                                             <a
-                                                href={`phonepe://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
-                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=com.phonepe.app;end`}
+                                                className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
-                                                PhonePe
+                                                <div className="w-8 h-8 rounded-full bg-[#5f259f] flex items-center justify-center p-1.5">
+                                                    <span className="font-bold text-white italic text-xs">Pe</span>
+                                                </div>
+                                                <span className="text-[10px] font-medium text-gray-300">PhonePe</span>
                                             </a>
+
+                                            {/* Paytm */}
                                             <a
-                                                href={`paytmmp://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
-                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=net.one97.paytm;end`}
+                                                className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
-                                                Paytm
+                                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                                                    <span className="font-bold text-[#00baf2] text-[8px] tracking-tighter">Paytm</span>
+                                                </div>
+                                                <span className="text-[10px] font-medium text-gray-300">Paytm</span>
                                             </a>
                                         </div>
                                     </div>
