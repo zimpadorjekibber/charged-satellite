@@ -29,15 +29,6 @@ export default function OrderStatusPage() {
     }, [initialize]);
 
 
-    if (!currentTableId) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center">
-                <p className="text-gray-400 mb-4">Please scan a table QR code first.</p>
-                <Link href="/" className="px-6 py-2 bg-white/10 rounded-full text-white hover:bg-white/20">Go Home</Link>
-            </div>
-        )
-    }
-
     if (myOrders.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center">
@@ -45,7 +36,9 @@ export default function OrderStatusPage() {
                     <Clock size={40} className="text-gray-600" />
                 </div>
                 <h2 className="text-xl font-bold text-white mb-2">No Active Orders</h2>
-                <p className="text-gray-400 mb-6">Hungry? Order something delicious!</p>
+                <p className="text-gray-400 mb-6">
+                    {currentTableId ? "Hungry? Order something delicious!" : "Scan a QR code or browse the menu to order."}
+                </p>
                 <Link href="/customer/menu" className="px-8 py-3 bg-tashi-accent text-tashi-dark font-bold rounded-xl shadow-lg shadow-yellow-500/20 hover:scale-105 transition-transform">
                     View Menu
                 </Link>
@@ -61,7 +54,7 @@ export default function OrderStatusPage() {
 
             <div className="space-y-6">
                 {myOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order) => (
-                    <OrderTracker key={order.id} order={order} isRemote={currentTableId === 'REQUEST'} />
+                    <OrderTracker key={order.id} order={order} isRemote={order.tableId === 'REQUEST'} />
                 ))}
             </div>
 
