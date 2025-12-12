@@ -412,7 +412,21 @@ export const useStore = create<AppState>()(
             },
 
             updateOrderTable: async (orderId, tableId) => {
-                await updateDoc(doc(db, 'orders', orderId), { tableId });
+                const orderRef = doc(db, 'orders', orderId);
+                const snap = await getDoc(orderRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    // If moving from REQUEST (Remote) to a real table, reset the clock (acceptedAt)
+                    // This prevents "Late" or "Free Food" messages for customers driving from far away.
+                    if (data.tableId === 'REQUEST' && tableId !== 'REQUEST') {
+                        await updateDoc(orderRef, {
+                            tableId,
+                            acceptedAt: new Date().toISOString()
+                        });
+                    } else {
+                        await updateDoc(orderRef, { tableId });
+                    }
+                }
             },
 
             deleteOrder: async (orderId) => {
