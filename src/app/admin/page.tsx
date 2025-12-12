@@ -42,6 +42,17 @@ export default function AdminDashboard() {
     const prevOrdersLength = useRef(0);
     const prevNotifLength = useRef(0);
 
+    // Scan Stats Logic
+    const [showScanStats, setShowScanStats] = useState(false);
+    const [scanStats, setScanStats] = useState<any[]>([]);
+    const fetchScanStats = useStore((state) => state.fetchScanStats);
+
+    useEffect(() => {
+        if (showScanStats) {
+            fetchScanStats().then(setScanStats);
+        }
+    }, [showScanStats, fetchScanStats]);
+
     useEffect(() => {
         prevOrdersLength.current = orders.filter(o => o.status === 'Pending').length;
         prevNotifLength.current = notifications.filter(n => n.status === 'pending').length;
@@ -312,6 +323,20 @@ export default function AdminDashboard() {
             </div>
 
             <div className="max-w-7xl mx-auto p-4 md:p-8">
+                {/* Traffic Stats Button - Floating or Header? Header is crowded. Let's put a banner or a card in Live view? */}
+                {/* User asked for a BUTTON on admin portal. */}
+                <div className="flex justify-end mb-4">
+                    <button
+                        onClick={() => setShowScanStats(true)}
+                        className="bg-blue-600/20 text-blue-400 border border-blue-600/50 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-600/30 transition-colors"
+                    >
+                        <Users size={20} />
+                        View Scan Traffic
+                    </button>
+                </div>
+
+                {showScanStats && <ScanStatsModal stats={scanStats} onClose={() => setShowScanStats(false)} />}
+
                 <AnimatePresence mode="wait">
                     {/* LIVE DASHBOARD VIEW */}
                     {activeTab === 'live' && (
@@ -2266,6 +2291,82 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors">
                     <Trash size={16} />
                 </button>
+            </div>
+        </div>
+    );
+}
+
+
+function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] }) {
+    const totalScans = stats.length;
+    const tableScans = stats.filter(s => s.type === 'table_qr').length;
+    const appScans = stats.filter(s => s.type === 'app_qr').length;
+    const uniqueUsers = new Set(stats.map(s => s.userAgent + (s.tableId || ''))).size; // Crude unique approximation
+
+    // Group by timestamps (Day)
+    const getDayStr = (iso: string) => new Date(iso).toLocaleDateString();
+    const scansByDay = stats.reduce((acc, curr) => {
+        const day = getDayStr(curr.timestamp);
+        acc[day] = (acc[day] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
+            <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Users className="text-blue-400" /> Scan Traffic Analytics
+                    </h2>
+                    <button onClick={onClose} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Total Scans</p>
+                        <p className="text-3xl font-bold text-white mt-1">{totalScans}</p>
+                    </div>
+                    <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
+                        <p className="text-xs text-blue-300 uppercase tracking-wider font-bold">App / Web Visits</p>
+                        <p className="text-3xl font-bold text-blue-400 mt-1">{appScans}</p>
+                    </div>
+                    <div className="bg-green-500/10 p-4 rounded-xl border border-green-500/20">
+                        <p className="text-xs text-green-300 uppercase tracking-wider font-bold">Table QR Scans</p>
+                        <p className="text-3xl font-bold text-green-400 mt-1">{tableScans}</p>
+                    </div>
+                    <div className="bg-purple-500/10 p-4 rounded-xl border border-purple-500/20">
+                        <p className="text-xs text-purple-300 uppercase tracking-wider font-bold">Est. Unique Users</p>
+                        <p className="text-3xl font-bold text-purple-400 mt-1">{uniqueUsers}</p>
+                    </div>
+                </div>
+
+                <div className="bg-black/40 rounded-xl p-4 border border-white/5 max-h-96 overflow-y-auto">
+                    <h3 className="text-sm font-bold text-gray-300 mb-4 uppercase">Recent Activity Log</h3>
+                    <table className="w-full text-left text-sm text-gray-400">
+                        <thead className="text-xs text-gray-500 uppercase border-b border-white/10">
+                            <tr>
+                                <th className="pb-2">Time</th>
+                                <th className="pb-2">Type</th>
+                                <th className="pb-2">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {[...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 50).map((scan, idx) => (
+                                <tr key={idx} className="hover:bg-white/5">
+                                    <td className="py-2 text-white/80">{new Date(scan.timestamp).toLocaleString()}</td>
+                                    <td className="py-2">
+                                        <span className={`text-xs font-bold px-2 py-1 rounded ${scan.type === 'table_qr' ? 'bg-green-900/50 text-green-400' : 'bg-blue-900/50 text-blue-400'}`}>
+                                            {scan.type === 'table_qr' ? 'Table QR' : 'App Visit'}
+                                        </span>
+                                    </td>
+                                    <td className="py-2 font-mono text-xs">{scan.tableId ? `Table ${scan.tableId}` : (scan.path || '-')}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

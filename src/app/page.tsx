@@ -4,10 +4,16 @@ import Link from 'next/link';
 import { UtensilsCrossed, ChefHat, ShieldCheck, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useStore } from '@/lib/store';
 
 export default function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = ['/tashizom-winter.jpg', '/tashizom-summer.jpg'];
+
+  useEffect(() => {
+    // Record generic visit / app scan
+    useStore.getState().recordScan('app_qr', { path: '/' });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

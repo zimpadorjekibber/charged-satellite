@@ -11,7 +11,8 @@ import {
     query,
     orderBy,
     setDoc,
-    getDoc
+    getDoc,
+    getDocs
 } from 'firebase/firestore';
 
 export type Category = string;
@@ -164,6 +165,9 @@ interface AppState {
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
     addMediaItem: (url: string, name: string) => Promise<void>;
     deleteMedia: (id: string) => Promise<void>;
+
+    recordScan: (type: 'table_qr' | 'app_qr' | 'manual', details?: any) => Promise<void>;
+    fetchScanStats: () => Promise<any[]>;
 
     logout: () => void;
 }
@@ -438,8 +442,32 @@ export const useStore = create<AppState>()(
                     tableId,
                     type,
                     status: 'pending',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
                 });
+            },
+
+            recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}) => {
+                try {
+                    await addDoc(collection(db, 'analytics_scans'), {
+                        type,
+                        ...details,
+                        timestamp: new Date().toISOString(),
+                        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
+                    });
+                } catch (e) {
+                    console.error("Failed to record scan", e);
+                }
+            },
+
+            fetchScanStats: async () => {
+                try {
+                    const q = query(collection(db, 'analytics_scans'));
+                    const snapshot = await getDocs(q);
+                    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                } catch (e) {
+                    console.error("Failed to fetch stats", e);
+                    return [];
+                }
             },
 
             resolveNotification: async (notificationId) => {

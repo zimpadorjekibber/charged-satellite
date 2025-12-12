@@ -47,6 +47,9 @@ function ScanPageContent() {
             return;
         }
 
+        // Record Scan
+        useStore.getState().recordScan('table_qr', { tableId });
+
         // Check if Geolocation is supported
         if (!navigator.geolocation) {
             console.warn("Geolocation not supported. Proceeding...");
