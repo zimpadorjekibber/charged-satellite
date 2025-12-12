@@ -781,7 +781,8 @@ export default function StaffDashboard() {
             <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] overflow-hidden pb-32 lg:pb-0">
 
                 {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
-                <div className={`w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden ${selectedOrderId ? 'hidden lg:flex' : 'flex flex-col'}`}>
+                {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
+                <div className="w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex flex-col">
                     <div className="p-4 border-b border-white/10 bg-black/20 flex justify-between items-center">
                         <h2 className="font-bold text-gray-400 uppercase tracking-widest text-xs">Active List</h2>
                         <span className="bg-tashi-accent text-tashi-dark text-xs font-bold px-2 py-0.5 rounded-full">{activeOrders.length}</span>
@@ -803,47 +804,71 @@ export default function StaffDashboard() {
                                     </div>
                                     <div className="space-y-2">
                                         {statusOrders.map(order => (
-                                            <button
-                                                key={order.id}
-                                                onClick={() => setSelectedOrderId(selectedOrderId === order.id ? null : order.id)}
-                                                className={`w-full text-left p-3 rounded-xl border transition-all relative group ${selectedOrderId === order.id
-                                                    ? 'bg-gradient-to-r from-white/10 to-transparent border-l-4 border-l-tashi-accent border-y-transparent border-r-transparent'
-                                                    : 'bg-black/20 border-transparent hover:bg-white/5 border-l-4 border-l-transparent'
-                                                    }`}
-                                            >
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className={`font-bold text-lg ${order.tableId === 'REQUEST' ? 'text-red-400 animate-pulse' : 'text-white'
-                                                        }`}>
-                                                        {order.tableId === 'REQUEST' ? 'REQ' : order.tableId}
-                                                    </span>
-                                                    <span className="text-[10px] font-mono text-gray-500">
-                                                        #{order.id.slice(0, 4)}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <div className="flex flex-col">
-                                                        {(order.customerName || order.customerPhone) ? (
-                                                            <span className="text-sm font-bold text-gray-200 truncate max-w-[120px]">
-                                                                {order.customerName || order.customerPhone}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-xs text-gray-400 italic">Guest</span>
-                                                        )}
-                                                        <span className="text-[10px] text-gray-500 font-mono">
-                                                            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            <div key={order.id} className="w-full text-left p-1 rounded-xl transition-colors">
+                                                <div
+                                                    onClick={() => setSelectedOrderId(selectedOrderId === order.id ? null : order.id)}
+                                                    className={`w-full text-left p-3 rounded-xl border transition-all relative group cursor-pointer ${selectedOrderId === order.id
+                                                        ? 'bg-gradient-to-r from-white/10 to-transparent border-l-4 border-l-tashi-accent border-y-transparent border-r-transparent'
+                                                        : 'bg-black/20 border-transparent hover:bg-white/5 border-l-4 border-l-transparent'
+                                                        }`}
+                                                >
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className={`font-bold text-lg ${order.tableId === 'REQUEST' ? 'text-red-400 animate-pulse' : 'text-white'
+                                                            }`}>
+                                                            {order.tableId === 'REQUEST' ? 'REQ' : order.tableId}
+                                                        </span>
+                                                        <span className="text-[10px] font-mono text-gray-500">
+                                                            #{order.id.slice(0, 4)}
                                                         </span>
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-300">
-                                                        ₹{order.totalAmount}
-                                                    </span>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex flex-col">
+                                                            {(order.customerName || order.customerPhone) ? (
+                                                                <span className="text-sm font-bold text-gray-200 truncate max-w-[120px]">
+                                                                    {order.customerName || order.customerPhone}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-xs text-gray-400 italic">Guest</span>
+                                                            )}
+                                                            <span className="text-[10px] text-gray-500 font-mono">
+                                                                {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs font-bold text-gray-300">
+                                                            ₹{order.totalAmount}
+                                                        </span>
+                                                    </div>
+                                                    {selectedOrderId === order.id && (
+                                                        <motion.div
+                                                            layoutId="activeGlow"
+                                                            className="absolute inset-0 bg-white/5 rounded-xl -z-10 hidden lg:block"
+                                                        />
+                                                    )}
                                                 </div>
-                                                {selectedOrderId === order.id && (
-                                                    <motion.div
-                                                        layoutId="activeGlow"
-                                                        className="absolute inset-0 bg-white/5 rounded-xl -z-10"
-                                                    />
-                                                )}
-                                            </button>
+
+                                                <AnimatePresence>
+                                                    {selectedOrderId === order.id && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            className="lg:hidden bg-[#111] border border-white/10 rounded-xl mt-2 overflow-hidden mx-1 shadow-inner"
+                                                        >
+                                                            <div className="p-2">
+                                                                <StaffOrderCard
+                                                                    order={order}
+                                                                    onUpdateStatus={(s) => updateOrderStatus(order.id, s)}
+                                                                    onAssignTable={updateOrderTable}
+                                                                    onPrintKOT={() => handlePrintKOT(order)}
+                                                                    onPrintBill={() => handlePrintBill(order)}
+                                                                    onShareBill={() => handleShareBill(order)}
+                                                                    onShareKOT={() => { }}
+                                                                />
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
@@ -859,8 +884,8 @@ export default function StaffDashboard() {
                     </div>
                 </div>
 
-                {/* RIGHT/MAIN AREA: SELECTED ORDER DETAIL */}
-                <div className="flex-1 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex flex-col relative">
+                {/* RIGHT/MAIN AREA: SELECTED ORDER DETAIL (Desktop Only) */}
+                <div className="hidden lg:flex flex-1 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex-col relative">
                     {selectedOrder ? (
                         <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-white/10">
                             <div className="max-w-3xl mx-auto">
