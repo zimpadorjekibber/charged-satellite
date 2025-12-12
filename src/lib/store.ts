@@ -417,8 +417,20 @@ export const useStore = create<AppState>()(
 
             updateOrderTable: async (orderId, tableId) => {
                 const orderRef = doc(db, 'orders', orderId);
-                // Simply update the table ID without resetting the timer
-                await updateDoc(orderRef, { tableId });
+                const snap = await getDoc(orderRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    // If moving from REQUEST (Remote) to a real table, reset the clock (acceptedAt)
+                    // This ensures the cooking timer starts mainly when they are seated.
+                    if (data.tableId === 'REQUEST' && tableId !== 'REQUEST') {
+                        await updateDoc(orderRef, {
+                            tableId,
+                            acceptedAt: new Date().toISOString()
+                        });
+                    } else {
+                        await updateDoc(orderRef, { tableId });
+                    }
+                }
             },
 
             deleteOrder: async (orderId) => {

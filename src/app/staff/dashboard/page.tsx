@@ -782,6 +782,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
 
 function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onAssignTable: (oid: string, tid: string) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
     const tables = useStore((state) => state.tables);
+    const [selectedTable, setSelectedTable] = useState('');
 
     return (
         <motion.div
@@ -794,18 +795,29 @@ function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPr
                 <div>
                     <h4 className="font-bold text-white text-xl flex flex-col sm:flex-row sm:items-center sm:gap-2">
                         {order.tableId === 'REQUEST' ? (
-                            <div className="flex flex-col gap-1 w-full sm:w-auto p-2 bg-red-500/10 border border-red-500/30 rounded animate-pulse">
-                                <span className="text-xs text-red-300 font-bold uppercase tracking-wider">⚠️ Assign Table</span>
-                                <select
-                                    className="bg-black text-white p-2 rounded border border-white/20 text-sm focus:outline-none focus:border-red-500"
-                                    onChange={(e) => {
-                                        if (e.target.value) onAssignTable(order.id, e.target.value);
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <option value="">Select Table...</option>
-                                    {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                </select>
+                            <div className="flex flex-col gap-2 w-full sm:w-auto p-3 bg-red-500/10 border border-red-500/30 rounded animate-pulse">
+                                <span className="text-xs text-red-300 font-bold uppercase tracking-wider">⚠️ Assign Table to Start Timer</span>
+                                <div className="flex gap-2 items-center">
+                                    <select
+                                        className="bg-black text-white p-2 rounded border border-white/20 text-sm focus:outline-none focus:border-red-500"
+                                        onChange={(e) => setSelectedTable(e.target.value)}
+                                        value={selectedTable}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <option value="">Select...</option>
+                                        {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                    </select>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (selectedTable) onAssignTable(order.id, selectedTable);
+                                        }}
+                                        disabled={!selectedTable}
+                                        className="bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded text-xs font-bold shadow-lg shadow-red-900/30 active:scale-95 transition-all"
+                                    >
+                                        UPDATE
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             tables.find(t => t.id === order.tableId)?.name || order.tableId
