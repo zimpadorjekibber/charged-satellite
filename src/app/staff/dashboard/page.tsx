@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut } from 'lucide-react';
+import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -39,6 +39,7 @@ export default function StaffDashboard() {
 
     // UI State for Split View
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Auto-select first order if none selected
     useEffect(() => {
@@ -629,14 +630,28 @@ export default function StaffDashboard() {
                 )}
             </AnimatePresence>
 
-            <div className="flex flex-col md:flex-row justify-between items-center bg-white/5 p-4 rounded-2xl backdrop-blur-md border border-white/5 mx-1 gap-4 md:gap-0">
-                <h1 className="text-2xl font-bold text-white font-serif flex items-center gap-3">
-                    <div className="p-2 bg-tashi-accent/20 rounded-lg text-tashi-accent">
-                        <ChefHat size={24} />
-                    </div>
-                    Kitchen Display System
-                </h1>
-                <div className="flex flex-col md:flex-row items-center gap-6">
+            {/* Header */}
+            <header className="bg-white/5 p-4 rounded-2xl backdrop-blur-md border border-white/5 mx-1 flex justify-between items-center relative z-50">
+                <div className="flex items-center gap-4">
+                    {/* Mobile Hamburger */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="lg:hidden p-2 -ml-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+
+                    <h1 className="text-xl md:text-2xl font-bold text-white font-serif flex items-center gap-3">
+                        <div className="hidden lg:block p-2 bg-tashi-accent/20 rounded-lg text-tashi-accent">
+                            <ChefHat size={24} />
+                        </div>
+                        <span className="lg:hidden text-tashi-accent">KDS</span>
+                        <span className="hidden lg:inline">Kitchen Display System</span>
+                    </h1>
+                </div>
+
+                {/* Desktop Stats & Controls */}
+                <div className="hidden lg:flex items-center gap-6">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold border border-tashi-accent bg-tashi-accent/10 text-tashi-accent select-none cursor-default">
                         <Bell size={16} className="animate-pulse" />
                         <span>Sound ACTIVE</span>
@@ -644,7 +659,7 @@ export default function StaffDashboard() {
 
                     <div className="flex gap-4 text-sm font-mono bg-black/20 px-4 py-2 rounded-lg border border-white/5">
                         <span className="text-gray-400">
-                            Today's Orders: <strong className="text-white">{todaysOrders.length}</strong>
+                            Orders: <strong className="text-white">{todaysOrders.length}</strong>
                         </span>
                         <div className="w-px h-4 bg-white/10" />
                         <span className="text-gray-400">
@@ -654,12 +669,13 @@ export default function StaffDashboard() {
 
                     <div className="flex items-center gap-3 pl-6 border-l border-white/10">
                         <div className="flex flex-col items-end mr-2">
-                            <span className="text-sm font-bold text-white hidden sm:inline">{currentUser?.name}</span>
+                            <span className="text-sm font-bold text-white">{currentUser?.name}</span>
                             {currentUser?.serialNumber && (
                                 <span className="text-[10px] bg-white/10 px-1.5 rounded text-tashi-accent font-mono">{currentUser.serialNumber}</span>
                             )}
                         </div>
                     </div>
+
                     <button
                         onClick={logout}
                         className="p-2 bg-white/5 hover:bg-red-900/40 text-gray-400 hover:text-red-400 rounded-lg transition-colors"
@@ -668,7 +684,61 @@ export default function StaffDashboard() {
                         <LogOut size={18} />
                     </button>
                 </div>
-            </div>
+
+                {/* Mobile Menu Overlay */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl p-5 flex flex-col gap-6 lg:hidden z-50 overflow-hidden backdrop-blur-3xl"
+                        >
+                            {/* Stats Row */}
+                            <div className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Today's Orders</span>
+                                    <span className="text-2xl font-black text-white">{todaysOrders.length}</span>
+                                </div>
+                                <div className="w-px h-10 bg-white/10"></div>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Total Sales</span>
+                                    <span className="text-2xl font-black text-tashi-accent">₹{dailyRevenue.toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Controls */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 bg-tashi-accent/10 border border-tashi-accent/30 rounded-xl flex items-center justify-center gap-3 text-tashi-accent font-bold text-sm shadow-inner">
+                                    <Bell size={20} className="animate-pulse" /> Sound ON
+                                </div>
+                                <button className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-sm hover:bg-white/10 transition-colors">
+                                    <Utensils size={20} /> History
+                                </button>
+                            </div>
+
+                            {/* User & Logout */}
+                            <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 font-bold border border-blue-500/20 text-lg">
+                                        {currentUser?.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-white text-lg">{currentUser?.name}</span>
+                                        <span className="text-xs text-gray-500 font-mono">ID: {currentUser?.serialNumber || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={logout}
+                                    className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-2 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-colors font-bold text-sm"
+                                >
+                                    <LogOut size={16} /> Exit
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </header>
 
             <AnimatePresence>
                 {activeNotifications.length > 0 && (
