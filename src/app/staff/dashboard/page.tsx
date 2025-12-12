@@ -1,7 +1,16 @@
 'use client';
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut, Menu, X } from 'lucide-react';
+import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut, Menu, X, History, Volume2, VolumeX, UserCheck, AlertCircle } from 'lucide-react';
+
+// Filter Configuration
+const OBS_FILTERS = [
+    { id: 'requests', label: 'Requests', statuses: ['Pending'], icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+    { id: 'cooking', label: 'Kitchen', statuses: ['Preparing'], icon: Utensils, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 'ready', label: 'Ready', statuses: ['Ready'], icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/10' },
+    { id: 'served', label: 'Served', statuses: ['Served'], icon: UserCheck, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+    { id: 'history', label: 'History', statuses: ['Paid', 'Rejected', 'Cancelled'], icon: History, color: 'text-gray-400', bg: 'bg-gray-500/10' },
+];
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -25,26 +34,34 @@ export default function StaffDashboard() {
 
 
 
+
+
+    // Navigation State
+    const [activeFilterId, setActiveFilterId] = useState('requests');
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [soundEnabled, setSoundEnabled] = useState(true);
+
     // Sound & Visual Notification Logic
     const [prevPendingCount, setPrevPendingCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
 
-    // Filter unresolved notifications
+    // Derived Lists & Logic
     const activeNotifications = (notifications || []).filter((n) => n.status === 'pending');
-    // Sort orders: Newest first
-    // Sort orders: Newest first, exclude rejected/cancelled from active processing view
-    const activeOrders = [...(orders || [])]
-        .filter(o => o.status !== 'Rejected' && o.status !== 'Cancelled')
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    // UI State for Split View
-    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    // Audio Ref
+    const audioCtxRef = useRef<any>(null);
+    const [audioReady, setAudioReady] = useState(false);
 
-    // Auto-select logic removed to ensure mobile users see the list first.
-    // Desktop users will see "Select an Order" placeholder initially.
+    // Initialization and derived lists
+    const activeOrders = [...(orders || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    // Update selected order details when data changes
+    // Filter Logic
+    const currentList = activeOrders.filter(o => {
+        const filter = OBS_FILTERS.find(f => f.id === activeFilterId);
+        return filter?.statuses.includes(o.status);
+    });
+
     const selectedOrder = activeOrders.find(o => o.id === selectedOrderId) || null;
 
     // Calculate Daily Stats
@@ -53,10 +70,6 @@ export default function StaffDashboard() {
     const dailyRevenue = todaysOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
     const pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending').length;
-
-    const audioCtxRef = useRef<any>(null);
-
-    const [audioReady, setAudioReady] = useState(false);
 
     // Initialize Audio Context on user interaction
     const initAudio = () => {
@@ -78,21 +91,7 @@ export default function StaffDashboard() {
         }
     };
 
-    useEffect(() => {
-        window.addEventListener('click', initAudio);
-        window.addEventListener('keydown', initAudio);
-        return () => {
-            window.removeEventListener('click', initAudio);
-            window.removeEventListener('keydown', initAudio);
-        };
-    }, []);
-
-    // Initialize Store (Real-time) - only once
-    const initialize = useStore((state) => state.initialize);
-    useEffect(() => {
-        initialize();
-    }, [initialize]);
-
+    // Play sound on new orders
     const playNotificationSound = () => {
         try {
             // Audio context setup...
