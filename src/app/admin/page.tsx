@@ -2303,69 +2303,90 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
     const appScans = stats.filter(s => s.type === 'app_qr').length;
     const uniqueUsers = new Set(stats.map(s => s.userAgent + (s.tableId || ''))).size; // Crude unique approximation
 
-    // Group by timestamps (Day)
-    const getDayStr = (iso: string) => new Date(iso).toLocaleDateString();
-    const scansByDay = stats.reduce((acc, curr) => {
-        const day = getDayStr(curr.timestamp);
-        acc[day] = (acc[day] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    // Helper to parse UA
+    const getDeviceInfo = (ua: string) => {
+        if (!ua) return 'Unknown Device';
+        if (ua.includes('iPhone')) return 'iPhone';
+        if (ua.includes('iPad')) return 'iPad';
+        if (ua.includes('Android')) return 'Android';
+        if (ua.includes('Windows')) return 'Windows PC';
+        if (ua.includes('Macintosh')) return 'Mac';
+        return 'Other Device';
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
-            <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-4xl p-6 shadow-2xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Users className="text-blue-400" /> Scan Traffic Analytics
+                        <Users className="text-blue-400" /> Vistor Analytics
                     </h2>
                     <button onClick={onClose} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
                     <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                        <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Total Scans</p>
+                        <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Total Visits</p>
                         <p className="text-3xl font-bold text-white mt-1">{totalScans}</p>
                     </div>
                     <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                        <p className="text-xs text-blue-300 uppercase tracking-wider font-bold">App / Web Visits</p>
+                        <p className="text-xs text-blue-300 uppercase tracking-wider font-bold">App / Web</p>
                         <p className="text-3xl font-bold text-blue-400 mt-1">{appScans}</p>
                     </div>
                     <div className="bg-green-500/10 p-4 rounded-xl border border-green-500/20">
-                        <p className="text-xs text-green-300 uppercase tracking-wider font-bold">Table QR Scans</p>
+                        <p className="text-xs text-green-300 uppercase tracking-wider font-bold">Table QR</p>
                         <p className="text-3xl font-bold text-green-400 mt-1">{tableScans}</p>
                     </div>
                     <div className="bg-purple-500/10 p-4 rounded-xl border border-purple-500/20">
-                        <p className="text-xs text-purple-300 uppercase tracking-wider font-bold">Est. Unique Users</p>
+                        <p className="text-xs text-purple-300 uppercase tracking-wider font-bold">Unique Visitors</p>
                         <p className="text-3xl font-bold text-purple-400 mt-1">{uniqueUsers}</p>
                     </div>
                 </div>
 
-                <div className="bg-black/40 rounded-xl p-4 border border-white/5 max-h-96 overflow-y-auto">
-                    <h3 className="text-sm font-bold text-gray-300 mb-4 uppercase">Recent Activity Log</h3>
-                    <table className="w-full text-left text-sm text-gray-400">
-                        <thead className="text-xs text-gray-500 uppercase border-b border-white/10">
-                            <tr>
-                                <th className="pb-2">Time</th>
-                                <th className="pb-2">Type</th>
-                                <th className="pb-2">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {[...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 50).map((scan, idx) => (
-                                <tr key={idx} className="hover:bg-white/5">
-                                    <td className="py-2 text-white/80">{new Date(scan.timestamp).toLocaleString()}</td>
-                                    <td className="py-2">
-                                        <span className={`text-xs font-bold px-2 py-1 rounded ${scan.type === 'table_qr' ? 'bg-green-900/50 text-green-400' : 'bg-blue-900/50 text-blue-400'}`}>
-                                            {scan.type === 'table_qr' ? 'Table QR' : 'App Visit'}
-                                        </span>
-                                    </td>
-                                    <td className="py-2 font-mono text-xs">{scan.tableId ? `Table ${scan.tableId}` : (scan.path || '-')}</td>
+                <div className="bg-black/40 rounded-xl border border-white/5 flex-1 overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-white/10 shrink-0">
+                        <h3 className="text-sm font-bold text-gray-300 uppercase">Detailed Visitor Log</h3>
+                    </div>
+                    <div className="overflow-auto flex-1 p-4">
+                        <table className="w-full text-left text-sm text-gray-400">
+                            <thead className="text-xs text-gray-500 uppercase border-b border-white/10 bg-neutral-900 sticky top-0 z-10">
+                                <tr>
+                                    <th className="pb-3 pl-2">Time</th>
+                                    <th className="pb-3">Type</th>
+                                    <th className="pb-3">Device / OS</th>
+                                    <th className="pb-3">Location / Table</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {stats.length === 0 ? (
+                                    <tr><td colSpan={4} className="py-8 text-center">No visits recorded yet.</td></tr>
+                                ) : (
+                                    [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 100).map((scan, idx) => (
+                                        <tr key={idx} className="hover:bg-white/5 transition-colors">
+                                            <td className="py-3 pl-2 text-white/80 font-mono text-xs whitespace-nowrap">
+                                                {new Date(scan.timestamp).toLocaleString()}
+                                            </td>
+                                            <td className="py-3">
+                                                <span className={`text-[10px] font-bold px-2 py-1 rounded border ${scan.type === 'table_qr' ? 'bg-green-900/40 text-green-400 border-green-500/30' : 'bg-blue-900/40 text-blue-400 border-blue-500/30'}`}>
+                                                    {scan.type === 'table_qr' ? 'TABLE SCAN' : 'WEB VISIT'}
+                                                </span>
+                                            </td>
+                                            <td className="py-3 text-white">
+                                                <div className="flex items-center gap-2">
+                                                    {getDeviceInfo(scan.userAgent)}
+                                                </div>
+                                            </td>
+                                            <td className="py-3 font-mono text-xs text-tashi-accent">
+                                                {scan.tableId ? `Table ${scan.tableId}` : (scan.path || 'Remote')}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
