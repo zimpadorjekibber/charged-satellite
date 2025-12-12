@@ -330,11 +330,24 @@ export default function CartPage() {
                                     <div className="space-y-2">
                                         <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 2: Pay via UPI App</p>
                                         <div className="grid grid-cols-3 gap-2">
-                                            {['GPay', 'PhonePe', 'Paytm'].map(app => (
-                                                <div key={app} className="bg-white/5 p-2 rounded-lg text-xs text-gray-300 border border-white/5">
-                                                    {app}
-                                                </div>
-                                            ))}
+                                            <a
+                                                href={`tez://upi/pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
+                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                            >
+                                                GPay
+                                            </a>
+                                            <a
+                                                href={`phonepe://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
+                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                            >
+                                                PhonePe
+                                            </a>
+                                            <a
+                                                href={`paytmmp://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR`}
+                                                className="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-xs text-center text-gray-300 border border-white/5 transition-colors block"
+                                            >
+                                                Paytm
+                                            </a>
                                         </div>
                                     </div>
 
