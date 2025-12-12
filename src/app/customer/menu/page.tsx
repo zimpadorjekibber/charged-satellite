@@ -773,85 +773,85 @@ export default function MenuPage() {
                     </div>
                 </div>
             )}
-        </div>
-            {/* Review Modal */ }
-    <AnimatePresence>
-        {showReviewModal && (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-                onClick={() => setShowReviewModal(false)}
-            >
-                <motion.div
-                    initial={{ scale: 0.9, y: 20 }}
-                    animate={{ scale: 1, y: 0 }}
-                    exit={{ scale: 0.9, y: 20 }}
-                    className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
-                    onClick={e => e.stopPropagation()}
-                >
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h3 className="text-xl font-bold text-white font-serif">Rate Us</h3>
-                            <p className="text-sm text-gray-400">Tell us about your experience</p>
-                        </div>
-                        <button onClick={() => setShowReviewModal(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
-                    </div>
 
-                    <div className="space-y-4 pt-2">
-                        {/* Stars */}
-                        <div className="flex justify-center gap-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    onClick={() => setReviewRating(star)}
-                                    className={`p-1 transition-all ${reviewRating >= star ? 'text-tashi-accent scale-110' : 'text-gray-600'}`}
-                                >
-                                    <Star size={32} fill={reviewRating >= star ? "currentColor" : "none"} />
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Inputs */}
-                        <input
-                            type="text"
-                            placeholder="Your Name (Optional)"
-                            value={reviewName}
-                            onChange={(e) => setReviewName(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50"
-                        />
-
-                        <textarea
-                            placeholder="Share your feedback..."
-                            value={reviewComment}
-                            onChange={(e) => setReviewComment(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
-                        />
-
-                        <button
-                            onClick={() => {
-                                addReview({
-                                    customerName: reviewName || 'Guest',
-                                    rating: reviewRating,
-                                    comment: reviewComment
-                                });
-                                setShowReviewModal(false);
-                                setReviewComment('');
-                                setReviewRating(5);
-                                setReviewName('');
-                            }}
-                            disabled={!reviewComment.trim()}
-                            className="w-full bg-tashi-accent text-tashi-dark font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            {/* Review Modal */}
+            <AnimatePresence>
+                {showReviewModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                        onClick={() => setShowReviewModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+                            onClick={e => e.stopPropagation()}
                         >
-                            <Send size={18} />
-                            Submit Review
-                        </button>
-                    </div>
-                </motion.div>
-            </motion.div>
-        )}
-    </AnimatePresence>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="text-xl font-bold text-white font-serif">Rate Us</h3>
+                                    <p className="text-sm text-gray-400">Tell us about your experience</p>
+                                </div>
+                                <button onClick={() => setShowReviewModal(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                            </div>
+
+                            <div className="space-y-4 pt-2">
+                                {/* Stars */}
+                                <div className="flex justify-center gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            onClick={() => setReviewRating(star)}
+                                            className={`p-1 transition-all ${reviewRating >= star ? 'text-tashi-accent scale-110' : 'text-gray-600'}`}
+                                        >
+                                            <Star size={32} fill={reviewRating >= star ? "currentColor" : "none"} />
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Inputs */}
+                                <input
+                                    type="text"
+                                    placeholder="Your Name (Optional)"
+                                    value={reviewName}
+                                    onChange={(e) => setReviewName(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50"
+                                />
+
+                                <textarea
+                                    placeholder="Share your feedback..."
+                                    value={reviewComment}
+                                    onChange={(e) => setReviewComment(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
+                                />
+
+                                <button
+                                    onClick={() => {
+                                        addReview({
+                                            customerName: reviewName || 'Guest',
+                                            rating: reviewRating,
+                                            comment: reviewComment
+                                        });
+                                        setShowReviewModal(false);
+                                        setReviewComment('');
+                                        setReviewRating(5);
+                                        setReviewName('');
+                                    }}
+                                    disabled={!reviewComment.trim()}
+                                    className="w-full bg-tashi-accent text-tashi-dark font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    <Send size={18} />
+                                    Submit Review
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
     );
 }
