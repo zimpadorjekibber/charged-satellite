@@ -1,4 +1,5 @@
 'use client';
+// Staff Dashboard v2.0 - Forced Update
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
 import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut, Menu, X, History, Volume2, VolumeX, UserCheck, AlertCircle } from 'lucide-react';
