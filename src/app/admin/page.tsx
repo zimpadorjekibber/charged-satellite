@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image, Upload } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image, Upload, Share2, Download } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -595,6 +595,87 @@ export default function AdminDashboard() {
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                             className="space-y-12"
                         >
+                            {/* App Sharing & QR */}
+                            <div className="bg-gradient-to-br from-tashi-accent/20 to-black/40 border border-tashi-accent/30 rounded-2xl p-8">
+                                <div className="flex flex-col md:flex-row gap-8 items-center">
+                                    <div className="bg-white p-4 rounded-xl shadow-2xl shadow-tashi-accent/10">
+                                        <QRCodeSVG
+                                            value="https://tashizomcafe.in"
+                                            size={200}
+                                            level="H"
+                                            includeMargin={true}
+                                            id="app-home-qr"
+                                        />
+                                    </div>
+                                    <div className="flex-1 text-center md:text-left space-y-4">
+                                        <div>
+                                            <h2 className="text-3xl font-bold text-white mb-2">Share TashiZom App</h2>
+                                            <p className="text-gray-300">
+                                                Scan to open the home page immediately. Share this link with guests to let them access the menu from anywhere.
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                            <button
+                                                onClick={async () => {
+                                                    const shareData = {
+                                                        title: 'TashiZom | Digital Dining',
+                                                        text: 'Check out the TashiZom menu and order food instantly!',
+                                                        url: 'https://tashizomcafe.in'
+                                                    };
+                                                    if (navigator.share) {
+                                                        try {
+                                                            await navigator.share(shareData);
+                                                        } catch (err) {
+                                                            console.error('Share failed:', err);
+                                                        }
+                                                    } else {
+                                                        navigator.clipboard.writeText('https://tashizomcafe.in');
+                                                        alert('Link copied to clipboard!');
+                                                    }
+                                                }}
+                                                className="bg-tashi-accent hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95"
+                                            >
+                                                <Share2 size={20} />
+                                                Share App Link
+                                            </button>
+
+                                            <button
+                                                onClick={() => {
+                                                    const svg = document.getElementById('app-home-qr');
+                                                    if (svg) {
+                                                        const svgData = new XMLSerializer().serializeToString(svg);
+                                                        const canvas = document.createElement('canvas');
+                                                        const ctx = canvas.getContext('2d');
+                                                        const img = new Image();
+                                                        img.onload = () => {
+                                                            canvas.width = img.width;
+                                                            canvas.height = img.height;
+                                                            if (ctx) {
+                                                                ctx.fillStyle = 'white';
+                                                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                                                ctx.drawImage(img, 0, 0);
+                                                                const pngFile = canvas.toDataURL('image/png');
+                                                                const downloadLink = document.createElement('a');
+                                                                downloadLink.download = 'tashizom-app-qr.png';
+                                                                downloadLink.href = pngFile;
+                                                                downloadLink.click();
+                                                            }
+                                                        };
+                                                        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+                                                    }
+                                                }}
+                                                className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 border border-white/20"
+                                            >
+                                                <Download size={20} />
+                                                Download QR
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-tashi-accent/60 font-mono">https://tashizomcafe.in</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Valley Updates Management */}
                             <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
                                 <h2 className="text-xl font-bold text-white mb-6">Valley Updates</h2>
