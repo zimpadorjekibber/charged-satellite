@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -146,7 +146,28 @@ export default function MenuPage() {
 
     const [activeCategory, setActiveCategory] = useState<Category>(getDefaultCategory());
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+    const [selectedItemContext, setSelectedItemContext] = useState<MenuItem[]>([]);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
+
+    const handleSelectItem = (item: MenuItem, context: MenuItem[]) => {
+        setSelectedItem(item);
+        setSelectedItemContext(context);
+    };
+
+    const handleNextItem = () => {
+        if (!selectedItem || selectedItemContext.length === 0) return;
+        const currentIndex = selectedItemContext.findIndex(i => i.id === selectedItem.id);
+        const nextIndex = (currentIndex + 1) % selectedItemContext.length;
+        setSelectedItem(selectedItemContext[nextIndex]);
+    };
+
+    const handlePrevItem = () => {
+        if (!selectedItem || selectedItemContext.length === 0) return;
+        const currentIndex = selectedItemContext.findIndex(i => i.id === selectedItem.id);
+        const prevIndex = (currentIndex - 1 + selectedItemContext.length) % selectedItemContext.length;
+        setSelectedItem(selectedItemContext[prevIndex]);
+    };
+
     const [showAllUpdates, setShowAllUpdates] = useState(false); // Controls Valley Updates expansion
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [showNavigationModal, setShowNavigationModal] = useState(false);
@@ -346,15 +367,19 @@ export default function MenuPage() {
             </div>
 
             {/* Chef's Special Section */}
-            {menu.some(item => item.isChefSpecial) && (
-                <ChefsSpecialSection
-                    items={menu.filter(item => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)))}
-                    addToCart={addToCart}
-                    removeFromCart={removeFromCart}
-                    getQuantity={getQuantity}
-                    setSelectedItem={setSelectedItem}
-                />
-            )}
+            {(() => {
+                const chefSpecialItems = menu.filter(item => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)));
+                if (chefSpecialItems.length === 0) return null;
+                return (
+                    <ChefsSpecialSection
+                        items={chefSpecialItems}
+                        addToCart={addToCart}
+                        removeFromCart={removeFromCart}
+                        getQuantity={getQuantity}
+                        setSelectedItem={(item) => handleSelectItem(item, chefSpecialItems)}
+                    />
+                );
+            })()}
 
             {/* Menu Grid - CONTINUOUS SCROLL */}
             <div className="mt-6 space-y-12">
@@ -390,7 +415,7 @@ export default function MenuPage() {
                                             quantity={getQuantity(item.id)}
                                             onAdd={() => addToCart(item)}
                                             onRemove={() => removeFromCart(item.id)}
-                                            onSelect={() => setSelectedItem(item)}
+                                            onSelect={() => handleSelectItem(item, categoryItems)}
                                         />
                                     ))}
                                 </div>
@@ -406,7 +431,7 @@ export default function MenuPage() {
                                             quantity={getQuantity(item.id)}
                                             onAdd={() => addToCart(item)}
                                             onRemove={() => removeFromCart(item.id)}
-                                            onSelect={() => setSelectedItem(item)}
+                                            onSelect={() => handleSelectItem(item, categoryItems)}
                                         />
                                     ))}
                                 </div>
@@ -447,23 +472,51 @@ export default function MenuPage() {
                                 exit={{ scale: 0.9, y: 20 }}
                                 className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl"
                                 onClick={(e) => e.stopPropagation()}
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.2}
+                                onDragEnd={(e, { offset, velocity }) => {
+                                    const swipeThreshold = 50;
+                                    if (offset.x > swipeThreshold) {
+                                        handlePrevItem();
+                                    } else if (offset.x < -swipeThreshold) {
+                                        handleNextItem();
+                                    }
+                                }}
                             >
                                 <button
                                     onClick={() => setSelectedItem(null)}
-                                    className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-white"
+                                    className="absolute top-4 right-4 z-[20] w-10 h-10 bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-white"
                                 >
                                     <X size={20} />
                                 </button>
 
+                                {selectedItemContext.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handlePrevItem(); }}
+                                            className="absolute top-1/2 left-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
+                                        >
+                                            <ChevronLeft size={24} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleNextItem(); }}
+                                            className="absolute top-1/2 right-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
+                                        >
+                                            <ChevronRight size={24} />
+                                        </button>
+                                    </>
+                                )}
+
                                 <div className="h-64 w-full relative">
                                     {selectedItem.image ? (
-                                        <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
+                                        <img key={selectedItem.image} src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
                                             <span className="text-gray-600 font-bold text-xl uppercase tracking-widest">No Image</span>
                                         </div>
                                     )}
-                                    <div className="absolute top-4 left-4">
+                                    <div className="absolute top-4 left-4 z-[10]">
                                         <div className={`px-3 py-1.5 rounded-full shadow-lg border backdrop-blur-md flex items-center gap-2 ${selectedItem.isVegetarian
                                             ? 'bg-green-600/90 border-green-400'
                                             : 'bg-red-600/90 border-red-400'
@@ -518,93 +571,95 @@ export default function MenuPage() {
             </div>
 
             {/* Valley Updates - Collapsible Bottom Sheet */}
-            {valleyUpdates.length > 0 && (
-                <div className="mt-8 mx-1 mb-6">
-                    <motion.div
-                        initial={false}
-                        animate={{ height: showAllUpdates ? 'auto' : '60px' }}
-                        className={`bg-neutral-900/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-neutral-900'
-                            }`}
-                        onClick={() => setShowAllUpdates(!showAllUpdates)}
-                    >
-                        {/* Header (Always Visible) */}
-                        <div className="absolute top-0 left-0 right-0 h-[60px] flex items-center justify-between px-6 cursor-pointer z-10">
-                            <h3 className="text-tashi-accent font-serif text-lg font-bold flex items-center gap-2">
-                                <Newspaper size={18} className={showAllUpdates ? '' : 'animate-pulse'} />
-                                Valley Updates
-                            </h3>
-                            <div className="flex items-center gap-3">
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${showAllUpdates ? 'bg-white/10 border-white/20 text-white' : 'bg-red-500/10 border-red-500/30 text-red-400 animate-pulse'}`}>
-                                    {showAllUpdates ? 'Close' : `${valleyUpdates.length} NEW`}
-                                </span>
-                                {showAllUpdates ? <Minus size={16} className="text-gray-400" /> : <Plus size={16} className="text-gray-400" />}
+            {
+                valleyUpdates.length > 0 && (
+                    <div className="mt-8 mx-1 mb-6">
+                        <motion.div
+                            initial={false}
+                            animate={{ height: showAllUpdates ? 'auto' : '60px' }}
+                            className={`bg-neutral-900/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-neutral-900'
+                                }`}
+                            onClick={() => setShowAllUpdates(!showAllUpdates)}
+                        >
+                            {/* Header (Always Visible) */}
+                            <div className="absolute top-0 left-0 right-0 h-[60px] flex items-center justify-between px-6 cursor-pointer z-10">
+                                <h3 className="text-tashi-accent font-serif text-lg font-bold flex items-center gap-2">
+                                    <Newspaper size={18} className={showAllUpdates ? '' : 'animate-pulse'} />
+                                    Valley Updates
+                                </h3>
+                                <div className="flex items-center gap-3">
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${showAllUpdates ? 'bg-white/10 border-white/20 text-white' : 'bg-red-500/10 border-red-500/30 text-red-400 animate-pulse'}`}>
+                                        {showAllUpdates ? 'Close' : `${valleyUpdates.length} NEW`}
+                                    </span>
+                                    {showAllUpdates ? <Minus size={16} className="text-gray-400" /> : <Plus size={16} className="text-gray-400" />}
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Expandable Content */}
-                        <div className="pt-[70px] px-6 pb-6">
-                            {/* Consolidated card with all updates as bullets */}
-                            <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
-                                <motion.ul
-                                    className="space-y-3"
-                                    variants={containerVariants}
-                                    initial="hidden"
-                                    animate={showAllUpdates ? "show" : "hidden"}
-                                >
-                                    {valleyUpdates.map((update, idx) => (
-                                        <motion.li
-                                            key={idx}
-                                            variants={itemVariants}
-                                            className="flex gap-3 group"
-                                        >
-                                            {/* Colored bullet indicator based on status */}
-                                            <div className="flex-shrink-0 mt-1.5">
-                                                <div
-                                                    className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
-                                                        update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
-                                                            update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
-                                                                'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
-                                                        }`}
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <p className="text-sm text-gray-300 leading-relaxed">
-                                                        <span className="font-semibold text-white">{update.title}</span>
-                                                        {update.description && (
-                                                            <span className="text-gray-400"> — {update.description}</span>
-                                                        )}
-                                                    </p>
-                                                    {update.status && update.status.toLowerCase() !== 'create' && (
-                                                        <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
-                                                            update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-                                                                update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
-                                                                    'bg-gray-500/20 text-gray-400'
-                                                            }`}>
-                                                            {update.status}
-                                                        </span>
-                                                    )}
+                            {/* Expandable Content */}
+                            <div className="pt-[70px] px-6 pb-6">
+                                {/* Consolidated card with all updates as bullets */}
+                                <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
+                                    <motion.ul
+                                        className="space-y-3"
+                                        variants={containerVariants}
+                                        initial="hidden"
+                                        animate={showAllUpdates ? "show" : "hidden"}
+                                    >
+                                        {valleyUpdates.map((update, idx) => (
+                                            <motion.li
+                                                key={idx}
+                                                variants={itemVariants}
+                                                className="flex gap-3 group"
+                                            >
+                                                {/* Colored bullet indicator based on status */}
+                                                <div className="flex-shrink-0 mt-1.5">
+                                                    <div
+                                                        className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
+                                                            update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
+                                                                update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
+                                                                    'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
+                                                            }`}
+                                                    />
                                                 </div>
-                                                {/* Show media if available */}
-                                                {update.mediaUrl && (
-                                                    <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
-                                                        {update.mediaType === 'video' ? (
-                                                            <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />
-                                                        ) : (
-                                                            <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
+                                                <div className="flex-1">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <p className="text-sm text-gray-300 leading-relaxed">
+                                                            <span className="font-semibold text-white">{update.title}</span>
+                                                            {update.description && (
+                                                                <span className="text-gray-400"> — {update.description}</span>
+                                                            )}
+                                                        </p>
+                                                        {update.status && update.status.toLowerCase() !== 'create' && (
+                                                            <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
+                                                                update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
+                                                                    update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
+                                                                        'bg-gray-500/20 text-gray-400'
+                                                                }`}>
+                                                                {update.status}
+                                                            </span>
                                                         )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        </motion.li>
-                                    ))}
-                                </motion.ul>
+                                                    {/* Show media if available */}
+                                                    {update.mediaUrl && (
+                                                        <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
+                                                            {update.mediaType === 'video' ? (
+                                                                <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />
+                                                            ) : (
+                                                                <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </motion.li>
+                                        ))}
+                                    </motion.ul>
+                                </div>
+                                <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
                             </div>
-                            <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
-                        </div>
-                    </motion.div>
-                </div>
-            )}
+                        </motion.div>
+                    </div>
+                )
+            }
             {/* Navigation Selection Modal */}
             <AnimatePresence>
                 {showNavigationModal && (
@@ -707,72 +762,74 @@ export default function MenuPage() {
             </AnimatePresence>
 
             {/* Contact Info Modal */}
-            {showContactInfo && (
-                <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
-                    <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h3 className="text-xl font-bold text-white font-serif">Contact Us</h3>
-                                <p className="text-sm text-gray-400">We are here to help!</p>
-                            </div>
-                            <button onClick={() => setShowContactInfo(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
-                        </div>
-
-                        <div className="space-y-3 pt-2">
-                            <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
-                                <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
-                                    <Phone size={24} />
-                                </div>
+            {
+                showContactInfo && (
+                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
+                        <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
+                            <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="font-bold text-gray-200">Call Staffs</p>
-                                    <p className="text-xs text-gray-500">{contactInfo.phone}</p>
+                                    <h3 className="text-xl font-bold text-white font-serif">Contact Us</h3>
+                                    <p className="text-sm text-gray-400">We are here to help!</p>
                                 </div>
-                            </a>
+                                <button onClick={() => setShowContactInfo(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                            </div>
 
-                            {contactInfo.secondaryPhone && (
-                                <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                            <div className="space-y-3 pt-2">
+                                <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
                                     <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
                                         <Phone size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Call Owner</p>
-                                        <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
+                                        <p className="font-bold text-gray-200">Call Staffs</p>
+                                        <p className="text-xs text-gray-500">{contactInfo.phone}</p>
                                     </div>
                                 </a>
-                            )}
 
-                            <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
-                                <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                                    <MessageCircle size={24} />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-200">WhatsApp</p>
-                                    <p className="text-xs text-gray-500">Chat with us</p>
-                                </div>
-                            </a>
+                                {contactInfo.secondaryPhone && (
+                                    <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                        <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                                            <Phone size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-200">Call Owner</p>
+                                            <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
+                                        </div>
+                                    </a>
+                                )}
 
-
-
-                            <div className="flex gap-2 w-full pt-2">
-
-
-                                <a
-                                    href="https://wa.me/918988220022"
-                                    target="_blank"
-                                    className="flex-1 bg-gradient-to-br from-green-600 to-green-800 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform shadow-lg shadow-green-900/40"
-                                >
-                                    <span className="bg-white/20 p-2 rounded-full text-white">
-                                        <MessageCircle size={18} />
-                                    </span>
-                                    <span className="text-[10px] font-bold text-white">WHATSAPP US</span>
+                                <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                    <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                        <MessageCircle size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-200">WhatsApp</p>
+                                        <p className="text-xs text-gray-500">Chat with us</p>
+                                    </div>
                                 </a>
+
+
+
+                                <div className="flex gap-2 w-full pt-2">
+
+
+                                    <a
+                                        href="https://wa.me/918988220022"
+                                        target="_blank"
+                                        className="flex-1 bg-gradient-to-br from-green-600 to-green-800 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform shadow-lg shadow-green-900/40"
+                                    >
+                                        <span className="bg-white/20 p-2 rounded-full text-white">
+                                            <MessageCircle size={18} />
+                                        </span>
+                                        <span className="text-[10px] font-bold text-white">WHATSAPP US</span>
+                                    </a>
+                                </div>
+
+
                             </div>
-
-
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Review Modal */}
             <AnimatePresence>
