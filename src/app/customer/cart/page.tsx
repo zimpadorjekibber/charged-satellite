@@ -332,7 +332,7 @@ export default function CartPage() {
                                         <div className="grid grid-cols-3 gap-3 mt-4">
                                             {/* GPay */}
                                             <a
-                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`}
+                                                href={`tez://upi/pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden p-1.5">
@@ -348,7 +348,7 @@ export default function CartPage() {
 
                                             {/* PhonePe */}
                                             <a
-                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=com.phonepe.app;end`}
+                                                href={`phonepe://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-[#5f259f] flex items-center justify-center p-1.5">
@@ -359,7 +359,7 @@ export default function CartPage() {
 
                                             {/* Paytm */}
                                             <a
-                                                href={`intent://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&cu=INR#Intent;scheme=upi;package=net.one97.paytm;end`}
+                                                href={`paytmmp://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
