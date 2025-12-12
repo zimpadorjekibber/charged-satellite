@@ -11,6 +11,7 @@ export default function StaffDashboard() {
     const tables = useStore((state) => state.tables);
     const notifications = useStore((state) => state.notifications);
     const updateOrderStatus = useStore((state) => state.updateOrderStatus);
+    const updateOrderTable = useStore((state) => state.updateOrderTable);
     const resolveNotification = useStore((state) => state.resolveNotification);
 
     // Auth
@@ -705,6 +706,7 @@ export default function StaffDashboard() {
                     borderColor="border-yellow-400/20"
                     orders={activeOrders.filter(o => o.status === 'Pending')}
                     onUpdateStatus={updateOrderStatus}
+                    onAssignTable={updateOrderTable}
                     handlePrintKOT={handlePrintKOT}
                     handlePrintBill={handlePrintBill}
                     handleShareBill={handleShareBill}
@@ -738,7 +740,7 @@ export default function StaffDashboard() {
     );
 }
 
-function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, handlePrintKOT, handlePrintBill, handleShareBill, handleShareKOT }: any) {
+function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, onAssignTable, handlePrintKOT, handlePrintBill, handleShareBill, handleShareKOT }: any) {
     return (
         <div className={`glass-card rounded-2xl flex flex-col h-full border ${borderColor} ${bgColor}`}>
             <div className={`flex items-center gap-3 p-4 border-b ${borderColor} ${color}`}>
@@ -756,6 +758,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
                             key={order.id}
                             order={order}
                             onUpdateStatus={(s) => onUpdateStatus(order.id, s)}
+                            onAssignTable={onAssignTable}
                             onPrintKOT={() => handlePrintKOT(order)}
                             onPrintBill={() => handlePrintBill(order)}
                             onShareBill={() => handleShareBill(order)}
@@ -777,7 +780,7 @@ function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpda
     )
 }
 
-function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
+function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onAssignTable: (oid: string, tid: string) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
     const tables = useStore((state) => state.tables);
 
     return (
@@ -790,7 +793,23 @@ function StaffOrderCard({ order, onUpdateStatus, onPrintKOT, onPrintBill, onShar
             <div className="flex justify-between items-start mb-2">
                 <div>
                     <h4 className="font-bold text-white text-xl flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                        {tables.find(t => t.id === order.tableId)?.name || order.tableId}
+                        {order.tableId === 'REQUEST' ? (
+                            <div className="flex flex-col gap-1 w-full sm:w-auto p-2 bg-red-500/10 border border-red-500/30 rounded animate-pulse">
+                                <span className="text-xs text-red-300 font-bold uppercase tracking-wider">⚠️ Assign Table</span>
+                                <select
+                                    className="bg-black text-white p-2 rounded border border-white/20 text-sm focus:outline-none focus:border-red-500"
+                                    onChange={(e) => {
+                                        if (e.target.value) onAssignTable(order.id, e.target.value);
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <option value="">Select Table...</option>
+                                    {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                </select>
+                            </div>
+                        ) : (
+                            tables.find(t => t.id === order.tableId)?.name || order.tableId
+                        )}
                         {(order.customerName || order.customerPhone) && (
                             <span className="text-sm font-normal text-gray-400">
                                 ({order.customerName} {order.customerPhone && (

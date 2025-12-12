@@ -17,6 +17,8 @@ export default function CartPage() {
     const [isOrdering, setIsOrdering] = useState(false);
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
+    const [showTableModal, setShowTableModal] = useState(false);
+    const [manualTableInput, setManualTableInput] = useState('');
 
     // Calculate Total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -24,21 +26,7 @@ export default function CartPage() {
 
     const currentTableId = useStore((state) => state.currentTableId);
 
-    const handlePlaceOrder = async () => {
-        let tableId = currentTableId;
-
-        // 1. Table ID Check
-        if (!tableId) {
-            const manualId = window.prompt("We couldn't detect your Table Number. Please enter it (e.g., 't1' or '1'):");
-            if (manualId && manualId.trim()) {
-                tableId = manualId.trim();
-                useStore.getState().setTableId(tableId);
-            } else {
-                alert("Table Number is required to place an order.");
-                return;
-            }
-        }
-
+    const submitOrder = async (finalTableId: string) => {
         // 2. Personal Info Check
         if (!customerName.trim() || !customerPhone.trim()) {
             alert("Please provide your name and phone number to confirm your order.");
@@ -55,16 +43,13 @@ export default function CartPage() {
             // Only enforce if coordinates are set in admin settings
             if (contactInfo.mapsLocation && geoRadius > 0) {
                 try {
-                    // Dynamic import to avoid SSR issues with navigator if any (though 'use client' handles it, explicit import of logic is fine)
                     const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
-
-                    const storeCoords = parseCoordinates(contactInfo.mapsLocation); // "Lat,Lon"
+                    const storeCoords = parseCoordinates(contactInfo.mapsLocation);
 
                     if (storeCoords) {
                         const pos = await getCurrentPosition();
                         const userLat = pos.coords.latitude;
                         const userLon = pos.coords.longitude;
-
                         const distance = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
 
                         console.log(`Geofence Check: User at (${userLat}, ${userLon}), Store at (${storeCoords.lat}, ${storeCoords.lon}), Dist: ${distance.toFixed(3)}km, Limit: ${geoRadius}km`);
@@ -77,8 +62,7 @@ export default function CartPage() {
                     }
                 } catch (locError: any) {
                     console.error("Geolocation Error:", locError);
-                    // If user denies permission or browser error
-                    if (locError instanceof Error && (locError.message.includes('permission') || (locError as any).code === 1)) { // 1 is PERMISSION_DENIED
+                    if (locError instanceof Error && (locError.message.includes('permission') || (locError as any).code === 1)) {
                         alert("Location access is required to verify you are within our service area. Please allow location access to place an order.");
                     } else {
                         alert("Could not verify your location. Please ensure location services are enabled.");
@@ -88,16 +72,15 @@ export default function CartPage() {
                 }
             }
 
-
             // Fake UX delay if desired
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             // Ensure Table ID matches what acts as source of truth
-            if (!state.currentTableId) {
-                useStore.getState().setTableId(tableId);
+            if (!state.currentTableId && finalTableId !== 'REQUEST') {
+                useStore.getState().setTableId(finalTableId);
             }
 
-            await placeOrder(customerName, customerPhone, tableId);
+            await placeOrder(customerName, customerPhone, finalTableId);
 
             // Verify order was placed (Cart should be empty)
             if (useStore.getState().cart.length === 0) {
@@ -109,6 +92,14 @@ export default function CartPage() {
             console.error("Order Error:", error);
             alert("Something went wrong placing your order. Please try again.");
             setIsOrdering(false);
+        }
+    };
+
+    const handlePlaceOrder = () => {
+        if (!currentTableId) {
+            setShowTableModal(true);
+        } else {
+            submitOrder(currentTableId);
         }
     };
 
@@ -227,6 +218,89 @@ export default function CartPage() {
                     )}
                 </button>
             </motion.div>
-        </div>
+
+
+            {/* Table Selection Modal */}
+            <AnimatePresence>
+                {showTableModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setShowTableModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-6"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="text-center">
+                                <div className="bg-tashi-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-tashi-accent">
+                                    <Utensils size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Select Your Table</h3>
+                                <p className="text-gray-400 text-sm">
+                                    Please enter your table number if you know it, or request assistance.
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs uppercase font-bold text-gray-500 mb-2 block">I know my Table Number</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={manualTableInput}
+                                            onChange={(e) => setManualTableInput(e.target.value)}
+                                            placeholder="e.g. 5"
+                                            className="flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-tashi-accent font-mono text-center text-lg"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                if (manualTableInput.trim()) {
+                                                    submitOrder(manualTableInput.trim());
+                                                    setShowTableModal(false);
+                                                }
+                                            }}
+                                            disabled={!manualTableInput.trim()}
+                                            className="bg-tashi-primary text-white px-6 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 transition-colors"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="relative flex py-2 items-center">
+                                    <div className="flex-grow border-t border-white/10"></div>
+                                    <span className="flex-shrink-0 mx-4 text-gray-600 text-xs uppercase font-bold">OR</span>
+                                    <div className="flex-grow border-t border-white/10"></div>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        submitOrder('REQUEST');
+                                        setShowTableModal(false);
+                                    }}
+                                    className="w-full bg-white/5 hover:bg-white/10 border border-tashi-accent/30 text-tashi-accent py-4 rounded-xl font-bold transition-all flex flex-col items-center gap-1 group"
+                                >
+                                    <span>I don't have a Table Number</span>
+                                    <span className="text-xs text-gray-500 font-normal group-hover:text-gray-400">Request staff to assign a table</span>
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={() => setShowTableModal(false)}
+                                className="w-full text-gray-500 text-sm hover:text-white py-2"
+                            >
+                                Cancel
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div >
     );
 }

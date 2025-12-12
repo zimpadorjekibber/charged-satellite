@@ -146,6 +146,7 @@ interface AppState {
 
     placeOrder: (customerName: string, customerPhone: string, tableId?: string) => Promise<void>;
     updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
+    updateOrderTable: (orderId: string, tableId: string) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
 
     addNotification: (tableId: string, type: 'call_staff' | 'bill_request') => void;
@@ -407,6 +408,10 @@ export const useStore = create<AppState>()(
                     }
                 }
                 await updateDoc(doc(db, 'orders', orderId), updates);
+            },
+
+            updateOrderTable: async (orderId, tableId) => {
+                await updateDoc(doc(db, 'orders', orderId), { tableId });
             },
 
             deleteOrder: async (orderId) => {
