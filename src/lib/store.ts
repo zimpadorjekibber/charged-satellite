@@ -42,6 +42,7 @@ export interface MenuItem {
     isSpicy?: boolean;
     available: boolean;
     sortOrder?: number; // For drag-and-drop ordering
+    isChefSpecial?: boolean; // New: Highlight as Chef's Special
 }
 
 export interface OrderItem {

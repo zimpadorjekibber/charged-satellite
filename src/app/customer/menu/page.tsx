@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -325,6 +325,17 @@ export default function MenuPage() {
                     )}
                 </div>
             </div>
+
+            {/* Chef's Special Section */}
+            {menu.some(item => item.isChefSpecial) && (
+                <ChefsSpecialSection
+                    items={menu.filter(item => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)))}
+                    addToCart={addToCart}
+                    removeFromCart={removeFromCart}
+                    getQuantity={getQuantity}
+                    setSelectedItem={setSelectedItem}
+                />
+            )}
 
             {/* Menu Grid - CONTINUOUS SCROLL */}
             <div className="mt-6 space-y-12">
@@ -879,5 +890,103 @@ function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
         <span className="font-mono font-bold text-sm">
             {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
         </span>
+    );
+}
+
+function ChefsSpecialSection({
+    items,
+    addToCart,
+    removeFromCart,
+    getQuantity,
+    setSelectedItem
+}: {
+    items: MenuItem[],
+    addToCart: (item: MenuItem) => void,
+    removeFromCart: (id: string) => void,
+    getQuantity: (id: string) => number,
+    setSelectedItem: (item: MenuItem) => void
+}) {
+    if (items.length === 0) return null;
+
+    return (
+        <section className="mb-8 mt-4">
+            <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
+                <Sparkles className="text-tashi-accent animate-pulse" size={24} />
+                <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest animate-pulse drop-shadow-[0_0_8px_rgba(218,165,32,0.5)]">
+                    Chef's Specials
+                </h2>
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
+            </div>
+
+            <div className="flex overflow-x-auto gap-5 px-4 pb-6 pt-2 hide-scrollbar snap-x snap-mandatory">
+                {items.map((item) => (
+                    <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex-shrink-0 w-[85vw] md:w-[350px] snap-center relative group"
+                    >
+                        {/* Flashing Border Effect */}
+                        <div className="absolute -inset-[2px] bg-gradient-to-r from-tashi-accent via-yellow-200 to-tashi-accent rounded-2xl opacity-75 blur-sm animate-pulse" />
+
+                        <div
+                            className="relative bg-neutral-900 border border-tashi-accent/50 rounded-2xl overflow-hidden p-3 flex gap-4 h-28 shadow-xl"
+                            onClick={() => setSelectedItem(item)}
+                        >
+                            {/* Image */}
+                            <div className="w-24 h-full flex-shrink-0 bg-black rounded-xl overflow-hidden relative border border-white/5">
+                                {item.image ? (
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
+                                )}
+                                <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
+                                    ★ SPECIAL
+                                </div>
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 flex flex-col justify-between py-1">
+                                <div>
+                                    <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${item.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
+                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                                        </span>
+                                        {item.isSpicy && (
+                                            <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/10">
+                                                Spicy
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-serif text-tashi-accent font-bold">₹{item.price}</span>
+
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        {getQuantity(item.id) === 0 ? (
+                                            <button
+                                                onClick={() => addToCart(item)}
+                                                disabled={item.available === false}
+                                                className="bg-tashi-accent text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20"
+                                            >
+                                                ADD
+                                            </button>
+                                        ) : (
+                                            <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
+                                                <button onClick={() => removeFromCart(item.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
+                                                <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(item.id)}</span>
+                                                <button onClick={() => addToCart(item)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </section>
     );
 }

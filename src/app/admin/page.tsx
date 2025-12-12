@@ -1196,6 +1196,7 @@ export default function AdminDashboard() {
                                                     category: (formData.get('category') as any) || 'Main Course',
                                                     isVegetarian: formData.get('isVegetarian') === 'on',
                                                     isSpicy: formData.get('isSpicy') === 'on',
+                                                    isChefSpecial: formData.get('isChefSpecial') === 'on',
                                                     available: true
                                                 };
 
@@ -1242,6 +1243,7 @@ export default function AdminDashboard() {
                                         <div className="flex gap-4 items-center">
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
                                             <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
+                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isChefSpecial" type="checkbox" className="accent-yellow-500" /> Chef's Special</label>
                                         </div>
                                         <div className="md:col-span-3">
                                             <div className="flex gap-2">
@@ -1385,6 +1387,7 @@ export default function AdminDashboard() {
                                                         image: formData.get('image'),
                                                         isVegetarian: formData.get('isVegetarian') === 'on',
                                                         isSpicy: formData.get('isSpicy') === 'on',
+                                                        isChefSpecial: formData.get('isChefSpecial') === 'on',
                                                     };
 
                                                     await useStore.getState().updateMenuItem(editingItem.id, updates);
@@ -1458,6 +1461,10 @@ export default function AdminDashboard() {
                                                     <label className="flex items-center gap-2 text-white cursor-pointer select-none">
                                                         <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
                                                         <span>Spicy</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
+                                                        <span>Chef's Special</span>
                                                     </label>
                                                 </div>
 
