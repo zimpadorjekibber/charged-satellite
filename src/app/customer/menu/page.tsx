@@ -237,7 +237,10 @@ export default function MenuPage() {
     const hasPendingCall = notifications.some(n => n.tableId === currentTableId && n.type === 'call_staff' && n.status === 'pending');
 
     const handleCallStaff = () => {
-        if (!currentTableId) return;
+        if (!currentTableId) {
+            alert("Please scan a table QR code or select a table to call staff.");
+            return;
+        }
         if (hasPendingCall) {
             cancelNotification(currentTableId, 'call_staff');
         } else {
