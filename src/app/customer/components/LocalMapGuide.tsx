@@ -18,8 +18,11 @@ export default function LocalMapGuide() {
                     <h3 className="text-tashi-accent font-serif font-bold text-lg mb-1 flex items-center gap-2">
                         <Navigation size={18} /> Tourist Loop
                     </h3>
-                    <p className="text-gray-300 text-xs max-w-[200px] leading-relaxed">
-                        Don't double back! The road connects <span className="text-white font-bold">Chicham Bridge</span> and <span className="text-white font-bold">TashiZom</span> in a seamless loop.
+                    <p className="text-gray-300 text-xs max-w-[220px] leading-relaxed">
+                        Complete clearer loop:
+                        <br />• <span className="text-white font-bold">TashiZom</span> to <span className="text-white font-bold">Chicham Bridge</span>
+                        <br />• <span className="text-white font-bold">Chicham Bridge</span> to <span className="text-white font-bold">Link Road</span>
+                        <br />• <span className="text-white font-bold">Link Road</span> back to <span className="text-white font-bold">TashiZom</span>
                     </p>
                 </div>
             </div>
@@ -40,94 +43,111 @@ export default function LocalMapGuide() {
                     </filter>
                 </defs>
 
-                {/* Road System - The Loop */}
+                {/* Road System - TRIANGULAR LOOP schema */}
                 {/* 
                    Points:
-                   - Link Road (Start/Bottom Left): 200, 500
-                   - TashiZom (Right): 600, 300
-                   - Chicham Bridge (Top Left): 250, 100
+                   A: TashiZom (Bottom Right) -> 600, 450
+                   B: Chicham Bridge (Top Center) -> 400, 100
+                   C: Link Road (Bottom Left) -> 200, 450
                 */}
 
-                {/* Connecting Roads (Base) */}
+                {/* Connectivity Lines (The Roads) */}
+
+                {/* 1. TashiZom to Chicham Bridge (Right Leg) */}
                 <path
-                    d="M 200 500 Q 400 550 600 300" // Link to TashiZom
+                    d="M 600 450 Q 600 250 400 100"
                     fill="none"
                     stroke="#333"
-                    strokeWidth="12"
+                    strokeWidth="16"
                     strokeLinecap="round"
-                />
-                <path
-                    d="M 600 300 Q 500 150 250 100" // TashiZom to Bridge
-                    fill="none"
-                    stroke="#333"
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                />
-                <path
-                    d="M 250 100 Q 100 250 200 500" // Bridge back to Link Road (Closing the loop roughly)
-                    fill="none"
-                    stroke="#333"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    strokeDasharray="10 10" // Dash for generic connecting road
                 />
 
-                {/* Animated Directional Path (The "Flow") */}
+                {/* 2. Chicham Bridge to Link Road (Left Leg) */}
+                <path
+                    d="M 400 100 Q 200 250 200 450"
+                    fill="none"
+                    stroke="#333"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                />
+
+                {/* 3. Link Road to TashiZom (Bottom Connection) */}
+                <path
+                    d="M 200 450 L 600 450"
+                    fill="none"
+                    stroke="#333"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                />
+
+                {/* Animated Flows (Golden Arrows) */}
+
+                {/* Flow: TashiZom -> Chicham Bridge */}
                 <motion.path
-                    d="M 200 500 Q 400 550 600 300"
+                    d="M 600 450 Q 600 250 400 100"
                     fill="none"
                     stroke="#DAA520"
                     strokeWidth="4"
                     strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
                     markerEnd="url(#arrowhead)"
                 />
+
+                {/* Flow: Chicham Bridge -> Link Road */}
                 <motion.path
-                    d="M 600 300 Q 500 150 250 100"
+                    d="M 400 100 Q 200 250 200 450"
                     fill="none"
                     stroke="#DAA520"
                     strokeWidth="4"
                     strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, delay: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 2.5, delay: 2.5, repeat: Infinity, ease: "linear" }}
                     markerEnd="url(#arrowhead)"
                 />
 
-                {/* --- LOCATIONS --- */}
+                {/* Flow: Link Road -> TashiZom */}
+                <motion.path
+                    d="M 200 450 L 600 450"
+                    fill="none"
+                    stroke="#DAA520"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 2.5, delay: 5.0, repeat: Infinity, ease: "linear" }}
+                    markerEnd="url(#arrowhead)"
+                />
 
-                {/* 1. Link Road (Entry) */}
-                <g transform="translate(200, 500)" className="cursor-pointer group">
-                    <circle r="12" fill="#3b82f6" className="animate-pulse" />
-                    <circle r="6" fill="white" />
-                    <text x="-40" y="40" fill="#94a3b8" fontSize="14" fontWeight="bold" fontFamily="sans-serif">From Kaza</text>
-                    <text x="-60" y="60" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">Link Road</text>
-                </g>
 
-                {/* 2. TashiZom (Hero Location) */}
-                <g transform="translate(600, 300)" onClick={() => setHeaderVisible(prev => !prev)} className="cursor-pointer">
+                {/* --- NODES / LOCATIONS --- */}
+
+                {/* A. TashiZom (Bottom Right) */}
+                <g transform="translate(600, 450)" onClick={() => setHeaderVisible(prev => !prev)} className="cursor-pointer">
                     {/* Ripple Effect */}
                     <circle r="40" fill="#DAA520" opacity="0.2">
                         <animate attributeName="r" from="20" to="50" dur="1.5s" repeatCount="indefinite" />
                         <animate attributeName="opacity" from="0.4" to="0" dur="1.5s" repeatCount="indefinite" />
                     </circle>
-
                     <circle r="25" fill="#171717" stroke="#DAA520" strokeWidth="3" />
-                    {/* Simple House Icon inside */}
-                    <path d="M-10 5 L0 -8 L10 5 Z M-10 5 L10 5" fill="#DAA520" />
-
                     <text x="35" y="5" fill="#DAA520" fontSize="24" fontWeight="bold" fontFamily="serif" filter="url(#glow)">TashiZom</text>
-                    <text x="35" y="25" fill="#9ca3af" fontSize="12" fontFamily="sans-serif">Restaurant & Stay</text>
+                    <text x="35" y="25" fill="#9ca3af" fontSize="12" fontFamily="sans-serif">You are here</text>
                 </g>
 
-                {/* 3. Chicham Bridge */}
-                <g transform="translate(250, 100)" className="cursor-pointer">
+                {/* B. Chicham Bridge (Top Center) */}
+                <g transform="translate(400, 100)" className="cursor-pointer">
                     <circle r="15" fill="#ef4444" />
-                    <path d="M-8 0 L8 0 M-6 -4 L6 -4 M-6 4 L6 4" stroke="white" strokeWidth="2" />
                     <text x="-60" y="-25" fill="white" fontSize="18" fontWeight="bold" fontFamily="sans-serif">Chicham Bridge</text>
-                    <text x="-60" y="-10" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">Highest Bridge</text>
+                    <text x="-60" y="-10" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">Tourist Spot</text>
+                </g>
+
+                {/* C. Link Road (Bottom Left) */}
+                <g transform="translate(200, 450)" className="cursor-pointer">
+                    <circle r="12" fill="#3b82f6" />
+                    <text x="-40" y="40" fill="white" fontSize="16" fontWeight="bold" fontFamily="sans-serif">Link Road</text>
+                    <text x="-40" y="60" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">To Kaza / Main RD</text>
                 </g>
 
             </svg>
@@ -135,7 +155,7 @@ export default function LocalMapGuide() {
             {/* Footer Note */}
             <div className="absolute bottom-4 right-4 z-20">
                 <span className="bg-black/50 px-3 py-1 rounded-full text-[10px] text-gray-500 border border-white/5 backdrop-blur">
-                    Schematic Map (Not to scale)
+                    Circular Loop • No Need to U-Turn
                 </span>
             </div>
         </div>

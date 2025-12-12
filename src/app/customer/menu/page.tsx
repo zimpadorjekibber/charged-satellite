@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -148,6 +148,7 @@ export default function MenuPage() {
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
     const [showAllUpdates, setShowAllUpdates] = useState(false); // Controls Valley Updates expansion
     const [showContactInfo, setShowContactInfo] = useState(false);
+    const [showNavigationModal, setShowNavigationModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -252,20 +253,19 @@ export default function MenuPage() {
                         </span>
                     </motion.button>
 
-                    {/* Rate Us Button */}
-                    <Link href="/customer/feedback">
-                        <motion.button
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 transition-all"
-                        >
-                            <Newspaper size={24} />
-                            <span className="text-[10px] uppercase tracking-wider font-bold">
-                                Rate Us
-                            </span>
-                        </motion.button>
-                    </Link>
+                    {/* Navigate/Location Button */}
+                    <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowNavigationModal(true)}
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 transition-all"
+                    >
+                        <Navigation size={24} />
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            Navigate
+                        </span>
+                    </motion.button>
                 </div>
             </div>
 
@@ -588,8 +588,67 @@ export default function MenuPage() {
                     </motion.div>
                 </div>
             )}
+            {/* Navigation Selection Modal */}
+            <AnimatePresence>
+                {showNavigationModal && (
+                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowNavigationModal(false)}>
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-6"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold text-white font-serif mb-2">Navigate</h3>
+                                <p className="text-gray-400 text-sm">Choose your wayfinding method</p>
+                            </div>
 
-            {/* Local Map Modal */}
+                            <div className="space-y-4">
+                                {/* Option 1: Google Maps */}
+                                <a
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group"
+                                >
+                                    <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                        <MapPin size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-200">Google Maps</p>
+                                        <p className="text-xs text-gray-500">Live GPS Directions</p>
+                                    </div>
+                                </a>
+
+                                {/* Option 2: Local Map Loop */}
+                                <button
+                                    onClick={() => {
+                                        setShowNavigationModal(false);
+                                        setTimeout(() => setShowMap(true), 200); // Small delay for smooth transition
+                                    }}
+                                    className="w-full flex items-center gap-4 bg-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group text-left"
+                                >
+                                    <div className="bg-tashi-accent/20 p-3 rounded-full text-tashi-accent group-hover:bg-tashi-accent group-hover:text-black transition-colors">
+                                        <Navigation size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-200">Tourist Loop Map</p>
+                                        <p className="text-xs text-gray-500">Local Schematic Guide (No U-Turn)</p>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={() => setShowNavigationModal(false)}
+                                className="w-full py-3 rounded-xl bg-neutral-800 text-gray-400 font-bold hover:bg-neutral-700 hover:text-white transition-colors text-sm uppercase tracking-wide"
+                            >
+                                Cancel
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
             <AnimatePresence>
                 {showMap && (
                     <motion.div
