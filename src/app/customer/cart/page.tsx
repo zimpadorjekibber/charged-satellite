@@ -305,41 +305,39 @@ export default function CartPage() {
                                 <p className="text-gray-400 text-xs uppercase tracking-widest font-bold">Payment Required</p>
                             </div>
 
-                            {/* Payment Details & QR */}
+                            {/* Payment Instructions & Number Only */}
                             <div className="space-y-4">
-                                <div className="bg-white p-2 rounded-xl mx-auto w-56 h-56 flex items-center justify-center shadow-lg overflow-hidden relative">
-                                    {/* Zoomed in to crop wood background */}
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src="/upi-qr.jpg"
-                                        alt="Payment QR"
-                                        className="w-full h-full object-cover scale-[1.7]"
-                                    />
-                                    <div className="absolute inset-0 pointer-events-none border-[3px] border-tashi-accent/50 rounded-xl" />
-                                </div>
+                                <div className="bg-neutral-800 p-5 rounded-xl border border-white/10 shadow-lg text-center space-y-4">
 
-                                <div className="text-center bg-neutral-800 p-4 rounded-xl border border-white/10 shadow-lg">
-                                    <p className="text-red-300 text-xs font-bold uppercase tracking-wider mb-2 animate-pulse">
-                                        Scan QR above OR Pay to Number
-                                    </p>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <div className="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-lg border border-white/5 w-full justify-between group cursor-pointer"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText('8988203683');
-                                                // Visual feedback logic would be here
-                                            }}
-                                            title="Tap to Copy"
+                                    <div className="space-y-1">
+                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 1: Copy Number</p>
+                                        <div
+                                            onClick={() => navigator.clipboard.writeText('8988203683')}
+                                            className="bg-black/40 p-3 rounded-xl border border-white/10 flex items-center justify-between cursor-pointer active:scale-95 transition-all group"
                                         >
-                                            <span className="text-2xl font-mono font-bold text-white tracking-widest">8988203683</span>
-                                            <span className="text-tashi-accent bg-white/10 p-2 rounded hover:bg-white/20 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+                                            <span className="text-2xl font-mono font-bold text-white tracking-widest pl-2">8988203683</span>
+                                            <span className="bg-tashi-accent/20 text-tashi-accent p-2 rounded-lg group-hover:bg-tashi-accent group-hover:text-white transition-colors">
+                                                <div className="flex items-center gap-1 text-xs font-bold px-1">
+                                                    COPY
+                                                </div>
                                             </span>
                                         </div>
-                                        <p className="text-sm text-emerald-400 font-medium flex items-center gap-1">
-                                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                            Lalit Kumar
-                                        </p>
+                                        <p className="text-emerald-400 text-xs font-medium pt-1">Lalit Kumar</p>
                                     </div>
+
+                                    <div className="w-full h-px bg-white/5" />
+
+                                    <div className="space-y-2">
+                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 2: Pay via UPI App</p>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {['GPay', 'PhonePe', 'Paytm'].map(app => (
+                                                <div key={app} className="bg-white/5 p-2 rounded-lg text-xs text-gray-300 border border-white/5">
+                                                    {app}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
