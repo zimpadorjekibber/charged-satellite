@@ -241,42 +241,18 @@ export default function CartPage() {
                                 <div className="bg-tashi-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-tashi-accent">
                                     <Utensils size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-2">Select Your Table</h3>
+                                <h3 className="text-xl font-bold text-white mb-2">No Table Number?</h3>
                                 <p className="text-gray-400 text-sm">
-                                    Please enter your table number if you know it, or request assistance.
+                                    You are ordering without a scanned table QR.
                                 </p>
                             </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-xs uppercase font-bold text-gray-500 mb-2 block">I know my Table Number</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={manualTableInput}
-                                            onChange={(e) => setManualTableInput(e.target.value)}
-                                            placeholder="e.g. 5"
-                                            className="flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-tashi-accent font-mono text-center text-lg"
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                if (manualTableInput.trim()) {
-                                                    submitOrder(manualTableInput.trim());
-                                                    setShowTableModal(false);
-                                                }
-                                            }}
-                                            disabled={!manualTableInput.trim()}
-                                            className="bg-tashi-primary text-white px-6 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-600 transition-colors"
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="relative flex py-2 items-center">
-                                    <div className="flex-grow border-t border-white/10"></div>
-                                    <span className="flex-shrink-0 mx-4 text-gray-600 text-xs uppercase font-bold">OR</span>
-                                    <div className="flex-grow border-t border-white/10"></div>
+                            <div className="space-y-6">
+                                <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-left">
+                                    <p className="text-blue-200 font-bold mb-1 text-sm">Don't worry!</p>
+                                    <p className="text-blue-400 text-xs leading-relaxed">
+                                        Your order request will be sent directly to our staff. They will assign you a table as soon as you arrive.
+                                    </p>
                                 </div>
 
                                 <button
@@ -284,10 +260,9 @@ export default function CartPage() {
                                         submitOrder('REQUEST');
                                         setShowTableModal(false);
                                     }}
-                                    className="w-full bg-white/5 hover:bg-white/10 border border-tashi-accent/30 text-tashi-accent py-4 rounded-xl font-bold transition-all flex flex-col items-center gap-1 group"
+                                    className="w-full bg-tashi-primary hover:bg-red-700 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-red-900/40 flex items-center justify-center gap-2 group"
                                 >
-                                    <span>I don't have a Table Number</span>
-                                    <span className="text-xs text-gray-500 font-normal group-hover:text-gray-400">Request staff to assign a table</span>
+                                    Send Request to Staff <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </div>
 
