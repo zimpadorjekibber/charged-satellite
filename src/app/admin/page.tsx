@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
@@ -39,6 +39,8 @@ export default function AdminDashboard() {
 
     // Sound Logic
     const [soundEnabled, setSoundEnabled] = useState(false);
+    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+    const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
     const prevOrdersLength = useRef(0);
     const prevNotifLength = useRef(0);
 
@@ -268,15 +270,15 @@ export default function AdminDashboard() {
     const pastOrders = (orders || []).filter(o => o.status === 'Paid' || o.status === 'Rejected' || o.status === 'Cancelled');
 
     return (
-        <div className="min-h-screen bg-neutral-900 pb-20">
+        <div className={`min-h-screen pb-20 transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             {/* Top Navigation Bar */}
-            <div className="bg-neutral-900 border-b border-white/5 p-4 sticky top-0 z-50">
+            <div className={`border-b p-4 sticky top-0 z-50 transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900 border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/" className="p-2 bg-white/5 rounded-full hover:bg-white/10 text-white transition-colors">
+                        <Link href="/" className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
                             <ArrowLeft size={20} />
                         </Link>
-                        <h1 className="text-xl font-bold text-white font-serif hidden md:block">Admin Dashboard</h1>
+                        <h1 className={`text-xl font-bold font-serif hidden md:block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Admin Dashboard</h1>
                     </div>
 
                     {/* Centered Tab Navigation */}
@@ -291,6 +293,13 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-2 rounded-lg transition-colors border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white' : 'bg-white border-gray-200 text-orange-500 hover:bg-orange-50 shadow-sm'}`}
+                            title="Toggle Theme"
+                        >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
                         <button
                             onClick={toggleSound}
                             className={`p-2 rounded-lg transition-colors border ${soundEnabled ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-red-500/20 text-red-400 border-red-500/50'}`}

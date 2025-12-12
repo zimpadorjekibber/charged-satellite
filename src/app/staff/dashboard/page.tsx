@@ -23,6 +23,8 @@ export default function StaffDashboard() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+
+
     // Sound & Visual Notification Logic
     const [prevPendingCount, setPrevPendingCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
@@ -34,6 +36,19 @@ export default function StaffDashboard() {
     const activeOrders = [...(orders || [])]
         .filter(o => o.status !== 'Rejected' && o.status !== 'Cancelled')
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // UI State for Split View
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+    // Auto-select first order if none selected
+    useEffect(() => {
+        if (!selectedOrderId && activeOrders.length > 0) {
+            setSelectedOrderId(activeOrders[0].id);
+        }
+    }, [activeOrders.length]);
+
+    // Update selected order details when data changes
+    const selectedOrder = activeOrders.find(o => o.id === selectedOrderId) || null;
 
     // Calculate Daily Stats
     const today = new Date().toDateString();
@@ -697,88 +712,111 @@ export default function StaffDashboard() {
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[calc(100vh-280px)] lg:overflow-hidden pb-32 lg:pb-0">
-                <StatusColumn
-                    title="Pending"
-                    icon={<Clock size={20} />}
-                    color="text-yellow-400"
-                    bgColor="bg-yellow-400/5"
-                    borderColor="border-yellow-400/20"
-                    orders={activeOrders.filter(o => o.status === 'Pending')}
-                    onUpdateStatus={updateOrderStatus}
-                    onAssignTable={updateOrderTable}
-                    handlePrintKOT={handlePrintKOT}
-                    handlePrintBill={handlePrintBill}
-                    handleShareBill={handleShareBill}
-                />
-                <StatusColumn
-                    title="Cooking"
-                    icon={<Utensils size={20} />}
-                    color="text-blue-400"
-                    bgColor="bg-blue-400/5"
-                    borderColor="border-blue-400/20"
-                    orders={activeOrders.filter(o => o.status === 'Preparing')}
-                    onUpdateStatus={updateOrderStatus}
-                    handlePrintKOT={handlePrintKOT}
-                    handlePrintBill={handlePrintBill}
-                    handleShareBill={handleShareBill}
-                />
-                <StatusColumn
-                    title="Ready to Serve"
-                    icon={<CheckCircle2 size={20} />}
-                    color="text-green-400"
-                    bgColor="bg-green-400/5"
-                    borderColor="border-green-400/20"
-                    orders={activeOrders.filter(o => o.status === 'Served')}
-                    onUpdateStatus={updateOrderStatus}
-                    handlePrintKOT={handlePrintKOT}
-                    handlePrintBill={handlePrintBill}
-                    handleShareBill={handleShareBill}
-                />
+            <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] overflow-hidden pb-32 lg:pb-0">
+
+                {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
+                <div className="w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 flex flex-col h-full overflow-hidden">
+                    <div className="p-4 border-b border-white/10 bg-black/20 flex justify-between items-center">
+                        <h2 className="font-bold text-gray-400 uppercase tracking-widest text-xs">Active List</h2>
+                        <span className="bg-tashi-accent text-tashi-dark text-xs font-bold px-2 py-0.5 rounded-full">{activeOrders.length}</span>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+                        {['Pending', 'Preparing', 'Served'].map(status => {
+                            const statusOrders = activeOrders.filter(o => o.status === status);
+                            if (statusOrders.length === 0) return null;
+                            return (
+                                <div key={status}>
+                                    <div className={`px-2 py-1 text-[10px] font-bold uppercase mb-2 flex items-center gap-2 ${status === 'Pending' ? 'text-yellow-400' :
+                                        status === 'Preparing' ? 'text-blue-400' : 'text-green-400'
+                                        }`}>
+                                        {status === 'Pending' && <Clock size={12} />}
+                                        {status === 'Preparing' && <Utensils size={12} />}
+                                        {status === 'Served' && <CheckCircle2 size={12} />}
+                                        {status} ({statusOrders.length})
+                                    </div>
+                                    <div className="space-y-2">
+                                        {statusOrders.map(order => (
+                                            <button
+                                                key={order.id}
+                                                onClick={() => setSelectedOrderId(order.id)}
+                                                className={`w-full text-left p-3 rounded-xl border transition-all relative group ${selectedOrderId === order.id
+                                                    ? 'bg-gradient-to-r from-white/10 to-transparent border-l-4 border-l-tashi-accent border-y-transparent border-r-transparent'
+                                                    : 'bg-black/20 border-transparent hover:bg-white/5 border-l-4 border-l-transparent'
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className={`font-bold text-lg ${order.tableId === 'REQUEST' ? 'text-red-400 animate-pulse' : 'text-white'
+                                                        }`}>
+                                                        {order.tableId === 'REQUEST' ? 'REQ' : order.tableId}
+                                                    </span>
+                                                    <span className="text-[10px] font-mono text-gray-500">
+                                                        #{order.id.slice(0, 4)}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs text-gray-400 font-mono">
+                                                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-gray-300">
+                                                        ₹{order.totalAmount}
+                                                    </span>
+                                                </div>
+                                                {selectedOrderId === order.id && (
+                                                    <motion.div
+                                                        layoutId="activeGlow"
+                                                        className="absolute inset-0 bg-white/5 rounded-xl -z-10"
+                                                    />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
+                        })}
+
+                        {activeOrders.length === 0 && (
+                            <div className="flex flex-col items-center justify-center h-48 opacity-30 text-center">
+                                <ChefHat size={48} className="mb-2" />
+                                <p className="text-sm">Kitchen is All Clear!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* RIGHT/MAIN AREA: SELECTED ORDER DETAIL */}
+                <div className="flex-1 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex flex-col relative">
+                    {selectedOrder ? (
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-white/10">
+                            <div className="max-w-3xl mx-auto">
+                                <StaffOrderCard
+                                    key={selectedOrder.id}
+                                    order={selectedOrder}
+                                    onUpdateStatus={(s) => updateOrderStatus(selectedOrder.id, s)}
+                                    onAssignTable={updateOrderTable}
+                                    onPrintKOT={() => handlePrintKOT(selectedOrder)}
+                                    onPrintBill={() => handlePrintBill(selectedOrder)}
+                                    onShareBill={() => handleShareBill(selectedOrder)}
+                                    onShareKOT={() => { }}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-50">
+                            <ArrowLeft size={48} className="mb-4 lg:hidden" />
+                            <ArrowLeft size={48} className="mb-4 hidden lg:block rotate-180" />
+                            <p className="text-xl font-bold">Select an Order</p>
+                            <p className="text-sm">Click a ticket from the list to view details</p>
+                        </div>
+                    )}
+                </div>
+
             </div>
         </div>
     );
 }
 
-function StatusColumn({ title, icon, color, bgColor, borderColor, orders, onUpdateStatus, onAssignTable, handlePrintKOT, handlePrintBill, handleShareBill, handleShareKOT }: any) {
-    return (
-        <div className={`glass-card rounded-2xl flex flex-col h-full border ${borderColor} ${bgColor}`}>
-            <div className={`flex items-center gap-3 p-4 border-b ${borderColor} ${color}`}>
-                {icon}
-                <h3 className="font-bold text-lg tracking-wide uppercase">{title}</h3>
-                <span className="ml-auto bg-white/10 px-3 py-1 rounded-full text-sm font-mono text-white">
-                    {orders.length}
-                </span>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent pb-32">
-                <AnimatePresence mode="popLayout">
-                    {orders.map((order: Order) => (
-                        <StaffOrderCard
-                            key={order.id}
-                            order={order}
-                            onUpdateStatus={(s) => onUpdateStatus(order.id, s)}
-                            onAssignTable={onAssignTable}
-                            onPrintKOT={() => handlePrintKOT(order)}
-                            onPrintBill={() => handlePrintBill(order)}
-                            onShareBill={() => handleShareBill(order)}
-                            onShareKOT={() => handleShareKOT(order)}
-                        />
-                    ))}
-                </AnimatePresence>
-
-                {orders.length === 0 && (
-                    <div className="text-center py-10 opacity-30">
-                        <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            {icon}
-                        </div>
-                        <p className="font-mono text-sm">No orders</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
 
 function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onAssignTable: (oid: string, tid: string) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
     const tables = useStore((state) => state.tables);
