@@ -328,11 +328,16 @@ export default function CartPage() {
                                     <div className="w-full h-px bg-white/5" />
 
                                     <div className="space-y-2">
-                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 2: Pay via UPI App</p>
+                                        <div className="flex flex-col gap-1">
+                                            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Step 2: Open App & Pay</p>
+                                            <p className="text-[10px] text-yellow-500/80 leading-tight">
+                                                Copy the number above, open your UPI app manually, and make the payment.
+                                            </p>
+                                        </div>
                                         <div className="grid grid-cols-3 gap-3 mt-4">
                                             {/* GPay */}
                                             <a
-                                                href={`tez://upi/pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
+                                                href="intent:#Intent;package=com.google.android.apps.nbu.paisa.user;category=android.intent.category.LAUNCHER;end"
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden p-1.5">
@@ -343,29 +348,29 @@ export default function CartPage() {
                                                         <path d="M12.42 5.25c1.46 0 2.77.5 3.8 1.48l2.84-2.84C17.29 2.22 15.03 1.25 12.42 1.25 8.68 1.25 3.59 3.58 1.96 6.52l4.91 3.08c.78-2.34 2.97-4.08 5.55-4.08z" fill="#EA4335" />
                                                     </svg>
                                                 </div>
-                                                <span className="text-[10px] font-medium text-gray-300">GPay</span>
+                                                <span className="text-[10px] font-medium text-gray-300">Open GPay</span>
                                             </a>
 
                                             {/* PhonePe */}
                                             <a
-                                                href={`phonepe://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
+                                                href="intent:#Intent;package=com.phonepe.app;category=android.intent.category.LAUNCHER;end"
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-[#5f259f] flex items-center justify-center p-1.5">
                                                     <span className="font-bold text-white italic text-xs">Pe</span>
                                                 </div>
-                                                <span className="text-[10px] font-medium text-gray-300">PhonePe</span>
+                                                <span className="text-[10px] font-medium text-gray-300">Open PhonePe</span>
                                             </a>
 
                                             {/* Paytm */}
                                             <a
-                                                href={`paytmmp://pay?pa=8988203683@okbizaxis&pn=Lalit%20Kumar&am=${Math.ceil(grandTotal * 0.5)}&tr=${Date.now()}&tn=FoodOrder&cu=INR`}
+                                                href="intent:#Intent;package=net.one97.paytm;category=android.intent.category.LAUNCHER;end"
                                                 className="bg-[#1F1F1F] hover:bg-[#2F2F2F] p-3 rounded-xl border border-white/10 flex flex-col items-center justify-center gap-2 transition-all active:scale-95 group"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
                                                     <span className="font-bold text-[#00baf2] text-[8px] tracking-tighter">Paytm</span>
                                                 </div>
-                                                <span className="text-[10px] font-medium text-gray-300">Paytm</span>
+                                                <span className="text-[10px] font-medium text-gray-300">Open Paytm</span>
                                             </a>
                                         </div>
                                     </div>
