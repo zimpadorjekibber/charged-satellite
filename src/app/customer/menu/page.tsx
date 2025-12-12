@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -27,6 +27,8 @@ const itemVariants = {
 export default function MenuPage() {
     const menu = useStore((state) => state.menu);
     const cart = useStore((state) => state.cart);
+    const orders = useStore((state) => state.orders); // Added
+    const sessionId = useStore((state) => state.sessionId); // Added
     const addToCart = useStore((state) => state.addToCart);
     const removeFromCart = useStore((state) => state.removeFromCart);
     const currentTableId = useStore((state) => state.currentTableId);
@@ -236,6 +238,9 @@ export default function MenuPage() {
     // Check if there is already a pending call for this table
     const hasPendingCall = notifications.some(n => n.tableId === currentTableId && n.type === 'call_staff' && n.status === 'pending');
 
+    // Check for active order
+    const hasActiveOrder = orders.some(o => o.sessionId === sessionId && (o.status === 'Pending' || o.status === 'Preparing'));
+
     const handleCallStaff = () => {
         if (!currentTableId) {
             alert("Please scan a table QR code or select a table to call staff.");
@@ -253,6 +258,22 @@ export default function MenuPage() {
             {/* Bottom Action Bar - Horizontal */}
             <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl border-t border-white/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
+                    {/* My Order Button - Visible if active order exists */}
+                    {hasActiveOrder && (
+                        <Link href="/customer/status">
+                            <motion.button
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 transition-all shadow-[0_0_15px_rgba(255,165,0,0.3)] animate-pulse"
+                            >
+                                <UtensilsCrossed size={24} />
+                                <span className="text-[10px] uppercase tracking-wider font-bold">
+                                    Status
+                                </span>
+                            </motion.button>
+                        </Link>
+                    )}
                     {/* Call Staff Button */}
                     <motion.button
                         initial={{ scale: 0 }}
@@ -812,20 +833,7 @@ export default function MenuPage() {
 
 
 
-                                <div className="flex gap-2 w-full pt-2">
-
-
-                                    <a
-                                        href="https://wa.me/918988220022"
-                                        target="_blank"
-                                        className="flex-1 bg-gradient-to-br from-green-600 to-green-800 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform shadow-lg shadow-green-900/40"
-                                    >
-                                        <span className="bg-white/20 p-2 rounded-full text-white">
-                                            <MessageCircle size={18} />
-                                        </span>
-                                        <span className="text-[10px] font-bold text-white">WHATSAPP US</span>
-                                    </a>
-                                </div>
+                                {/* Removed Duplicate WhatsApp Button */}
 
 
                             </div>
@@ -1106,9 +1114,9 @@ function MiniOrderTimer() {
     const sessionId = useStore((state) => state.sessionId);
 
     // Find the latest active order for THIS session
+    // FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
     const activeOrder = orders
         .filter(o =>
-            o.tableId === currentTableId &&
             o.sessionId === sessionId &&
             (o.status === 'Pending' || o.status === 'Preparing')
         )
