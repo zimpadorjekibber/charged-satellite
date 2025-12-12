@@ -54,6 +54,18 @@ async function checkMenu() {
 
         console.log('⚠️  POTENTIAL MISMATCHES (Duplicate Images):');
         let mismatchCount = 0;
+
+        console.log('\n--- DEBUG: FIRST 10 IMAGE PATHS IN DB ---');
+        let debugCount = 0;
+        menuSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.image && debugCount < 10) {
+                console.log(`[${doc.id}] ${data.image}`);
+                debugCount++;
+            }
+        });
+        console.log('-----------------------------------------\n');
+
         Object.entries(imageUsage).forEach(([url, items]) => {
             if (items.length > 1) {
                 mismatchCount++;
