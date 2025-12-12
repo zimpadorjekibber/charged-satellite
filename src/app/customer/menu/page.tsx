@@ -578,7 +578,6 @@ export default function MenuPage() {
                                             <button
                                                 onClick={() => {
                                                     addToCart(selectedItem);
-                                                    setSelectedItem(null);
                                                 }}
                                                 disabled={selectedItem.available === false}
                                                 className="bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
