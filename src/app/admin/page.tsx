@@ -2198,6 +2198,13 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 >
                     {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
                 </button>
+                <button
+                    onClick={() => useStore.getState().updateMenuItem(item.id, { isChefSpecial: !item.isChefSpecial })}
+                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center border transition-colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'}`}
+                    title={item.isChefSpecial ? "Remove from Chef's Specials" : "Mark as Chef's Special"}
+                >
+                    <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
+                </button>
                 <button onClick={() => onEdit(item)} className="text-blue-400 hover:text-white hover:bg-blue-500/20 p-2 rounded transition-colors">
                     <Pencil size={16} />
                 </button>
