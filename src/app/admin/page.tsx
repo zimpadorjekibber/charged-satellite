@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image, Upload, Share2, Download } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect } from 'react';
@@ -743,7 +743,7 @@ export default function AdminDashboard() {
                                                         }}
                                                         className="text-red-500 hover:text-white p-1"
                                                     >
-                                                        <TrashIcon />
+                                                        <Trash size={16} />
                                                     </button>
                                                 </div>
                                                 <div className="flex gap-2 mb-2">
