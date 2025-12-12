@@ -711,162 +711,54 @@ export default function MenuPage() {
                                 </a>
                             </div>
 
-                            <div className="flex gap-2 w-full mt-2">
-                                <button
-                                    onClick={() => {
-                                        setShowContactInfo(false);
-                                        setShowMap(true);
-                                    }}
-                                    className="flex-1 bg-black/40 backdrop-blur border border-white/5 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
-                                >
-                                    <span className="bg-blue-500/10 p-2 rounded-full text-blue-400">
-                                        <MapPin size={18} />
-                                    </span>
-                                    <span className="text-[10px] font-bold text-gray-400">VIEW LOCAL MAP</span>
-                                </button>
 
-                                <a
-                                    href="https://wa.me/918988220022"
-                                    target="_blank"
-                                    className="flex-1 bg-gradient-to-br from-green-600 to-green-800 rounded-2xl py-3 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform shadow-lg shadow-green-900/40"
-                                >
-                                    <span className="bg-white/20 p-2 rounded-full text-white">
-                                        <MessageCircle size={18} />
-                                    </span>
-                                    <span className="text-[10px] font-bold text-white">WHATSAPP US</span>
-                                </a>
-                            </div>
                         </div>
                     </div>
+                </div>
             )}
-                </div>
-            );
+        </div>
+    );
 }
 
 
 
-            function MenuItemCard({item, quantity, onAdd, onRemove, onSelect}: {item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
     const isAvailable = item.available !== false;
 
-            return (
-            <motion.div
-                variants={itemVariants}
-                whileTap={isAvailable ? { scale: 0.98 } : {}}
-                className={`glass-card rounded-2xl p-3 flex gap-4 overflow-hidden relative group ${!isAvailable ? 'opacity-60 grayscale' : ''}`}
-                onClick={onSelect}
-            >
-                {/* Dynamic Background Glow for selected items */}
-                {quantity > 0 && isAvailable && (
-                    <div className="absolute inset-0 bg-tashi-primary/10 pointer-events-none" />
-                )}
+    return (
+        <motion.div
+            variants={itemVariants}
+            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            className={`glass-card rounded-2xl p-3 flex gap-4 overflow-hidden relative group ${!isAvailable ? 'opacity-60 grayscale' : ''}`}
+            onClick={onSelect}
+        >
+            {/* Dynamic Background Glow for selected items */}
+            {quantity > 0 && isAvailable && (
+                <div className="absolute inset-0 bg-tashi-primary/10 pointer-events-none" />
+            )}
 
-                {/* Image Placeholder with Gradient */}
-                <div className="w-32 h-32 bg-neutral-800 rounded-xl flex-shrink-0 relative overflow-hidden border border-white/5 cursor-pointer">
-                    {item.image ? (
-                        <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                                ((e.target as HTMLImageElement).nextSibling as HTMLElement).style.display = 'flex';
-                            }}
-                        />
-                    ) : null}
+            {/* Image Placeholder with Gradient */}
+            <div className="w-32 h-32 bg-neutral-800 rounded-xl flex-shrink-0 relative overflow-hidden border border-white/5 cursor-pointer">
+                {item.image ? (
+                    <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            ((e.target as HTMLImageElement).nextSibling as HTMLElement).style.display = 'flex';
+                        }}
+                    />
+                ) : null}
 
-                    {/* Fallback "Image" - Hidden if image loads successfully */}
-                    <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-600 p-2 bg-gradient-to-br from-gray-800 to-black ${item.image ? 'hidden' : 'flex'}`}>
-                        <span className="text-[10px] text-center uppercase tracking-widest font-bold opacity-50">TashiZom</span>
-                    </div>
-
-                    {/* Veg/Non-Veg Indicator (Icons) */}
-                    {/* Veg/Non-Veg Indicator (Icons) */}
-                    <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
-                        ? 'bg-green-600 border-green-400'
-                        : 'bg-red-600 border-red-400'
-                        }`}>
-                        {item.isVegetarian ? (
-                            <Leaf size={14} className="text-white fill-white" />
-                        ) : (
-                            <Drumstick size={14} className="text-white fill-white" />
-                        )}
-                    </div>
-
-                    {/* Availability Badge */}
-                    {!isAvailable && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-                            <span className="text-red-500 font-bold text-xs uppercase border-2 border-red-500 px-2 py-1 -rotate-12 bg-black/50 backdrop-blur-sm rounded">Sold Out</span>
-                        </div>
-                    )}
+                {/* Fallback "Image" - Hidden if image loads successfully */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-600 p-2 bg-gradient-to-br from-gray-800 to-black ${item.image ? 'hidden' : 'flex'}`}>
+                    <span className="text-[10px] text-center uppercase tracking-widest font-bold opacity-50">TashiZom</span>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-between py-1">
-                    <div onClick={(e) => { e.stopPropagation(); onSelect(); }} className="cursor-pointer">
-                        <h3 className="font-bold text-gray-100 text-lg leading-tight mb-1">{item.name}</h3>
-                        <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
-                        {/* Status Text */}
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`} />
-                            <span className={`text-[10px] font-bold uppercase tracking-wider ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>
-                                {isAvailable ? 'Available' : 'Unavailable'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
-                        <span className="font-serif text-xl text-tashi-accent">₹{item.price}</span>
-
-                        {quantity === 0 ? (
-                            <motion.button
-                                whileHover={isAvailable ? { scale: 1.1 } : {}}
-                                whileTap={isAvailable ? { scale: 0.9 } : {}}
-                                onClick={isAvailable ? onAdd : undefined}
-                                disabled={!isAvailable}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
-                                    ? 'bg-white/5 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
-                                    : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
-                                    }`}
-                            >
-                                <Plus size={20} />
-                            </motion.button>
-                        ) : (
-                            <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
-                                <motion.button
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={onRemove}
-                                    className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                                >
-                                    <Minus size={16} />
-                                </motion.button>
-                                <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
-                                <motion.button
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={onAdd}
-                                    className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                                >
-                                    <Plus size={16} />
-                                </motion.button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </motion.div>
-            );
-}
-
-            function MenuItemListRow({item, quantity, onAdd, onRemove, onSelect}: {item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
-    const isAvailable = item.available !== false;
-
-            return (
-            <motion.div
-                variants={itemVariants}
-                whileTap={isAvailable ? { scale: 0.98 } : {}}
-                className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-pointer ${!isAvailable ? 'opacity-60' : ''}`}
-                onClick={onSelect}
-            >
-                {/* Veg/Non-Veg small indicator */}
-                {/* Veg/Non-Veg small indicator */}
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${item.isVegetarian
+                {/* Veg/Non-Veg Indicator (Icons) */}
+                {/* Veg/Non-Veg Indicator (Icons) */}
+                <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
                     ? 'bg-green-600 border-green-400'
                     : 'bg-red-600 border-red-400'
                     }`}>
@@ -877,31 +769,42 @@ export default function MenuPage() {
                     )}
                 </div>
 
-                {/* Name and Price */}
-                <div className="flex-1">
-                    <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="font-serif text-lg text-tashi-accent">₹{item.price}</span>
-                        {!isAvailable && (
-                            <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
-                        )}
+                {/* Availability Badge */}
+                {!isAvailable && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
+                        <span className="text-red-500 font-bold text-xs uppercase border-2 border-red-500 px-2 py-1 -rotate-12 bg-black/50 backdrop-blur-sm rounded">Sold Out</span>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex-1 flex flex-col justify-between py-1">
+                <div onClick={(e) => { e.stopPropagation(); onSelect(); }} className="cursor-pointer">
+                    <h3 className="font-bold text-gray-100 text-lg leading-tight mb-1">{item.name}</h3>
+                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
+                    {/* Status Text */}
+                    <div className="flex items-center gap-2 mt-2">
+                        <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`} />
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>
+                            {isAvailable ? 'Available' : 'Unavailable'}
+                        </span>
                     </div>
                 </div>
 
-                {/* Add button */}
-                <div onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
+                    <span className="font-serif text-xl text-tashi-accent">₹{item.price}</span>
+
                     {quantity === 0 ? (
                         <motion.button
                             whileHover={isAvailable ? { scale: 1.1 } : {}}
                             whileTap={isAvailable ? { scale: 0.9 } : {}}
                             onClick={isAvailable ? onAdd : undefined}
                             disabled={!isAvailable}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
-                                ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
+                                ? 'bg-white/5 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
                                 : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
                                 }`}
                         >
-                            <Plus size={18} />
+                            <Plus size={20} />
                         </motion.button>
                     ) : (
                         <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
@@ -923,46 +826,120 @@ export default function MenuPage() {
                         </div>
                     )}
                 </div>
-            </motion.div>
-            );
+            </div>
+        </motion.div>
+    );
 }
 
-            function MiniOrderTimer() {
+function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+    const isAvailable = item.available !== false;
+
+    return (
+        <motion.div
+            variants={itemVariants}
+            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-pointer ${!isAvailable ? 'opacity-60' : ''}`}
+            onClick={onSelect}
+        >
+            {/* Veg/Non-Veg small indicator */}
+            {/* Veg/Non-Veg small indicator */}
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${item.isVegetarian
+                ? 'bg-green-600 border-green-400'
+                : 'bg-red-600 border-red-400'
+                }`}>
+                {item.isVegetarian ? (
+                    <Leaf size={14} className="text-white fill-white" />
+                ) : (
+                    <Drumstick size={14} className="text-white fill-white" />
+                )}
+            </div>
+
+            {/* Name and Price */}
+            <div className="flex-1">
+                <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className="font-serif text-lg text-tashi-accent">₹{item.price}</span>
+                    {!isAvailable && (
+                        <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Add button */}
+            <div onClick={(e) => e.stopPropagation()}>
+                {quantity === 0 ? (
+                    <motion.button
+                        whileHover={isAvailable ? { scale: 1.1 } : {}}
+                        whileTap={isAvailable ? { scale: 0.9 } : {}}
+                        onClick={isAvailable ? onAdd : undefined}
+                        disabled={!isAvailable}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
+                            ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                            : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                            }`}
+                    >
+                        <Plus size={18} />
+                    </motion.button>
+                ) : (
+                    <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onRemove}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                        >
+                            <Minus size={16} />
+                        </motion.button>
+                        <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onAdd}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                        >
+                            <Plus size={16} />
+                        </motion.button>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
+function MiniOrderTimer() {
     const orders = useStore((state) => state.orders);
     const currentTableId = useStore((state) => state.currentTableId);
     const sessionId = useStore((state) => state.sessionId);
 
-            // Find the latest active order for THIS session
-            const activeOrder = orders
+    // Find the latest active order for THIS session
+    const activeOrder = orders
         .filter(o =>
             o.tableId === currentTableId &&
             o.sessionId === sessionId &&
             (o.status === 'Pending' || o.status === 'Preparing')
-            )
+        )
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
-            if (!activeOrder) return null;
+    if (!activeOrder) return null;
 
-            return (
-            <Link href="/customer/status">
-                <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
-                >
-                    <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
-                    <div className="flex flex-col leading-none">
-                        <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                            {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
-                        </span>
-                        <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
-                    </div>
-                </motion.div>
-            </Link>
-            );
+    return (
+        <Link href="/customer/status">
+            <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
+            >
+                <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
+                <div className="flex flex-col leading-none">
+                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                        {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
+                    </span>
+                    <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
+                </div>
+            </motion.div>
+        </Link>
+    );
 }
 
-            function MiniTimerDisplay({startTime}: {startTime: Date | string }) {
+function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
     const [timeLeft, setTimeLeft] = useState(0);
 
     useEffect(() => {
@@ -977,24 +954,24 @@ export default function MenuPage() {
         return () => clearInterval(interval);
     }, [startTime]);
 
-            const mins = Math.floor((timeLeft / 1000 / 60) % 60);
-            const secs = Math.floor((timeLeft / 1000) % 60);
+    const mins = Math.floor((timeLeft / 1000 / 60) % 60);
+    const secs = Math.floor((timeLeft / 1000) % 60);
 
-            return (
-            <span className="font-mono font-bold text-sm">
-                {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
-            </span>
-            );
+    return (
+        <span className="font-mono font-bold text-sm">
+            {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
+        </span>
+    );
 }
 
-            function ChefsSpecialSection({
-                items,
-                addToCart,
-                removeFromCart,
-                getQuantity,
-                setSelectedItem
-            }: {
-                items: MenuItem[],
+function ChefsSpecialSection({
+    items,
+    addToCart,
+    removeFromCart,
+    getQuantity,
+    setSelectedItem
+}: {
+    items: MenuItem[],
     addToCart: (item: MenuItem) => void,
     removeFromCart: (id: string) => void,
     getQuantity: (id: string) => number,
@@ -1002,85 +979,85 @@ export default function MenuPage() {
 }) {
     if (items.length === 0) return null;
 
-            return (
-            <section className="mb-8 mt-4">
-                <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
-                    <Sparkles className="text-tashi-accent animate-pulse" size={24} />
-                    <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest animate-pulse drop-shadow-[0_0_8px_rgba(218,165,32,0.5)]">
-                        Chef's Specials
-                    </h2>
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
-                </div>
+    return (
+        <section className="mb-8 mt-4">
+            <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
+                <Sparkles className="text-tashi-accent animate-pulse" size={24} />
+                <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest animate-pulse drop-shadow-[0_0_8px_rgba(218,165,32,0.5)]">
+                    Chef's Specials
+                </h2>
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
+            </div>
 
-                <div className="flex overflow-x-auto gap-5 px-4 pb-6 pt-2 hide-scrollbar snap-x snap-mandatory">
-                    {items.map((item) => (
-                        <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex-shrink-0 w-[85vw] md:w-[350px] snap-center relative group"
+            <div className="flex overflow-x-auto gap-5 px-4 pb-6 pt-2 hide-scrollbar snap-x snap-mandatory">
+                {items.map((item) => (
+                    <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex-shrink-0 w-[85vw] md:w-[350px] snap-center relative group"
+                    >
+                        {/* Flashing Border Effect */}
+                        <div className="absolute -inset-[2px] bg-gradient-to-r from-tashi-accent via-yellow-200 to-tashi-accent rounded-2xl opacity-75 blur-sm animate-pulse" />
+
+                        <div
+                            className="relative bg-neutral-900 border border-tashi-accent/50 rounded-2xl overflow-hidden p-3 flex gap-4 h-28 shadow-xl"
+                            onClick={() => setSelectedItem(item)}
                         >
-                            {/* Flashing Border Effect */}
-                            <div className="absolute -inset-[2px] bg-gradient-to-r from-tashi-accent via-yellow-200 to-tashi-accent rounded-2xl opacity-75 blur-sm animate-pulse" />
+                            {/* Image */}
+                            <div className="w-24 h-full flex-shrink-0 bg-black rounded-xl overflow-hidden relative border border-white/5">
+                                {item.image ? (
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
+                                )}
+                                <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
+                                    ★ SPECIAL
+                                </div>
+                            </div>
 
-                            <div
-                                className="relative bg-neutral-900 border border-tashi-accent/50 rounded-2xl overflow-hidden p-3 flex gap-4 h-28 shadow-xl"
-                                onClick={() => setSelectedItem(item)}
-                            >
-                                {/* Image */}
-                                <div className="w-24 h-full flex-shrink-0 bg-black rounded-xl overflow-hidden relative border border-white/5">
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
-                                    )}
-                                    <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
-                                        ★ SPECIAL
+                            {/* Info */}
+                            <div className="flex-1 flex flex-col justify-between py-1">
+                                <div>
+                                    <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${item.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
+                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                                        </span>
+                                        {item.isSpicy && (
+                                            <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/10">
+                                                Spicy
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 
-                                {/* Info */}
-                                <div className="flex-1 flex flex-col justify-between py-1">
-                                    <div>
-                                        <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${item.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
-                                                {item.isVegetarian ? 'Veg' : 'Non-Veg'}
-                                            </span>
-                                            {item.isSpicy && (
-                                                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/10">
-                                                    Spicy
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-serif text-tashi-accent font-bold">₹{item.price}</span>
 
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-lg font-serif text-tashi-accent font-bold">₹{item.price}</span>
-
-                                        <div onClick={(e) => e.stopPropagation()}>
-                                            {getQuantity(item.id) === 0 ? (
-                                                <button
-                                                    onClick={() => addToCart(item)}
-                                                    disabled={item.available === false}
-                                                    className="bg-tashi-accent text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20"
-                                                >
-                                                    ADD
-                                                </button>
-                                            ) : (
-                                                <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
-                                                    <button onClick={() => removeFromCart(item.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
-                                                    <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(item.id)}</span>
-                                                    <button onClick={() => addToCart(item)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
-                                                </div>
-                                            )}
-                                        </div>
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        {getQuantity(item.id) === 0 ? (
+                                            <button
+                                                onClick={() => addToCart(item)}
+                                                disabled={item.available === false}
+                                                className="bg-tashi-accent text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20"
+                                            >
+                                                ADD
+                                            </button>
+                                        ) : (
+                                            <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
+                                                <button onClick={() => removeFromCart(item.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
+                                                <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(item.id)}</span>
+                                                <button onClick={() => addToCart(item)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
-            );
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </section>
+    );
 }
