@@ -1,1 +1,260 @@
-[]
+[
+  {
+    "name": "butter_chicken_menu_1765270404394.png",
+    "path": "/gallery/butter_chicken_menu_1765270404394.png",
+    "size": 878044,
+    "source": "gallery"
+  },
+  {
+    "name": "chicken_biryani_menu_1765270453329.png",
+    "path": "/gallery/chicken_biryani_menu_1765270453329.png",
+    "size": 757263,
+    "source": "gallery"
+  },
+  {
+    "name": "chicken_momos_menu_1765270324171.png",
+    "path": "/gallery/chicken_momos_menu_1765270324171.png",
+    "size": 922273,
+    "source": "gallery"
+  },
+  {
+    "name": "chicken_tikka_masala_dish_1765271202462.png",
+    "path": "/gallery/chicken_tikka_masala_dish_1765271202462.png",
+    "size": 824637,
+    "source": "gallery"
+  },
+  {
+    "name": "gobi_manchurian_1765271219590.png",
+    "path": "/gallery/gobi_manchurian_1765271219590.png",
+    "size": 936003,
+    "source": "gallery"
+  },
+  {
+    "name": "honey_chilly_potato_1765271240602.png",
+    "path": "/gallery/honey_chilly_potato_1765271240602.png",
+    "size": 957622,
+    "source": "gallery"
+  },
+  {
+    "name": "kashmiri_kauwa_tea_1765271046658.png",
+    "path": "/gallery/kashmiri_kauwa_tea_1765271046658.png",
+    "size": 697955,
+    "source": "gallery"
+  },
+  {
+    "name": "malai_kofta_1765271181329.png",
+    "path": "/gallery/malai_kofta_1765271181329.png",
+    "size": 732499,
+    "source": "gallery"
+  },
+  {
+    "name": "mango_lassi_menu_1765270383257.png",
+    "path": "/gallery/mango_lassi_menu_1765270383257.png",
+    "size": 652056,
+    "source": "gallery"
+  },
+  {
+    "name": "margherita_pizza_1765271260803.png",
+    "path": "/gallery/margherita_pizza_1765271260803.png",
+    "size": 886343,
+    "source": "gallery"
+  },
+  {
+    "name": "nutella_pancakes_1765271101587.png",
+    "path": "/gallery/nutella_pancakes_1765271101587.png",
+    "size": 759050,
+    "source": "gallery"
+  },
+  {
+    "name": "original_food_photo_1.png",
+    "path": "/gallery/original_food_photo_1.png",
+    "size": 532637,
+    "source": "gallery"
+  },
+  {
+    "name": "paneer_parantha_1765271083320.png",
+    "path": "/gallery/paneer_parantha_1765271083320.png",
+    "size": 869144,
+    "source": "gallery"
+  },
+  {
+    "name": "paneer_tikka_masala_1765271164440.png",
+    "path": "/gallery/paneer_tikka_masala_1765271164440.png",
+    "size": 901016,
+    "source": "gallery"
+  },
+  {
+    "name": "spring_rolls_menu_1765270425381.png",
+    "path": "/gallery/spring_rolls_menu_1765270425381.png",
+    "size": 813358,
+    "source": "gallery"
+  },
+  {
+    "name": "tashizom_special_breakfast_1765271066198.png",
+    "path": "/gallery/tashizom_special_breakfast_1765271066198.png",
+    "size": 819499,
+    "source": "gallery"
+  },
+  {
+    "name": "tashizom_veg_kathi_roll_1765271141503.png",
+    "path": "/gallery/tashizom_veg_kathi_roll_1765271141503.png",
+    "size": 739078,
+    "source": "gallery"
+  },
+  {
+    "name": "thukpa_soup_menu_1765270361075.png",
+    "path": "/gallery/thukpa_soup_menu_1765270361075.png",
+    "size": 808912,
+    "source": "gallery"
+  },
+  {
+    "name": "veg_biryani_dish_1765271284184.png",
+    "path": "/gallery/veg_biryani_dish_1765271284184.png",
+    "size": 864862,
+    "source": "gallery"
+  },
+  {
+    "name": "veg_manchow_soup_1765271118021.png",
+    "path": "/gallery/veg_manchow_soup_1765271118021.png",
+    "size": 794996,
+    "source": "gallery"
+  },
+  {
+    "name": "honey-chili-potato-refined.png",
+    "path": "/gallery-uploads/honey-chili-potato-refined.png",
+    "size": 537672,
+    "source": "gallery-uploads"
+  },
+  {
+    "name": "breakfast.png",
+    "path": "/images/placeholders/breakfast.png",
+    "size": 782824,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "chinese_cuisine.png",
+    "path": "/images/placeholders/chinese_cuisine.png",
+    "size": 733069,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "chowmein.png",
+    "path": "/images/placeholders/chowmein.png",
+    "size": 662572,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "continental_breakfast.png",
+    "path": "/images/placeholders/continental_breakfast.png",
+    "size": 701435,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "cornflakes.png",
+    "path": "/images/placeholders/cornflakes.png",
+    "size": 790073,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "desserts.png",
+    "path": "/images/placeholders/desserts.png",
+    "size": 694661,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "indian_breads.png",
+    "path": "/images/placeholders/indian_breads.png",
+    "size": 790531,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "italian_course.png",
+    "path": "/images/placeholders/italian_course.png",
+    "size": 644602,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "momos.png",
+    "path": "/images/placeholders/momos.png",
+    "size": 762819,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "muesli.png",
+    "path": "/images/placeholders/muesli.png",
+    "size": 795730,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "non_veg.png",
+    "path": "/images/placeholders/non_veg.png",
+    "size": 802644,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "paratha.png",
+    "path": "/images/placeholders/paratha.png",
+    "size": 1013998,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "porridge.png",
+    "path": "/images/placeholders/porridge.png",
+    "size": 732477,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "snacks.png",
+    "path": "/images/placeholders/snacks.png",
+    "size": 1024680,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "special_breakfast.jpg",
+    "path": "/images/placeholders/special_breakfast.jpg",
+    "size": 143682,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "tashizom_biryani.png",
+    "path": "/images/placeholders/tashizom_biryani.png",
+    "size": 761319,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "tashizom_breakfast.png",
+    "path": "/images/placeholders/tashizom_breakfast.png",
+    "size": 687690,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "tashizom_curry.png",
+    "path": "/images/placeholders/tashizom_curry.png",
+    "size": 667941,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "tashizom_fries.png",
+    "path": "/images/placeholders/tashizom_fries.png",
+    "size": 823811,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "tashizom_pizza.png",
+    "path": "/images/placeholders/tashizom_pizza.png",
+    "size": 732648,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "thukpa.png",
+    "path": "/images/placeholders/thukpa.png",
+    "size": 827761,
+    "source": "images/placeholders"
+  },
+  {
+    "name": "veg_curry.png",
+    "path": "/images/placeholders/veg_curry.png",
+    "size": 808768,
+    "source": "images/placeholders"
+  }
+]

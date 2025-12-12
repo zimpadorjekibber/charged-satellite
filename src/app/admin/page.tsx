@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => setActiveTab('reviews')} />
                         <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => setActiveTab('settings')} />
                         <TabButton active={activeTab === 'media'} label="Gallery" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('media')} />
-                        <TabButton active={activeTab === 'storage'} label="Storage" icon={<FolderOpen size={16} />} onClick={() => setActiveTab('storage')} />
+
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -447,11 +447,54 @@ export default function AdminDashboard() {
                                     ))
                                 )}
                             </div>
+
+                            {/* Local Gallery (Restored) */}
+                            <div className="bg-neutral-900 rounded-xl p-6 border border-white/5 mt-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-bold text-white">Local Gallery ({localGallery.length} files)</h3>
+                                    <span className="text-xs text-gray-500">Available in public folders</span>
+                                </div>
+
+                                {localGallery.length === 0 ? (
+                                    <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-xl">
+                                        <p className="text-gray-500">No local images found.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                        {localGallery.map((file, idx) => (
+                                            <div key={idx} className="bg-black/40 rounded-lg border border-white/5 overflow-hidden group relative">
+                                                <div className="aspect-square bg-neutral-900 relative">
+                                                    <img
+                                                        src={file.path}
+                                                        alt={file.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                                        <button
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(file.path);
+                                                                alert('Path copied: ' + file.path);
+                                                            }}
+                                                            className="bg-white text-black font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transform scale-90 group-hover:scale-100 transition-all"
+                                                        >
+                                                            Copy Path
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="p-2">
+                                                    <p className="text-[10px] text-gray-400 truncate" title={file.name}>{file.name}</p>
+                                                    <p className="text-[9px] text-gray-600">{(file.size / 1024).toFixed(1)} KB</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </motion.div>
                     )}
 
                     {/* STORAGE MANAGER VIEW */}
-                    {activeTab === 'storage' && (
+                    {false && ( // Deprecated Storage View
                         <motion.div
                             key="storage"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
