@@ -142,9 +142,26 @@ export default function LocalMapGuide() {
                     {/* To Kaza Direction */}
                     <g transform="translate(150, 500)">
                         <path d="M 0 20 Q -20 40 -40 60" fill="none" stroke="#22c55e" strokeWidth="6" strokeLinecap="round" markerEnd="url(#arrowhead-green)" />
-                        <text x="-60" y="80" fill="#22c55e" fontSize="16" fontWeight="bold" fontFamily="sans-serif">To Kaza</text>
+                        <text x="-60" y="80" fill="#22c55e" fontSize="20" fontWeight="bold" fontFamily="sans-serif">To Kaza</text>
                         <text x="-60" y="95" fill="#4ade80" fontSize="10" fontFamily="sans-serif">Main Highway</text>
                     </g>
+
+                    {/* To Manali Direction (From Chicham) */}
+                    <g transform="translate(300, 100)">
+                        <path d="M 0 -20 Q -20 -40 -40 -60" fill="none" stroke="#22c55e" strokeWidth="6" strokeLinecap="round" markerEnd="url(#arrowhead-green)" />
+                        <text x="-80" y="-70" fill="#22c55e" fontSize="20" fontWeight="bold" fontFamily="sans-serif">To Manali</text>
+                    </g>
+
+                    {/* Distance Indicators */}
+                    {/* Direct Route (Left) */}
+                    <text x="120" y="300" fill="#94a3b8" fontSize="14" fontWeight="bold" fontFamily="sans-serif" transform="rotate(-15 120,300)">
+                        2 km (Direct)
+                    </text>
+
+                    {/* Via Kibber Route (Right) */}
+                    <text x="660" y="400" fill="#94a3b8" fontSize="14" fontWeight="bold" fontFamily="sans-serif">
+                        4 km (Via Kibber)
+                    </text>
 
                     {/* --- NODES / LOCATIONS --- */}
 
