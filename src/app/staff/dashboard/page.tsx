@@ -805,7 +805,7 @@ export default function StaffDashboard() {
                                         {statusOrders.map(order => (
                                             <button
                                                 key={order.id}
-                                                onClick={() => setSelectedOrderId(order.id)}
+                                                onClick={() => setSelectedOrderId(selectedOrderId === order.id ? null : order.id)}
                                                 className={`w-full text-left p-3 rounded-xl border transition-all relative group ${selectedOrderId === order.id
                                                     ? 'bg-gradient-to-r from-white/10 to-transparent border-l-4 border-l-tashi-accent border-y-transparent border-r-transparent'
                                                     : 'bg-black/20 border-transparent hover:bg-white/5 border-l-4 border-l-transparent'
@@ -821,9 +821,18 @@ export default function StaffDashboard() {
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-xs text-gray-400 font-mono">
-                                                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
+                                                    <div className="flex flex-col">
+                                                        {(order.customerName || order.customerPhone) ? (
+                                                            <span className="text-sm font-bold text-gray-200 truncate max-w-[120px]">
+                                                                {order.customerName || order.customerPhone}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-xs text-gray-400 italic">Guest</span>
+                                                        )}
+                                                        <span className="text-[10px] text-gray-500 font-mono">
+                                                            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    </div>
                                                     <span className="text-xs font-bold text-gray-300">
                                                         ₹{order.totalAmount}
                                                     </span>
