@@ -5,7 +5,7 @@ import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageC
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
 
 // Animation Variants
@@ -1107,7 +1107,7 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
     );
 }
 
-function MiniOrderTimer() {
+const MiniOrderTimer = memo(function MiniOrderTimer() {
     const orders = useStore((state) => state.orders);
     const currentTableId = useStore((state) => state.currentTableId);
     const sessionId = useStore((state) => state.sessionId);
@@ -1140,7 +1140,7 @@ function MiniOrderTimer() {
             </motion.div>
         </Link>
     );
-}
+});
 
 function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
     const [timeLeft, setTimeLeft] = useState(0);
@@ -1167,7 +1167,7 @@ function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
     );
 }
 
-function ChefsSpecialSection({
+const ChefsSpecialSection = memo(function ChefsSpecialSection({
     items,
     addToCart,
     removeFromCart,
@@ -1292,4 +1292,4 @@ function ChefsSpecialSection({
             </div>
         </section>
     );
-}
+});
