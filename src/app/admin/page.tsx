@@ -2383,20 +2383,49 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
 
 
 function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] }) {
+    const [filter, setFilter] = useState<'all' | 'app' | 'table' | 'unique'>('all');
+
     const totalScans = stats.length;
     const tableScans = stats.filter(s => s.type === 'table_qr').length;
-    const appScans = stats.filter(s => s.type === 'app_qr').length;
-    const uniqueUsers = new Set(stats.map(s => s.userAgent + (s.tableId || ''))).size; // Crude unique approximation
+    const appScans = stats.filter(s => s.type === 'app_qr' || s.type === 'manual').length;
 
-    // Helper to parse UA
+    // Calculate Repeaters Map
+    const sessionCounts = stats.reduce((acc, curr) => {
+        const id = curr.sessionId || 'unknown';
+        acc[id] = (acc[id] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    // Unique Visitors Count
+    const uniqueUsers = Object.keys(sessionCounts).filter(k => k !== 'unknown').length;
+
+    // Filter Logic
+    let displayedStats = [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    if (filter === 'app') {
+        displayedStats = displayedStats.filter(s => s.type === 'app_qr' || s.type === 'manual');
+    } else if (filter === 'table') {
+        displayedStats = displayedStats.filter(s => s.type === 'table_qr');
+    } else if (filter === 'unique') {
+        const seen = new Set();
+        displayedStats = displayedStats.filter(s => {
+            const id = s.sessionId || 'unknown';
+            if (id === 'unknown') return true;
+            if (seen.has(id)) return false;
+            seen.add(id);
+            return true;
+        });
+    }
+
+    // Helper to parse UA (Keep existing or simplified)
     const getDeviceInfo = (ua: string) => {
-        if (!ua) return 'Unknown Device';
+        if (!ua) return 'Unknown';
         if (ua.includes('iPhone')) return 'iPhone';
         if (ua.includes('iPad')) return 'iPad';
         if (ua.includes('Android')) return 'Android';
         if (ua.includes('Windows')) return 'Windows PC';
         if (ua.includes('Macintosh')) return 'Mac';
-        return 'Other Device';
+        return 'Other';
     };
 
     return (
@@ -2412,27 +2441,45 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
-                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <button
+                        onClick={() => setFilter('all')}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'all' ? 'bg-gray-100 border-gray-400 ring-2 ring-gray-200' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}
+                    >
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
                         <p className="text-3xl font-bold text-gray-900 mt-1">{totalScans}</p>
-                    </div>
-                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    </button>
+                    <button
+                        onClick={() => setFilter('app')}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'app' ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-200' : 'bg-blue-50 border-blue-100 hover:border-blue-300'}`}
+                    >
                         <p className="text-xs text-blue-600 uppercase tracking-wider font-bold">App / Web</p>
                         <p className="text-3xl font-bold text-blue-600 mt-1">{appScans}</p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                    </button>
+                    <button
+                        onClick={() => setFilter('table')}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'table' ? 'bg-green-100 border-green-400 ring-2 ring-green-200' : 'bg-green-50 border-green-100 hover:border-green-300'}`}
+                    >
                         <p className="text-xs text-green-600 uppercase tracking-wider font-bold">Table QR</p>
                         <p className="text-3xl font-bold text-green-600 mt-1">{tableScans}</p>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    </button>
+                    <button
+                        onClick={() => setFilter('unique')}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'unique' ? 'bg-purple-100 border-purple-400 ring-2 ring-purple-200' : 'bg-purple-50 border-purple-100 hover:border-purple-300'}`}
+                    >
                         <p className="text-xs text-purple-600 uppercase tracking-wider font-bold">Unique Visitors</p>
                         <p className="text-3xl font-bold text-purple-600 mt-1">{uniqueUsers}</p>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="bg-white rounded-xl border border-gray-200 flex-1 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-gray-200 shrink-0 bg-gray-50">
-                        <h3 className="text-sm font-bold text-gray-700 uppercase">Detailed Visitor Log</h3>
+                    <div className="p-4 border-b border-gray-200 shrink-0 bg-gray-50 flex justify-between items-center">
+                        <h3 className="text-sm font-bold text-gray-700 uppercase">
+                            {filter === 'all' && 'All Visits'}
+                            {filter === 'app' && 'App & Web Visits'}
+                            {filter === 'table' && 'Table QR Scans'}
+                            {filter === 'unique' && 'Unique Visitors (Latest)'}
+                        </h3>
+                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-md font-mono">{displayedStats.length} Records</span>
                     </div>
                     <div className="overflow-auto flex-1 p-4">
                         <table className="w-full text-left text-sm text-gray-600">
@@ -2441,15 +2488,18 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                     <th className="pb-3 pl-2">Time</th>
                                     <th className="pb-3">IP / Location</th>
                                     <th className="pb-3">Network/ISP</th>
-                                    <th className="pb-3">Device</th>
+                                    <th className="pb-3">Device / ID</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {stats.length === 0 ? (
-                                    <tr><td colSpan={4} className="py-8 text-center text-gray-500">No visits recorded yet.</td></tr>
+                                {displayedStats.length === 0 ? (
+                                    <tr><td colSpan={4} className="py-8 text-center text-gray-500">No records found for this filter.</td></tr>
                                 ) : (
-                                    [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 100).map((scan, idx) => {
+                                    displayedStats.slice(0, 100).map((scan, idx) => {
                                         const ipInfo = scan.ipData || {};
+                                        const visitCount = (scan.sessionId && sessionCounts[scan.sessionId]) || 0;
+                                        const isRepeater = visitCount > 1;
+
                                         return (
                                             <tr key={idx} className="hover:bg-gray-50 transition-colors">
                                                 <td className="py-3 pl-2 text-gray-900 font-mono text-xs whitespace-nowrap align-top">
@@ -2478,12 +2528,21 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                                     </div>
                                                 </td>
                                                 <td className="py-3 align-top">
-                                                    <div className="flex flex-col">
+                                                    <div className="flex flex-col items-start gap-1">
                                                         <span className="text-xs font-bold text-gray-700">{getDeviceInfo(scan.userAgent)}</span>
                                                         <span className="text-[10px] text-gray-400 max-w-[150px] truncate" title={scan.userAgent}>
                                                             {scan.userAgent.split(')')[0].replace('Mozilla/5.0 (', '')}
                                                         </span>
-                                                        {scan.sessionId && <span className="text-[9px] font-mono text-gray-300 mt-1">ID: {scan.sessionId.slice(-6)}</span>}
+                                                        {scan.sessionId && (
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <span className="text-[9px] font-mono text-gray-300">ID: {scan.sessionId.slice(-4)}</span>
+                                                                {isRepeater && (
+                                                                    <span className="bg-amber-100 text-amber-700 text-[9px] font-bold px-1.5 py-0.5 rounded border border-amber-200">
+                                                                        {visitCount}x REPEATER
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

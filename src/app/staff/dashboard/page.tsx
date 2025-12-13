@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2 } from 'lucide-react';
+import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -29,6 +29,7 @@ export default function StaffDashboard() {
     const [prevPendingCount, setPrevPendingCount] = useState(0);
     const [prevNotificationCount, setPrevNotificationCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
+    const [isSoundEnabled, setIsSoundEnabled] = useState(true); // Default ON
     const audioCtxRef = useRef<any>(null);
     const isFirstMount = useRef(true);
 
@@ -67,7 +68,10 @@ export default function StaffDashboard() {
     const timeTrend = avgPrepTime > 15 ? '+5%' : avgPrepTime < 12 ? '-5%' : '-2%';
 
     // Sound notification
+    // Sound notification
     const playNotificationSound = () => {
+        if (!isSoundEnabled) return; // Mute check
+
         try {
             // Use standard Audio API for better compatibility than WebAudio for simple alerts
             const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3'); // Phone Ring
@@ -78,6 +82,16 @@ export default function StaffDashboard() {
             });
         } catch (e) {
             console.error("Audio setup failed", e);
+        }
+    };
+
+    // Toggle Sound
+    const toggleSound = () => {
+        const newState = !isSoundEnabled;
+        setIsSoundEnabled(newState);
+        if (newState) {
+            // Play a short beep to confirm and unlock audio
+            playNotificationSound();
         }
     };
 
@@ -217,11 +231,15 @@ export default function StaffDashboard() {
                                 </div>
                             </div>
                             <button
-                                onClick={playNotificationSound}
-                                className="hidden md:flex p-2 text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 text-xs items-center gap-2"
-                                title="Test Sound"
+                                onClick={toggleSound}
+                                className={`hidden md:flex p-2 border rounded-lg text-xs items-center gap-2 transition-colors ${isSoundEnabled
+                                    ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                                    : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                    }`}
+                                title={isSoundEnabled ? "Sound Enabled" : "Sound Muted"}
                             >
-                                <Bell size={14} /> Test
+                                {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                                {isSoundEnabled ? 'Sound ON' : 'Sound OFF'}
                             </button>
                             <button
                                 onClick={logout}
