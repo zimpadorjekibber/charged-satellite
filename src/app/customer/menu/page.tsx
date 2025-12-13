@@ -159,7 +159,10 @@ export default function MenuPage() {
         if (activeCategory && categoryScrollContainerRef.current) {
             const activeBtn = document.getElementById(`tab-${activeCategory}`);
             if (activeBtn) {
-                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                const container = categoryScrollContainerRef.current;
+                // Calculate position to center the button
+                const scrollLeft = activeBtn.offsetLeft - (container.clientWidth / 2) + (activeBtn.clientWidth / 2);
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
         }
     }, [activeCategory]);
