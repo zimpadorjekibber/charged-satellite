@@ -38,9 +38,9 @@ export default function CustomerLayout({
     const isMenu = pathname === '/customer/menu';
 
     return (
-        <div className="min-h-screen bg-tashi-darker pb-20">
+        <div className="min-h-[100dvh] bg-tashi-darker pb-20">
             {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-4 py-3 flex items-center justify-between">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-tashi-darker/95 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center justify-between" style={{ willChange: 'transform' }}>
                 <div className="flex items-center gap-3">
                     {!isMenu && (
                         <Link href="/customer/menu" className="text-gray-300 hover:text-white">
