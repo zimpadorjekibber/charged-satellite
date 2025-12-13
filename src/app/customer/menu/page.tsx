@@ -1006,7 +1006,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                 </div>
 
                 <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
-                    <span className="font-serif text-xl text-tashi-accent">â‚¹{item.price}</span>
+                    <span className="font-serif text-xl text-tashi-accent">&#8377;{item.price}</span>
 
                     {quantity === 0 ? (
                         <motion.button
@@ -1073,7 +1073,7 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
             <div className="flex-1">
                 <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                    <span className="font-serif text-lg text-tashi-accent">â‚¹{item.price}</span>
+                    <span className="font-serif text-lg text-tashi-accent">&#8377;{item.price}</span>
                     {!isAvailable && (
                         <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
                     )}
