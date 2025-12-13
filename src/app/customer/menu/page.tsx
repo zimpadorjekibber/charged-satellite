@@ -270,9 +270,9 @@ export default function MenuPage() {
     };
 
     return (
-        <div className="pb-32 pointer-events-auto min-h-screen relative">
+        <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
             {/* Bottom Action Bar - Horizontal */}
-            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-xl border-t border-white/10 pointer-events-auto">
+            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-md border-t border-white/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
                     {/* My Order Button - Visible if active order exists */}
                     {hasActiveOrder && (
@@ -281,7 +281,7 @@ export default function MenuPage() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 whileTap={{ scale: 0.9 }}
-                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 transition-all shadow-[0_0_15px_rgba(255,165,0,0.3)] animate-pulse"
+                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 transition-all shadow-[0_0_15px_rgba(255,165,0,0.3)]"
                             >
                                 <UtensilsCrossed size={24} />
                                 <span className="text-[10px] uppercase tracking-wider font-bold">
@@ -297,7 +297,7 @@ export default function MenuPage() {
                         whileTap={{ scale: 0.9 }}
                         onClick={handleCallStaff}
                         className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all ${hasPendingCall
-                            ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/40'
+                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
                             : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
                             }`}
                     >
