@@ -341,6 +341,8 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
     isPreparing: boolean;
     isReady: boolean;
 }) {
+    const tables = useStore(state => state.tables);
+
     const getElapsedTime = () => {
         const now = Date.now();
         const created = new Date(order.createdAt).getTime();
@@ -348,6 +350,11 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
         const minutes = Math.floor(diff / 60000);
         return minutes;
     };
+
+    // Find if this tableId matches an actual table
+    const matchedTable = tables.find(t => t.id === order.tableId || t.name === order.tableId);
+    const isTableOrder = !!matchedTable;
+    const isRemoteOrder = !isTableOrder || order.tableId === 'Remote' || order.tableId === 'REQUEST';
 
     const elapsed = getElapsedTime();
     const borderColor = isNew ? 'border-l-red-500' : isPreparing ? 'border-l-orange-500' : 'border-l-blue-500';
@@ -360,25 +367,57 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
         >
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
-                <div>
-                    <div className="flex items-center gap-3 mb-1">
+                <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-2xl font-bold text-gray-900">#{order.id.slice(0, 4)}</h3>
-                        <span className="text-sm font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
-                            {order.tableId}
-                        </span>
+
+                        {/* Show Table Name for table orders */}
+                        {isTableOrder && matchedTable && (
+                            <span className="text-lg font-bold px-4 py-1 bg-blue-100 text-blue-700 rounded-full border-2 border-blue-300">
+                                📍 {matchedTable.name}
+                            </span>
+                        )}
+
+                        {/* Show "Remote Order" badge for non-table orders */}
+                        {isRemoteOrder && (
+                            <span className="text-sm font-semibold px-3 py-1 bg-purple-100 text-purple-700 rounded-full border border-purple-300">
+                                🚚 Remote Order
+                            </span>
+                        )}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Clock size={14} />
-                        <span>{elapsed}m ago</span>
-                        {(order.customerName || order.customerPhone) && (
-                            <>
-                                <span>•</span>
-                                <span className="font-medium text-gray-700">{order.customerName || order.customerPhone}</span>
-                            </>
+
+                    {/* Customer Info Section */}
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Clock size={14} />
+                            <span>{elapsed}m ago</span>
+                        </div>
+
+                        {/* For Remote Orders: Show BOTH name and phone */}
+                        {isRemoteOrder && (order.customerName || order.customerPhone) && (
+                            <div className="flex flex-col gap-0.5 mt-1 p-2 bg-purple-50 rounded-lg border border-purple-100">
+                                {order.customerName && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-purple-600 font-semibold">👤 Customer:</span>
+                                        <span className="font-bold text-gray-900">{order.customerName}</span>
+                                    </div>
+                                )}
+                                {order.customerPhone && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-purple-600 font-semibold">📞 Phone:</span>
+                                        <a
+                                            href={`tel:${order.customerPhone}`}
+                                            className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                                        >
+                                            {order.customerPhone}
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>
-                <div className={`text-right ${isNew ? 'animate-pulse' : ''}`}>
+                <div className={`text-right ml-4 ${isNew ? 'animate-pulse' : ''}`}>
                     <div className={`text-xl font-bold ${elapsed > 12 ? 'text-red-600' : 'text-gray-500'}`}>
                         {elapsed}min
                     </div>
