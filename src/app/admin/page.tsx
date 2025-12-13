@@ -39,8 +39,8 @@ export default function AdminDashboard() {
 
     // Sound Logic
     const [soundEnabled, setSoundEnabled] = useState(false);
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-    const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    // Theme removed - forcing Premium Dark Mode
+
     const prevOrdersLength = useRef(0);
     const prevNotifLength = useRef(0);
 
@@ -213,48 +213,48 @@ export default function AdminDashboard() {
 
     if (!currentUser || currentUser.role !== 'admin') {
         return (
-            <div className="min-h-screen bg-tashi-darker flex flex-col items-center justify-center p-6">
-                <Link href="/" className="absolute top-8 left-8 text-gray-500 hover:text-white transition-colors flex items-center gap-2">
+            <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+                <Link href="/" className="absolute top-8 left-8 text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2">
                     <ArrowLeft size={20} /> Back
                 </Link>
-                <div className="w-full max-w-md bg-white/5 border border-white/5 p-8 rounded-2xl backdrop-blur-xl">
+                <div className="w-full max-w-md bg-white border border-gray-200 p-8 rounded-2xl shadow-xl">
                     <div className="flex justify-center mb-6">
-                        <div className="p-4 bg-tashi-primary/20 rounded-full text-tashi-primary">
+                        <div className="p-4 bg-tashi-primary/10 rounded-full text-tashi-primary">
                             <Lock size={32} />
                         </div>
                     </div>
-                    <h1 className="text-2xl font-bold text-white text-center mb-2">Admin Login</h1>
-                    <p className="text-gray-400 text-center mb-8 text-sm">Restricted Access Portal</p>
+                    <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Admin Login</h1>
+                    <p className="text-gray-500 text-center mb-8 text-sm">Restricted Access Portal</p>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Username</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-tashi-primary transition-colors"
+                                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-tashi-primary transition-colors"
                                 placeholder="Enter admin ID"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-tashi-primary transition-colors"
+                                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-tashi-primary transition-colors"
                                 placeholder="••••••••"
                             />
                         </div>
                         {error && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+                            <div className="bg-red-50 text-red-500 border border-red-200 p-3 rounded-lg text-sm text-center">
                                 {error}
                             </div>
                         )}
                         <button
                             type="submit"
-                            className="w-full bg-tashi-primary hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-all active:scale-95"
+                            className="w-full bg-tashi-primary hover:bg-tashi-primary/90 text-white font-bold py-3 rounded-lg transition-all active:scale-95 shadow-md shadow-tashi-primary/20"
                         >
                             Access Dashboard
                         </button>
@@ -270,36 +270,29 @@ export default function AdminDashboard() {
     const pastOrders = (orders || []).filter(o => o.status === 'Paid' || o.status === 'Rejected' || o.status === 'Cancelled');
 
     return (
-        <div className={`min-h-screen pb-20 transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-            {/* Top Navigation Bar */}
-            <div className={`border-b p-4 sticky top-0 z-50 transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900 border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+        <div className="min-h-screen pb-24 bg-gray-50 text-gray-900 selection:bg-orange-100 selection:text-orange-900">
+            {/* Top Navigation Bar - Desktop Only / Minimal Mobile Header */}
+            <div className="border-b border-gray-200 p-4 sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/" className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
+                        <Link href="/" className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors">
                             <ArrowLeft size={20} />
                         </Link>
-                        <h1 className={`text-xl font-bold font-serif hidden md:block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Admin Dashboard</h1>
+                        <h1 className="text-xl font-bold font-serif text-gray-900">Admin Dashboard</h1>
                     </div>
 
-                    {/* Centered Tab Navigation */}
-                    <div className="flex bg-black/30 p-1 rounded-xl border border-white/5 text-sm overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                    {/* Desktop Tab Navigation - Hidden on Mobile */}
+                    <div className="hidden md:flex bg-gray-100 p-1 rounded-xl border border-gray-200 text-sm">
                         <TabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('live')} />
                         <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => setActiveTab('history')} />
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => setActiveTab('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => setActiveTab('reviews')} />
                         <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => setActiveTab('settings')} />
-                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('media')} />
-
+                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<ImageIcon size={16} />} onClick={() => setActiveTab('media')} />
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={toggleTheme}
-                            className={`p-2 rounded-lg transition-colors border ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white' : 'bg-white border-gray-200 text-orange-500 hover:bg-orange-50 shadow-sm'}`}
-                            title="Toggle Theme"
-                        >
-                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                        </button>
+                        {/* Theme Toggle Removed */}
                         <button
                             onClick={toggleSound}
                             className={`p-2 rounded-lg transition-colors border ${soundEnabled ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-red-500/20 text-red-400 border-red-500/50'}`}
@@ -328,6 +321,18 @@ export default function AdminDashboard() {
                             <LogOut size={16} />
                         </button>
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 md:hidden px-2 py-2 pb-safe shadow-lg">
+                <div className="grid grid-cols-6 gap-1">
+                    <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={20} />} onClick={() => setActiveTab('live')} />
+                    <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => setActiveTab('history')} />
+                    <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => setActiveTab('analytics')} />
+                    <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => setActiveTab('reviews')} />
+                    <MobileTabButton active={activeTab === 'settings'} label="Manage" icon={<Settings size={20} />} onClick={() => setActiveTab('settings')} />
+                    <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => setActiveTab('media')} />
                 </div>
             </div>
 
@@ -376,8 +381,8 @@ export default function AdminDashboard() {
                                 />
                             </div>
 
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                     Live Orders
                                 </h2>
@@ -403,10 +408,10 @@ export default function AdminDashboard() {
                             key="history"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                         >
-                            <h2 className="text-2xl font-bold text-white mb-6">Order History</h2>
-                            <div className="bg-neutral-800 rounded-xl border border-white/5 overflow-hidden">
-                                <table className="w-full text-left text-sm text-gray-400">
-                                    <thead className="bg-white/5 text-xs uppercase font-bold text-white">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Order History</h2>
+                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                                <table className="w-full text-left text-sm text-gray-500">
+                                    <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-700 border-b border-gray-200">
                                         <tr>
                                             <th className="p-4">Order ID</th>
                                             <th className="p-4">Date & Time</th>
@@ -417,13 +422,13 @@ export default function AdminDashboard() {
                                             <th className="p-4 text-center">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-white/5">
+                                    <tbody className="divide-y divide-gray-100">
                                         {pastOrders.length === 0 ? (
-                                            <tr><td colSpan={6} className="p-8 text-center">No past orders found.</td></tr>
+                                            <tr><td colSpan={7} className="p-8 text-center text-gray-400">No past orders found.</td></tr>
                                         ) : (
                                             pastOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(order => (
-                                                <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                                                    <td className="p-4 font-mono text-white">#{order.id.slice(0, 6)}</td>
+                                                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="p-4 font-mono text-gray-900">#{order.id.slice(0, 6)}</td>
                                                     <td className="p-4">{new Date(order.createdAt).toLocaleString()}</td>
                                                     <td className="p-4">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</td>
                                                     <td className="p-4">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
@@ -463,12 +468,12 @@ export default function AdminDashboard() {
                         <motion.div
                             key="media"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                            className="bg-neutral-800 rounded-xl border border-white/5 p-6"
+                            className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm"
                         >
                             <div className="flex justify-between items-center mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-white">Media Gallery</h2>
-                                    <p className="text-gray-400 text-sm">Upload and manage photos for your menu and updates.</p>
+                                    <h2 className="text-2xl font-bold text-gray-900">Media Gallery</h2>
+                                    <p className="text-gray-500 text-sm">Upload and manage photos for your menu and updates.</p>
                                 </div>
                                 <button
                                     onClick={async () => {
@@ -500,13 +505,13 @@ export default function AdminDashboard() {
 
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {useStore.getState().media?.length === 0 ? (
-                                    <div className="col-span-full py-20 text-center border-2 border-dashed border-white/10 rounded-xl">
+                                    <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-300 rounded-xl">
                                         <p className="text-gray-500 mb-2">No photos in gallery yet.</p>
                                         <p className="text-xs text-gray-600">Upload photos to use them in your app.</p>
                                     </div>
                                 ) : (
                                     useStore.getState().media?.map((item) => (
-                                        <div key={item.id} className="group relative bg-black/20 rounded-lg overflow-hidden border border-white/5 aspect-square">
+                                        <div key={item.id} className="group relative bg-gray-50 rounded-lg overflow-hidden border border-gray-200 aspect-square">
                                             <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
                                                 <button
@@ -538,9 +543,9 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Local Gallery (Restored) */}
-                            <div className="bg-neutral-900 rounded-xl p-6 border border-white/5 mt-8">
+                            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mt-8">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-lg font-bold text-white">Local Gallery ({localGallery.length} files)</h3>
+                                    <h3 className="text-lg font-bold text-gray-900">Local Gallery ({localGallery.length} files)</h3>
                                     <span className="text-xs text-gray-500">Available in public folders</span>
                                 </div>
 
@@ -551,8 +556,8 @@ export default function AdminDashboard() {
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                         {localGallery.map((file, idx) => (
-                                            <div key={idx} className="bg-black/40 rounded-lg border border-white/5 overflow-hidden group relative">
-                                                <div className="aspect-square bg-neutral-900 relative">
+                                            <div key={idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden group relative">
+                                                <div className="aspect-square bg-gray-100 relative">
                                                     <img
                                                         src={file.path}
                                                         alt={file.name}
@@ -571,8 +576,8 @@ export default function AdminDashboard() {
                                                     </div>
                                                 </div>
                                                 <div className="p-2">
-                                                    <p className="text-[10px] text-gray-400 truncate" title={file.name}>{file.name}</p>
-                                                    <p className="text-[9px] text-gray-600">{(file.size / 1024).toFixed(1)} KB</p>
+                                                    <p className="text-[10px] text-gray-900 truncate" title={file.name}>{file.name}</p>
+                                                    <p className="text-[9px] text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -683,8 +688,8 @@ export default function AdminDashboard() {
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {localGallery.map((file, idx) => (
-                                            <div key={idx} className="bg-black/40 rounded-lg border border-white/5 overflow-hidden group relative">
-                                                <div className="aspect-square bg-neutral-900 relative">
+                                            <div key={idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden group relative">
+                                                <div className="aspect-square bg-gray-100 relative">
                                                     <img
                                                         src={file.path}
                                                         alt={file.name}
@@ -728,9 +733,9 @@ export default function AdminDashboard() {
                             className="space-y-12"
                         >
                             {/* App Sharing & QR */}
-                            <div className="bg-gradient-to-br from-tashi-accent/20 to-black/40 border border-tashi-accent/30 rounded-2xl p-8">
+                            <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
                                 <div className="flex flex-col md:flex-row gap-8 items-center">
-                                    <div className="bg-white p-4 rounded-xl shadow-2xl shadow-tashi-accent/10">
+                                    <div className="bg-white p-4 rounded-xl shadow-lg shadow-orange-100 border border-orange-100">
                                         <QRCodeSVG
                                             value="https://tashizomcafe.in"
                                             size={200}
@@ -741,8 +746,8 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="flex-1 text-center md:text-left space-y-4">
                                         <div>
-                                            <h2 className="text-3xl font-bold text-white mb-2">Share TashiZom App</h2>
-                                            <p className="text-gray-300">
+                                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Share TashiZom App</h2>
+                                            <p className="text-gray-600">
                                                 Scan to open the home page immediately. Share this link with guests to let them access the menu from anywhere.
                                             </p>
                                         </div>
@@ -766,7 +771,7 @@ export default function AdminDashboard() {
                                                         alert('Link copied to clipboard!');
                                                     }
                                                 }}
-                                                className="bg-tashi-accent hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95"
+                                                className="bg-tashi-accent hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shadow-md shadow-yellow-500/20"
                                             >
                                                 <Share2 size={20} />
                                                 Share App Link
@@ -797,24 +802,101 @@ export default function AdminDashboard() {
                                                         img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
                                                     }
                                                 }}
-                                                className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 border border-white/20"
+                                                className="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl flex items-center gap-2 border border-gray-200 shadow-sm"
                                             >
                                                 <Download size={20} />
                                                 Download QR
                                             </button>
                                         </div>
-                                        <p className="text-xs text-tashi-accent/60 font-mono">https://tashizomcafe.in</p>
+                                        <p className="text-xs text-orange-500 font-mono">https://tashizomcafe.in</p>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Menu Appearance Settings (New) */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                            <span className="p-2 bg-purple-100 rounded-lg text-purple-600"><Pencil size={20} /></span>
+                                            Menu Appearance
+                                        </h2>
+                                        <p className="text-gray-500 text-sm mt-1">Customize fonts and colors for your customer menu.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Category Headers */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Category Headers</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Font Size</label>
+                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none">
+                                                <option>Normal (1rem)</option>
+                                                <option>Large (1.25rem)</option>
+                                                <option>Extra Large (1.5rem)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Text Color</label>
+                                            <div className="flex gap-2 items-center">
+                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#ffffff" />
+                                                <span className="text-xs text-gray-500">#FFFFFF</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Item Titles */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Item Names</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Font Size</label>
+                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none">
+                                                <option>Compact (0.9rem)</option>
+                                                <option selected>Standard (1rem)</option>
+                                                <option>Large (1.1rem)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Text Color</label>
+                                            <div className="flex gap-2 items-center">
+                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#e5e5e5" />
+                                                <span className="text-xs text-gray-500">#E5E5E5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price & Accent */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Accents & Prices</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Accent Color</label>
+                                            <div className="flex gap-2 items-center">
+                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#DAA520" />
+                                                <span className="text-xs text-gray-500">#DAA520</span>
+                                            </div>
+                                        </div>
+                                        <div className="pt-2">
+                                            <button className="w-full bg-white hover:bg-gray-100 text-xs font-bold py-2 rounded text-gray-600 border border-gray-300 transition-colors">
+                                                Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <button className="bg-tashi-primary text-white text-sm font-bold px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                                        Save Appearance
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Valley Updates Management */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <h2 className="text-xl font-bold text-white mb-6">Valley Updates</h2>
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Valley Updates</h2>
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {(valleyUpdates || []).map((update, idx) => (
-                                            <div key={idx} className="bg-black/20 p-4 rounded-xl border border-white/5 relative group">
+                                            <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-200 relative group">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <input
                                                         defaultValue={update.title}
@@ -823,14 +905,14 @@ export default function AdminDashboard() {
                                                             newUpdates[idx].title = e.target.value;
                                                             useStore.getState().saveValleyUpdates(newUpdates);
                                                         }}
-                                                        className="bg-transparent text-white font-bold text-sm w-full focus:outline-none focus:border-b border-tashi-accent"
+                                                        className="bg-transparent text-gray-900 font-bold text-sm w-full focus:outline-none focus:border-b border-tashi-accent"
                                                     />
                                                     <button
                                                         onClick={() => {
                                                             const newUpdates = useStore.getState().valleyUpdates.filter((_, i) => i !== idx);
                                                             useStore.getState().saveValleyUpdates(newUpdates);
                                                         }}
-                                                        className="text-red-500 hover:text-white p-1"
+                                                        className="text-gray-400 hover:text-red-500 p-1"
                                                     >
                                                         <Trash size={16} />
                                                     </button>
@@ -843,7 +925,7 @@ export default function AdminDashboard() {
                                                             newUpdates[idx].statusColor = e.target.value;
                                                             useStore.getState().saveValleyUpdates(newUpdates);
                                                         }}
-                                                        className="bg-white/5 text-xs text-gray-300 rounded p-1 border border-white/10"
+                                                        className="bg-white text-xs text-gray-600 rounded p-1 border border-gray-300"
                                                     >
                                                         <option value="green">Green (Good)</option>
                                                         <option value="blue">Blue (Info)</option>
@@ -856,7 +938,7 @@ export default function AdminDashboard() {
                                                             newUpdates[idx].status = e.target.value;
                                                             useStore.getState().saveValleyUpdates(newUpdates);
                                                         }}
-                                                        className="bg-transparent text-xs text-gray-400 w-full focus:outline-none focus:border-b border-tashi-accent text-right"
+                                                        className="bg-transparent text-xs text-gray-500 w-full focus:outline-none focus:border-b border-tashi-accent text-right"
                                                     />
                                                 </div>
                                                 <textarea
@@ -866,10 +948,10 @@ export default function AdminDashboard() {
                                                         newUpdates[idx].description = e.target.value;
                                                         useStore.getState().saveValleyUpdates(newUpdates);
                                                     }}
-                                                    className="w-full bg-transparent text-xs text-gray-500 focus:outline-none border border-transparent focus:border-white/10 rounded p-1 resize-none h-16"
+                                                    className="w-full bg-transparent text-xs text-gray-600 focus:outline-none border border-transparent focus:border-gray-300 rounded p-1 resize-none h-16"
                                                 />
                                                 {/* Media Inputs */}
-                                                <div className="flex gap-2 items-center border-t border-white/5 pt-2">
+                                                <div className="flex gap-2 items-center border-t border-gray-200 pt-2">
                                                     <select
                                                         defaultValue={update.mediaType || 'image'}
                                                         onChange={(e) => {
@@ -877,7 +959,7 @@ export default function AdminDashboard() {
                                                             newUpdates[idx].mediaType = e.target.value as any;
                                                             useStore.getState().saveValleyUpdates(newUpdates);
                                                         }}
-                                                        className="bg-white/5 text-[10px] text-gray-400 rounded p-1 border border-white/10 w-20"
+                                                        className="bg-white text-[10px] text-gray-600 rounded p-1 border border-gray-300 w-20"
                                                     >
                                                         <option value="image">Image</option>
                                                         <option value="video">Video</option>
@@ -891,13 +973,13 @@ export default function AdminDashboard() {
                                                                 newUpdates[idx].mediaUrl = e.target.value;
                                                                 useStore.getState().saveValleyUpdates(newUpdates);
                                                             }}
-                                                            className="bg-transparent text-[10px] text-blue-400 w-full focus:outline-none focus:border-b border-blue-500"
+                                                            className="bg-transparent text-[10px] text-blue-600 w-full focus:outline-none focus:border-b border-blue-300"
                                                         />
                                                     </div>
                                                 </div>
                                                 {/* Media Preview */}
                                                 {update.mediaUrl && (
-                                                    <div className="w-full h-32 rounded bg-black flex items-center justify-center overflow-hidden">
+                                                    <div className="w-full h-32 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 mt-2">
                                                         {update.mediaType === 'video' ? (
                                                             <video src={update.mediaUrl} controls className="h-full max-w-full" />
                                                         ) : (
@@ -909,6 +991,7 @@ export default function AdminDashboard() {
                                         ))}
 
                                         {/* Add New Button */}
+
                                         <button
                                             onClick={() => {
                                                 const currentUpdates = useStore.getState().valleyUpdates || [];
@@ -923,9 +1006,9 @@ export default function AdminDashboard() {
                                                 };
                                                 useStore.getState().saveValleyUpdates([...currentUpdates, newUpdate]);
                                             }}
-                                            className="bg-white/5 hover:bg-white/10 border border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-white transition-colors min-h-[160px]"
+                                            className="bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-gray-500 hover:text-gray-900 transition-colors min-h-[160px]"
                                         >
-                                            <div className="p-2 bg-white/5 rounded-full"><Plus size={20} /></div>
+                                            <div className="p-2 bg-white rounded-full"><Plus size={20} /></div>
                                             <span className="text-sm font-bold">Add Update</span>
                                         </button>
                                     </div>
@@ -935,11 +1018,12 @@ export default function AdminDashboard() {
 
 
                             {/* Geo Settings */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <h2 className="text-xl font-bold text-white mb-6">Geo-Restriction Settings</h2>
-                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 flex flex-col md:flex-row gap-6 items-center">
+                            {/* Geo Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Geo-Restriction Settings</h2>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
                                     <div className="flex-1">
-                                        <label className="block text-sm font-bold text-gray-400 mb-2">Allowed Radius (km)</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Allowed Radius (km)</label>
                                         <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to place orders.</p>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -948,9 +1032,9 @@ export default function AdminDashboard() {
                                                 id="geo-radius-input"
                                                 type="number"
                                                 defaultValue={useStore.getState().geoRadius || 5}
-                                                className="bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
+                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
                                             />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">km</span>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">km</span>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -974,12 +1058,13 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Contact Settings */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                                <h2 className="text-xl font-bold text-white mb-6">Contact Information</h2>
-                                <p className="text-sm text-gray-400 mb-6">Update your restaurant contact details that appear in the customer menu.</p>
-                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
+                            {/* Contact Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
+                                <p className="text-sm text-gray-500 mb-6">Update your restaurant contact details that appear in the customer menu.</p>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-400 mb-2">Phone Number</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Phone Number</label>
                                         <input
                                             type="tel"
                                             defaultValue={useStore.getState().contactInfo.phone}
@@ -993,11 +1078,11 @@ export default function AdminDashboard() {
                                                 }
                                             }}
                                             placeholder="+91 98765 43210"
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-400 mb-2">Owner Phone (Alternate)</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Owner Phone (Alternate)</label>
                                         <input
                                             type="tel"
                                             defaultValue={useStore.getState().contactInfo.secondaryPhone}
@@ -1010,11 +1095,11 @@ export default function AdminDashboard() {
                                                 });
                                             }}
                                             placeholder="+91 98765 43210"
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-400 mb-2">WhatsApp Number</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">WhatsApp Number</label>
                                         <input
                                             type="tel"
                                             defaultValue={useStore.getState().contactInfo.whatsapp}
@@ -1028,12 +1113,12 @@ export default function AdminDashboard() {
                                                 }
                                             }}
                                             placeholder="+91 98765 43210"
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +91 for India)</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-400 mb-2">Google Maps Location</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Google Maps Location</label>
                                         <input
                                             type="text"
                                             defaultValue={useStore.getState().contactInfo.mapsLocation}
@@ -1047,7 +1132,7 @@ export default function AdminDashboard() {
                                                 }
                                             }}
                                             placeholder="TashiZom+Resort or Coordinates"
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-tashi-accent"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">Enter your business name or exact location (use + for spaces)</p>
                                     </div>
@@ -1055,17 +1140,18 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Table Management */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
+                            {/* Table Management */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-white">Table Management</h2>
+                                    <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
                                     <button
                                         onClick={handlePrintAllQRs}
-                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm"
+                                        className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition-colors text-xs sm:text-sm"
                                     >
                                         <Printer size={16} /> Print All QRs (A4)
                                     </button>
                                 </div>
-                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
                                     <form
                                         onSubmit={async (e) => {
                                             e.preventDefault();
@@ -1088,7 +1174,7 @@ export default function AdminDashboard() {
                                             name="tableName"
                                             required
                                             placeholder="New Table Name (e.g. Roof Top 1)"
-                                            className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-tashi-accent"
+                                            className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-tashi-accent"
                                         />
                                         <button type="submit" className="bg-tashi-accent text-tashi-dark font-bold px-6 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
                                             Add
@@ -1097,11 +1183,11 @@ export default function AdminDashboard() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
                                     {tables.map((table) => (
-                                        <div key={table.id} className="bg-neutral-800 p-4 rounded-xl border border-white/5 flex flex-col gap-4 group">
+                                        <div key={table.id} className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col gap-4 group shadow-sm hover:border-gray-300">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-white font-medium">{table.name}</span>
+                                                <span className="text-gray-900 font-medium">{table.name}</span>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => { const n = prompt('New name:', table.name); if (n) useStore.getState().updateTable(table.id, n); }} className="text-xs bg-white/10 px-2 py-1 rounded hover:bg-white/20">Edit</button>
+                                                    <button onClick={() => { const n = prompt('New name:', table.name); if (n) useStore.getState().updateTable(table.id, n); }} className="text-xs bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200">Edit</button>
                                                     <button onClick={() => { if (confirm('Delete?')) useStore.getState().removeTable(table.id); }} className="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded hover:bg-red-500/20">Del</button>
                                                 </div>
                                             </div>
@@ -1125,9 +1211,10 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Menu Management */}
-                            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
+                            {/* Menu Management */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-white">Menu Management</h2>
+                                    <h2 className="text-xl font-bold text-gray-900">Menu Management</h2>
                                     <button
                                         onClick={() => {
                                             const printWindow = window.open('', '_blank');
@@ -1212,11 +1299,11 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {/* Category Management */}
-                                <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-8">
+                                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Manage Categories</h3>
-                                            <p className="text-xs text-gray-600 mt-1">Categories are created automatically when you add an item to them.</p>
+                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Manage Categories</h3>
+                                            <p className="text-xs text-gray-500 mt-1">Categories are created automatically when you add an item to them.</p>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -1255,8 +1342,8 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
-                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4">Add Item</h3>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
+                                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Add Item</h3>
                                     <form
                                         onSubmit={async (e) => {
                                             e.preventDefault();
@@ -1311,9 +1398,9 @@ export default function AdminDashboard() {
                                         }}
                                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
                                     >
-                                        <input name="name" required placeholder="Name" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                        <input name="price" type="number" required placeholder="Price" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                        <input list="category-list" name="category" required placeholder="Category" className="bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <input name="name" required placeholder="Name" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <input name="price" type="number" required placeholder="Price" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <input list="category-list" name="category" required placeholder="Category" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                         <datalist id="category-list">
                                             {Array.from(new Set(menu.map(i => i.category))).map(c => (
                                                 <option key={c} value={c} />
@@ -1330,14 +1417,14 @@ export default function AdminDashboard() {
                                             <option value="Desserts" />
                                         </datalist>
                                         <div className="flex gap-4 items-center">
-                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
-                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
-                                            <label className="flex items-center gap-2 text-white text-sm"><input name="isChefSpecial" type="checkbox" className="accent-yellow-500" /> Chef's Special</label>
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isChefSpecial" type="checkbox" className="accent-yellow-500" /> Chef's Special</label>
                                         </div>
                                         <div className="md:col-span-3">
                                             <div className="flex gap-2">
-                                                <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -1363,13 +1450,13 @@ export default function AdminDashboard() {
                                             </div>
                                             <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
                                         </div>
-                                        <input name="description" required placeholder="Description" className="md:col-span-4 bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                        <input name="description" required placeholder="Description" className="md:col-span-4 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                         <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
                                     </form>
                                 </div>
 
                                 {/* Search and Filter Section */}
-                                <div className="bg-neutral-900 border border-white/5 rounded-xl p-6 mb-6 space-y-4">
+                                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
                                     {/* Search Bar */}
                                     <div className="relative">
                                         <input
@@ -1377,13 +1464,13 @@ export default function AdminDashboard() {
                                             placeholder="🔍 Search menu items by name..."
                                             value={menuSearchQuery}
                                             onChange={(e) => setMenuSearchQuery(e.target.value)}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-tashi-accent transition-colors"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-tashi-accent transition-colors"
                                         />
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">🔍</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
                                         {menuSearchQuery && (
                                             <button
                                                 onClick={() => setMenuSearchQuery('')}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                             >
                                                 <X size={18} />
                                             </button>
@@ -1398,7 +1485,7 @@ export default function AdminDashboard() {
                                                 onClick={() => setMenuCategoryFilter(cat)}
                                                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
                                                     ? 'bg-tashi-accent text-tashi-dark shadow-lg'
-                                                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                                                    : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
                                                     }`}
                                             >
                                                 {cat}
@@ -1451,16 +1538,16 @@ export default function AdminDashboard() {
 
                                 {/* EDIT ITEM MODAL */}
                                 {editingItem && (
-                                    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                                        <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
                                             <button
                                                 onClick={() => setEditingItem(null)}
-                                                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
                                             >
                                                 <X size={24} />
                                             </button>
 
-                                            <h2 className="text-xl font-bold text-white mb-6">Edit Item</h2>
+                                            <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
 
                                             <form
                                                 onSubmit={async (e) => {
@@ -1487,18 +1574,18 @@ export default function AdminDashboard() {
                                             >
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
-                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
+                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price</label>
-                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
+                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
-                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                                     <datalist id="category-list-edit">
                                                         {Array.from(new Set(menu.map(i => i.category))).map(c => (
                                                             <option key={c} value={c} />
@@ -1507,10 +1594,10 @@ export default function AdminDashboard() {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Image URL</label>
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
                                                     <div className="flex gap-2">
-                                                        <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none" />
-                                                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 flex items-center justify-center transition-colors border border-white/5">
+                                                        <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                        <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
                                                             <input
                                                                 type="file"
                                                                 accept="image/*"
@@ -1614,9 +1701,9 @@ function ReviewsView() {
                 </div>
 
                 {/* Internal Rating Stats */}
-                <div className="bg-white/5 border border-white/5 rounded-3xl p-8 flex flex-col justify-center items-center">
-                    <h3 className="text-gray-400 font-medium uppercase tracking-widest mb-2">In-App Customer Rating</h3>
-                    <div className="text-7xl font-bold text-white mb-2">{averageRating}</div>
+                <div className="bg-white border border-gray-200 rounded-3xl p-8 flex flex-col justify-center items-center shadow-sm">
+                    <h3 className="text-gray-500 font-medium uppercase tracking-widest mb-2">In-App Customer Rating</h3>
+                    <div className="text-7xl font-bold text-gray-900 mb-2">{averageRating}</div>
                     <div className="flex gap-1 text-yellow-400 mb-4">
                         {[1, 2, 3, 4, 5].map((s) => (
                             <Star key={s} size={24} fill={s <= Math.round(Number(averageRating)) ? "currentColor" : "none"} strokeWidth={s <= Math.round(Number(averageRating)) ? 0 : 2} />
@@ -1626,8 +1713,8 @@ function ReviewsView() {
                 </div>
             </div>
 
-            <div className="bg-white/5 border border-white/5 rounded-3xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">Recent Feedback</h3>
+            <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Recent Feedback</h3>
                 {reviews.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                         No in-app reviews yet.
@@ -1635,10 +1722,10 @@ function ReviewsView() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {reviews.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((review) => (
-                            <div key={review.id} className="bg-neutral-800 p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                            <div key={review.id} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-gray-300 transition-colors">
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h4 className="font-bold text-white">{review.customerName}</h4>
+                                        <h4 className="font-bold text-gray-900">{review.customerName}</h4>
                                         <p className="text-xs text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</p>
                                     </div>
                                     <div className="flex gap-0.5 text-yellow-400">
@@ -1647,7 +1734,7 @@ function ReviewsView() {
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-gray-300 text-sm leading-relaxed">"{review.comment}"</p>
+                                <p className="text-gray-600 text-sm leading-relaxed">"{review.comment}"</p>
                             </div>
                         ))}
                     </div>
@@ -1657,28 +1744,17 @@ function ReviewsView() {
     );
 }
 
-function TabButton({ active, label, icon, onClick }: any) {
-    return (
-        <button
-            onClick={onClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${active ? 'bg-white text-black font-bold shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-        >
-            {icon}
-            <span className="hidden sm:inline">{label}</span>
-        </button>
-    );
-}
+
 
 function StatCard({ title, value, icon, subtext }: any) {
     return (
-        <div className="bg-neutral-800 p-6 rounded-2xl border border-white/5 flex items-center justify-between hover:border-white/10 transition-colors">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200 flex items-center justify-between hover:border-gray-300 transition-colors shadow-sm">
             <div>
-                <p className="text-gray-400 text-sm mb-1">{title}</p>
-                <h3 className="text-3xl font-bold text-white">{value}</h3>
-                {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
+                <p className="text-gray-500 text-sm mb-1">{title}</p>
+                <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+                {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
             </div>
-            <div className="p-3 bg-white/5 rounded-xl">
+            <div className="p-3 bg-gray-100 rounded-xl">
                 {icon}
             </div>
         </div>
@@ -1714,21 +1790,21 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">Top Selling Items</h3>
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Top Selling Items</h3>
                 <div className="space-y-4">
                     {topItems.map(([name, count], idx) => (
                         <div key={name} className="flex items-center gap-4">
-                            <div className="w-8 h-8 rounded-full bg-tashi-accent font-bold text-tashi-dark flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-tashi-primary text-white font-bold flex items-center justify-center">
                                 {idx + 1}
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-white font-medium">{name}</span>
-                                    <span className="text-gray-400 text-sm">{count} sold</span>
+                                    <span className="text-gray-900 font-medium">{name}</span>
+                                    <span className="text-gray-500 text-sm">{count} sold</span>
                                 </div>
-                                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                                    <div className="h-full bg-tashi-accent" style={{ width: `${(count / topItems[0][1]) * 100}%` }} />
+                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="h-full bg-tashi-primary" style={{ width: `${(count / topItems[0][1]) * 100}%` }} />
                                 </div>
                             </div>
                         </div>
@@ -1737,8 +1813,8 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
                 </div>
             </div>
 
-            <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">Revenue / Hour</h3>
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Revenue / Hour</h3>
                 <div className="flex items-end justify-between h-48 gap-2">
                     {hours.map((val, idx) => {
                         const max = Math.max(...hours, 1);
@@ -1750,8 +1826,8 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
                                     className="w-full bg-blue-500/50 hover:bg-blue-500 transition-all rounded-t"
                                     style={{ height: `${height}%` }}
                                 />
-                                <span className="text-[10px] text-gray-500 font-mono">{idx}h</span>
-                                <div className="opacity-0 group-hover:opacity-100 absolute -mt-8 bg-black text-white text-xs px-2 py-1 rounded pointer-events-none">
+                                <span className="text-[10px] text-gray-400 font-mono">{idx}h</span>
+                                <div className="opacity-0 group-hover:opacity-100 absolute -mt-8 bg-gray-900 text-white text-xs px-2 py-1 rounded pointer-events-none">
                                     ₹{val}
                                 </div>
                             </div>
@@ -1760,24 +1836,24 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
                 </div>
             </div>
 
-            <div className="md:col-span-2 bg-white/5 border border-white/5 rounded-2xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">Recent Customer Feedback</h3>
+            <div className="md:col-span-2 bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Recent Customer Feedback</h3>
                 {useStore.getState().reviews.length === 0 ? (
                     <p className="text-gray-500 italic">No reviews yet.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {useStore.getState().reviews.slice(0, 6).map((review) => (
-                            <div key={review.id} className="bg-neutral-800 p-4 rounded-xl border border-white/5">
+                            <div key={review.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="font-bold text-white">{review.customerName}</span>
+                                    <span className="font-bold text-gray-900">{review.customerName}</span>
                                     <div className="flex text-yellow-500">
                                         {[...Array(5)].map((_, i) => (
                                             <svg key={i} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={i < review.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-gray-400 text-sm italic">"{review.comment}"</p>
-                                <p className="text-xs text-gray-600 mt-2 text-right">{new Date(review.createdAt).toLocaleDateString()}</p>
+                                <p className="text-gray-500 text-sm italic">"{review.comment}"</p>
+                                <p className="text-xs text-gray-400 mt-2 text-right">{new Date(review.createdAt).toLocaleDateString()}</p>
                             </div>
                         ))}
                     </div>
@@ -2115,21 +2191,21 @@ function AdminOrderCard({ order }: { order: any }) {
     const updateOrderStatus = useStore((state) => state.updateOrderStatus);
 
     return (
-        <div className="bg-neutral-800 p-4 rounded-xl border border-white/5">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between mb-2">
                 <div>
-                    <h4 className="font-bold text-white text-lg">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</h4>
+                    <h4 className="font-bold text-gray-900 text-lg">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</h4>
                     {(order.customerName || order.customerPhone) && (
-                        <p className="text-xs text-tashi-accent font-mono">
+                        <p className="text-xs text-tashi-primary font-mono">
                             {order.customerName} {order.customerPhone && `• ${order.customerPhone}`}
                         </p>
                     )}
                 </div>
                 <StatusBadge status={order.status} />
             </div>
-            <div className="space-y-1 mb-4 border-t border-white/5 pt-2 mt-2">
+            <div className="space-y-1 mb-4 border-t border-gray-100 pt-2 mt-2">
                 {order.items.map((item: any, idx: number) => (
-                    <div key={idx} className="flex justify-between text-gray-300 text-sm">
+                    <div key={idx} className="flex justify-between text-gray-600 text-sm">
                         <span>{item.quantity}x {item.name}</span>
                         <span>₹{item.price * item.quantity}</span>
                     </div>
@@ -2239,14 +2315,14 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center justify-between bg-neutral-800 p-3 rounded-lg border ${isDragging ? 'border-tashi-accent shadow-lg shadow-tashi-accent/20' : 'border-white/5 hover:border-white/10'
+            className={`flex items-center justify-between bg-white p-3 rounded-lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'
                 }`}
         >
             {/* Drag Handle */}
             <div
                 {...attributes}
                 {...listeners}
-                className="cursor-grab active:cursor-grabbing text-gray-500 hover:text-white p-2 -ml-2"
+                className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-700 p-2 -ml-2"
                 title="Drag to reorder"
             >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -2264,7 +2340,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 {item.image && <img src={item.image} className="w-10 h-10 rounded object-cover" />}
                 <div>
                     <div className="flex items-center gap-2">
-                        <p className="font-bold text-white">{item.name}</p>
+                        <p className="font-bold text-gray-900">{item.name}</p>
                         <span className={`w-2 h-2 rounded-full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'}`} />
                         {item.isVegetarian ? <Leaf size={12} className="text-green-500" /> : <Drumstick size={12} className="text-red-500" />}
                     </div>
@@ -2294,7 +2370,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 >
                     <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
                 </button>
-                <button onClick={() => onEdit(item)} className="text-blue-400 hover:text-white hover:bg-blue-500/20 p-2 rounded transition-colors">
+                <button onClick={() => onEdit(item)} className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded transition-colors">
                     <Pencil size={16} />
                 </button>
                 <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors">
@@ -2324,43 +2400,43 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
-            <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-4xl p-6 shadow-2xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+            <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-4xl p-6 shadow-2xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Users className="text-blue-400" /> Vistor Analytics
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <Users className="text-blue-500" /> Visitor Analytics
                     </h2>
-                    <button onClick={onClose} className="bg-white/10 hover:bg-white/20 p-2 rounded-full text-white transition-colors">
+                    <button onClick={onClose} className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-600 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
-                    <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                        <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Total Visits</p>
-                        <p className="text-3xl font-bold text-white mt-1">{totalScans}</p>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
+                        <p className="text-3xl font-bold text-gray-900 mt-1">{totalScans}</p>
                     </div>
-                    <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                        <p className="text-xs text-blue-300 uppercase tracking-wider font-bold">App / Web</p>
-                        <p className="text-3xl font-bold text-blue-400 mt-1">{appScans}</p>
+                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <p className="text-xs text-blue-600 uppercase tracking-wider font-bold">App / Web</p>
+                        <p className="text-3xl font-bold text-blue-600 mt-1">{appScans}</p>
                     </div>
-                    <div className="bg-green-500/10 p-4 rounded-xl border border-green-500/20">
-                        <p className="text-xs text-green-300 uppercase tracking-wider font-bold">Table QR</p>
-                        <p className="text-3xl font-bold text-green-400 mt-1">{tableScans}</p>
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                        <p className="text-xs text-green-600 uppercase tracking-wider font-bold">Table QR</p>
+                        <p className="text-3xl font-bold text-green-600 mt-1">{tableScans}</p>
                     </div>
-                    <div className="bg-purple-500/10 p-4 rounded-xl border border-purple-500/20">
-                        <p className="text-xs text-purple-300 uppercase tracking-wider font-bold">Unique Visitors</p>
-                        <p className="text-3xl font-bold text-purple-400 mt-1">{uniqueUsers}</p>
+                    <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                        <p className="text-xs text-purple-600 uppercase tracking-wider font-bold">Unique Visitors</p>
+                        <p className="text-3xl font-bold text-purple-600 mt-1">{uniqueUsers}</p>
                     </div>
                 </div>
 
-                <div className="bg-black/40 rounded-xl border border-white/5 flex-1 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-white/10 shrink-0">
-                        <h3 className="text-sm font-bold text-gray-300 uppercase">Detailed Visitor Log</h3>
+                <div className="bg-white rounded-xl border border-gray-200 flex-1 overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-gray-200 shrink-0 bg-gray-50">
+                        <h3 className="text-sm font-bold text-gray-700 uppercase">Detailed Visitor Log</h3>
                     </div>
                     <div className="overflow-auto flex-1 p-4">
-                        <table className="w-full text-left text-sm text-gray-400">
-                            <thead className="text-xs text-gray-500 uppercase border-b border-white/10 bg-neutral-900 sticky top-0 z-10">
+                        <table className="w-full text-left text-sm text-gray-600">
+                            <thead className="text-xs text-gray-500 uppercase border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
                                 <tr>
                                     <th className="pb-3 pl-2">Time</th>
                                     <th className="pb-3">Type</th>
@@ -2368,26 +2444,26 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                     <th className="pb-3">Location / Table</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-gray-100">
                                 {stats.length === 0 ? (
-                                    <tr><td colSpan={4} className="py-8 text-center">No visits recorded yet.</td></tr>
+                                    <tr><td colSpan={4} className="py-8 text-center text-gray-500">No visits recorded yet.</td></tr>
                                 ) : (
                                     [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 100).map((scan, idx) => (
-                                        <tr key={idx} className="hover:bg-white/5 transition-colors">
-                                            <td className="py-3 pl-2 text-white/80 font-mono text-xs whitespace-nowrap">
+                                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                            <td className="py-3 pl-2 text-gray-900 font-mono text-xs whitespace-nowrap">
                                                 {new Date(scan.timestamp).toLocaleString()}
                                             </td>
                                             <td className="py-3">
-                                                <span className={`text-[10px] font-bold px-2 py-1 rounded border ${scan.type === 'table_qr' ? 'bg-green-900/40 text-green-400 border-green-500/30' : 'bg-blue-900/40 text-blue-400 border-blue-500/30'}`}>
+                                                <span className={`text-[10px] font-bold px-2 py-1 rounded border ${scan.type === 'table_qr' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-blue-100 text-blue-700 border-blue-200'}`}>
                                                     {scan.type === 'table_qr' ? 'TABLE SCAN' : 'WEB VISIT'}
                                                 </span>
                                             </td>
-                                            <td className="py-3 text-white">
+                                            <td className="py-3 text-gray-700">
                                                 <div className="flex items-center gap-2">
                                                     {getDeviceInfo(scan.userAgent)}
                                                 </div>
                                             </td>
-                                            <td className="py-3 font-mono text-xs text-tashi-accent">
+                                            <td className="py-3 font-mono text-xs text-tashi-primary">
                                                 {scan.tableId ? `Table ${scan.tableId}` : (scan.path || 'Remote')}
                                             </td>
                                         </tr>
@@ -2453,8 +2529,8 @@ function SortableCategoryItem({ category }: { category: string }) {
     const menu = useStore((state) => state.menu);
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="group bg-neutral-800 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-3 cursor-grab active:cursor-grabbing hover:bg-neutral-700 transition-colors select-none">
-            <span className="text-white font-bold text-sm">{category}</span>
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="group bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-3 cursor-grab active:cursor-grabbing hover:bg-gray-50 transition-colors select-none shadow-sm">
+            <span className="text-gray-900 font-bold text-sm">{category}</span>
             <button
                 onPointerDown={(e) => e.stopPropagation()} // Prevent drag
                 onClick={async (e) => {
@@ -2470,10 +2546,42 @@ function SortableCategoryItem({ category }: { category: string }) {
                         alert('Categories updated!');
                     }
                 }}
-                className="text-xs text-blue-400 hover:text-white px-2 py-1 bg-blue-500/10 hover:bg-blue-500 rounded transition-colors"
+                className="text-xs text-blue-600 hover:text-blue-700 px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded transition-colors"
             >
                 Rename
             </button>
         </div>
+    );
+}
+
+function TabButton({ active, label, icon, onClick }: { active: boolean; label: string; icon: React.ReactNode; onClick: () => void }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${active
+                ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+        >
+            {icon}
+            <span>{label}</span>
+        </button>
+    );
+}
+
+function MobileTabButton({ active, label, icon, onClick }: { active: boolean; label: string; icon: React.ReactNode; onClick: () => void }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`flex flex-col items-center justify-center py-2 rounded-lg transition-all ${active
+                ? 'text-tashi-primary'
+                : 'text-gray-400 hover:text-gray-600'
+                }`}
+        >
+            <div className={`p-1 rounded-full ${active ? 'bg-tashi-primary/10' : ''}`}>
+                {icon}
+            </div>
+            <span className="text-[10px] font-bold mt-1">{label}</span>
+        </button>
     );
 }

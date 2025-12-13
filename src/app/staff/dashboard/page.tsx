@@ -7,15 +7,15 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 export default function StaffDashboard() {
-    const orders = useStore(state => state.orders);
-    const updateOrderStatus = useStore(state => state.updateOrderStatus);
-    const notifications = useStore(state => state.notifications);
-    const resolveNotification = useStore(state => state.resolveNotification);
+    const orders = useStore((state: any) => state.orders);
+    const updateOrderStatus = useStore((state: any) => state.updateOrderStatus);
+    const notifications = useStore((state: any) => state.notifications);
+    const resolveNotification = useStore((state: any) => state.resolveNotification);
 
     // Auth
-    const currentUser = useStore(state => state.currentUser);
-    const login = useStore(state => state.login);
-    const logout = useStore(state => state.logout);
+    const currentUser = useStore((state: any) => state.currentUser);
+    const login = useStore((state: any) => state.login);
+    const logout = useStore((state: any) => state.logout);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -33,20 +33,21 @@ export default function StaffDashboard() {
     const isFirstMount = useRef(true);
 
     // Derived data
-    const activeOrders = [...(orders || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Derived data
+    const activeOrders = [...(orders || [])].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const today = new Date().toDateString();
-    const todaysOrders = (orders || []).filter(o => new Date(o.createdAt).toDateString() === today);
+    const todaysOrders = (orders || []).filter((o: any) => new Date(o.createdAt).toDateString() === today);
 
     // Stats
-    const newOrders = activeOrders.filter(o => o.status === 'Pending');
-    const preparingOrders = activeOrders.filter(o => o.status === 'Preparing');
-    const readyOrders = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Served');
+    const newOrders = activeOrders.filter((o: any) => o.status === 'Pending');
+    const preparingOrders = activeOrders.filter((o: any) => o.status === 'Preparing');
+    const readyOrders = activeOrders.filter((o: any) => o.status === 'Ready' || o.status === 'Served');
 
     // Active Service Requests
-    const activeNotifications = (notifications || []).filter(n => n.status === 'pending');
+    const activeNotifications = (notifications || []).filter((n: any) => n.status === 'pending');
 
     // Filter orders based on active tab
-    const filteredOrders = activeOrders.filter(o => {
+    const filteredOrders = activeOrders.filter((o: any) => {
         if (activeFilter === 'new') return o.status === 'Pending';
         if (activeFilter === 'preparing') return o.status === 'Preparing';
         if (activeFilter === 'ready') return o.status === 'Ready';
@@ -55,7 +56,7 @@ export default function StaffDashboard() {
 
     // Calculate average preparation time
     const avgPrepTime = preparingOrders.length > 0
-        ? Math.round(preparingOrders.reduce((sum, order) => {
+        ? Math.round(preparingOrders.reduce((sum: number, order: any) => {
             const elapsed = (Date.now() - new Date(order.createdAt).getTime()) / 60000;
             return sum + elapsed;
         }, 0) / preparingOrders.length)
@@ -256,8 +257,8 @@ export default function StaffDashboard() {
                 <AnimatePresence>
                     {activeNotifications.length > 0 && (
                         <div className="mb-6 space-y-2">
-                            {activeNotifications.map(notification => {
-                                const table = useStore.getState().tables.find(t => t.id === notification.tableId);
+                            {activeNotifications.map((notification: any) => {
+                                const table = useStore.getState().tables.find((t: any) => t.id === notification.tableId);
                                 const tableName = table ? table.name : 'Unknown Table';
                                 return (
                                     <motion.div
@@ -397,7 +398,7 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
     isPreparing: boolean;
     isReady: boolean;
 }) {
-    const tables = useStore(state => state.tables);
+    const tables = useStore((state: any) => state.tables);
 
     const getElapsedTime = () => {
         const now = Date.now();
@@ -408,7 +409,7 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
     };
 
     // Find if this tableId matches an actual table
-    const matchedTable = tables.find(t => t.id === order.tableId || t.name === order.tableId);
+    const matchedTable = tables.find((t: any) => t.id === order.tableId || t.name === order.tableId);
     const isTableOrder = !!matchedTable;
     const isRemoteOrder = !isTableOrder || order.tableId === 'Remote' || order.tableId === 'REQUEST';
 
@@ -483,7 +484,7 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
 
             {/* Items */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 p-4 bg-gray-50 rounded-xl">
-                {order.items.map((item, idx) => (
+                {order.items.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center gap-2">
                         <span className="flex items-center justify-center w-7 h-7 bg-orange-500 text-white rounded text-sm font-bold">
                             {item.quantity}x
