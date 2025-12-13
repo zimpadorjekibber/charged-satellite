@@ -72,6 +72,8 @@ export interface Notification {
     type: 'call_staff' | 'bill_request';
     status: 'pending' | 'resolved';
     createdAt: string;
+    customerName?: string;
+    customerPhone?: string;
 }
 
 export interface Review {
@@ -151,7 +153,7 @@ interface AppState {
     updateOrderTable: (orderId: string, tableId: string) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
 
-    addNotification: (tableId: string, type: 'call_staff' | 'bill_request') => void;
+    addNotification: (tableId: string, type: 'call_staff' | 'bill_request', details?: { customerName?: string, customerPhone?: string }) => void;
     resolveNotification: (notificationId: string) => void;
     cancelNotification: (tableId: string, type: string) => void;
 
@@ -436,12 +438,14 @@ export const useStore = create<AppState>()(
                 await deleteDoc(doc(db, 'orders', orderId));
             },
 
-            addNotification: async (tableId, type) => {
+            addNotification: async (tableId, type, details) => {
                 await addDoc(collection(db, 'notifications'), {
                     tableId,
                     type,
                     status: 'pending',
                     createdAt: new Date().toISOString(),
+                    customerName: details?.customerName,
+                    customerPhone: details?.customerPhone
                 });
             },
 

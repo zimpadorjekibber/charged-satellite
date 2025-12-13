@@ -279,6 +279,11 @@ export default function StaffDashboard() {
                                                 <p className="font-medium opacity-90">
                                                     {tableName} • {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </p>
+                                                {(notification.customerName || notification.customerPhone) && (
+                                                    <p className="text-xs font-bold mt-1 bg-black/20 inline-block px-2 py-1 rounded">
+                                                        👤 {notification.customerName || 'Guest'} {notification.customerPhone ? `• 📞 ${notification.customerPhone}` : ''}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         <button

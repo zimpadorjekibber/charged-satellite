@@ -265,7 +265,14 @@ export default function MenuPage() {
         if (hasPendingCall) {
             cancelNotification(currentTableId, 'call_staff');
         } else {
-            addNotification(currentTableId, 'call_staff');
+            // Find recent customer details from previous orders
+            const myOrders = orders.filter(o => o.sessionId === sessionId);
+            const lastOrder = myOrders[0]; // Orders are sorted desc
+
+            addNotification(currentTableId, 'call_staff', {
+                customerName: lastOrder?.customerName,
+                customerPhone: lastOrder?.customerPhone
+            });
         }
     };
 
