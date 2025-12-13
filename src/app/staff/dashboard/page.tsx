@@ -446,7 +446,8 @@ export default function StaffDashboard() {
 }
 
 // Helper Functions for KOT and Bill
-const handlePrintKOT = (order: Order) => {
+// Custom KOT Printing Logic (Mobile-friendly, stays on screen)
+const handlePrintKOT = (order: any) => {
     const printWindow = window.open('', '_blank', 'width=500,height=800');
     if (!printWindow) return;
 
@@ -668,8 +669,7 @@ const handlePrintKOT = (order: Order) => {
                     <div class="items">
                         ${order.items.map((item: any) => `
                             <div class="item">
-                                <div class="item-qty">${item.quantity}x</div>
-                                <div class="item-name">${item.name}</div>
+                                <div class="item-qty">${item.quantity}x</div><div class="item-name">${item.name}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -697,7 +697,7 @@ const handlePrintKOT = (order: Order) => {
     printWindow.document.close();
 };
 
-const handlePrintBill = (order: Order) => {
+const handlePrintBill = (order: any) => {
     const printWindow = window.open('', '_blank', 'width=500,height=900');
     if (!printWindow) return;
 
@@ -1019,6 +1019,7 @@ const handlePrintBill = (order: Order) => {
     `);
     printWindow.document.close();
 };
+
 
 const handleShareKOT = async (order: Order) => {
     const tables = useStore.getState().tables;
