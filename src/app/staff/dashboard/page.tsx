@@ -369,32 +369,30 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
             <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-2xl font-bold text-gray-900">#{order.id.slice(0, 4)}</h3>
-
                         {/* Show Table Name for table orders */}
                         {isTableOrder && matchedTable && (
-                            <span className="text-lg font-bold px-4 py-1 bg-blue-100 text-blue-700 rounded-full border-2 border-blue-300">
+                            <span className="text-xl font-bold px-4 py-1 bg-blue-100 text-blue-700 rounded-full border-2 border-blue-300">
                                 📍 {matchedTable.name}
                             </span>
                         )}
 
                         {/* Show "Remote Order" badge for non-table orders */}
                         {isRemoteOrder && (
-                            <span className="text-sm font-semibold px-3 py-1 bg-purple-100 text-purple-700 rounded-full border border-purple-300">
+                            <span className="text-lg font-semibold px-4 py-1 bg-purple-100 text-purple-700 rounded-full border border-purple-300">
                                 🚚 Remote Order
                             </span>
                         )}
                     </div>
 
-                    {/* Customer Info Section */}
+                    {/* Customer Info Section - NOW SHOWING FOR ALL ORDERS */}
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <Clock size={14} />
                             <span>{elapsed}m ago</span>
                         </div>
 
-                        {/* For Remote Orders: Show BOTH name and phone */}
-                        {isRemoteOrder && (order.customerName || order.customerPhone) && (
+                        {/* Show customer name and phone for ALL orders */}
+                        {(order.customerName || order.customerPhone) && (
                             <div className="flex flex-col gap-0.5 mt-1 p-2 bg-purple-50 rounded-lg border border-purple-100">
                                 {order.customerName && (
                                     <div className="flex items-center gap-2 text-sm">
