@@ -579,7 +579,7 @@ export default function MenuPage() {
                                     </div>
 
                                     <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                                        <span className="text-3xl font-serif text-tashi-accent">â‚¹{selectedItem.price}</span>
+                                        <span className="text-3xl font-serif text-tashi-accent">&#8377;{selectedItem.price}</span>
 
                                         <div className="flex items-center gap-4">
                                             {getQuantity(selectedItem.id) > 0 && (
@@ -1261,7 +1261,7 @@ function ChefsSpecialSection({
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <span className="text-lg font-serif text-tashi-accent font-bold">₹{currentItem.price}</span>
+                                    <span className="text-lg font-serif text-tashi-accent font-bold">&#8377;{currentItem.price}</span>
 
                                     <div onClick={(e) => e.stopPropagation()}>
                                         {getQuantity(currentItem.id) === 0 ? (
