@@ -2464,6 +2464,11 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                                         <span className="text-[10px] text-gray-500">
                                                             {ipInfo.city ? `${ipInfo.city}, ${ipInfo.region}` : (scan.tableId ? 'Local Scan' : 'N/A')}
                                                         </span>
+                                                        {scan.distanceKm !== undefined && scan.distanceKm !== null && (
+                                                            <span className="text-[9px] font-bold text-indigo-600">
+                                                                ~{scan.distanceKm} km away
+                                                            </span>
+                                                        )}
                                                         {ipInfo.country_name && <span className="text-[9px] text-gray-400 uppercase">{ipInfo.country_name}</span>}
                                                     </div>
                                                 </td>

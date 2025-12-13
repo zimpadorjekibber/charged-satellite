@@ -452,11 +452,33 @@ export const useStore = create<AppState>()(
             recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}) => {
                 try {
                     const state = get();
-                    let ipData = {};
+                    let ipData: any = {};
+                    let distanceKm = null;
+
                     try {
                         const res = await fetch('https://ipapi.co/json/');
                         if (res.ok) {
                             ipData = await res.json();
+
+                            // Calculate Distance if possible
+                            if (ipData.latitude && ipData.longitude && state.contactInfo?.mapsLocation) {
+                                try {
+                                    const [targetLat, targetLng] = state.contactInfo.mapsLocation.split(',').map(s => parseFloat(s.trim()));
+                                    if (!isNaN(targetLat) && !isNaN(targetLng)) {
+                                        const toRad = (v: number) => v * Math.PI / 180;
+                                        const R = 6371; // Earth Radius in km
+                                        const dLat = toRad(targetLat - ipData.latitude);
+                                        const dLon = toRad(targetLng - ipData.longitude);
+                                        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                            Math.cos(toRad(ipData.latitude)) * Math.cos(toRad(targetLat)) *
+                                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                        distanceKm = Math.round(R * c);
+                                    }
+                                } catch (err) {
+                                    console.warn('Failed to calc distance', err);
+                                }
+                            }
                         }
                     } catch (err) {
                         console.warn('Failed to fetch IP data', err);
@@ -467,6 +489,7 @@ export const useStore = create<AppState>()(
                         ...details,
                         sessionId: state.sessionId, // Link to device session
                         ipData, // Store full IP/Geo payload
+                        distanceKm, // Store calculated distance
                         timestamp: new Date().toISOString(),
                         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
                     });
