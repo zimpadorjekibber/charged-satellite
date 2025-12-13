@@ -2439,35 +2439,51 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                             <thead className="text-xs text-gray-500 uppercase border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
                                 <tr>
                                     <th className="pb-3 pl-2">Time</th>
-                                    <th className="pb-3">Type</th>
-                                    <th className="pb-3">Device / OS</th>
-                                    <th className="pb-3">Location / Table</th>
+                                    <th className="pb-3">IP / Location</th>
+                                    <th className="pb-3">Network/ISP</th>
+                                    <th className="pb-3">Device</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {stats.length === 0 ? (
                                     <tr><td colSpan={4} className="py-8 text-center text-gray-500">No visits recorded yet.</td></tr>
                                 ) : (
-                                    [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 100).map((scan, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                                            <td className="py-3 pl-2 text-gray-900 font-mono text-xs whitespace-nowrap">
-                                                {new Date(scan.timestamp).toLocaleString()}
-                                            </td>
-                                            <td className="py-3">
-                                                <span className={`text-[10px] font-bold px-2 py-1 rounded border ${scan.type === 'table_qr' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-blue-100 text-blue-700 border-blue-200'}`}>
-                                                    {scan.type === 'table_qr' ? 'TABLE SCAN' : 'WEB VISIT'}
-                                                </span>
-                                            </td>
-                                            <td className="py-3 text-gray-700">
-                                                <div className="flex items-center gap-2">
-                                                    {getDeviceInfo(scan.userAgent)}
-                                                </div>
-                                            </td>
-                                            <td className="py-3 font-mono text-xs text-tashi-primary">
-                                                {scan.tableId ? `Table ${scan.tableId}` : (scan.path || 'Remote')}
-                                            </td>
-                                        </tr>
-                                    ))
+                                    [...stats].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 100).map((scan, idx) => {
+                                        const ipInfo = scan.ipData || {};
+                                        return (
+                                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                                <td className="py-3 pl-2 text-gray-900 font-mono text-xs whitespace-nowrap align-top">
+                                                    {new Date(scan.timestamp).toLocaleString(undefined, {
+                                                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                                                    })}
+                                                    <div className="text-[10px] text-gray-400 font-normal">{scan.type === 'table_qr' ? `Table ${scan.tableId || '?'}` : 'Direct Link'}</div>
+                                                </td>
+                                                <td className="py-3 align-top">
+                                                    <div className="flex flex-col">
+                                                        <span className="font-mono text-xs text-blue-600 font-bold">{ipInfo.ip || 'Unknown IP'}</span>
+                                                        <span className="text-[10px] text-gray-500">
+                                                            {ipInfo.city ? `${ipInfo.city}, ${ipInfo.region}` : (scan.tableId ? 'Local Scan' : 'N/A')}
+                                                        </span>
+                                                        {ipInfo.country_name && <span className="text-[9px] text-gray-400 uppercase">{ipInfo.country_name}</span>}
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 align-top">
+                                                    <div className="text-xs text-gray-600 max-w-[150px] truncate" title={ipInfo.org}>
+                                                        {ipInfo.org || ipInfo.asn || '-'}
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 align-top">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-bold text-gray-700">{getDeviceInfo(scan.userAgent)}</span>
+                                                        <span className="text-[10px] text-gray-400 max-w-[150px] truncate" title={scan.userAgent}>
+                                                            {scan.userAgent.split(')')[0].replace('Mozilla/5.0 (', '')}
+                                                        </span>
+                                                        {scan.sessionId && <span className="text-[9px] font-mono text-gray-300 mt-1">ID: {scan.sessionId.slice(-6)}</span>}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 )}
                             </tbody>
                         </table>
@@ -2477,6 +2493,7 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
         </div>
     );
 }
+
 
 function SortableCategoryList({ categories, onReorder }: { categories: string[]; onReorder: (newOrder: string[]) => void }) {
     const [localCats, setLocalCats] = useState(categories);

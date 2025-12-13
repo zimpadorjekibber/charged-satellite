@@ -451,9 +451,22 @@ export const useStore = create<AppState>()(
 
             recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}) => {
                 try {
+                    const state = get();
+                    let ipData = {};
+                    try {
+                        const res = await fetch('https://ipapi.co/json/');
+                        if (res.ok) {
+                            ipData = await res.json();
+                        }
+                    } catch (err) {
+                        console.warn('Failed to fetch IP data', err);
+                    }
+
                     await addDoc(collection(db, 'analytics_scans'), {
                         type,
                         ...details,
+                        sessionId: state.sessionId, // Link to device session
+                        ipData, // Store full IP/Geo payload
                         timestamp: new Date().toISOString(),
                         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
                     });

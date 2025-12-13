@@ -257,6 +257,16 @@ export default function MenuPage() {
     // Check for active order
     const hasActiveOrder = orders.some(o => o.sessionId === sessionId && (o.status === 'Pending' || o.status === 'Preparing'));
 
+    const playCallSound = () => {
+        try {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.error("Audio play failed", e));
+        } catch (e) {
+            console.error("Audio setup failed", e);
+        }
+    };
+
     const handleCallStaff = () => {
         if (!currentTableId) {
             alert("Please scan a table QR code or select a table to call staff.");
@@ -265,6 +275,9 @@ export default function MenuPage() {
         if (hasPendingCall) {
             cancelNotification(currentTableId, 'call_staff');
         } else {
+            // Play feedback sound for customer
+            playCallSound();
+
             // Find recent customer details from previous orders
             const myOrders = orders.filter(o => o.sessionId === sessionId);
             const lastOrder = myOrders[0]; // Orders are sorted desc

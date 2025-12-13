@@ -69,39 +69,15 @@ export default function StaffDashboard() {
     // Sound notification
     const playNotificationSound = () => {
         try {
-            if (!audioCtxRef.current) {
-                const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-                if (AudioContext) audioCtxRef.current = new AudioContext();
-            }
-
-            const ctx = audioCtxRef.current;
-            if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
-
-            const playBlast = (startTime: number) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(900, startTime);
-                osc.frequency.linearRampToValueAtTime(500, startTime + 0.4);
-
-                gain.gain.setValueAtTime(0.8, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                osc.start(startTime);
-                osc.stop(startTime + 0.5);
-            };
-
-            const now = ctx.currentTime;
-            for (let i = 0; i < 4; i++) {
-                playBlast(now + (i * 0.6));
-            }
+            // Use standard Audio API for better compatibility than WebAudio for simple alerts
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3'); // Phone Ring
+            audio.volume = 1.0;
+            audio.play().catch(e => {
+                console.error("Audio play failed", e);
+                // Fallback attempt with WebAudio if needed, or just log
+            });
         } catch (e) {
-            console.error("Audio play failed", e);
+            console.error("Audio setup failed", e);
         }
     };
 
@@ -240,6 +216,13 @@ export default function StaffDashboard() {
                                     <p className="text-xs text-gray-500">Staff Portal</p>
                                 </div>
                             </div>
+                            <button
+                                onClick={playNotificationSound}
+                                className="hidden md:flex p-2 text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 text-xs items-center gap-2"
+                                title="Test Sound"
+                            >
+                                <Bell size={14} /> Test
+                            </button>
                             <button
                                 onClick={logout}
                                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -391,7 +374,7 @@ export default function StaffDashboard() {
                     )}
                 </div>
             </main>
-        </div>
+        </div >
     );
 }
 
