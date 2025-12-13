@@ -2,10 +2,10 @@
 
 import { useStore, Category, MenuItem } from '@/lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
-import { useState } from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
 
 // Animation Variants
@@ -150,6 +150,19 @@ export default function MenuPage() {
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemContext, setSelectedItemContext] = useState<MenuItem[]>([]);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
+
+    // Ref for category scroll container
+    const categoryScrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll the category bar when activeCategory changes
+    useEffect(() => {
+        if (activeCategory && categoryScrollContainerRef.current) {
+            const activeBtn = document.getElementById(`tab-${activeCategory}`);
+            if (activeBtn) {
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+    }, [activeCategory]);
 
     const handleSelectItem = (item: MenuItem, context: MenuItem[]) => {
         setSelectedItem(item);
@@ -360,17 +373,14 @@ export default function MenuPage() {
 
             {/* Category Tabs */}
             <div className="sticky top-[60px] z-40 bg-tashi-darker/95 backdrop-blur-md -mx-4 px-4 border-b border-white/5 pt-2 pb-4">
-                <div className="flex overflow-x-auto gap-3 hide-scrollbar">
-                    {/* ADDED: Valley Updates Tab if it's collapsed (optional, but requested as "clickable tab") */}
-                    {/* Note: User said "Clickable tab" but also "wrapped at bottom". We'll keep the actual interaction at the bottom mostly to prevent layout shift in tabs. 
-                        Let's focus on the Category tabs here. */}
-
+                <div ref={categoryScrollContainerRef} className="flex overflow-x-auto gap-3 hide-scrollbar snap-x">
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
+                            id={`tab-${cat}`}
                             onClick={() => scrollToCategory(cat)}
-                            className={`relative whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeCategory === cat
-                                ? 'text-tashi-dark'
+                            className={`relative whitespace-nowrap px-8 py-3 rounded-full text-base font-bold transition-all duration-300 snap-center ${activeCategory === cat
+                                ? 'text-tashi-dark scale-105'
                                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
                                 }`}
                         >
@@ -1230,7 +1240,7 @@ function ChefsSpecialSection({
                                     <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
                                 )}
                                 <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
-                                     SPECIAL
+                                    SPECIAL
                                 </div>
                             </div>
 
