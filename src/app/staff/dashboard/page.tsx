@@ -289,9 +289,9 @@ export default function StaffDashboard() {
                                         </div>
                                         <button
                                             onClick={() => resolveNotification(notification.id)}
-                                            className="bg-white text-red-600 px-6 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors shadow-sm"
+                                            className="bg-white text-red-600 px-4 py-3 rounded-lg font-bold hover:bg-red-50 transition-colors shadow-sm flex items-center gap-2 text-lg"
                                         >
-                                            Dismiss
+                                            <X size={20} /> Dismiss
                                         </button>
                                     </motion.div>
                                 );
