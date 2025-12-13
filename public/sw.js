@@ -28,8 +28,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Cache Images (Unsplash or local)
-    if (event.request.destination === 'image' || url.hostname.includes('unsplash.com')) {
+    // Cache Images (Unsplash, Firebase, or destination=image)
+    if (event.request.destination === 'image' || url.hostname.includes('unsplash.com') || url.hostname.includes('firebasestorage.googleapis.com')) {
         event.respondWith(
             caches.open(IMAGE_CACHE_NAME).then((cache) => {
                 return cache.match(event.request).then((cachedResponse) => {

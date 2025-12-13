@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { ServiceWorkerKiller } from './sw-killer';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import { StateInitializer } from '@/components/StateInitializer';
 
 
@@ -63,7 +63,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ServiceWorkerKiller />
+        <ServiceWorkerRegister />
         <StateInitializer />
         {children}
       </body>
