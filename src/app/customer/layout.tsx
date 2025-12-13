@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ShoppingCart, ArrowLeft, Info, Phone, MessageCircle, MapPin, X } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useState } from 'react';
+import ReviewModal from '@/components/ReviewModal';
 
 export default function CustomerLayout({
     children,
@@ -124,6 +125,9 @@ export default function CustomerLayout({
                     </div>
                 </div>
             )}
+
+            {/* Review Modal - Shows when order is completed */}
+            <ReviewModal />
 
             {/* Mobile Bottom Nav (Optional, mostly covered by header, but let's keep it simple) */}
         </div>
