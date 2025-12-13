@@ -1203,8 +1203,8 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
             </div>
 
-            <div className="px-4 pb-6 pt-2">
-                <AnimatePresence mode="wait">
+            <div className="px-4 pb-6 pt-2 min-h-[170px]">
+                <AnimatePresence mode="popLayout">
                     <motion.div
                         key={currentItem.id}
                         initial={{ opacity: 0, x: 50 }}
