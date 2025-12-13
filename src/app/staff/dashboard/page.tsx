@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText } from 'lucide-react';
+import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import Link from 'next/link';
 export default function StaffDashboard() {
     const orders = useStore((state: any) => state.orders);
     const updateOrderStatus = useStore((state: any) => state.updateOrderStatus);
+    const deleteOrder = useStore((state: any) => state.deleteOrder);
     const notifications = useStore((state: any) => state.notifications);
     const resolveNotification = useStore((state: any) => state.resolveNotification);
 
@@ -429,6 +430,7 @@ export default function StaffDashboard() {
                                 key={order.id}
                                 order={order}
                                 onUpdateStatus={(status) => updateOrderStatus(order.id, status)}
+                                onDelete={() => deleteOrder(order.id)}
                                 isNew={activeFilter === 'new'}
                                 isPreparing={activeFilter === 'preparing'}
                                 isReady={activeFilter === 'ready'}
@@ -756,9 +758,10 @@ Thank you for dining with us! 🙏`.trim();
 };
 
 // Order Card Component with Collapsible View
-function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady, isExpanded, onToggleExpand }: {
+function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isReady, isExpanded, onToggleExpand }: {
     order: Order;
     onUpdateStatus: (status: OrderStatus) => void;
+    onDelete?: () => void;
     isNew: boolean;
     isPreparing: boolean;
     isReady: boolean;
@@ -922,13 +925,13 @@ function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady, isExpan
                                         Mark Ready
                                     </button>
                                 )}
-                                {isReady && (
+                                {isReady && onDelete && (
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); onUpdateStatus('Served'); }}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-200 active:scale-95"
+                                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-red-200 active:scale-95"
                                     >
-                                        <Check size={18} className="inline mr-2" />
-                                        Mark Served
+                                        <Trash2 size={18} className="inline mr-2" />
+                                        Delete Order
                                     </button>
                                 )}
                             </div>
