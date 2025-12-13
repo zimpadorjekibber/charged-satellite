@@ -274,29 +274,22 @@ export default function MenuPage() {
             {/* Bottom Action Bar - Horizontal */}
             <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-md border-t border-white/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
-                    {/* My Order Button - Visible if active order exists */}
                     {hasActiveOrder && (
                         <Link href="/customer/status">
-                            <motion.button
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                whileTap={{ scale: 0.9 }}
-                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 transition-all shadow-[0_0_15px_rgba(255,165,0,0.3)]"
+                            <button
+                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 shadow-[0_0_15px_rgba(255,165,0,0.3)] active:scale-95 transition-transform"
                             >
                                 <UtensilsCrossed size={24} />
                                 <span className="text-[10px] uppercase tracking-wider font-bold">
                                     Status
                                 </span>
-                            </motion.button>
+                            </button>
                         </Link>
                     )}
                     {/* Call Staff Button */}
-                    <motion.button
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        whileTap={{ scale: 0.9 }}
+                    <button
                         onClick={handleCallStaff}
-                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all ${hasPendingCall
+                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${hasPendingCall
                             ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
                             : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
                             }`}
@@ -305,35 +298,29 @@ export default function MenuPage() {
                         <span className="text-[10px] uppercase tracking-wider font-bold">
                             {hasPendingCall ? 'Cancel' : 'Call Staff'}
                         </span>
-                    </motion.button>
+                    </button>
 
                     {/* Contact Button */}
-                    <motion.button
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        whileTap={{ scale: 0.9 }}
+                    <button
                         onClick={() => setShowContactInfo(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 border border-blue-400/30 shadow-lg shadow-blue-500/40 transition-all"
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 border border-blue-400/30 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
                     >
                         <Info size={24} />
                         <span className="text-[10px] uppercase tracking-wider font-bold">
                             Contact
                         </span>
-                    </motion.button>
+                    </button>
 
                     {/* Navigate/Location Button */}
-                    <motion.button
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        whileTap={{ scale: 0.9 }}
+                    <button
                         onClick={() => setShowNavigationModal(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 transition-all"
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 active:scale-95 transition-transform"
                     >
                         <Navigation size={24} />
                         <span className="text-[10px] uppercase tracking-wider font-bold">
                             Navigate
                         </span>
-                    </motion.button>
+                    </button>
                 </div>
             </div>
 
@@ -388,10 +375,8 @@ export default function MenuPage() {
                                 }`}
                         >
                             {activeCategory === cat && (
-                                <motion.div
-                                    layoutId="activePill"
+                                <div
                                     className="absolute inset-0 bg-tashi-accent rounded-full shadow-[0_0_15px_rgba(218,165,32,0.4)]"
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 />
                             )}
                             <span className="relative z-10">{cat}</span>
