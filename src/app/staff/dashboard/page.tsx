@@ -30,6 +30,7 @@ export default function StaffDashboard() {
     const [prevNotificationCount, setPrevNotificationCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
     const [isSoundEnabled, setIsSoundEnabled] = useState(true); // Default ON
+    const [isRinging, setIsRinging] = useState(false); // Track if audio is playing
     const audioCtxRef = useRef<any>(null);
     const isFirstMount = useRef(true);
 
@@ -84,12 +85,19 @@ export default function StaffDashboard() {
             const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3'); // Phone Ring
             audio.volume = 1.0;
             currentAudioRef.current = audio;
+            setIsRinging(true);
+
+            audio.addEventListener('ended', () => {
+                setIsRinging(false);
+            });
 
             audio.play().catch(e => {
                 console.error("Audio play failed", e);
+                setIsRinging(false);
             });
         } catch (e) {
             console.error("Audio setup failed", e);
+            setIsRinging(false);
         }
     };
 
@@ -99,6 +107,7 @@ export default function StaffDashboard() {
             currentAudioRef.current.currentTime = 0;
             currentAudioRef.current = null;
         }
+        setIsRinging(false);
     };
 
     // Toggle Sound
@@ -254,6 +263,15 @@ export default function StaffDashboard() {
                                     <p className="text-xs text-gray-500">Staff Portal</p>
                                 </div>
                             </div>
+                            {isRinging && (
+                                <button
+                                    onClick={stopNotificationSound}
+                                    className="flex p-3 bg-red-600 text-white border-2 border-white rounded-lg text-sm font-bold items-center gap-2 transition-all hover:bg-red-700 animate-pulse shadow-lg"
+                                    title="Stop Ringing"
+                                >
+                                    <Bell className="animate-bounce" size={18} /> Stop Ring
+                                </button>
+                            )}
                             <button
                                 onClick={toggleSound}
                                 className={`hidden md:flex p-2 border rounded-lg text-xs items-center gap-2 transition-colors ${isSoundEnabled
