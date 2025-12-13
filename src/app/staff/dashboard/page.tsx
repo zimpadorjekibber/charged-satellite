@@ -68,20 +68,36 @@ export default function StaffDashboard() {
     const timeTrend = avgPrepTime > 15 ? '+5%' : avgPrepTime < 12 ? '-5%' : '-2%';
 
     // Sound notification
-    // Sound notification
+    const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
     const playNotificationSound = () => {
         if (!isSoundEnabled) return; // Mute check
+
+        // Stop any currently playing audio first
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause();
+            currentAudioRef.current.currentTime = 0;
+        }
 
         try {
             // Use standard Audio API for better compatibility than WebAudio for simple alerts
             const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3'); // Phone Ring
             audio.volume = 1.0;
+            currentAudioRef.current = audio;
+
             audio.play().catch(e => {
                 console.error("Audio play failed", e);
-                // Fallback attempt with WebAudio if needed, or just log
             });
         } catch (e) {
             console.error("Audio setup failed", e);
+        }
+    };
+
+    const stopNotificationSound = () => {
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause();
+            currentAudioRef.current.currentTime = 0;
+            currentAudioRef.current = null;
         }
     };
 
@@ -92,6 +108,9 @@ export default function StaffDashboard() {
         if (newState) {
             // Play a short beep to confirm and unlock audio
             playNotificationSound();
+        } else {
+            // Stop any playing sound when muting
+            stopNotificationSound();
         }
     };
 
@@ -113,7 +132,12 @@ export default function StaffDashboard() {
 
         // Check for new notifications (Call Staff)
         if (activeNotifications.length > prevNotificationCount) {
-            playNotificationSound(); // Re-use the blast sound for now, effective enough
+            playNotificationSound();
+        }
+
+        // Stop audio if notifications decreased (customer cancelled or staff dismissed)
+        if (activeNotifications.length < prevNotificationCount) {
+            stopNotificationSound();
         }
 
         setPrevPendingCount(newOrders.length);
