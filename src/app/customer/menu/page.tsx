@@ -409,12 +409,14 @@ export default function MenuPage() {
             <div className="mt-6 space-y-12">
                 {CATEGORIES.map((cat) => {
                     // Filter items for this category based on filterType
-                    const categoryItems = menu.filter((item) => {
-                        if (item.category !== cat) return false;
-                        if (filterType === 'veg') return item.isVegetarian;
-                        if (filterType === 'non-veg') return !item.isVegetarian;
-                        return true;
-                    });
+                    const categoryItems = menu
+                        .filter((item) => {
+                            if (item.category !== cat) return false;
+                            if (filterType === 'veg') return item.isVegetarian;
+                            if (filterType === 'non-veg') return !item.isVegetarian;
+                            return true;
+                        })
+                        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)); // Sort by admin-defined order
 
                     if (categoryItems.length === 0) return null;
 
@@ -1180,7 +1182,18 @@ function ChefsSpecialSection({
     getQuantity: (id: string) => number,
     setSelectedItem: (item: MenuItem) => void
 }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (items.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % items.length);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [items.length]);
+
     if (items.length === 0) return null;
+    const currentItem = items[currentIndex];
 
     return (
         <section className="mb-8 mt-4">
@@ -1192,25 +1205,27 @@ function ChefsSpecialSection({
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
             </div>
 
-            <div className="flex overflow-x-auto gap-5 px-4 pb-6 pt-2 hide-scrollbar snap-x snap-mandatory">
-                {items.map((item) => (
+            <div className="px-4 pb-6 pt-2">
+                <AnimatePresence mode="wait">
                     <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex-shrink-0 w-[85vw] md:w-[350px] snap-center relative group"
+                        key={currentItem.id}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.5 }}
+                        className="relative group"
                     >
                         {/* Flashing Border Effect */}
                         <div className="absolute -inset-[2px] bg-gradient-to-r from-tashi-accent via-yellow-200 to-tashi-accent rounded-2xl opacity-75 blur-sm animate-pulse" />
 
                         <div
                             className="relative bg-neutral-900 border border-tashi-accent/50 rounded-2xl overflow-hidden p-3 flex gap-4 h-28 shadow-xl"
-                            onClick={() => setSelectedItem(item)}
+                            onClick={() => setSelectedItem(currentItem)}
                         >
                             {/* Image */}
                             <div className="w-24 h-full flex-shrink-0 bg-black rounded-xl overflow-hidden relative border border-white/5">
-                                {item.image ? (
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                {currentItem.image ? (
+                                    <img src={currentItem.image} alt={currentItem.name} className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
                                 )}
@@ -1222,12 +1237,12 @@ function ChefsSpecialSection({
                             {/* Info */}
                             <div className="flex-1 flex flex-col justify-between py-1">
                                 <div>
-                                    <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
+                                    <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{currentItem.name}</h3>
                                     <div className="flex items-center gap-2">
-                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${item.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
-                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                                        <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${currentItem.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
+                                            {currentItem.isVegetarian ? 'Veg' : 'Non-Veg'}
                                         </span>
-                                        {item.isSpicy && (
+                                        {currentItem.isSpicy && (
                                             <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/10">
                                                 Spicy
                                             </span>
@@ -1236,31 +1251,46 @@ function ChefsSpecialSection({
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <span className="text-lg font-serif text-tashi-accent font-bold">₹{item.price}</span>
+                                    <span className="text-lg font-serif text-tashi-accent font-bold">₹{currentItem.price}</span>
 
                                     <div onClick={(e) => e.stopPropagation()}>
-                                        {getQuantity(item.id) === 0 ? (
+                                        {getQuantity(currentItem.id) === 0 ? (
                                             <button
-                                                onClick={() => addToCart(item)}
-                                                disabled={item.available === false}
+                                                onClick={() => addToCart(currentItem)}
+                                                disabled={currentItem.available === false}
                                                 className="bg-tashi-accent text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20"
                                             >
                                                 ADD
                                             </button>
                                         ) : (
                                             <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
-                                                <button onClick={() => removeFromCart(item.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
-                                                <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(item.id)}</span>
-                                                <button onClick={() => addToCart(item)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
-                                            </div>
+                                                <button onClick={() => removeFromCart(currentItem.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
+                                                <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(currentItem.id)}</span>
+                                                <button onClick(() => addToCart(currentItem)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
+                                </div>
                                         )}
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
-                ))}
-            </div>
-        </section>
+                    </div>
+
+                    {/* Indicator dots */}
+                    {items.length > 1 && (
+                        <div className="flex justify-center gap-1.5 mt-3">
+                            {items.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentIndex(index)}
+                                    className={`h-1.5 rounded-full transition-all ${index === currentIndex
+                                        ? 'w-6 bg-tashi-accent'
+                                        : 'w-1.5 bg-gray-600 hover:bg-gray-500'
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+            </AnimatePresence >
+        </section >
     );
 }
