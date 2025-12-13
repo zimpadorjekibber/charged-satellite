@@ -410,7 +410,9 @@ export const useStore = create<AppState>()(
                 if (status === 'Preparing') {
                     // Check if already has acceptedAt to avoid overwriting
                     const orderStr = get().orders.find(o => o.id === orderId);
-                    if (orderStr && !orderStr.acceptedAt) {
+                    // For remote orders (tableId = 'REQUEST'), do NOT set acceptedAt yet
+                    // It will be set when customer arrives and table is assigned
+                    if (orderStr && !orderStr.acceptedAt && orderStr.tableId !== 'REQUEST') {
                         updates.acceptedAt = new Date().toISOString();
                     }
                 }

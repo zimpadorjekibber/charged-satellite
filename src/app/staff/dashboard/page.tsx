@@ -447,7 +447,7 @@ export default function StaffDashboard() {
 
 // Helper Functions for KOT and Bill
 const handlePrintKOT = (order: Order) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'width=500,height=800');
     if (!printWindow) return;
 
     const tables = useStore.getState().tables;
@@ -455,91 +455,242 @@ const handlePrintKOT = (order: Order) => {
     const tableName = matchedTable ? matchedTable.name : 'Remote Order';
 
     printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
         <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <title>KOT #${order.id.slice(0, 6)}</title>
             <style>
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 body { 
-                    font-family: 'Courier New', monospace; 
-                    padding: 20px; 
-                    background: white; 
-                    color: black;
+                    font-family: 'Arial', 'Helvetica', sans-serif; 
+                    background: #f5f5f5;
+                    color: #000;
                     font-size: 16px;
+                    line-height: 1.6;
+                    padding: 0;
+                    margin: 0;
+                }
+                .container {
+                    max-width: 500px;
+                    margin: 0 auto;
+                    background: white;
+                    min-height: 100vh;
+                    padding: 0;
+                }
+                .content {
+                    padding: 20px;
+                    padding-bottom: 100px; /* Space for fixed buttons */
                 }
                 .header { 
                     text-align: center; 
-                    border-bottom: 3px solid #000; 
-                    padding-bottom: 15px; 
-                    margin-bottom: 20px; 
+                    background: #ff6b00;
+                    color: white;
+                    padding: 20px; 
+                    margin-bottom: 20px;
                 }
-                .header h2 { font-size: 24px; margin-bottom: 5px; }
-                .header h3 { font-size: 42px; font-weight: 900; }
+                .header h2 { 
+                    font-size: 16px; 
+                    font-weight: 600;
+                    margin-bottom: 8px;
+                    letter-spacing: 2px;
+                }
+                .header h1 { 
+                    font-size: 32px; 
+                    font-weight: 900;
+                    margin: 0;
+                }
                 .meta { 
                     font-size: 18px; 
                     margin-bottom: 25px; 
-                    padding-bottom: 15px;
-                    border-bottom: 2px dashed #000;
-                    line-height: 1.8;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #e9ecef;
                 }
-                .meta div { margin: 5px 0; }
-                .meta strong { font-weight: 900; }
-                .items { margin: 20px 0; }
+                .meta-row { 
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #dee2e6;
+                }
+                .meta-row:last-child {
+                    border-bottom: none;
+                }
+                .meta-label { 
+                    font-weight: 700; 
+                    color: #495057;
+                }
+                .meta-value {
+                    font-weight: 600;
+                    color: #212529;
+                }
+                .section-title {
+                    font-size: 20px;
+                    font-weight: 800;
+                    margin: 25px 0 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 3px solid #ff6b00;
+                    color: #212529;
+                }
+                .items { 
+                    margin: 20px 0;
+                }
                 .item { 
                     display: flex; 
-                    justify-content: space-between; 
-                    padding: 12px 0; 
-                    border-bottom: 1px solid #ddd;
+                    align-items: center;
+                    padding: 15px; 
+                    margin-bottom: 10px;
+                    background: #fff;
+                    border: 2px solid #e9ecef;
+                    border-radius: 10px;
                     font-size: 18px;
                 }
-                .item strong { font-size: 24px; font-weight: 900; }
-                .footer { 
-                    margin-top: 30px; 
-                    padding-top: 20px; 
-                    border-top: 3px solid #000; 
-                    text-align: center; 
-                    font-size: 14px;
+                .item-qty { 
+                    background: #ff6b00;
+                    color: white;
+                    font-size: 22px; 
+                    font-weight: 900; 
+                    min-width: 50px;
+                    height: 50px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 8px;
+                    margin-right: 15px;
+                    flex-shrink: 0;
                 }
+                .item-name {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #212529;
+                    flex: 1;
+                }
+                .summary { 
+                    margin-top: 30px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #ff6b00;
+                    text-align: center;
+                }
+                .summary-item {
+                    font-size: 18px;
+                    font-weight: 700;
+                    padding: 8px 0;
+                    color: #495057;
+                }
+                .button-container {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    padding: 15px;
+                    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+                    display: flex;
+                    gap: 10px;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    z-index: 1000;
+                }
+                .btn {
+                    flex: 1;
+                    padding: 16px;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-print {
+                    background: #ff6b00;
+                    color: white;
+                }
+                .btn-close {
+                    background: #6c757d;
+                    color: white;
+                }
+                .btn:active {
+                    transform: scale(0.98);
+                }
+
                 @media print {
-                    body { padding: 10px; }
+                    body { background: white; }
+                    .button-container { display: none; }
+                    .content { padding-bottom: 20px; }
+                    .container { background: white; }
+                }
+
+                @media (max-width: 480px) {
+                    .header h1 { font-size: 28px; }
+                    .item { font-size: 16px; }
+                    .item-name { font-size: 18px; }
                 }
             </style>
         </head>
         <body>
-            <div class="header">
-                <h2>KITCHEN ORDER TICKET</h2>
-                <h3>KOT #${order.id.slice(0, 6)}</h3>
-            </div>
-            
-            <div class="meta">
-                <div><strong>TABLE:</strong> ${tableName}</div>
-                ${order.customerName ? `<div><strong>CUSTOMER:</strong> ${order.customerName}</div>` : ''}
-                ${order.customerPhone ? `<div><strong>PHONE:</strong> ${order.customerPhone}</div>` : ''}
-                <div><strong>TIME:</strong> ${new Date(order.createdAt).toLocaleString()}</div>
-                <div><strong>STATUS:</strong> ${order.status}</div>
-            </div>
-            
-            <div class="items">
-                <h3 style="margin-bottom: 15px; font-size: 20px;">ITEMS:</h3>
-                ${order.items.map((item: any) => `
-                    <div class="item">
-                        <span><strong>${item.quantity}x</strong> ${item.name}</span>
+            <div class="container">
+                <div class="content">
+                    <div class="header">
+                        <h2>KITCHEN ORDER TICKET</h2>
+                        <h1>KOT #${order.id.slice(0, 6)}</h1>
                     </div>
-                `).join('')}
+                    
+                    <div class="meta">
+                        <div class="meta-row">
+                            <span class="meta-label">TABLE:</span>
+                            <span class="meta-value">${tableName}</span>
+                        </div>
+                        ${order.customerName ? `
+                        <div class="meta-row">
+                            <span class="meta-label">CUSTOMER:</span>
+                            <span class="meta-value">${order.customerName}</span>
+                        </div>` : ''}
+                        ${order.customerPhone ? `
+                        <div class="meta-row">
+                            <span class="meta-label">PHONE:</span>
+                            <span class="meta-value">${order.customerPhone}</span>
+                        </div>` : ''}
+                        <div class="meta-row">
+                            <span class="meta-label">TIME:</span>
+                            <span class="meta-value">${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">DATE:</span>
+                            <span class="meta-value">${new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title">🍽️ ORDER ITEMS</h3>
+                    <div class="items">
+                        ${order.items.map((item: any) => `
+                            <div class="item">
+                                <div class="item-qty">${item.quantity}x</div>
+                                <div class="item-name">${item.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="summary">
+                        <div class="summary-item">Total Items: ${order.items.reduce((sum: number, i: any) => sum + i.quantity, 0)}</div>
+                        <div class="summary-item" style="color: #212529; font-size: 16px; margin-top: 10px;">
+                            Printed: ${new Date().toLocaleTimeString('en-IN')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-print" onclick="window.print()">
+                        🖨️ PRINT KOT
+                    </button>
+                    <button class="btn btn-close" onclick="window.close()">
+                        ✖️ CLOSE
+                    </button>
+                </div>
             </div>
-            
-            <div class="footer">
-                <p>Total Items: ${order.items.reduce((sum: number, i: any) => sum + i.quantity, 0)}</p>
-                <p style="margin-top: 10px;">Printed: ${new Date().toLocaleTimeString()}</p>
-            </div>
-            
-            <script>
-                window.onload = function() { 
-                    window.print(); 
-                    setTimeout(() => window.close(), 500);
-                }
-            </script>
         </body>
     </html>
     `);
@@ -547,54 +698,146 @@ const handlePrintKOT = (order: Order) => {
 };
 
 const handlePrintBill = (order: Order) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'width=500,height=900');
     if (!printWindow) return;
 
     const tables = useStore.getState().tables;
     const matchedTable = tables.find((t: any) => t.id === order.tableId || t.name === order.tableId);
     const tableName = matchedTable ? matchedTable.name : 'Remote Order';
+    const contactInfo = useStore.getState().contactInfo;
 
     printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
         <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <title>Bill #${order.id.slice(0, 6)}</title>
             <style>
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 body { 
-                    font-family: 'Arial', sans-serif; 
-                    padding: 20px; 
-                    max-width: 400px;
+                    font-family: 'Arial', 'Helvetica', sans-serif; 
+                    background: #f5f5f5;
+                    color: #000;
+                    font-size: 16px;
+                    padding: 0;
+                    margin: 0;
+                }
+                .container {
+                    max-width: 500px;
                     margin: 0 auto;
+                    background: white;
+                    min-height: 100vh;
+                    padding: 0;
+                }
+                .content {
+                    padding: 20px;
+                    padding-bottom: 100px; /* Space for fixed buttons */
                 }
                 .header { 
                     text-align: center; 
+                    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+                    color: white;
+                    padding: 25px 20px;
                     margin-bottom: 20px;
-                    padding-bottom: 20px;
-                    border-bottom: 2px solid #000;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 }
-                .header h1 { font-size: 28px; margin-bottom: 5px; }
-                .header p { font-size: 14px; color: #666; }
-                .bill-info { margin: 20px 0; font-size: 14px; }
-                .bill-info div { margin: 5px 0; display: flex; justify-content: space-between; }
+                .header h1 { 
+                    font-size: 28px; 
+                    font-weight: 900;
+                    margin-bottom: 5px;
+                    letter-spacing: 1px;
+                }
+                .header .subtitle {
+                    font-size: 14px;
+                    opacity: 0.95;
+                    margin-bottom: 8px;
+                }
+                .header .location {
+                    font-size: 13px;
+                    opacity: 0.9;
+                    font-style: italic;
+                }
+                .bill-tag {
+                    background: white;
+                    color: #DAA520;
+                    display: inline-block;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: 800;
+                    margin-top: 12px;
+                    font-size: 16px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                .bill-info { 
+                    margin: 20px 0;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #e9ecef;
+                }
+                .bill-info-row { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #dee2e6;
+                }
+                .bill-info-row:last-child {
+                    border-bottom: none;
+                }
+                .bill-info-row strong {
+                    color: #495057;
+                    font-weight: 700;
+                }
+                .bill-info-row span {
+                    color: #212529;
+                    font-weight: 600;
+                }
+                .section-title {
+                    font-size: 20px;
+                    font-weight: 800;
+                    margin: 25px 0 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 3px solid #DAA520;
+                    color: #212529;
+                }
                 .items { margin: 20px 0; }
-                .items table { width: 100%; border-collapse: collapse; }
+                .items table { 
+                    width: 100%; 
+                    border-collapse: collapse;
+                }
                 .items th { 
-                    background: #f0f0f0; 
-                    padding: 10px; 
+                    background: #DAA520;
+                    color: white;
+                    padding: 12px 8px; 
                     text-align: left; 
-                    font-size: 12px;
-                    border-bottom: 2px solid #000;
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+                .items th:nth-child(2),
+                .items th:nth-child(3),
+                .items th:nth-child(4) {
+                    text-align: right;
                 }
                 .items td { 
-                    padding: 8px; 
-                    border-bottom: 1px solid #ddd;
-                    font-size: 14px;
+                    padding: 12px 8px; 
+                    border-bottom: 1px solid #e9ecef;
+                    font-size: 15px;
+                }
+                .items td:nth-child(2),
+                .items td:nth-child(3),
+                .items td:nth-child(4) {
+                    text-align: right;
+                }
+                .items tr:last-child td {
+                    border-bottom: none;
                 }
                 .total-section { 
-                    margin-top: 20px; 
-                    padding-top: 15px; 
-                    border-top: 2px solid #000;
+                    margin-top: 25px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #DAA520;
                 }
                 .total-row { 
                     display: flex; 
@@ -603,83 +846,174 @@ const handlePrintBill = (order: Order) => {
                     font-size: 16px;
                 }
                 .total-row.grand { 
-                    font-size: 20px; 
-                    font-weight: bold; 
-                    margin-top: 10px;
-                    padding-top: 10px;
-                    border-top: 2px dashed #000;
+                    font-size: 24px; 
+                    font-weight: 900; 
+                    margin-top: 12px;
+                    padding-top: 12px;
+                    border-top: 2px dashed #DAA520;
+                    color: #DAA520;
                 }
                 .footer { 
                     text-align: center; 
                     margin-top: 30px; 
-                    padding-top: 20px;
-                    border-top: 1px solid #ddd;
-                    font-size: 12px;
-                    color: #666;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                }
+                .footer p {
+                    font-size: 15px;
+                    color: #495057;
+                    margin: 5px 0;
+                }
+                .footer .thank-you {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #DAA520;
+                    margin-bottom: 10px;
+                }
+                .footer .contact {
+                    font-size: 13px;
+                    color: #6c757d;
+                    margin-top: 15px;
+                }
+                .button-container {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    padding: 15px;
+                    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+                    display: flex;
+                    gap: 10px;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    z-index: 1000;
+                }
+                .btn {
+                    flex: 1;
+                    padding: 16px;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-print {
+                    background: #DAA520;
+                    color: white;
+                }
+                .btn-close {
+                    background: #6c757d;
+                    color: white;
+                }
+                .btn:active {
+                    transform: scale(0.98);
+                }
+
+                @media print {
+                    body { background: white; }
+                    .button-container { display: none; }
+                    .content { padding-bottom: 20px; }
+                    .container { background: white; }
+                }
+
+                @media (max-width: 480px) {
+                    .header h1 { font-size: 24px; }
+                    .total-row.grand { font-size: 20px; }
                 }
             </style>
         </head>
         <body>
-            <div class="header">
-                <h1>TashiZom</h1>
-                <p>Kibber, Spiti Valley</p>
-                <p style="margin-top: 10px; font-weight: bold;">BILL #${order.id.slice(0, 6)}</p>
-            </div>
-            
-            <div class="bill-info">
-                <div><strong>Table:</strong> <span>${tableName}</span></div>
-                ${order.customerName ? `<div><strong>Customer:</strong> <span>${order.customerName}</span></div>` : ''}
-                ${order.customerPhone ? `<div><strong>Phone:</strong> <span>${order.customerPhone}</span></div>` : ''}
-                <div><strong>Date:</strong> <span>${new Date(order.createdAt).toLocaleDateString()}</span></div>
-                <div><strong>Time:</strong> <span>${new Date(order.createdAt).toLocaleTimeString()}</span></div>
-            </div>
-            
-            <div class="items">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th style="text-align: center;">Qty</th>
-                            <th style="text-align: right;">Price</th>
-                            <th style="text-align: right;">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${order.items.map((item: any) => `
-                            <tr>
-                                <td>${item.name}</td>
-                                <td style="text-align: center;">${item.quantity}</td>
-                                <td style="text-align: right;">₹${item.price}</td>
-                                <td style="text-align: right;">₹${item.price * item.quantity}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="total-section">
-                <div class="total-row">
-                    <span>Subtotal:</span>
-                    <span>₹${order.totalAmount}</span>
+            <div class="container">
+                <div class="content">
+                    <div class="header">
+                        <h1>TashiZom</h1>
+                        <div class="subtitle">Multi-Cuisine Restaurant</div>
+                        <div class="location">📍 Kibber, Spiti Valley</div>
+                        <div class="bill-tag">BILL #${order.id.slice(0, 6)}</div>
+                    </div>
+                    
+                    <div class="bill-info">
+                        <div class="bill-info-row">
+                            <strong>Table:</strong>
+                            <span>${tableName}</span>
+                        </div>
+                        ${order.customerName ? `
+                        <div class="bill-info-row">
+                            <strong>Customer:</strong>
+                            <span>${order.customerName}</span>
+                        </div>` : ''}
+                        ${order.customerPhone ? `
+                        <div class="bill-info-row">
+                            <strong>Phone:</strong>
+                            <span>${order.customerPhone}</span>
+                        </div>` : ''}
+                        <div class="bill-info-row">
+                            <strong>Date:</strong>
+                            <span>${new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                        <div class="bill-info-row">
+                            <strong>Time:</strong>
+                            <span>${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title">📋 ORDER DETAILS</h3>
+                    <div class="items">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${order.items.map((item: any) => `
+                                    <tr>
+                                        <td>${item.name}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>₹${item.price}</td>
+                                        <td><strong>₹${item.price * item.quantity}</strong></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>₹${order.totalAmount}</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span>TOTAL:</span>
+                            <span>₹${order.totalAmount}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        <p class="thank-you">🙏 Thank you for dining with us!</p>
+                        <p>We hope to serve you again soon</p>
+                        <p class="contact">📞 ${contactInfo?.phone || '+91 9876543210'}</p>
+                        <p style="margin-top: 20px; font-size: 12px; color: #adb5bd;">
+                            Generated: ${new Date().toLocaleString('en-IN')}
+                        </p>
+                    </div>
                 </div>
-                <div class="total-row grand">
-                    <span>TOTAL:</span>
-                    <span>₹${order.totalAmount}</span>
+
+                <div class="button-container">
+                    <button class="btn btn-print" onclick="window.print()">
+                        🖨️ PRINT BILL
+                    </button>
+                    <button class="btn btn-close" onclick="window.close()">
+                        ✖️ CLOSE
+                    </button>
                 </div>
             </div>
-            
-            <div class="footer">
-                <p>Thank you for dining with us!</p>
-                <p style="margin-top: 5px;">Visit us again soon</p>
-                <p style="margin-top: 15px; font-size: 10px;">Printed: ${new Date().toLocaleString()}</p>
-            </div>
-            
-            <script>
-                window.onload = function() { 
-                    window.print(); 
-                    setTimeout(() => window.close(), 500);
-                }
-            </script>
         </body>
     </html>
     `);
@@ -769,6 +1103,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
     onToggleExpand?: () => void;
 }) {
     const tables = useStore((state: any) => state.tables);
+    const updateOrderTable = useStore((state: any) => state.updateOrderTable);
 
     const getElapsedTime = () => {
         const now = Date.now();
@@ -862,6 +1197,38 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
                                             </a>
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Table Assignment for Remote Orders */}
+                            {(order.tableId === 'REQUEST' || order.tableId === 'Remote') && (
+                                <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                    <h4 className="font-bold text-orange-800 mb-2 flex items-center gap-2">
+                                        <Utensils size={16} /> Assign Table
+                                    </h4>
+                                    <p className="text-xs text-orange-700 mb-3">
+                                        Customer has arrived? Assign them a table to start service.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <select
+                                            className="flex-1 bg-white border border-orange-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2.5 outline-none"
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                if (e.target.value) {
+                                                    updateOrderTable(order.id, e.target.value);
+                                                }
+                                            }}
+                                            defaultValue=""
+                                        >
+                                            <option value="" disabled>Choose a table...</option>
+                                            {tables.map((table: any) => (
+                                                <option key={table.id} value={table.id}>
+                                                    {table.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
                             )}
 

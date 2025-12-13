@@ -1,0 +1,580 @@
+'use client';
+
+import { useStore, Order, OrderStatus } from '@/lib/store';
+import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+
+export default function StaffDashboard() {
+    const orders = useStore((state: any) => state.orders);
+    const updateOrderStatus = useStore((state: any) => state.updateOrderStatus);
+    const notifications = useStore((state: any) => state.notifications);
+    const resolveNotification = useStore((state: any) => state.resolveNotification);
+
+    // Auth
+    const currentUser = useStore((state: any) => state.currentUser);
+    const login = useStore((state: any) => state.login);
+    const logout = useStore((state: any) => state.logout);
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    // State
+    const [activeFilter, setActiveFilter] = useState<'new' | 'preparing' | 'ready'>('new');
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set());
+
+    // Sound notification
+    const [prevPendingCount, setPrevPendingCount] = useState(0);
+    const [prevNotificationCount, setPrevNotificationCount] = useState(0);
+    const [showVisualAlert, setShowVisualAlert] = useState(false);
+    const [isSoundEnabled, setIsSoundEnabled] = useState(true); // Default ON
+    const [isRinging, setIsRinging] = useState(false); // Track if audio is playing
+    const audioCtxRef = useRef<any>(null);
+    const isFirstMount = useRef(true);
+
+    // Derived data
+    // Derived data
+    const activeOrders = [...(orders || [])].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const today = new Date().toDateString();
+    const todaysOrders = (orders || []).filter((o: any) => new Date(o.createdAt).toDateString() === today);
+
+    // Stats
+    const newOrders = activeOrders.filter((o: any) => o.status === 'Pending');
+    const preparingOrders = activeOrders.filter((o: any) => o.status === 'Preparing');
+    const readyOrders = activeOrders.filter((o: any) => o.status === 'Ready' || o.status === 'Served');
+
+    // Active Service Requests
+    const activeNotifications = (notifications || []).filter((n: any) => n.status === 'pending');
+
+    // Filter orders based on active tab
+    const filteredOrders = activeOrders.filter((o: any) => {
+        if (activeFilter === 'new') return o.status === 'Pending';
+        if (activeFilter === 'preparing') return o.status === 'Preparing';
+        if (activeFilter === 'ready') return o.status === 'Ready';
+        return false;
+    });
+
+    // Calculate average preparation time
+    const avgPrepTime = preparingOrders.length > 0
+        ? Math.round(preparingOrders.reduce((sum: number, order: any) => {
+            const elapsed = (Date.now() - new Date(order.createdAt).getTime()) / 60000;
+            return sum + elapsed;
+        }, 0) / preparingOrders.length)
+        : 14;
+
+    // Calculate trend
+    const activeTrend = newOrders.length > 5 ? '+20%' : newOrders.length < 3 ? '-5%' : '+10%';
+    const timeTrend = avgPrepTime > 15 ? '+5%' : avgPrepTime < 12 ? '-5%' : '-2%';
+
+    // Sound notification
+    const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    const playNotificationSound = () => {
+        if (!isSoundEnabled) return; // Mute check
+
+        // Stop any currently playing audio first
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause();
+            currentAudioRef.current.currentTime = 0;
+        }
+
+        try {
+            // Use standard Audio API for better compatibility than WebAudio for simple alerts
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3'); // Phone Ring
+            audio.volume = 1.0;
+            currentAudioRef.current = audio;
+            setIsRinging(true);
+
+            audio.addEventListener('ended', () => {
+                setIsRinging(false);
+            });
+
+            audio.play().catch(e => {
+                console.error("Audio play failed", e);
+                setIsRinging(false);
+            });
+        } catch (e) {
+            console.error("Audio setup failed", e);
+            setIsRinging(false);
+        }
+    };
+
+    const stopNotificationSound = () => {
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause();
+            currentAudioRef.current.currentTime = 0;
+            currentAudioRef.current = null;
+        }
+        setIsRinging(false);
+    };
+
+    // Toggle Sound
+    const toggleSound = () => {
+        const newState = !isSoundEnabled;
+        setIsSoundEnabled(newState);
+        if (newState) {
+            // Play a short beep to confirm and unlock audio
+            playNotificationSound();
+        } else {
+            // Stop any playing sound when muting
+            stopNotificationSound();
+        }
+    };
+
+    // Monitor for new pending orders AND notifications
+    useEffect(() => {
+        if (isFirstMount.current) {
+            isFirstMount.current = false;
+            setPrevPendingCount(newOrders.length);
+            setPrevNotificationCount(activeNotifications.length);
+            return;
+        }
+
+        // Check for new orders
+        if (newOrders.length > prevPendingCount) {
+            playNotificationSound();
+            setShowVisualAlert(true);
+            setTimeout(() => setShowVisualAlert(false), 3000);
+        }
+
+        // Check for new notifications (Call Staff)
+        if (activeNotifications.length > prevNotificationCount) {
+            playNotificationSound();
+        }
+
+        // Stop audio if notifications decreased (customer cancelled or staff dismissed)
+        if (activeNotifications.length < prevNotificationCount) {
+            stopNotificationSound();
+        }
+
+        setPrevPendingCount(newOrders.length);
+        setPrevNotificationCount(activeNotifications.length);
+    }, [newOrders.length, activeNotifications.length]);
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        const success = await login(username, password);
+        if (!success) {
+            setError('Invalid credentials');
+        }
+    };
+
+    // Login Screen
+    if (!currentUser || (currentUser.role !== 'staff' && currentUser.role !== 'admin')) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+                <Link href="/" className="absolute top-8 left-8 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2">
+                    <ArrowLeft size={20} /> Back
+                </Link>
+                <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <div className="flex justify-center mb-6">
+                        <div className="p-4 bg-orange-100 rounded-full text-orange-600">
+                            <ChefHat size={32} />
+                        </div>
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Staff Portal</h1>
+                    <p className="text-gray-500 text-center mb-8 text-sm">Kitchen Dashboard Access</p>
+
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Staff ID</label>
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
+                                placeholder="e.g. tenzin"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Password</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
+                                placeholder="••••••••"
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all active:scale-95 shadow-lg shadow-orange-200"
+                        >
+                            Login
+                        </button>
+                    </form>
+
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p className="text-xs text-gray-400">Authorized Personnel Only</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Main Dashboard
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Visual Alert */}
+            <AnimatePresence>
+                {showVisualAlert && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-orange-500/10 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.5 }}
+                            animate={{ scale: 1.2 }}
+                            exit={{ scale: 0.5 }}
+                            transition={{ type: 'spring', damping: 10 }}
+                            className="bg-orange-500 text-white font-black text-6xl md:text-8xl px-12 py-8 rounded-3xl shadow-2xl"
+                        >
+                            NEW ORDER!
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Header */}
+            <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-16">
+                        <h1 className="text-xl font-bold text-gray-900">Kitchen Dashboard</h1>
+
+                        <div className="flex items-center gap-4">
+                            <div className="hidden sm:flex items-center gap-3">
+                                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <User size={20} className="text-orange-600" />
+                                </div>
+                                <div className="hidden md:block">
+                                    <p className="text-sm font-semibold text-gray-900">{currentUser?.name}</p>
+                                    <p className="text-xs text-gray-500">Staff Portal</p>
+                                </div>
+                            </div>
+                            {isRinging && (
+                                <button
+                                    onClick={stopNotificationSound}
+                                    className="flex p-3 bg-red-600 text-white border-2 border-white rounded-lg text-sm font-bold items-center gap-2 transition-all hover:bg-red-700 animate-pulse shadow-lg"
+                                    title="Stop Ringing"
+                                >
+                                    <Bell className="animate-bounce" size={18} /> Stop Ring
+                                </button>
+                            )}
+                            <button
+                                onClick={toggleSound}
+                                className={`hidden md:flex p-2 border rounded-lg text-xs items-center gap-2 transition-colors ${isSoundEnabled
+                                    ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                                    : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                    }`}
+                                title={isSoundEnabled ? "Sound Enabled" : "Sound Muted"}
+                            >
+                                {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                                {isSoundEnabled ? 'Sound ON' : 'Sound OFF'}
+                            </button>
+                            <button
+                                onClick={logout}
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Logout"
+                            >
+                                <LogOut size={20} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+                {/* Service Request Alerts */}
+                <AnimatePresence>
+                    {activeNotifications.length > 0 && (
+                        <div className="mb-6 space-y-2">
+                            {activeNotifications.map((notification: any) => {
+                                const table = useStore.getState().tables.find((t: any) => t.id === notification.tableId);
+                                const tableName = table ? table.name : 'Unknown Table';
+                                return (
+                                    <motion.div
+                                        key={notification.id}
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="bg-red-500 text-white p-4 rounded-xl shadow-lg flex items-center justify-between animate-pulse"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-white/20 p-2 rounded-full">
+                                                <Bell className="text-white" size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg">
+                                                    {notification.type === 'call_staff' ? 'STAFF CALLED' : 'BILL REQUESTED'}
+                                                </h3>
+                                                <p className="font-medium opacity-90">
+                                                    {tableName} • {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                                {(notification.customerName || notification.customerPhone) && (
+                                                    <p className="text-xs font-bold mt-1 bg-black/20 inline-block px-2 py-1 rounded">
+                                                        👤 {notification.customerName || 'Guest'} {notification.customerPhone ? `• 📞 ${notification.customerPhone}` : ''}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => resolveNotification(notification.id)}
+                                            className="bg-white text-red-600 px-4 py-3 rounded-lg font-bold hover:bg-red-50 transition-colors shadow-sm flex items-center gap-2 text-lg"
+                                        >
+                                            <X size={20} /> Dismiss
+                                        </button>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                    {/* Active Orders */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+                            <Package size={18} className="text-orange-500" />
+                            <span className="uppercase font-semibold">Active</span>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <h3 className="text-4xl font-bold text-gray-900">{newOrders.length}</h3>
+                            <div className={`flex items-center gap-1 text-sm font-semibold ${activeTrend.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                                {activeTrend.startsWith('+') ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                <span>{activeTrend}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Avg Time */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+                            <Clock size={18} className="text-blue-500" />
+                            <span className="uppercase font-semibold">Avg Time</span>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <h3 className="text-4xl font-bold text-gray-900">{avgPrepTime}m</h3>
+                            <div className={`flex items-center gap-1 text-sm font-semibold ${timeTrend.startsWith('-') ? 'text-green-600' : 'text-red-600'}`}>
+                                {timeTrend.startsWith('-') ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                                <span>{timeTrend}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex gap-2 mb-6 bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
+                    <button
+                        onClick={() => setActiveFilter('new')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'new'
+                            ? 'bg-orange-50 text-orange-600 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        New <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'new' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {newOrders.length}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setActiveFilter('preparing')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'preparing'
+                            ? 'bg-gray-100 text-gray-800 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        Preparing <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'preparing' ? 'bg-gray-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {preparingOrders.length}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setActiveFilter('ready')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'ready'
+                            ? 'bg-blue-50 text-blue-600 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        Ready <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'ready' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {readyOrders.length}
+                        </span>
+                    </button>
+                </div>
+
+                {/* Orders List */}
+                <div className="space-y-4">
+                    {filteredOrders.length === 0 ? (
+                        <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
+                            <ChefHat size={48} className="mx-auto mb-4 text-gray-300" />
+                            <p className="text-gray-500 font-medium">No orders in this category</p>
+                            <p className="text-gray-400 text-sm mt-1">Orders will appear here when placed</p>
+                        </div>
+                    ) : (
+                        filteredOrders.map(order => (
+                            <OrderCard
+                                key={order.id}
+                                order={order}
+                                onUpdateStatus={(status) => updateOrderStatus(order.id, status)}
+                                isNew={activeFilter === 'new'}
+                                isPreparing={activeFilter === 'preparing'}
+                                isReady={activeFilter === 'ready'}
+                            />
+                        ))
+                    )}
+                </div>
+            </main>
+        </div >
+    );
+}
+
+// Order Card Component
+function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
+    order: Order;
+    onUpdateStatus: (status: OrderStatus) => void;
+    isNew: boolean;
+    isPreparing: boolean;
+    isReady: boolean;
+}) {
+    const tables = useStore((state: any) => state.tables);
+
+    const getElapsedTime = () => {
+        const now = Date.now();
+        const created = new Date(order.createdAt).getTime();
+        const diff = now - created;
+        const minutes = Math.floor(diff / 60000);
+        return minutes;
+    };
+
+    // Find if this tableId matches an actual table
+    const matchedTable = tables.find((t: any) => t.id === order.tableId || t.name === order.tableId);
+    const isTableOrder = !!matchedTable;
+    const isRemoteOrder = !isTableOrder || order.tableId === 'Remote' || order.tableId === 'REQUEST';
+
+    const elapsed = getElapsedTime();
+    const borderColor = isNew ? 'border-l-red-500' : isPreparing ? 'border-l-orange-500' : 'border-l-blue-500';
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`bg-white rounded-2xl p-6 shadow-sm border-l-4 ${borderColor} border-y border-r border-gray-100`}
+        >
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                        {/* Show Table Name for table orders */}
+                        {isTableOrder && matchedTable && (
+                            <span className="text-xl font-bold px-4 py-1 bg-blue-100 text-blue-700 rounded-full border-2 border-blue-300">
+                                📍 {matchedTable.name}
+                            </span>
+                        )}
+
+                        {/* Show "Remote Order" badge for non-table orders */}
+                        {isRemoteOrder && (
+                            <span className="text-lg font-semibold px-4 py-1 bg-purple-100 text-purple-700 rounded-full border border-purple-300">
+                                🚚 Remote Order
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Customer Info Section - NOW SHOWING FOR ALL ORDERS */}
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Clock size={14} />
+                            <span>{elapsed}m ago</span>
+                        </div>
+
+                        {/* Show customer name and phone for ALL orders */}
+                        {(order.customerName || order.customerPhone) && (
+                            <div className="flex flex-col gap-0.5 mt-1 p-2 bg-purple-50 rounded-lg border border-purple-100">
+                                {order.customerName && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-purple-600 font-semibold">👤 Customer:</span>
+                                        <span className="font-bold text-gray-900">{order.customerName}</span>
+                                    </div>
+                                )}
+                                {order.customerPhone && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-purple-600 font-semibold">📞 Phone:</span>
+                                        <a
+                                            href={`tel:${order.customerPhone}`}
+                                            className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                                        >
+                                            {order.customerPhone}
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className={`text-right ml-4 ${isNew ? 'animate-pulse' : ''}`}>
+                    <div className={`text-xl font-bold ${elapsed > 12 ? 'text-red-600' : 'text-gray-500'}`}>
+                        {elapsed}min
+                    </div>
+                    {isNew && elapsed > 12 && (
+                        <span className="text-xs text-red-600 font-semibold">URGENT!</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Items */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 p-4 bg-gray-50 rounded-xl">
+                {order.items.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2">
+                        <span className="flex items-center justify-center w-7 h-7 bg-orange-500 text-white rounded text-sm font-bold">
+                            {item.quantity}x
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">{item.name}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+                {isNew && (
+                    <>
+                        <button
+                            onClick={() => onUpdateStatus('Preparing')}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-orange-200 active:scale-95"
+                        >
+                            <Utensils size={18} className="inline mr-2" />
+                            Start Preparation
+                        </button>
+                    </>
+                )}
+                {isPreparing && (
+                    <button
+                        onClick={() => onUpdateStatus('Ready')}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-green-200 active:scale-95"
+                    >
+                        <CheckCircle2 size={18} className="inline mr-2" />
+                        Mark Ready
+                    </button>
+                )}
+                {isReady && (
+                    <button
+                        onClick={() => onUpdateStatus('Served')}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-200 active:scale-95"
+                    >
+                        <Check size={18} className="inline mr-2" />
+                        Mark Served
+                    </button>
+                )}
+            </div>
+        </motion.div>
+    );
+}

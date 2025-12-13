@@ -1863,143 +1863,248 @@ function AnalyticsView({ orders, menu }: { orders: Order[], menu: any[] }) {
     );
 }
 
-// Duplicated Printing Logic for reliability
-// Custom KOT Printing Logic (Matching Staff Dashboard for mobile readability)
+// Custom KOT Printing Logic (Mobile-friendly, stays on screen)
 const handlePrintKOT = (order: any) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'width=500,height=800');
     if (!printWindow) return;
 
+    const tables = useStore.getState().tables;
+    const matchedTable = tables.find((t: any) => t.id === order.tableId || t.name === order.tableId);
+    const tableName = matchedTable ? matchedTable.name : 'Remote Order';
+
     printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
         <head>
+            <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <title>KOT #${order.id.slice(0, 4)}</title>
+            <title>KOT #${order.id.slice(0, 6)}</title>
             <style>
-                * { box-sizing: border-box; }
+                * { box-sizing: border-box; margin: 0; padding: 0; }
                 body { 
-                    font-family: 'Courier New', monospace; 
-                    margin: 0; 
-                    padding: 15px; 
-                    background: white; 
-                    color: black;
-                    min-height: 100vh; /* Ensure full height */
-                    display: flex;
-                    flex-direction: column;
+                    font-family: 'Arial', 'Helvetica', sans-serif; 
+                    background: #f5f5f5;
+                    color: #000;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    padding: 0;
+                    margin: 0;
                 }
                 .container {
-                    max-width: 100%;
+                    max-width: 500px;
                     margin: 0 auto;
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
+                    background: white;
+                    min-height: 100vh;
+                    padding: 0;
+                }
+                .content {
+                    padding: 20px;
+                    padding-bottom: 100px; /* Space for fixed buttons */
                 }
                 .header { 
                     text-align: center; 
-                    border-bottom: 3px solid #000; 
-                    padding-bottom: 15px; 
-                    margin-bottom: 20px; 
+                    background: #ff6b00;
+                    color: white;
+                    padding: 20px; 
+                    margin-bottom: 20px;
                 }
-                .header h2 { margin: 0 0 5px 0; font-size: 24px; text-transform: uppercase; }
-                .header h3 { margin: 0; font-size: 42px; font-weight: 900; line-height: 1; }
-                
-                .meta { 
+                .header h2 { 
                     font-size: 16px; 
-                    margin-bottom: 25px; 
-                    padding-bottom: 15px;
-                    border-bottom: 1px dashed #000;
-                    line-height: 1.5;
+                    font-weight: 600;
+                    margin-bottom: 8px;
+                    letter-spacing: 2px;
                 }
-                .items {
-                    flex: 1; /* Pushes actions to bottom if content is short, or flows normally */
+                .header h1 { 
+                    font-size: 32px; 
+                    font-weight: 900;
+                    margin: 0;
+                }
+                .meta { 
+                    font-size: 18px; 
+                    margin-bottom: 25px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #e9ecef;
+                }
+                .meta-row { 
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #dee2e6;
+                }
+                .meta-row:last-child {
+                    border-bottom: none;
+                }
+                .meta-label { 
+                    font-weight: 700; 
+                    color: #495057;
+                }
+                .meta-value {
+                    font-weight: 600;
+                    color: #212529;
+                }
+                .section-title {
+                    font-size: 20px;
+                    font-weight: 800;
+                    margin: 25px 0 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 3px solid #ff6b00;
+                    color: #212529;
+                }
+                .items { 
+                    margin: 20px 0;
                 }
                 .item { 
                     display: flex; 
-                    align-items: flex-start;
-                    margin-bottom: 15px; 
-                    font-size: 20px; 
-                    font-weight: bold;
-                    line-height: 1.3;
+                    align-items: center;
+                    padding: 15px; 
+                    margin-bottom: 10px;
+                    background: #fff;
+                    border: 2px solid #e9ecef;
+                    border-radius: 10px;
+                    font-size: 18px;
                 }
-                .qty { 
-                    min-width: 45px;
-                    margin-right: 10px; 
-                    font-size: 24px;
-                    display: inline-block;
-                }
-                
-                .actions {
-                    margin-top: 30px;
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 15px;
-                    padding-top: 20px;
-                    border-top: 2px solid #eee;
-                }
-                
-                .btn {
-                    padding: 20px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    border: none;
-                    border-radius: 12px;
-                    cursor: pointer;
-                    text-transform: uppercase;
-                    width: 100%;
+                .item-qty { 
+                    background: #ff6b00;
+                    color: white;
+                    font-size: 22px; 
+                    font-weight: 900; 
+                    min-width: 50px;
+                    height: 50px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    border-radius: 8px;
+                    margin-right: 15px;
+                    flex-shrink: 0;
+                }
+                .item-name {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #212529;
+                    flex: 1;
+                }
+                .summary { 
+                    margin-top: 30px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #ff6b00;
+                    text-align: center;
+                }
+                .summary-item {
+                    font-size: 18px;
+                    font-weight: 700;
+                    padding: 8px 0;
+                    color: #495057;
+                }
+                .button-container {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    padding: 15px;
+                    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+                    display: flex;
                     gap: 10px;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    z-index: 1000;
                 }
-                
-                .print-btn {
-                    background: #000;
-                    color: #fff;
-                    grid-column: span 2;
+                .btn {
+                    flex: 1;
+                    padding: 16px;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
                 }
-                
-                .close-btn {
-                    background: #e5e5e5;
-                    color: #333;
-                    grid-column: span 2;
+                .btn-print {
+                    background: #ff6b00;
+                    color: white;
+                }
+                .btn-close {
+                    background: #6c757d;
+                    color: white;
+                }
+                .btn:active {
+                    transform: scale(0.98);
                 }
 
-                @media print { 
-                    .no-print { display: none !important; } 
-                    body { padding: 0; }
-                    .header h3 { font-size: 32px; }
+                @media print {
+                    body { background: white; }
+                    .button-container { display: none; }
+                    .content { padding-bottom: 20px; }
+                    .container { background: white; }
+                }
+
+                @media (max-width: 480px) {
+                    .header h1 { font-size: 28px; }
                     .item { font-size: 16px; }
-                    .qty { font-size: 18px; }
+                    .item-name { font-size: 18px; }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="header">
-                    <h2>Kitchen Order</h2>
-                    <h3>${order.tableId}</h3>
-                </div>
-                <div class="meta">
-                    <strong>KOT #:</strong> ${order.id.slice(0, 6)}<br>
-                    <strong>Time:</strong> ${new Date().toLocaleTimeString()}<br>
-                    <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-                    ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
-                    ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
-                </div>
-                <div class="items">
-                    ${order.items.map((i: any) => `
-                        <div class="item">
-                            <span class="qty">${i.quantity}</span>
-                            <span>${i.name}</span>
+                <div class="content">
+                    <div class="header">
+                        <h2>KITCHEN ORDER TICKET</h2>
+                        <h1>KOT #${order.id.slice(0, 6)}</h1>
+                    </div>
+                    
+                    <div class="meta">
+                        <div class="meta-row">
+                            <span class="meta-label">TABLE:</span>
+                            <span class="meta-value">${tableName}</span>
                         </div>
-                    `).join('')}
+                        ${order.customerName ? `
+                        <div class="meta-row">
+                            <span class="meta-label">CUSTOMER:</span>
+                            <span class="meta-value">${order.customerName}</span>
+                        </div>` : ''}
+                        ${order.customerPhone ? `
+                        <div class="meta-row">
+                            <span class="meta-label">PHONE:</span>
+                            <span class="meta-value">${order.customerPhone}</span>
+                        </div>` : ''}
+                        <div class="meta-row">
+                            <span class="meta-label">TIME:</span>
+                            <span class="meta-value">${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">DATE:</span>
+                            <span class="meta-value">${new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="section-title">🍽️ ORDER ITEMS</h3>
+                    <div class="items">
+                        ${order.items.map((item: any) => `
+                            <div class="item">
+                                <div class="item-qty">${item.quantity}x</div><div class="item-name">${item.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="summary">
+                        <div class="summary-item">Total Items: ${order.items.reduce((sum: number, i: any) => sum + i.quantity, 0)}</div>
+                        <div class="summary-item" style="color: #212529; font-size: 16px; margin-top: 10px;">
+                            Printed: ${new Date().toLocaleTimeString('en-IN')}
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="actions no-print">
-                    <button class="btn print-btn" onclick="window.print()">
+
+                <div class="button-container">
+                    <button class="btn btn-print" onclick="window.print()">
                         🖨️ PRINT KOT
                     </button>
-                    <button class="btn close-btn" onclick="window.close()">
-                        ✖ CLOSE
+                    <button class="btn btn-close" onclick="window.close()">
+                        ✖️ CLOSE
                     </button>
                 </div>
             </div>
@@ -2010,150 +2115,324 @@ const handlePrintKOT = (order: any) => {
 };
 
 const handlePrintBill = (order: any) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'width=500,height=900');
     if (!printWindow) return;
-    const total = order.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+
+    const tables = useStore.getState().tables;
+    const matchedTable = tables.find((t: any) => t.id === order.tableId || t.name === order.tableId);
+    const tableName = matchedTable ? matchedTable.name : 'Remote Order';
+    const contactInfo = useStore.getState().contactInfo;
 
     printWindow.document.write(`
+    <!DOCTYPE html>
     <html>
         <head>
+            <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <title>Bill #${order.id.slice(0, 4)}</title>
+            <title>Bill #${order.id.slice(0, 6)}</title>
             <style>
-                * { box-sizing: border-box; }
+                * { box-sizing: border-box; margin: 0; padding: 0; }
                 body { 
-                    font-family: 'Courier New', monospace; 
-                    margin: 0; 
-                    padding: 15px; 
-                    background: white; 
-                    color: black;
-                    min-height: 100vh;
-                    display: flex;
-                    flex-direction: column;
+                    font-family: 'Arial', 'Helvetica', sans-serif; 
+                    background: #f5f5f5;
+                    color: #000;
+                    font-size: 16px;
+                    padding: 0;
+                    margin: 0;
                 }
                 .container {
-                    max-width: 100%;
+                    max-width: 500px;
                     margin: 0 auto;
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
+                    background: white;
+                    min-height: 100vh;
+                    padding: 0;
+                }
+                .content {
+                    padding: 20px;
+                    padding-bottom: 100px; /* Space for fixed buttons */
                 }
                 .header { 
                     text-align: center; 
-                    border-bottom: 2px dashed #000; 
-                    padding-bottom: 15px; 
-                    margin-bottom: 20px; 
-                }
-                .store-name { font-size: 28px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
-                .store-subtitle { font-size: 14px; margin-bottom: 10px; }
-                
-                .meta { 
-                    font-size: 14px; 
-                    margin-bottom: 20px; 
-                    padding-bottom: 15px;
-                    border-bottom: 1px solid #000;
-                    line-height: 1.4;
-                }
-                
-                .items {
-                    flex: 1;
-                }
-                .item { 
-                    display: flex; 
-                    justify-content: space-between;
-                    margin-bottom: 10px; 
-                    font-size: 16px; 
-                    font-weight: bold;
-                }
-                .item-name { flex: 1; margin-right: 10px; }
-                
-                .totals {
-                    margin-top: 20px;
-                    border-top: 2px solid #000;
-                    padding-top: 15px;
-                }
-                .row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 5px; }
-                .grand { font-size: 24px; font-weight: 900; margin-top: 10px; }
-                
-                .footer {
-                    margin-top: 30px;
-                    text-align: center;
-                    font-size: 14px;
+                    background: linear-gradient(135deg, #DAA520 0%, #B8860B 100%);
+                    color: white;
+                    padding: 25px 20px;
                     margin-bottom: 20px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 }
-
-                .actions {
-                    margin-top: auto;
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 15px;
-                    padding-top: 20px;
-                    border-top: 2px solid #eee;
+                .header h1 { 
+                    font-size: 28px; 
+                    font-weight: 900;
+                    margin-bottom: 5px;
+                    letter-spacing: 1px;
                 }
-                
-                .btn {
-                    padding: 15px;
+                .header .subtitle {
+                    font-size: 14px;
+                    opacity: 0.95;
+                    margin-bottom: 8px;
+                }
+                .header .location {
+                    font-size: 13px;
+                    opacity: 0.9;
+                    font-style: italic;
+                }
+                .bill-tag {
+                    background: white;
+                    color: #DAA520;
+                    display: inline-block;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: 800;
+                    margin-top: 12px;
+                    font-size: 16px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                .bill-info { 
+                    margin: 20px 0;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #e9ecef;
+                }
+                .bill-info-row { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #dee2e6;
+                }
+                .bill-info-row:last-child {
+                    border-bottom: none;
+                }
+                .bill-info-row strong {
+                    color: #495057;
+                    font-weight: 700;
+                }
+                .bill-info-row span {
+                    color: #212529;
+                    font-weight: 600;
+                }
+                .section-title {
+                    font-size: 20px;
+                    font-weight: 800;
+                    margin: 25px 0 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 3px solid #DAA520;
+                    color: #212529;
+                }
+                .items { margin: 20px 0; }
+                .items table { 
+                    width: 100%; 
+                    border-collapse: collapse;
+                }
+                .items th { 
+                    background: #DAA520;
+                    color: white;
+                    padding: 12px 8px; 
+                    text-align: left; 
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+                .items th:nth-child(2),
+                .items th:nth-child(3),
+                .items th:nth-child(4) {
+                    text-align: right;
+                }
+                .items td { 
+                    padding: 12px 8px; 
+                    border-bottom: 1px solid #e9ecef;
+                    font-size: 15px;
+                }
+                .items td:nth-child(2),
+                .items td:nth-child(3),
+                .items td:nth-child(4) {
+                    text-align: right;
+                }
+                .items tr:last-child td {
+                    border-bottom: none;
+                }
+                .total-section { 
+                    margin-top: 25px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border: 2px solid #DAA520;
+                }
+                .total-row { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 8px 0;
+                    font-size: 16px;
+                }
+                .total-row.grand { 
+                    font-size: 24px; 
+                    font-weight: 900; 
+                    margin-top: 12px;
+                    padding-top: 12px;
+                    border-top: 2px dashed #DAA520;
+                    color: #DAA520;
+                }
+                .footer { 
+                    text-align: center; 
+                    margin-top: 30px; 
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                }
+                .footer p {
+                    font-size: 15px;
+                    color: #495057;
+                    margin: 5px 0;
+                }
+                .footer .thank-you {
                     font-size: 18px;
-                    font-weight: bold;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    text-transform: uppercase;
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 5px;
+                    font-weight: 700;
+                    color: #DAA520;
+                    margin-bottom: 10px;
                 }
-                
-                .print-btn { background: #000; color: #fff; grid-column: span 2; }
-                .close-btn { background: #e5e5e5; color: #333; grid-column: span 2; }
+                .footer .contact {
+                    font-size: 13px;
+                    color: #6c757d;
+                    margin-top: 15px;
+                }
+                .button-container {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    padding: 15px;
+                    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+                    display: flex;
+                    gap: 10px;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    z-index: 1000;
+                }
+                .btn {
+                    flex: 1;
+                    padding: 16px;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .btn-print {
+                    background: #DAA520;
+                    color: white;
+                }
+                .btn-close {
+                    background: #6c757d;
+                    color: white;
+                }
+                .btn:active {
+                    transform: scale(0.98);
+                }
 
-                @media print { 
-                    .no-print { display: none !important; } 
-                    body { padding: 0; }
+                @media print {
+                    body { background: white; }
+                    .button-container { display: none; }
+                    .content { padding-bottom: 20px; }
+                    .container { background: white; }
+                }
+
+                @media (max-width: 480px) {
+                    .header h1 { font-size: 24px; }
+                    .total-row.grand { font-size: 20px; }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="header">
-                    <div class="store-name">TashiZom</div>
-                    <div class="store-subtitle">Multi-Cuisine Restaurant</div>
-                </div>
-                <div class="meta">
-                    <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-                    <strong>Order #:</strong> ${order.id.slice(0, 8)}<br>
-                    <strong>Table:</strong> ${order.tableId}<br>
-                    ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
-                    ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
-                </div>
-                <div class="items">
-                    ${order.items.map((i: any) => `
-                        <div class="item">
-                            <span class="item-name">${i.quantity} x ${i.name}</span>
-                            <span>₹${(i.price * i.quantity).toFixed(2)}</span>
+                <div class="content">
+                    <div class="header">
+                        <h1>TashiZom</h1>
+                        <div class="subtitle">Multi-Cuisine Restaurant</div>
+                        <div class="location">📍 Kibber, Spiti Valley</div>
+                        <div class="bill-tag">BILL #${order.id.slice(0, 6)}</div>
+                    </div>
+                    
+                    <div class="bill-info">
+                        <div class="bill-info-row">
+                            <strong>Table:</strong>
+                            <span>${tableName}</span>
                         </div>
-                    `).join('')}
-                </div>
-                <div class="totals">
-                    <div class="row grand"><span>TOTAL</span><span>₹${total.toFixed(2)}</span></div>
-                </div>
-                <div class="footer">
-                    Thank you for visiting!<br>Please come again.
-                </div>
-                
-                <div class="actions no-print">
-                    <button class="btn print-btn" onclick="window.print()">
-                        🧾 PRINT BILL
-                    </button>
-                    <button class="btn close-btn" onclick="window.close()">
-                        ✖ CLOSE
-                    </button>
-                </div>
-            </div>
-        </body>
-    </html>
+                        ${order.customerName ? `
+                        <div class="bill-info-row">
+                            <strong>Customer:</strong>
+                            <span>${order.customerName}</span>
+                        </div>` : ''}
+                        ${order.customerPhone ? `
+                        <div class="bill-info-row">
+                            <strong>Phone:</strong>
+                            <span>${order.customerPhone}</span>
+                        </div>` : ''}
+                        <div class="bill-info-row">
+                            <strong>Date:</strong>
+                            <span>${new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                        <div class="bill-info-row">
+                            <strong>Time:</strong>
+                            <span>${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div >
+                    </div >
+                    
+                    <h3 class="section-title">📋 ORDER DETAILS</h3>
+                    <div class="items">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${order.items.map((item: any) => `
+                                    <tr>
+                                        <td>${item.name}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>₹${item.price}</td>
+                                        <td><strong>₹${item.price * item.quantity}</strong></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>₹${order.totalAmount}</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span>TOTAL:</span>
+                            <span>₹${order.totalAmount}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        <p class="thank-you">🙏 Thank you for dining with us!</p>
+                        <p>We hope to serve you again soon</p>
+                        <p class="contact">📞 ${contactInfo?.phone || '+91 9876543210'}</p>
+                        <p style="margin-top: 20px; font-size: 12px; color: #adb5bd;">
+                            Generated: ${new Date().toLocaleString('en-IN')}
+                        </p>
+                    </div>
+                </div >
+
+    <div class="button-container">
+        <button class="btn btn-print" onclick="window.print()">
+            🖨️ PRINT BILL
+        </button>
+        <button class="btn btn-close" onclick="window.close()">
+            ✖️ CLOSE
+        </button>
+    </div>
+            </div >
+        </body >
+    </html >
     `);
     printWindow.document.close();
 };
@@ -2197,7 +2476,7 @@ function AdminOrderCard({ order }: { order: any }) {
                     <h4 className="font-bold text-gray-900 text-lg">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</h4>
                     {(order.customerName || order.customerPhone) && (
                         <p className="text-xs text-tashi-primary font-mono">
-                            {order.customerName} {order.customerPhone && `• ${order.customerPhone}`}
+                            {order.customerName} {order.customerPhone && `• ${order.customerPhone} `}
                         </p>
                     )}
                 </div>
@@ -2231,7 +2510,7 @@ function StatusBadge({ status }: { status: string }) {
         'Served': 'bg-green-500/20 text-green-500',
         'Paid': 'bg-gray-500/20 text-gray-500',
     } as any;
-    return <span className={`px-2 py-1 rounded text-xs font-bold ${colors[status] || 'bg-gray-500/20'}`}>{status}</span>;
+    return <span className={`px - 2 py - 1 rounded text - xs font - bold ${colors[status] || 'bg-gray-500/20'} `}>{status}</span>;
 }
 
 // Drag and Drop Components
@@ -2315,8 +2594,8 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center justify-between bg-white p-3 rounded-lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'
-                }`}
+            className={`flex items - center justify - between bg - white p - 3 rounded - lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'
+                } `}
         >
             {/* Drag Handle */}
             <div
@@ -2341,7 +2620,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 <div>
                     <div className="flex items-center gap-2">
                         <p className="font-bold text-gray-900">{item.name}</p>
-                        <span className={`w-2 h-2 rounded-full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'}`} />
+                        <span className={`w - 2 h - 2 rounded - full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'} `} />
                         {item.isVegetarian ? <Leaf size={12} className="text-green-500" /> : <Drumstick size={12} className="text-red-500" />}
                     </div>
                     <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
@@ -2352,20 +2631,20 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { available: !(item.available !== false) })}
-                    className={`px-2 py-1 rounded text-xs font-bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
+                    className={`px - 2 py - 1 rounded text - xs font - bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'} `}
                 >
                     {item.available !== false ? 'Active' : 'Sold Out'}
                 </button>
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
-                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'}`}
+                    className={`p - 1.5 rounded text - xs font - bold flex items - center justify - center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'} `}
                     title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
                 >
                     {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
                 </button>
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { isChefSpecial: !item.isChefSpecial })}
-                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center border transition-colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'}`}
+                    className={`p - 1.5 rounded text - xs font - bold flex items - center justify - center border transition - colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'} `}
                     title={item.isChefSpecial ? "Remove from Chef's Specials" : "Mark as Chef's Special"}
                 >
                     <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
@@ -2443,28 +2722,28 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'all' ? 'bg-gray-100 border-gray-400 ring-2 ring-gray-200' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}
+                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'all' ? 'bg-gray-100 border-gray-400 ring-2 ring-gray-200' : 'bg-gray-50 border-gray-200 hover:border-gray-300'} `}
                     >
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
                         <p className="text-3xl font-bold text-gray-900 mt-1">{totalScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('app')}
-                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'app' ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-200' : 'bg-blue-50 border-blue-100 hover:border-blue-300'}`}
+                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'app' ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-200' : 'bg-blue-50 border-blue-100 hover:border-blue-300'} `}
                     >
                         <p className="text-xs text-blue-600 uppercase tracking-wider font-bold">App / Web</p>
                         <p className="text-3xl font-bold text-blue-600 mt-1">{appScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('table')}
-                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'table' ? 'bg-green-100 border-green-400 ring-2 ring-green-200' : 'bg-green-50 border-green-100 hover:border-green-300'}`}
+                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'table' ? 'bg-green-100 border-green-400 ring-2 ring-green-200' : 'bg-green-50 border-green-100 hover:border-green-300'} `}
                     >
                         <p className="text-xs text-green-600 uppercase tracking-wider font-bold">Table QR</p>
                         <p className="text-3xl font-bold text-green-600 mt-1">{tableScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('unique')}
-                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'unique' ? 'bg-purple-100 border-purple-400 ring-2 ring-purple-200' : 'bg-purple-50 border-purple-100 hover:border-purple-300'}`}
+                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'unique' ? 'bg-purple-100 border-purple-400 ring-2 ring-purple-200' : 'bg-purple-50 border-purple-100 hover:border-purple-300'} `}
                     >
                         <p className="text-xs text-purple-600 uppercase tracking-wider font-bold">Unique Visitors</p>
                         <p className="text-3xl font-bold text-purple-600 mt-1">{uniqueUsers}</p>
@@ -2506,13 +2785,13 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                                     {new Date(scan.timestamp).toLocaleString(undefined, {
                                                         month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                                                     })}
-                                                    <div className="text-[10px] text-gray-400 font-normal">{scan.type === 'table_qr' ? `Table ${scan.tableId || '?'}` : 'Direct Link'}</div>
+                                                    <div className="text-[10px] text-gray-400 font-normal">{scan.type === 'table_qr' ? `Table ${scan.tableId || '?'} ` : 'Direct Link'}</div>
                                                 </td>
                                                 <td className="py-3 align-top">
                                                     <div className="flex flex-col">
                                                         <span className="font-mono text-xs text-blue-600 font-bold">{ipInfo.ip || 'Unknown IP'}</span>
                                                         <span className="text-[10px] text-gray-500">
-                                                            {ipInfo.city ? `${ipInfo.city}, ${ipInfo.region}` : (scan.tableId ? 'Local Scan' : 'N/A')}
+                                                            {ipInfo.city ? `${ipInfo.city}, ${ipInfo.region} ` : (scan.tableId ? 'Local Scan' : 'N/A')}
                                                         </span>
                                                         {scan.distanceKm !== undefined && scan.distanceKm !== null && (
                                                             <span className="text-[9px] font-bold text-indigo-600">
@@ -2616,11 +2895,11 @@ function SortableCategoryItem({ category }: { category: string }) {
                 onPointerDown={(e) => e.stopPropagation()} // Prevent drag
                 onClick={async (e) => {
                     e.stopPropagation();
-                    const newName = prompt(`Rename category "${category}" to:`, category);
+                    const newName = prompt(`Rename category "${category}" to: `, category);
                     if (!newName || newName === category) return;
 
                     const itemsToUpdate = menu.filter(i => i.category === category);
-                    if (confirm(`This will move ${itemsToUpdate.length} items from "${category}" to "${newName}". Continue?`)) {
+                    if (confirm(`This will move ${itemsToUpdate.length} items from "${category}" to "${newName}".Continue ? `)) {
                         for (const item of itemsToUpdate) {
                             await useStore.getState().updateMenuItem(item.id, { category: newName });
                         }
@@ -2639,10 +2918,10 @@ function TabButton({ active, label, icon, onClick }: { active: boolean; label: s
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${active
-                ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
-                }`}
+            className={`flex items - center gap - 2 px - 4 py - 2 rounded - lg transition - all ${active
+                    ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
+                } `}
         >
             {icon}
             <span>{label}</span>
@@ -2654,12 +2933,12 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center py-2 rounded-lg transition-all ${active
-                ? 'text-tashi-primary'
-                : 'text-gray-400 hover:text-gray-600'
-                }`}
+            className={`flex flex - col items - center justify - center py - 2 rounded - lg transition - all ${active
+                    ? 'text-tashi-primary'
+                    : 'text-gray-400 hover:text-gray-600'
+                } `}
         >
-            <div className={`p-1 rounded-full ${active ? 'bg-tashi-primary/10' : ''}`}>
+            <div className={`p - 1 rounded - full ${active ? 'bg-tashi-primary/10' : ''} `}>
                 {icon}
             </div>
             <span className="text-[10px] font-bold mt-1">{label}</span>

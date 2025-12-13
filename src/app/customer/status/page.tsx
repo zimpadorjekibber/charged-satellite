@@ -4,19 +4,30 @@
 import { useStore, Order } from '@/lib/store';
 import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function OrderStatusPage() {
     const orders = useStore((state) => state.orders);
     const currentTableId = useStore((state) => state.currentTableId);
     const sessionId = useStore((state) => state.sessionId);
+    const router = useRouter();
+
+    // Track which orders we've already seen as paid to avoid duplicate redirects
+    const processedPaidOrders = useRef<Set<string>>(new Set());
 
     // Filter orders: Match Session ID primarily
     const myOrders = orders.filter(o =>
         (o.sessionId === sessionId) &&
         o.status !== 'Rejected' &&
         o.status !== 'Paid'
+    );
+
+    // Find recently paid orders for this session
+    const myPaidOrders = orders.filter(o =>
+        (o.sessionId === sessionId) &&
+        o.status === 'Paid'
     );
 
     // Polling to keep orders updated
@@ -28,8 +39,74 @@ export default function OrderStatusPage() {
         return () => clearInterval(interval);
     }, [initialize]);
 
+    // Auto-redirect to feedback page when an order is marked as Paid
+    useEffect(() => {
+        if (myPaidOrders.length > 0) {
+            // Find the most recent paid order that we haven't processed yet
+            const latestPaidOrder = myPaidOrders
+                .filter(o => !processedPaidOrders.current.has(o.id))
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+            if (latestPaidOrder) {
+                // Mark this order as processed
+                processedPaidOrders.current.add(latestPaidOrder.id);
+
+                // Redirect to feedback page with order details
+                const params = new URLSearchParams({
+                    orderId: latestPaidOrder.id,
+                    customerName: latestPaidOrder.customerName || '',
+                    customerPhone: latestPaidOrder.customerPhone || ''
+                });
+
+                router.push(`/customer/feedback?${params.toString()}`);
+            }
+        }
+    }, [myPaidOrders, router]);
+
 
     if (myOrders.length === 0) {
+        if (myPaidOrders.length > 0) {
+            const latestPaid = myPaidOrders[0];
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center space-y-6">
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30"
+                    >
+                        <CheckCircle2 size={48} className="text-white" />
+                    </motion.div>
+
+                    <div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Order Completed!</h2>
+                        <p className="text-gray-400">We hope you enjoyed your meal.</p>
+                    </div>
+
+                    <div className="w-full max-w-sm bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
+                        <p className="text-sm text-gray-300 mb-4">How was your experience?</p>
+                        <button
+                            onClick={() => {
+                                const params = new URLSearchParams({
+                                    orderId: latestPaid.id,
+                                    customerName: latestPaid.customerName || '',
+                                    customerPhone: latestPaid.customerPhone || ''
+                                });
+                                router.push(`/customer/feedback?${params.toString()}`);
+                            }}
+                            className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-xl shadow-lg transition-transform hover:scale-105 flex items-center justify-center gap-2"
+                        >
+                            <Star size={20} className="fill-black" />
+                            Leave a Review
+                        </button>
+                    </div>
+
+                    <Link href="/customer/menu" className="text-gray-500 hover:text-white text-sm mt-4">
+                        Back to Menu
+                    </Link>
+                </div>
+            );
+        }
+
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center">
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
