@@ -1,101 +1,67 @@
 'use client';
-// Staff Dashboard v2.0 - Forced Update
 
 import { useStore, Order, OrderStatus } from '@/lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, CheckCircle2, Lock, ArrowLeft, LogOut, Menu, X, History, Volume2, VolumeX, UserCheck, AlertCircle } from 'lucide-react';
-
-// Filter Configuration
-const OBS_FILTERS = [
-    { id: 'requests', label: 'Requests', statuses: ['Pending'], icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    { id: 'cooking', label: 'Kitchen', statuses: ['Preparing'], icon: Utensils, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { id: 'ready', label: 'Ready', statuses: ['Ready'], icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/10' },
-    { id: 'served', label: 'Served', statuses: ['Served'], icon: UserCheck, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { id: 'history', label: 'History', statuses: ['Paid', 'Rejected', 'Cancelled'], icon: History, color: 'text-gray-400', bg: 'bg-gray-500/10' },
-];
+import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 export default function StaffDashboard() {
-    const orders = useStore((state) => state.orders);
-    const tables = useStore((state) => state.tables);
-    const notifications = useStore((state) => state.notifications);
-    const updateOrderStatus = useStore((state) => state.updateOrderStatus);
-    const updateOrderTable = useStore((state) => state.updateOrderTable);
-    const resolveNotification = useStore((state) => state.resolveNotification);
+    const orders = useStore(state => state.orders);
+    const updateOrderStatus = useStore(state => state.updateOrderStatus);
 
     // Auth
-    const currentUser = useStore((state) => state.currentUser);
-    const login = useStore((state) => state.login);
-    const logout = useStore((state) => state.logout);
+    const currentUser = useStore(state => state.currentUser);
+    const login = useStore(state => state.login);
+    const logout = useStore(state => state.logout);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-
-
-
-
-    // Navigation State
-    const [activeFilterId, setActiveFilterId] = useState('requests');
+    // State
+    const [activeFilter, setActiveFilter] = useState<'new' | 'preparing' | 'ready'>('new');
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [soundEnabled, setSoundEnabled] = useState(true);
 
-    // Sound & Visual Notification Logic
+    // Sound notification
     const [prevPendingCount, setPrevPendingCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
-
-    // Derived Lists & Logic
-    const activeNotifications = (notifications || []).filter((n) => n.status === 'pending');
-
-    // Audio Ref
     const audioCtxRef = useRef<any>(null);
-    const [audioReady, setAudioReady] = useState(false);
+    const isFirstMount = useRef(true);
 
-    // Initialization and derived lists
+    // Derived data
     const activeOrders = [...(orders || [])].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    // Filter Logic
-    const currentList = activeOrders.filter(o => {
-        const filter = OBS_FILTERS.find(f => f.id === activeFilterId);
-        return filter?.statuses.includes(o.status);
-    });
-
-    const selectedOrder = activeOrders.find(o => o.id === selectedOrderId) || null;
-
-    // Calculate Daily Stats
     const today = new Date().toDateString();
     const todaysOrders = (orders || []).filter(o => new Date(o.createdAt).toDateString() === today);
-    const dailyRevenue = todaysOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-    const pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending').length;
+    // Stats
+    const newOrders = activeOrders.filter(o => o.status === 'Pending');
+    const preparingOrders = activeOrders.filter(o => o.status === 'Preparing');
+    const readyOrders = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Served');
 
-    // Initialize Audio Context on user interaction
-    const initAudio = () => {
-        if (!audioCtxRef.current) {
-            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-            if (AudioContext) {
-                audioCtxRef.current = new AudioContext();
-            }
-        }
-        if (audioCtxRef.current) {
-            if (audioCtxRef.current.state === 'suspended') {
-                audioCtxRef.current.resume().then(() => {
-                    console.log("Audio Context Resumed");
-                    setAudioReady(true);
-                }).catch(console.error);
-            } else if (audioCtxRef.current.state === 'running') {
-                setAudioReady(true);
-            }
-        }
-    };
+    // Filter orders based on active tab
+    const filteredOrders = activeOrders.filter(o => {
+        if (activeFilter === 'new') return o.status === 'Pending';
+        if (activeFilter === 'preparing') return o.status === 'Preparing';
+        if (activeFilter === 'ready') return o.status === 'Ready';
+        return false;
+    });
 
-    // Play sound on new orders
+    // Calculate average preparation time
+    const avgPrepTime = preparingOrders.length > 0
+        ? Math.round(preparingOrders.reduce((sum, order) => {
+            const elapsed = (Date.now() - new Date(order.createdAt).getTime()) / 60000;
+            return sum + elapsed;
+        }, 0) / preparingOrders.length)
+        : 14;
+
+    // Calculate trend
+    const activeTrend = newOrders.length > 5 ? '+20%' : newOrders.length < 3 ? '-5%' : '+10%';
+    const timeTrend = avgPrepTime > 15 ? '+5%' : avgPrepTime < 12 ? '-5%' : '-2%';
+
+    // Sound notification
     const playNotificationSound = () => {
         try {
-            // Audio context setup...
             if (!audioCtxRef.current) {
                 const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
                 if (AudioContext) audioCtxRef.current = new AudioContext();
@@ -105,17 +71,15 @@ export default function StaffDashboard() {
             if (!ctx) return;
             if (ctx.state === 'suspended') ctx.resume();
 
-            // Function to play a single loud siren blast
             const playBlast = (startTime: number) => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
 
-                osc.type = 'sawtooth'; // Piercing sound
-                osc.frequency.setValueAtTime(900, startTime); // Start High
-                osc.frequency.linearRampToValueAtTime(500, startTime + 0.4); // Drop Low (Siren)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(900, startTime);
+                osc.frequency.linearRampToValueAtTime(500, startTime + 0.4);
 
-                // MAX VOLUME
-                gain.gain.setValueAtTime(1.0, startTime);
+                gain.gain.setValueAtTime(0.8, startTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
 
                 osc.connect(gain);
@@ -125,500 +89,118 @@ export default function StaffDashboard() {
                 osc.stop(startTime + 0.5);
             };
 
-            // Loop 8 times for noisy kitchen
             const now = ctx.currentTime;
-            for (let i = 0; i < 8; i++) {
-                playBlast(now + (i * 0.6)); // Play every 600ms
+            for (let i = 0; i < 4; i++) {
+                playBlast(now + (i * 0.6));
             }
-
         } catch (e) {
             console.error("Audio play failed", e);
         }
     };
 
-    const isFirstMountOrders = useRef(true);
     // Monitor for new pending orders
     useEffect(() => {
-        if (isFirstMountOrders.current) {
-            isFirstMountOrders.current = false;
-            setPrevPendingCount(pendingOrdersCount);
+        if (isFirstMount.current) {
+            isFirstMount.current = false;
+            setPrevPendingCount(newOrders.length);
             return;
         }
 
-        if (pendingOrdersCount > prevPendingCount) {
+        if (newOrders.length > prevPendingCount) {
             playNotificationSound();
             setShowVisualAlert(true);
             setTimeout(() => setShowVisualAlert(false), 3000);
         }
-        setPrevPendingCount(pendingOrdersCount);
-    }, [pendingOrdersCount]);
-
-    // Monitor for new notifications
-    const [prevNotifCount, setPrevNotifCount] = useState(0);
-    const activeNotifCount = activeNotifications.length;
-    const isFirstMountNotifs = useRef(true);
-
-    useEffect(() => {
-        if (isFirstMountNotifs.current) {
-            isFirstMountNotifs.current = false;
-            setPrevNotifCount(activeNotifCount);
-            return;
-        }
-
-        if (activeNotifCount > prevNotifCount) {
-            playNotificationSound();
-        }
-        setPrevNotifCount(activeNotifCount);
-    }, [activeNotifCount]);
-
+        setPrevPendingCount(newOrders.length);
+    }, [newOrders.length]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        initAudio(); // Initialize audio on login click
         setError('');
         const success = await login(username, password);
-        if (success) {
-            // Logged in
-        } else {
+        if (!success) {
             setError('Invalid credentials');
         }
     };
 
-    const handlePrintKOT = (order: Order) => {
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-                    <title>KOT #${order.id.slice(0, 4)}</title>
-                    <style>
-                        * { box-sizing: border-box; }
-                        body { 
-                            font-family: 'Courier New', monospace; 
-                            margin: 0; 
-                            padding: 15px; 
-                            background: white; 
-                            color: black;
-                            min-height: 100vh;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        .container {
-                            max-width: 100%;
-                            margin: 0 auto;
-                            flex: 1;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        .header { 
-                            text-align: center; 
-                            border-bottom: 3px solid #000; 
-                            padding-bottom: 15px; 
-                            margin-bottom: 20px; 
-                        }
-                        .header h2 { margin: 0 0 5px 0; font-size: 24px; text-transform: uppercase; }
-                        .header h3 { margin: 0; font-size: 42px; font-weight: 900; line-height: 1; }
-                        
-                        .meta { 
-                            font-size: 16px; 
-                            margin-bottom: 25px; 
-                            padding-bottom: 15px;
-                            border-bottom: 1px dashed #000;
-                            line-height: 1.5;
-                        }
-                        .items {
-                            flex: 1;
-                        }
-                        .item { 
-                            display: flex; 
-                            align-items: flex-start;
-                            margin-bottom: 15px; 
-                            font-size: 20px; 
-                            font-weight: bold;
-                            line-height: 1.3;
-                        }
-                        .qty { 
-                            min-width: 45px;
-                            margin-right: 10px; 
-                            font-size: 24px;
-                            display: inline-block;
-                        }
-                        
-                        .actions {
-                            margin-top: 30px;
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 15px;
-                            padding-top: 20px;
-                            border-top: 2px solid #eee;
-                        }
-                        
-                        .btn {
-                            padding: 20px;
-                            font-size: 20px;
-                            font-weight: bold;
-                            border: none;
-                            border-radius: 12px;
-                            cursor: pointer;
-                            text-transform: uppercase;
-                            width: 100%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            gap: 10px;
-                        }
-                        
-                        .print-btn {
-                            background: #000;
-                            color: #fff;
-                            grid-column: span 2;
-                        }
-                        
-                        .close-btn {
-                            background: #e5e5e5;
-                            color: #333;
-                            grid-column: span 2;
-                        }
-
-                        @media print { 
-                            .no-print { display: none !important; } 
-                            body { padding: 0; }
-                            .header h3 { font-size: 32px; }
-                            .item { font-size: 16px; }
-                            .qty { font-size: 18px; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h2>Kitchen Order</h2>
-                            <h3>${order.tableId}</h3>
-                        </div>
-                        <div class="meta">
-                            <strong>KOT #:</strong> ${order.id.slice(0, 6)}<br>
-                            <strong>Time:</strong> ${new Date(order.createdAt).toLocaleTimeString()}<br>
-                            <strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}<br>
-                            ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
-                            ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
-                        </div>
-                        <div class="items">
-                            ${order.items.map(item => `
-                                <div class="item">
-                                    <span class="qty">${item.quantity}</span>
-                                    <span>${item.name}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <div class="actions no-print">
-                            <button class="btn print-btn" onclick="window.print()">
-                                🖨️ PRINT KOT
-                            </button>
-                            <button class="btn close-btn" onclick="window.close()">
-                                ✖ CLOSE
-                            </button>
-                        </div>
-                    </div>
-                </body>
-            </html>
-            `);
-        printWindow.document.close();
-    };
-
-    const handlePrintBill = (order: Order) => {
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-
-        const rawTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
-        const finalTotal = rawTotal;
-
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-                    <title>Bill #${order.id.slice(0, 4)}</title>
-                    <style>
-                        * { box-sizing: border-box; }
-                        body { 
-                            font-family: 'Courier New', monospace; 
-                            margin: 0; 
-                            padding: 15px; 
-                            background: white; 
-                            color: black;
-                            min-height: 100vh;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        .container {
-                            max-width: 100%;
-                            margin: 0 auto;
-                            flex: 1;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        .header { 
-                            text-align: center; 
-                            border-bottom: 2px dashed #000; 
-                            padding-bottom: 15px; 
-                            margin-bottom: 20px; 
-                        }
-                        .store-name { font-size: 28px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
-                        .store-subtitle { font-size: 14px; margin-bottom: 10px; }
-                        
-                        .meta { 
-                            font-size: 14px; 
-                            margin-bottom: 20px; 
-                            padding-bottom: 15px;
-                            border-bottom: 1px solid #000;
-                            line-height: 1.4;
-                        }
-                        
-                        .items {
-                            flex: 1;
-                        }
-                        .item { 
-                            display: flex; 
-                            justify-content: space-between;
-                            margin-bottom: 10px; 
-                            font-size: 16px; 
-                            font-weight: bold;
-                        }
-                        .item-name { flex: 1; margin-right: 10px; }
-                        
-                        .totals {
-                            margin-top: 20px;
-                            border-top: 2px solid #000;
-                            padding-top: 15px;
-                        }
-                        .row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 5px; }
-                        .grand { font-size: 24px; font-weight: 900; margin-top: 10px; }
-                        
-                        .footer {
-                            margin-top: 30px;
-                            text-align: center;
-                            font-size: 14px;
-                            margin-bottom: 20px;
-                        }
-
-                        .actions {
-                            margin-top: auto;
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 15px;
-                            padding-top: 20px;
-                            border-top: 2px solid #eee;
-                        }
-                        
-                        .btn {
-                            padding: 15px;
-                            font-size: 18px;
-                            font-weight: bold;
-                            border: none;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            text-transform: uppercase;
-                            width: 100%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            gap: 5px;
-                        }
-                        
-                        .print-btn { background: #000; color: #fff; grid-column: span 2; }
-                        .close-btn { background: #e5e5e5; color: #333; grid-column: span 2; }
-
-                        @media print { 
-                            .no-print { display: none !important; } 
-                            body { padding: 0; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <div class="store-name">TashiZom</div>
-                            <div class="store-subtitle">Multi-Cuisine Restaurant</div>
-                        </div>
-                        <div class="meta">
-                            <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-                            <strong>Order #:</strong> ${order.id.slice(0, 8)}<br>
-                            <strong>Table:</strong> ${order.tableId}<br>
-                            ${order.customerName ? `<strong>Guest:</strong> ${order.customerName}<br>` : ''}
-                            ${order.customerPhone ? `<strong>Phone:</strong> ${order.customerPhone}` : ''}
-                        </div>
-                        <div class="items">
-                            ${order.items.map(item => `
-                                <div class="item">
-                                    <span class="item-name">${item.quantity} x ${item.name}</span>
-                                    <span>₹${(item.price * item.quantity).toFixed(2)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="totals">
-                            <div class="row grand"><span>TOTAL</span><span>₹${finalTotal.toFixed(2)}</span></div>
-                        </div>
-                        <div class="footer">
-                            Thank you for visiting!<br>Please come again.
-                        </div>
-                        
-                        <div class="actions no-print">
-                            <button class="btn print-btn" onclick="window.print()">
-                                🧾 PRINT BILL
-                            </button>
-                            <button class="btn close-btn" onclick="window.close()">
-                                ✖ CLOSE
-                            </button>
-                        </div>
-                    </div>
-                </body>
-            </html>
-            `);
-        printWindow.document.close();
-    };
-
-    const handleShareBill = async (order: Order) => {
-        const rawTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
-
-        const text = `🧾 *TashiZom Bill*\n\n` +
-            `Order #: ${order.id.slice(0, 4)}\n` +
-            `Table: ${order.tableId}\n` +
-            `Date: ${new Date().toLocaleDateString()}\n\n` +
-            `*Items:*\n` +
-            order.items.map(i => `${i.quantity} x ${i.name} - ₹${i.price * i.quantity}`).join('\n') +
-            `\n\n----------------\n` +
-            `*TOTAL: ₹${rawTotal.toFixed(2)}*\n\n` +
-            `Thank you for visiting!`;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'TashiZom Bill',
-                    text: text,
-                });
-            } catch (err) {
-                console.log('Error sharing:', err);
-                // Fallback to clipboard or whatsapp
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-            }
-        } else {
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-    };
-
+    // Login Screen
     if (!currentUser || (currentUser.role !== 'staff' && currentUser.role !== 'admin')) {
         return (
-            <div className="min-h-screen bg-tashi-darker flex flex-col items-center justify-center p-6">
-                <Link href="/" className="absolute top-8 left-8 text-gray-500 hover:text-white transition-colors flex items-center gap-2">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+                <Link href="/" className="absolute top-8 left-8 text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-2">
                     <ArrowLeft size={20} /> Back
                 </Link>
-                <div className="w-full max-w-md bg-white/5 border border-white/5 p-8 rounded-2xl backdrop-blur-xl">
+                <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
                     <div className="flex justify-center mb-6">
-                        <div className="p-4 bg-blue-500/20 rounded-full text-blue-400">
+                        <div className="p-4 bg-orange-100 rounded-full text-orange-600">
                             <ChefHat size={32} />
                         </div>
                     </div>
-                    <h1 className="text-2xl font-bold text-white text-center mb-2">Staff Portal</h1>
-                    <p className="text-gray-400 text-center mb-8 text-sm">Kitchen & Service Access</p>
+                    <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Staff Portal</h1>
+                    <p className="text-gray-500 text-center mb-8 text-sm">Kitchen Dashboard Access</p>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Staff ID</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Staff ID</label>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
                                 placeholder="e.g. tenzin"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Password</label>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
 
                         {error && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+                            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm text-center">
                                 {error}
                             </div>
                         )}
 
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all active:scale-95 shadow-lg shadow-blue-900/20"
+                            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all active:scale-95 shadow-lg shadow-orange-200"
                         >
                             Login
                         </button>
-
-                        <button
-                            type="button"
-                            onClick={async () => {
-                                const s = await useStore.getState().login(username, password);
-                                if (s) window.location.reload();
-                                else setError("Manual Login Failed");
-                            }}
-                            className="w-full bg-gray-700 text-white text-xs py-2 rounded mt-2"
-                        >
-                            Force Login (Debug)
-                        </button>
                     </form>
 
-                    <div className="mt-8 pt-6 border-t border-white/5 text-center">
-                        <p className="text-xs text-gray-500">Authorized Personnel Only</p>
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p className="text-xs text-gray-400">Authorized Personnel Only</p>
                     </div>
                 </div>
             </div>
         );
     }
 
-
+    // Main Dashboard
     return (
-        <div className="space-y-8 max-w-[1600px] mx-auto relative px-6 py-6 text-white min-h-screen">
+        <div className="min-h-screen bg-gray-50">
+            {/* Visual Alert */}
             <AnimatePresence>
-                {!audioReady && currentUser && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-6 text-center"
-                        onClick={initAudio}
-                    >
-                        <motion.div
-                            animate={{ scale: [1, 1.1, 1] }}
-                            transition={{ repeat: Infinity, duration: 1.5 }}
-                            className="bg-tashi-accent text-tashi-dark p-6 rounded-full mb-6 cursor-pointer shadow-[0_0_50px_rgba(255,255,255,0.3)]"
-                        >
-                            <Bell size={64} />
-                        </motion.div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Tap Anywhere to Start</h2>
-                        <p className="text-xl text-gray-400 max-w-md">
-                            Kitchen Sound System needs activation.
-                            <br />
-                            <span className="text-tashi-accent text-sm font-bold mt-2 block">(Browser Security Requirement)</span>
-                        </p>
-                    </motion.div>
-                )}
                 {showVisualAlert && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-tashi-accent/20 backdrop-blur-sm"
+                        className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-orange-500/10 backdrop-blur-sm"
                     >
                         <motion.div
                             initial={{ scale: 0.5 }}
                             animate={{ scale: 1.2 }}
                             exit={{ scale: 0.5 }}
                             transition={{ type: 'spring', damping: 10 }}
-                            className="bg-tashi-accent text-tashi-dark font-black text-6xl md:text-8xl px-12 py-8 rounded-3xl shadow-2xl border-4 border-white transform rotate-[-5deg]"
+                            className="bg-orange-500 text-white font-black text-6xl md:text-8xl px-12 py-8 rounded-3xl shadow-2xl"
                         >
                             NEW ORDER!
                         </motion.div>
@@ -627,440 +209,228 @@ export default function StaffDashboard() {
             </AnimatePresence>
 
             {/* Header */}
-            <header className="bg-white/5 p-4 rounded-2xl backdrop-blur-md border border-white/5 mx-1 flex justify-between items-center relative z-50">
-                <div className="flex items-center gap-4">
-                    {/* Mobile Hamburger */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="lg:hidden p-2 -ml-2 text-white hover:bg-white/10 rounded-lg transition-colors"
-                    >
-                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
+            <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-16">
+                        <h1 className="text-xl font-bold text-gray-900">Kitchen Dashboard</h1>
 
-                    <h1 className="text-xl md:text-2xl font-bold text-white font-serif flex items-center gap-3">
-                        <div className="hidden lg:block p-2 bg-tashi-accent/20 rounded-lg text-tashi-accent">
-                            <ChefHat size={24} />
-                        </div>
-                        <span className="lg:hidden text-tashi-accent">KDS</span>
-                        <span className="hidden lg:inline">Kitchen Display System</span>
-                    </h1>
-                </div>
-
-                {/* Desktop Stats & Controls */}
-                <div className="hidden lg:flex items-center gap-6">
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold border border-tashi-accent bg-tashi-accent/10 text-tashi-accent select-none cursor-default">
-                        <Bell size={16} className="animate-pulse" />
-                        <span>Sound ACTIVE</span>
-                    </div>
-
-                    <div className="flex gap-4 text-sm font-mono bg-black/20 px-4 py-2 rounded-lg border border-white/5">
-                        <span className="text-gray-400">
-                            Orders: <strong className="text-white">{todaysOrders.length}</strong>
-                        </span>
-                        <div className="w-px h-4 bg-white/10" />
-                        <span className="text-gray-400">
-                            Sales: <strong className="text-tashi-accent">₹{dailyRevenue.toLocaleString()}</strong>
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-3 pl-6 border-l border-white/10">
-                        <div className="flex flex-col items-end mr-2">
-                            <span className="text-sm font-bold text-white">{currentUser?.name}</span>
-                            {currentUser?.serialNumber && (
-                                <span className="text-[10px] bg-white/10 px-1.5 rounded text-tashi-accent font-mono">{currentUser.serialNumber}</span>
-                            )}
+                        <div className="flex items-center gap-4">
+                            <div className="hidden sm:flex items-center gap-3">
+                                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <User size={20} className="text-orange-600" />
+                                </div>
+                                <div className="hidden md:block">
+                                    <p className="text-sm font-semibold text-gray-900">{currentUser?.name}</p>
+                                    <p className="text-xs text-gray-500">Staff Portal</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={logout}
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Logout"
+                            >
+                                <LogOut size={20} />
+                            </button>
                         </div>
                     </div>
-
-                    <button
-                        onClick={logout}
-                        className="p-2 bg-white/5 hover:bg-red-900/40 text-gray-400 hover:text-red-400 rounded-lg transition-colors"
-                        title="Logout"
-                    >
-                        <LogOut size={18} />
-                    </button>
                 </div>
-
-                {/* Mobile Menu Overlay */}
-                <AnimatePresence>
-                    {isMobileMenuOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl p-5 flex flex-col gap-6 lg:hidden z-50 overflow-hidden backdrop-blur-3xl"
-                        >
-                            {/* Stats Row */}
-                            <div className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Today's Orders</span>
-                                    <span className="text-2xl font-black text-white">{todaysOrders.length}</span>
-                                </div>
-                                <div className="w-px h-10 bg-white/10"></div>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Total Sales</span>
-                                    <span className="text-2xl font-black text-tashi-accent">₹{dailyRevenue.toLocaleString()}</span>
-                                </div>
-                            </div>
-
-                            {/* Controls */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 bg-tashi-accent/10 border border-tashi-accent/30 rounded-xl flex items-center justify-center gap-3 text-tashi-accent font-bold text-sm shadow-inner">
-                                    <Bell size={20} className="animate-pulse" /> Sound ON
-                                </div>
-                                <button className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-sm hover:bg-white/10 transition-colors">
-                                    <Utensils size={20} /> History
-                                </button>
-                            </div>
-
-                            {/* User & Logout */}
-                            <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 font-bold border border-blue-500/20 text-lg">
-                                        {currentUser?.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-white text-lg">{currentUser?.name}</span>
-                                        <span className="text-xs text-gray-500 font-mono">ID: {currentUser?.serialNumber || 'N/A'}</span>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={logout}
-                                    className="flex items-center gap-2 bg-red-500/10 text-red-400 px-4 py-2 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-colors font-bold text-sm"
-                                >
-                                    <LogOut size={16} /> Exit
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </header>
 
-            <AnimatePresence>
-                {activeNotifications.length > 0 && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
-                        <h2 className="text-red-400 font-bold flex items-center gap-2 mb-4 text-lg">
-                            <Bell className="animate-bounce" /> Attention Required ({activeNotifications.length})
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {activeNotifications.map((notif) => (
-                                <motion.div
-                                    key={notif.id}
-                                    layout
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
-                                    className="bg-neutral-900 border border-red-500/50 p-4 rounded-xl flex items-center justify-between shadow-lg shadow-red-900/10 group"
-                                >
-                                    <div>
-                                        <p className="font-bold text-white text-xl">{notif.tableId}</p>
-                                        <p className="text-red-400 text-sm uppercase font-bold tracking-wide">
-                                            {notif.type === 'call_staff' ? 'Call Service' : 'Bill Request'}
-                                        </p>
-                                        <p className="text-gray-500 text-xs mt-1 font-mono">{new Date(notif.createdAt).toLocaleTimeString()}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => resolveNotification(notif.id)}
-                                        className="bg-red-600 hover:bg-red-500 text-white p-3 rounded-lg transition-all shadow-md active:scale-95"
-                                    >
-                                        <Check size={24} />
-                                    </button>
-                                </motion.div>
-                            ))}
+            <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                    {/* Active Orders */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+                            <Package size={18} className="text-orange-500" />
+                            <span className="uppercase font-semibold">Active</span>
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] overflow-hidden pb-32 lg:pb-0">
-
-                {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
-                {/* LEFT SIDEBAR: ACTIVE ORDER LIST */}
-                <div className="w-full lg:w-96 flex-shrink-0 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-white/10 bg-black/20 flex justify-between items-center">
-                        <h2 className="font-bold text-gray-400 uppercase tracking-widest text-xs">Active List</h2>
-                        <span className="bg-tashi-accent text-tashi-dark text-xs font-bold px-2 py-0.5 rounded-full">{activeOrders.length}</span>
+                        <div className="flex items-end justify-between">
+                            <h3 className="text-4xl font-bold text-gray-900">{newOrders.length}</h3>
+                            <div className={`flex items-center gap-1 text-sm font-semibold ${activeTrend.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                                {activeTrend.startsWith('+') ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                <span>{activeTrend}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
-                        {['Pending', 'Preparing', 'Served'].map(status => {
-                            const statusOrders = activeOrders.filter(o => o.status === status);
-                            if (statusOrders.length === 0) return null;
-                            return (
-                                <div key={status}>
-                                    <div className={`px-2 py-1 text-[10px] font-bold uppercase mb-2 flex items-center gap-2 ${status === 'Pending' ? 'text-yellow-400' :
-                                        status === 'Preparing' ? 'text-blue-400' : 'text-green-400'
-                                        }`}>
-                                        {status === 'Pending' && <Clock size={12} />}
-                                        {status === 'Preparing' && <Utensils size={12} />}
-                                        {status === 'Served' && <CheckCircle2 size={12} />}
-                                        {status} ({statusOrders.length})
-                                    </div>
-                                    <div className="space-y-2">
-                                        {statusOrders.map(order => (
-                                            <div key={order.id} className="w-full text-left p-1 rounded-xl transition-colors">
-                                                <div
-                                                    onClick={() => setSelectedOrderId(selectedOrderId === order.id ? null : order.id)}
-                                                    className={`w-full text-left p-3 rounded-xl border transition-all relative group cursor-pointer ${selectedOrderId === order.id
-                                                        ? 'bg-gradient-to-r from-white/10 to-transparent border-l-4 border-l-tashi-accent border-y-transparent border-r-transparent'
-                                                        : 'bg-black/20 border-transparent hover:bg-white/5 border-l-4 border-l-transparent'
-                                                        }`}
-                                                >
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className={`font-bold text-lg ${order.tableId === 'REQUEST' ? 'text-red-400 animate-pulse' : 'text-white'
-                                                            }`}>
-                                                            {order.tableId === 'REQUEST' ? 'REQ' : order.tableId}
-                                                        </span>
-                                                        <span className="text-[10px] font-mono text-gray-500">
-                                                            #{order.id.slice(0, 4)}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex flex-col">
-                                                            {(order.customerName || order.customerPhone) ? (
-                                                                <span className="text-sm font-bold text-gray-200 truncate max-w-[120px]">
-                                                                    {order.customerName || order.customerPhone}
-                                                                </span>
-                                                            ) : (
-                                                                <span className="text-xs text-gray-400 italic">Guest</span>
-                                                            )}
-                                                            <span className="text-[10px] text-gray-500 font-mono">
-                                                                {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            </span>
-                                                        </div>
-                                                        <span className="text-xs font-bold text-gray-300">
-                                                            ₹{order.totalAmount}
-                                                        </span>
-                                                    </div>
-                                                    {selectedOrderId === order.id && (
-                                                        <motion.div
-                                                            layoutId="activeGlow"
-                                                            className="absolute inset-0 bg-white/5 rounded-xl -z-10 hidden lg:block"
-                                                        />
-                                                    )}
-                                                </div>
-
-                                                <AnimatePresence>
-                                                    {selectedOrderId === order.id && (
-                                                        <motion.div
-                                                            initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: "auto", opacity: 1 }}
-                                                            exit={{ height: 0, opacity: 0 }}
-                                                            className="lg:hidden bg-[#111] border border-white/10 rounded-xl mt-2 overflow-hidden mx-1 shadow-inner"
-                                                        >
-                                                            <div className="p-2">
-                                                                <StaffOrderCard
-                                                                    order={order}
-                                                                    onUpdateStatus={(s) => updateOrderStatus(order.id, s)}
-                                                                    onAssignTable={updateOrderTable}
-                                                                    onPrintKOT={() => handlePrintKOT(order)}
-                                                                    onPrintBill={() => handlePrintBill(order)}
-                                                                    onShareBill={() => handleShareBill(order)}
-                                                                    onShareKOT={() => { }}
-                                                                />
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )
-                        })}
-
-                        {activeOrders.length === 0 && (
-                            <div className="flex flex-col items-center justify-center h-48 opacity-30 text-center">
-                                <ChefHat size={48} className="mb-2" />
-                                <p className="text-sm">Kitchen is All Clear!</p>
+                    {/* Avg Time */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+                            <Clock size={18} className="text-blue-500" />
+                            <span className="uppercase font-semibold">Avg Time</span>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <h3 className="text-4xl font-bold text-gray-900">{avgPrepTime}m</h3>
+                            <div className={`flex items-center gap-1 text-sm font-semibold ${timeTrend.startsWith('-') ? 'text-green-600' : 'text-red-600'}`}>
+                                {timeTrend.startsWith('-') ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                                <span>{timeTrend}</span>
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
 
-                {/* RIGHT/MAIN AREA: SELECTED ORDER DETAIL (Desktop Only) */}
-                <div className="hidden lg:flex flex-1 bg-white/5 rounded-2xl border border-white/5 h-full overflow-hidden flex-col relative">
-                    {selectedOrder ? (
-                        <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-white/10">
-                            <div className="max-w-3xl mx-auto">
-                                <StaffOrderCard
-                                    key={selectedOrder.id}
-                                    order={selectedOrder}
-                                    onUpdateStatus={(s) => updateOrderStatus(selectedOrder.id, s)}
-                                    onAssignTable={updateOrderTable}
-                                    onPrintKOT={() => handlePrintKOT(selectedOrder)}
-                                    onPrintBill={() => handlePrintBill(selectedOrder)}
-                                    onShareBill={() => handleShareBill(selectedOrder)}
-                                    onShareKOT={() => { }}
-                                />
-                            </div>
+                {/* Filter Tabs */}
+                <div className="flex gap-2 mb-6 bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
+                    <button
+                        onClick={() => setActiveFilter('new')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'new'
+                            ? 'bg-orange-50 text-orange-600 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        New <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'new' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {newOrders.length}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setActiveFilter('preparing')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'preparing'
+                            ? 'bg-gray-100 text-gray-800 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        Preparing <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'preparing' ? 'bg-gray-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {preparingOrders.length}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setActiveFilter('ready')}
+                        className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all ${activeFilter === 'ready'
+                            ? 'bg-blue-50 text-blue-600 shadow-sm'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                    >
+                        Ready <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${activeFilter === 'ready' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                            {readyOrders.length}
+                        </span>
+                    </button>
+                </div>
+
+                {/* Orders List */}
+                <div className="space-y-4">
+                    {filteredOrders.length === 0 ? (
+                        <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
+                            <ChefHat size={48} className="mx-auto mb-4 text-gray-300" />
+                            <p className="text-gray-500 font-medium">No orders in this category</p>
+                            <p className="text-gray-400 text-sm mt-1">Orders will appear here when placed</p>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-50">
-                            <ArrowLeft size={48} className="mb-4 lg:hidden" />
-                            <ArrowLeft size={48} className="mb-4 hidden lg:block rotate-180" />
-                            <p className="text-xl font-bold">Select an Order</p>
-                            <p className="text-sm">Click a ticket from the list to view details</p>
-                        </div>
+                        filteredOrders.map(order => (
+                            <OrderCard
+                                key={order.id}
+                                order={order}
+                                onUpdateStatus={(status) => updateOrderStatus(order.id, status)}
+                                isNew={activeFilter === 'new'}
+                                isPreparing={activeFilter === 'preparing'}
+                                isReady={activeFilter === 'ready'}
+                            />
+                        ))
                     )}
                 </div>
-
-            </div>
+            </main>
         </div>
     );
 }
 
+// Order Card Component
+function OrderCard({ order, onUpdateStatus, isNew, isPreparing, isReady }: {
+    order: Order;
+    onUpdateStatus: (status: OrderStatus) => void;
+    isNew: boolean;
+    isPreparing: boolean;
+    isReady: boolean;
+}) {
+    const getElapsedTime = () => {
+        const now = Date.now();
+        const created = new Date(order.createdAt).getTime();
+        const diff = now - created;
+        const minutes = Math.floor(diff / 60000);
+        return minutes;
+    };
 
-
-function StaffOrderCard({ order, onUpdateStatus, onAssignTable, onPrintKOT, onPrintBill, onShareBill, onShareKOT }: { order: Order; onUpdateStatus: (s: OrderStatus) => void, onAssignTable: (oid: string, tid: string) => void, onPrintKOT: () => void, onPrintBill: () => void, onShareBill: () => void, onShareKOT: () => void }) {
-    const tables = useStore((state) => state.tables);
-    const [selectedTable, setSelectedTable] = useState('');
-    const [isUpdating, setIsUpdating] = useState(false);
+    const elapsed = getElapsedTime();
+    const borderColor = isNew ? 'border-l-red-500' : isPreparing ? 'border-l-orange-500' : 'border-l-blue-500';
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-neutral-800 p-4 rounded-xl border-l-4 border-l-tashi-accent shadow-lg relative group flex flex-col max-h-[85vh]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`bg-white rounded-2xl p-6 shadow-sm border-l-4 ${borderColor} border-y border-r border-gray-100`}
         >
-            <div className="flex justify-between items-start mb-2">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h4 className="font-bold text-white text-xl flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                        {order.tableId === 'REQUEST' ? (
-                            <div className="flex flex-col gap-2 w-full sm:w-auto p-3 bg-red-500/10 border border-red-500/30 rounded animate-pulse">
-                                <span className="text-xs text-red-300 font-bold uppercase tracking-wider">⚠️ Assign Table to Start Timer</span>
-                                <div className="flex gap-2 items-center">
-                                    <select
-                                        className="bg-black text-white p-2 rounded border border-white/20 text-sm focus:outline-none focus:border-red-500"
-                                        onChange={(e) => setSelectedTable(e.target.value)}
-                                        value={selectedTable}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <option value="">Select...</option>
-                                        {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                    </select>
-                                    <button
-                                        type="button"
-                                        onClick={async (e) => {
-                                            e.stopPropagation();
-                                            if (selectedTable) {
-                                                setIsUpdating(true);
-                                                try {
-                                                    await onAssignTable(order.id, selectedTable);
-                                                } finally {
-                                                    setIsUpdating(false);
-                                                }
-                                            }
-                                        }}
-                                        disabled={!selectedTable || isUpdating}
-                                        className={`bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded text-xs font-bold shadow-lg shadow-red-900/30 active:scale-95 transition-all flex items-center gap-1 ${isUpdating ? 'animate-pulse' : ''}`}
-                                    >
-                                        {isUpdating ? '...' : 'UPDATE'}
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            tables.find(t => t.id === order.tableId)?.name || order.tableId
-                        )}
+                    <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-2xl font-bold text-gray-900">#{order.id.slice(0, 4)}</h3>
+                        <span className="text-sm font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                            {order.tableId}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Clock size={14} />
+                        <span>{elapsed}m ago</span>
                         {(order.customerName || order.customerPhone) && (
-                            <span className="text-sm font-normal text-gray-400">
-                                ({order.customerName} {order.customerPhone && (
-                                    <>
-                                        • <a
-                                            href={`tel:${order.customerPhone}`}
-                                            className="hover:text-tashi-accent hover:underline transition-colors cursor-pointer"
-                                            onClick={(e) => e.stopPropagation()}
-                                            title="Call Customer"
-                                        >
-                                            {order.customerPhone}
-                                        </a>
-                                    </>
-                                )})
-                            </span>
+                            <>
+                                <span>•</span>
+                                <span className="font-medium text-gray-700">{order.customerName || order.customerPhone}</span>
+                            </>
                         )}
-                    </h4>
-                    <p className="text-xs text-gray-500 font-mono mt-1">#{order.id.slice(0, 4)} • {new Date(order.createdAt).toLocaleTimeString()}</p>
+                    </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-tashi-accent font-bold text-lg">₹{order.totalAmount}</p>
+                <div className={`text-right ${isNew ? 'animate-pulse' : ''}`}>
+                    <div className={`text-xl font-bold ${elapsed > 12 ? 'text-red-600' : 'text-gray-500'}`}>
+                        {elapsed}min
+                    </div>
+                    {isNew && elapsed > 12 && (
+                        <span className="text-xs text-red-600 font-semibold">URGENT!</span>
+                    )}
                 </div>
             </div>
 
-            <div className="space-y-2 my-2 border-t border-b border-white/5 py-2 bg-black/20 rounded-xl px-4 max-h-[100px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            {/* Items */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 p-4 bg-gray-50 rounded-xl">
                 {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm text-gray-300 items-center">
-                        <span className="flex items-center gap-2">
-                            <span className="flex items-center justify-center w-5 h-5 bg-white/10 rounded text-xs font-bold text-white flex-shrink-0">{item.quantity}</span>
-                            <span className="text-sm">{item.name}</span>
+                    <div key={idx} className="flex items-center gap-2">
+                        <span className="flex items-center justify-center w-7 h-7 bg-orange-500 text-white rounded text-sm font-bold">
+                            {item.quantity}x
                         </span>
+                        <span className="text-sm font-medium text-gray-900">{item.name}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="flex flex-col gap-2 relative z-10 shrink-0 mt-auto pt-1">
-                <div className="grid grid-cols-2 gap-2">
-                    <button
-                        onClick={onPrintKOT}
-                        className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
-                    >
-                        🖨️ KOT
-                    </button>
-                    <button
-                        onClick={onShareKOT}
-                        className="bg-orange-500/80 hover:bg-orange-600/80 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-orange-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
-                    >
-                        📱 Share KOT
-                    </button>
-
-                    <button
-                        onClick={onPrintBill}
-                        className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-purple-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
-                    >
-                        🧾 Bill
-                    </button>
-                    <button
-                        onClick={onShareBill}
-                        className="bg-purple-600/80 hover:bg-purple-700/80 text-white text-xs px-2 py-2 rounded font-bold font-mono shadow-lg shadow-green-900/20 active:scale-95 transition-all flex items-center justify-center gap-1"
-                    >
-                        📱 Share Bill
-                    </button>
-                </div>
-
-                <div className="flex gap-2">
-                    {order.status === 'Pending' && (
-                        <div className="flex gap-2 flex-1">
-                            <button
-                                onClick={() => onUpdateStatus('Rejected')}
-                                className="flex-1 bg-red-900/40 hover:bg-red-900/60 border border-red-900 text-red-400 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95"
-                            >
-                                Reject
-                            </button>
-                            <button
-                                onClick={() => onUpdateStatus('Preparing')}
-                                className="flex-[2] bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-green-900/20"
-                            >
-                                Accept Order
-                            </button>
-                        </div>
-                    )}
-                    {order.status === 'Preparing' && (
-                        <button onClick={() => onUpdateStatus('Served')} className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-green-900/20">
-                            Mark Ready
+            {/* Actions */}
+            <div className="flex gap-2">
+                {isNew && (
+                    <>
+                        <button
+                            onClick={() => onUpdateStatus('Preparing')}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-orange-200 active:scale-95"
+                        >
+                            <Utensils size={18} className="inline mr-2" />
+                            Start Preparation
                         </button>
-                    )}
-                    {order.status === 'Served' && (
-                        <button onClick={() => onUpdateStatus('Paid')} className="flex-1 bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all active:scale-95">
-                            Close Order
-                        </button>
-                    )}
-                </div>
+                    </>
+                )}
+                {isPreparing && (
+                    <button
+                        onClick={() => onUpdateStatus('Ready')}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-green-200 active:scale-95"
+                    >
+                        <CheckCircle2 size={18} className="inline mr-2" />
+                        Mark Ready
+                    </button>
+                )}
+                {isReady && (
+                    <button
+                        onClick={() => onUpdateStatus('Served')}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-blue-200 active:scale-95"
+                    >
+                        <Check size={18} className="inline mr-2" />
+                        Mark Served
+                    </button>
+                )}
             </div>
         </motion.div>
     );
