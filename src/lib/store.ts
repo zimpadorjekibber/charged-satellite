@@ -455,29 +455,45 @@ export const useStore = create<AppState>()(
                     let ipData: any = {};
                     let distanceKm = null;
 
-                    try {
-                        const res = await fetch('https://ipapi.co/json/');
-                        if (res.ok) {
-                            ipData = await res.json();
+                    const fetchIp = async () => {
+                        try {
+                            const r1 = await fetch('https://ipapi.co/json/');
+                            if (r1.ok) return await r1.json();
+                        } catch (e) {
+                            console.warn('ipapi failed', e);
+                        }
 
-                            // Calculate Distance if possible
-                            if (ipData.latitude && ipData.longitude && state.contactInfo?.mapsLocation) {
-                                try {
-                                    const [targetLat, targetLng] = state.contactInfo.mapsLocation.split(',').map(s => parseFloat(s.trim()));
-                                    if (!isNaN(targetLat) && !isNaN(targetLng)) {
-                                        const toRad = (v: number) => v * Math.PI / 180;
-                                        const R = 6371; // Earth Radius in km
-                                        const dLat = toRad(targetLat - ipData.latitude);
-                                        const dLon = toRad(targetLng - ipData.longitude);
-                                        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                                            Math.cos(toRad(ipData.latitude)) * Math.cos(toRad(targetLat)) *
-                                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                                        distanceKm = Math.round(R * c);
-                                    }
-                                } catch (err) {
-                                    console.warn('Failed to calc distance', err);
+                        try {
+                            // Fallback to ipwho.is (free, no key, generous limits)
+                            const r2 = await fetch('https://ipwho.is/');
+                            if (r2.ok) return await r2.json();
+                        } catch (e) {
+                            console.warn('ipwhois failed', e);
+                        }
+                        return {};
+                    };
+
+
+                    try {
+                        ipData = await fetchIp();
+
+                        // Calculate Distance if possible
+                        if (ipData.latitude && ipData.longitude && state.contactInfo?.mapsLocation) {
+                            try {
+                                const [targetLat, targetLng] = state.contactInfo.mapsLocation.split(',').map(s => parseFloat(s.trim()));
+                                if (!isNaN(targetLat) && !isNaN(targetLng)) {
+                                    const toRad = (v: number) => v * Math.PI / 180;
+                                    const R = 6371; // Earth Radius in km
+                                    const dLat = toRad(targetLat - ipData.latitude);
+                                    const dLon = toRad(targetLng - ipData.longitude);
+                                    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                        Math.cos(toRad(ipData.latitude)) * Math.cos(toRad(targetLat)) *
+                                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                    distanceKm = Math.round(R * c);
                                 }
+                            } catch (err) {
+                                console.warn('Failed to calc distance', err);
                             }
                         }
                     } catch (err) {
@@ -493,6 +509,7 @@ export const useStore = create<AppState>()(
                         timestamp: new Date().toISOString(),
                         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
                     });
+
                 } catch (e) {
                     console.error("Failed to record scan", e);
                 }
