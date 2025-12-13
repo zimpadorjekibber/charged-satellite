@@ -32,6 +32,7 @@ export default function MenuPage() {
     const addToCart = useStore((state) => state.addToCart);
     const removeFromCart = useStore((state) => state.removeFromCart);
     const currentTableId = useStore((state) => state.currentTableId);
+    const setTableId = useStore((state) => state.setTableId);
     const notifications = useStore((state) => state.notifications);
     const addNotification = useStore((state) => state.addNotification);
     const cancelNotification = useStore((state) => state.cancelNotification);
@@ -245,6 +246,30 @@ export default function MenuPage() {
             setDataLoaded(true);
         }
     }, [CATEGORIES, dataLoaded]);
+
+    // NEW: Monitor active orders to sync Table ID if assigned by staff
+    useEffect(() => {
+        if (!sessionId || !orders.length) return;
+
+        // Find the most recent active order for this session
+        const activeOrder = orders.find(o =>
+            o.sessionId === sessionId &&
+            ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
+        );
+
+        if (activeOrder && activeOrder.tableId) {
+            const isRealTable = activeOrder.tableId !== 'REQUEST' && activeOrder.tableId !== 'Remote';
+
+            // If we have a real table assigned and it differs from our local state
+            if (isRealTable && activeOrder.tableId !== currentTableId) {
+                console.log('Syncing assigned table:', activeOrder.tableId);
+                setTableId(activeOrder.tableId);
+
+                // Optional: We could trigger a notification here
+                // addNotification(activeOrder.tableId, 'info', { message: 'Table Assigned!' });
+            }
+        }
+    }, [orders, sessionId, currentTableId, setTableId]);
 
 
     const getQuantity = (id: string) => {
