@@ -9,6 +9,8 @@ import Link from 'next/link';
 export default function StaffDashboard() {
     const orders = useStore(state => state.orders);
     const updateOrderStatus = useStore(state => state.updateOrderStatus);
+    const notifications = useStore(state => state.notifications);
+    const resolveNotification = useStore(state => state.resolveNotification);
 
     // Auth
     const currentUser = useStore(state => state.currentUser);
@@ -25,6 +27,7 @@ export default function StaffDashboard() {
 
     // Sound notification
     const [prevPendingCount, setPrevPendingCount] = useState(0);
+    const [prevNotificationCount, setPrevNotificationCount] = useState(0);
     const [showVisualAlert, setShowVisualAlert] = useState(false);
     const audioCtxRef = useRef<any>(null);
     const isFirstMount = useRef(true);
@@ -38,6 +41,9 @@ export default function StaffDashboard() {
     const newOrders = activeOrders.filter(o => o.status === 'Pending');
     const preparingOrders = activeOrders.filter(o => o.status === 'Preparing');
     const readyOrders = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Served');
+
+    // Active Service Requests
+    const activeNotifications = (notifications || []).filter(n => n.status === 'pending');
 
     // Filter orders based on active tab
     const filteredOrders = activeOrders.filter(o => {
@@ -98,21 +104,30 @@ export default function StaffDashboard() {
         }
     };
 
-    // Monitor for new pending orders
+    // Monitor for new pending orders AND notifications
     useEffect(() => {
         if (isFirstMount.current) {
             isFirstMount.current = false;
             setPrevPendingCount(newOrders.length);
+            setPrevNotificationCount(activeNotifications.length);
             return;
         }
 
+        // Check for new orders
         if (newOrders.length > prevPendingCount) {
             playNotificationSound();
             setShowVisualAlert(true);
             setTimeout(() => setShowVisualAlert(false), 3000);
         }
+
+        // Check for new notifications (Call Staff)
+        if (activeNotifications.length > prevNotificationCount) {
+            playNotificationSound(); // Re-use the blast sound for now, effective enough
+        }
+
         setPrevPendingCount(newOrders.length);
-    }, [newOrders.length]);
+        setPrevNotificationCount(activeNotifications.length);
+    }, [newOrders.length, activeNotifications.length]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -237,6 +252,47 @@ export default function StaffDashboard() {
             </header>
 
             <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+                {/* Service Request Alerts */}
+                <AnimatePresence>
+                    {activeNotifications.length > 0 && (
+                        <div className="mb-6 space-y-2">
+                            {activeNotifications.map(notification => {
+                                const table = useStore.getState().tables.find(t => t.id === notification.tableId);
+                                const tableName = table ? table.name : 'Unknown Table';
+                                return (
+                                    <motion.div
+                                        key={notification.id}
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="bg-red-500 text-white p-4 rounded-xl shadow-lg flex items-center justify-between animate-pulse"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-white/20 p-2 rounded-full">
+                                                <Bell className="text-white" size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg">
+                                                    {notification.type === 'call_staff' ? 'STAFF CALLED' : 'BILL REQUESTED'}
+                                                </h3>
+                                                <p className="font-medium opacity-90">
+                                                    {tableName} • {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => resolveNotification(notification.id)}
+                                            className="bg-white text-red-600 px-6 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors shadow-sm"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </AnimatePresence>
+
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     {/* Active Orders */}

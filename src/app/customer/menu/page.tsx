@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useStore, Category, MenuItem } from '@/lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
@@ -569,7 +569,7 @@ export default function MenuPage() {
                                     </div>
 
                                     <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                                        <span className="text-3xl font-serif text-tashi-accent">₹{selectedItem.price}</span>
+                                        <span className="text-3xl font-serif text-tashi-accent">â‚¹{selectedItem.price}</span>
 
                                         <div className="flex items-center gap-4">
                                             {getQuantity(selectedItem.id) > 0 && (
@@ -651,7 +651,7 @@ export default function MenuPage() {
                                                         <p className="text-sm text-gray-300 leading-relaxed">
                                                             <span className="font-semibold text-white">{update.title}</span>
                                                             {update.description && (
-                                                                <span className="text-gray-400"> — {update.description}</span>
+                                                                <span className="text-gray-400"> â€” {update.description}</span>
                                                             )}
                                                         </p>
                                                         {update.status && update.status.toLowerCase() !== 'create' && (
@@ -679,7 +679,7 @@ export default function MenuPage() {
                                         ))}
                                     </motion.ul>
                                 </div>
-                                <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
+                                <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} â€¢ Ask staff for details</p>
                             </div>
                         </motion.div>
                     </div>
@@ -996,7 +996,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                 </div>
 
                 <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
-                    <span className="font-serif text-xl text-tashi-accent">₹{item.price}</span>
+                    <span className="font-serif text-xl text-tashi-accent">â‚¹{item.price}</span>
 
                     {quantity === 0 ? (
                         <motion.button
@@ -1063,7 +1063,7 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
             <div className="flex-1">
                 <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                    <span className="font-serif text-lg text-tashi-accent">₹{item.price}</span>
+                    <span className="font-serif text-lg text-tashi-accent">â‚¹{item.price}</span>
                     {!isAvailable && (
                         <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
                     )}
@@ -1230,7 +1230,7 @@ function ChefsSpecialSection({
                                     <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
                                 )}
                                 <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
-                                    ★ SPECIAL
+                                     SPECIAL
                                 </div>
                             </div>
 
@@ -1266,31 +1266,32 @@ function ChefsSpecialSection({
                                             <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
                                                 <button onClick={() => removeFromCart(currentItem.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
                                                 <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(currentItem.id)}</span>
-                                                <button onClick(() => addToCart(currentItem)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
-                                </div>
+                                                <button onClick={() => addToCart(currentItem)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
+                                            </div>
                                         )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Indicator dots */}
-                    {items.length > 1 && (
-                        <div className="flex justify-center gap-1.5 mt-3">
-                            {items.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`h-1.5 rounded-full transition-all ${index === currentIndex
-                                        ? 'w-6 bg-tashi-accent'
-                                        : 'w-1.5 bg-gray-600 hover:bg-gray-500'
-                                        }`}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </motion.div>
-            </AnimatePresence >
-        </section >
+                        {/* Indicator dots */}
+                        {items.length > 1 && (
+                            <div className="flex justify-center gap-1.5 mt-3">
+                                {items.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentIndex(index)}
+                                        className={`h-1.5 rounded-full transition-all ${index === currentIndex
+                                            ? 'w-6 bg-tashi-accent'
+                                            : 'w-1.5 bg-gray-600 hover:bg-gray-500'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </section>
     );
 }
