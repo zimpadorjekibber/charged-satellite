@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #8B2635;
+  /* Tibetan Maroon */
+  --color-brand-secondary: #BC9E68;
+  /* Antique Gold */
+  --color-brand-dark: #1C1917;
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  --background: #F8F7F5;
+  /* Warm Rice Paper White */
+  --foreground: #1C1917;
+}
+
+/* Custom Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}

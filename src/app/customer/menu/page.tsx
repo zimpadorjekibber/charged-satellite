@@ -279,38 +279,76 @@ export default function MenuPage() {
     // Check if there is already a pending call for this table
     const hasPendingCall = notifications.some(n => n.tableId === currentTableId && n.type === 'call_staff' && n.status === 'pending');
 
-    // Check for active order
-    const hasActiveOrder = orders.some(o => o.sessionId === sessionId && (o.status === 'Pending' || o.status === 'Preparing'));
+    // Check for active order (Expanded definition)
+    const hasActiveOrder = orders.some(o =>
+        o.sessionId === sessionId &&
+        ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
+    );
 
-    const playCallSound = () => {
-        try {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(e => console.error("Audio play failed", e));
-        } catch (e) {
-            console.error("Audio setup failed", e);
+    // Local state for "Calling" visual/audio feedback
+    const [isCalling, setIsCalling] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Initialize Audio
+    useEffect(() => {
+        audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        audioRef.current.loop = true; // Loop the ring sound
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
+
+    // Stop ringing if notification is resolved remotely by staff
+    useEffect(() => {
+        if (!hasPendingCall && isCalling) {
+            setIsCalling(false);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
         }
-    };
+    }, [hasPendingCall, isCalling]);
 
     const handleCallStaff = () => {
         if (!currentTableId) {
             alert("Please scan a table QR code or select a table to call staff.");
             return;
         }
-        if (hasPendingCall) {
-            cancelNotification(currentTableId, 'call_staff');
+
+        // REQUIREMENT: Must have active order to call staff
+        if (!hasActiveOrder) {
+            alert("You can call staff only if you have an active order.");
+            return;
+        }
+
+        if (isCalling) {
+            // ACTION: CUT CALL (Stop local ring, but keep notification active)
+            setIsCalling(false);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
         } else {
-            // Play feedback sound for customer
-            playCallSound();
+            // ACTION: START CALL
+            setIsCalling(true);
+            if (audioRef.current) {
+                audioRef.current.play().catch(e => console.error("Audio play failed", e));
+            }
 
-            // Find recent customer details from previous orders
-            const myOrders = orders.filter(o => o.sessionId === sessionId);
-            const lastOrder = myOrders[0]; // Orders are sorted desc
+            // Only send a new notification if one isn't already pending
+            if (!hasPendingCall) {
+                // Find recent customer details from previous orders
+                const myOrders = orders.filter(o => o.sessionId === sessionId);
+                const lastOrder = myOrders[0]; // Orders are sorted desc
 
-            addNotification(currentTableId, 'call_staff', {
-                customerName: lastOrder?.customerName,
-                customerPhone: lastOrder?.customerPhone
-            });
+                addNotification(currentTableId, 'call_staff', {
+                    customerName: lastOrder?.customerName,
+                    customerPhone: lastOrder?.customerPhone
+                });
+            }
         }
     };
 
@@ -334,14 +372,14 @@ export default function MenuPage() {
                     {/* Call Staff Button */}
                     <button
                         onClick={handleCallStaff}
-                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${hasPendingCall
-                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
+                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
+                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse'
                             : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
                             }`}
                     >
-                        {hasPendingCall ? <X size={24} /> : <Phone size={24} />}
+                        {isCalling ? <X size={24} /> : <Phone size={24} />}
                         <span className="text-[10px] uppercase tracking-wider font-bold">
-                            {hasPendingCall ? 'Cancel' : 'Call Staff'}
+                            {isCalling ? 'Cut Call' : 'Call Staff'}
                         </span>
                     </button>
 
