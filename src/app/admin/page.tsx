@@ -41,12 +41,8 @@ export default function AdminDashboard() {
     const [soundEnabled, setSoundEnabled] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audioRef.current.preload = 'auto';
-        }
-    }, []);
+    // Initial preload removal (handled by JSX now)
+
     // Theme removed - forcing Premium Dark Mode
 
     const prevOrdersLength = useRef(0);
@@ -69,23 +65,24 @@ export default function AdminDashboard() {
     }, []);
 
     useEffect(() => {
-        const pendingOrders = orders.filter(o => o.status === 'Pending').length;
         const pendingNotifs = notifications.filter(n => n.status === 'pending').length;
 
-        // If sound enabled, check specifically for INCREASE
-        if (soundEnabled) {
-            if (pendingOrders > prevOrdersLength.current || pendingNotifs > prevNotifLength.current) {
-                if (audioRef.current) {
-                    audioRef.current.currentTime = 0;
-                    audioRef.current.play().catch(e => console.error("Audio play failed", e));
+        // Continuous Ringer for Pending Calls
+        if (soundEnabled && pendingNotifs > 0) {
+            if (audioRef.current) {
+                if (audioRef.current.paused) {
+                    audioRef.current.loop = true; // Ensure looping
+                    audioRef.current.play().catch(e => console.error("Ring loop failed", e));
                 }
             }
+        } else {
+            // Silence if no pending calls
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
         }
-
-        // Always update refs to current state so we track from NOW
-        prevOrdersLength.current = pendingOrders;
-        prevNotifLength.current = pendingNotifs;
-    }, [orders, notifications, soundEnabled]);
+    }, [notifications, soundEnabled]);
 
     const toggleSound = () => {
         if (!soundEnabled) {
@@ -285,6 +282,9 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen pb-24 bg-gray-50 text-gray-900 selection:bg-orange-100 selection:text-orange-900">
+            {/* Hidden Audio Element for Reliable Playback */}
+            <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" />
+
             {/* Top Navigation Bar - Desktop Only / Minimal Mobile Header */}
             <div className="border-b border-gray-200 p-4 sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">

@@ -307,16 +307,9 @@ export default function MenuPage() {
     const callSoundRef = useRef<HTMLAudioElement | null>(null);
 
     // Initialize Audio
-    useEffect(() => {
-        callSoundRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        callSoundRef.current.loop = true; // Loop the ring sound
-        return () => {
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-                callSoundRef.current = null;
-            }
-        };
-    }, []);
+    // Initialize Audio removed - handled by JSX <audio> ref logic
+    // This ensures better compatibility with mobile browsers
+
 
     // Stop ringing if notification is resolved remotely by staff
     useEffect(() => {
@@ -460,6 +453,9 @@ export default function MenuPage() {
 
     return (
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
+            {/* Hidden Audio Element for Call Feedback */}
+            <audio ref={callSoundRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
+
             {/* Bottom Action Bar - Horizontal */}
             <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-md border-t border-white/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
