@@ -14,6 +14,8 @@ import {
     getDoc,
     getDocs
 } from 'firebase/firestore';
+import { auth } from './firebase';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 export type Category = string;
 export type UserRole = 'admin' | 'staff';
@@ -315,6 +317,39 @@ export const useStore = create<AppState>()(
                 }));
 
                 set({ isListening: true, unsubscribers });
+
+                // AUTH LISTENER
+                const authUnsub = onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        try {
+                            // Fetch Role from Firestore
+                            const userDoc = await getDoc(doc(db, 'users', user.uid));
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+                                set({
+                                    currentUser: {
+                                        id: user.uid,
+                                        name: userData.name || user.email?.split('@')[0] || 'User',
+                                        username: user.email || '',
+                                        role: userData.role
+                                    }
+                                });
+                            } else {
+                                // User exists in Auth but not in DB (e.g. freshly created)
+                                // We don't set currentUser yet, or set as 'guest'
+                                set({ currentUser: null });
+                            }
+                        } catch (e) {
+                            console.error('Auth Profile Fetch Error', e);
+                            set({ currentUser: null });
+                        }
+                    } else {
+                        set({ currentUser: null });
+                    }
+                });
+                // We don't strictly need to track this unsubscriber as it persists, 
+                // but good practice if we had a full unmount. 
+                // However, Zustand store is usually permanent.
             },
 
             cleanup: () => {
@@ -598,26 +633,45 @@ export const useStore = create<AppState>()(
                 await deleteDoc(doc(db, 'settings', 'media', 'library', id));
             },
 
-            login: async (username, password) => {
-                // Mock Auth for simplicity as requested 'quick fix'
-                // In real app, use Firebase Auth
-                // Admin Login
-                if (username === 'admin' && password === 'tashizomcafe@123') {
-                    set({ currentUser: { id: 'admin', name: 'Admin User', username: 'admin', role: 'admin' } });
-                    return true;
-                }
+            login: async (usernameOrEmail, password) => {
+                try {
+                    // Auto-append domain if simple username provided
+                    const email = usernameOrEmail.includes('@')
+                        ? usernameOrEmail
+                        : `${usernameOrEmail}@tashizomcafe.in`;
 
-                // Staff Logins (Multiple)
-                const validStaff = ['staff', 'staff1', 'staff2', 'staff3'];
-                if (validStaff.includes(username) && password === 'staff123') {
-                    set({ currentUser: { id: username, name: `Staff Member (${username})`, username: username, role: 'staff' } });
-                    return true;
-                }
+                    const cred = await signInWithEmailAndPassword(auth, email, password);
 
-                return false;
+                    // Fetch role immediately to ensure UI has correct state
+                    const user = cred.user;
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        set({
+                            currentUser: {
+                                id: user.uid,
+                                name: userData.name || user.email?.split('@')[0] || 'User',
+                                username: user.email || '',
+                                role: userData.role
+                            }
+                        });
+                        return true;
+                    } else {
+                        // Fallback if no role found (e.g. init page user)
+                        set({ currentUser: null });
+                        console.error("User has no role assigned");
+                        return false;
+                    }
+                } catch (error) {
+                    console.error("Login failed", error);
+                    return false;
+                }
             },
 
-            logout: () => set({ currentUser: null }),
+            logout: async () => {
+                await signOut(auth);
+                set({ currentUser: null });
+            },
         }),
         {
             name: 'tashizom-storage',
