@@ -2444,15 +2444,15 @@ const DbStatusIndicator = () => {
     useEffect(() => {
         const check = async () => {
             try {
-                // Try writing a dummy doc
-                const { collection, addDoc, deleteDoc } = await import('firebase/firestore');
+                // Try simple read operation (Checking Menu is public-safe)
+                const { collection, getDocs, query, limit } = await import('firebase/firestore');
                 const { db } = await import('@/lib/firebase');
-                const ref = await addDoc(collection(db, '_health'), { t: Date.now() });
-                await deleteDoc(ref);
+                const q = query(collection(db, 'menu'), limit(1));
+                await getDocs(q);
                 setStatus('connected');
             } catch (e: any) {
-                console.error(e);
-                setStatus('error');
+                console.error("Health check failed", e);
+                setStatus('error'); // Only show error if basic read fails
                 setMsg(e.message);
             }
         };
@@ -2919,8 +2919,8 @@ function TabButton({ active, label, icon, onClick }: { active: boolean; label: s
         <button
             onClick={onClick}
             className={`flex items - center gap - 2 px - 4 py - 2 rounded - lg transition - all ${active
-                    ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
+                ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
                 } `}
         >
             {icon}
@@ -2934,8 +2934,8 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
         <button
             onClick={onClick}
             className={`flex flex - col items - center justify - center py - 2 rounded - lg transition - all ${active
-                    ? 'text-tashi-primary'
-                    : 'text-gray-400 hover:text-gray-600'
+                ? 'text-tashi-primary'
+                : 'text-gray-400 hover:text-gray-600'
                 } `}
         >
             <div className={`p - 1 rounded - full ${active ? 'bg-tashi-primary/10' : ''} `}>
