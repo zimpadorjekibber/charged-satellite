@@ -70,14 +70,16 @@ export default function AdminDashboard() {
         // Continuous Ringer for Pending Calls
         if (soundEnabled && pendingNotifs > 0) {
             if (audioRef.current) {
+                // Ensure loop is enabled (handle race condition where audio is already playing)
+                audioRef.current.loop = true;
                 if (audioRef.current.paused) {
-                    audioRef.current.loop = true; // Ensure looping
                     audioRef.current.play().catch(e => console.error("Ring loop failed", e));
                 }
             }
         } else {
             // Silence if no pending calls
             if (audioRef.current) {
+                audioRef.current.loop = false; // Disable loop for previews
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
             }
