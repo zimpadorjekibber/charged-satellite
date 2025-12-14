@@ -193,6 +193,7 @@ export default function MenuPage() {
     const [showNavigationModal, setShowNavigationModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [isLocating, setIsLocating] = useState(false); // New loading state for Call Staff
 
     // Review Modal State
     const [showReviewModal, setShowReviewModal] = useState(false);
@@ -347,6 +348,7 @@ export default function MenuPage() {
         // GEOFENCE CHECK: Only allow in-app "Call Staff" if within configured radius
         const callStaffRadius = useStore.getState().callStaffRadius || 50; // Get from settings, default 50m
 
+        setIsLocating(true); // START LOADING
         try {
             const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
             const storeCoords = parseCoordinates(contactInfo.mapsLocation);
@@ -380,6 +382,8 @@ export default function MenuPage() {
             }
         } catch (err) {
             console.error("Location module error:", err);
+        } finally {
+            setIsLocating(false); // STOP LOADING
         }
 
         // If we reach here, customer is within 50m - proceed with in-app notification
@@ -436,14 +440,23 @@ export default function MenuPage() {
                     {/* Call Staff Button */}
                     <button
                         onClick={handleCallStaff}
+                        disabled={isLocating}
                         className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
                             ? 'bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse'
-                            : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
+                            : isLocating
+                                ? 'bg-neutral-800 text-gray-400 cursor-wait'
+                                : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
                             }`}
                     >
-                        {isCalling ? <X size={24} /> : <Phone size={24} />}
+                        {isLocating ? (
+                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : isCalling ? (
+                            <X size={24} />
+                        ) : (
+                            <Phone size={24} />
+                        )}
                         <span className="text-[10px] uppercase tracking-wider font-bold">
-                            {isCalling ? 'Cut Call' : 'Call Staff'}
+                            {isLocating ? 'Locating...' : isCalling ? 'Cut Call' : 'Call Staff'}
                         </span>
                     </button>
 
