@@ -421,7 +421,7 @@ export default function MenuPage() {
             console.log("Adding notification for:", finalTableId);
             addNotification(finalTableId, 'call_staff', {
                 customerName: lastOrder?.customerName || 'Guest',
-                customerPhone: lastOrder?.customerPhone
+                customerPhone: lastOrder?.customerPhone || ''
             });
         } catch (e) {
             console.error("Failed to call staff:", e);
