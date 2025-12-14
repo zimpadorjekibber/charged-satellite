@@ -287,128 +287,138 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
 }
 
 
-function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }) {
-    const startTimeStr = order.acceptedAt || order.createdAt;
-    const [elapsedMs, setElapsedMs] = useState(0);
+// Countdown Timer logic update
+const startTimeStr = order.acceptedAt; // Only use acceptedAt for the timer start
+const [elapsedMs, setElapsedMs] = useState(0);
 
-    useEffect(() => {
-        const update = () => {
-            const created = new Date(startTimeStr).getTime();
-            const now = new Date().getTime();
-            setElapsedMs(Math.max(0, now - created));
-        };
-        update();
-        const timer = setInterval(update, 1000);
-        return () => clearInterval(timer);
-    }, [startTimeStr]);
+// If it's a remote order and hasn't been accepted (table assigned), show waiting state
+if (isRemote && !order.acceptedAt) {
+    return (
+        <div className="flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-lg border border-blue-500/20 mb-4 animate-pulse">
+            <p className="text-blue-400 font-bold text-lg uppercase tracking-widest text-center">Order Received</p>
+            <p className="text-xs text-gray-400 text-center mt-1">
+                Waiting for table assignment to start cooking.
+            </p>
+        </div>
+    );
+}
 
-    // Pending/Rejected states remain the same
-    if (order.status === 'Pending') {
-        return (
-            <div className="flex flex-col items-center justify-center p-6 bg-yellow-500/10 rounded-lg border border-yellow-500/20 mb-4 animate-pulse">
-                <p className="text-yellow-500 font-bold text-lg uppercase tracking-widest text-center">Waiting Confirmation</p>
-                <p className="text-xs text-gray-400 text-center mt-1">Kitchen is reviewing your order...</p>
-            </div>
-        );
-    }
-    if (order.status === 'Rejected') {
-        return (
-            <div className="flex flex-col items-center justify-center p-6 bg-red-900/20 rounded-lg border border-red-500/20 mb-4">
-                <p className="text-red-500 font-bold text-lg uppercase tracking-widest text-center">Order Rejected</p>
-                <p className="text-xs text-gray-400 text-center mt-1">We cannot fulfill this order right now. Please check with staff.</p>
-            </div>
-        );
-    }
+// Fallback for immediate orders (if somehow acceptedAt is missing but it's not remote, or legacy)
+// We can default to createdAt as a failsafe, but for the new logic we prefer explicit acceptance.
+const effectiveStart = startTimeStr || order.createdAt;
 
-    if (isRemote && order.status !== 'Served') {
-        return (
-            <div className="flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-lg border border-blue-500/20 mb-4 animate-pulse">
-                <p className="text-blue-400 font-bold text-lg uppercase tracking-widest text-center">Order Accepted</p>
-                <p className="text-xs text-gray-400 text-center mt-1">
-                    Your food will be freshly served after reaching.
-                </p>
-            </div>
-        );
-    }
+useEffect(() => {
+    const update = () => {
+        // ... existing timer logic but using effectiveStart
+        const created = new Date(effectiveStart).getTime();
+        const now = new Date().getTime();
+        setElapsedMs(Math.max(0, now - created));
+    };
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+}, [effectiveStart]);
 
-    const elapsedMinutes = elapsedMs / 1000 / 60;
+// ... (Keep existing Pending/Rejected checks if they are above this)
 
-    let displayMs = 0;
-    let totalPhaseDurationMin = 30;
-    let phaseLabel = "Estimated Prep Time";
-    let isWarning = false;
-    let isCritical = false;
-    let isFree = false;
+if (order.status === 'Pending') {
+    return (
+        <div className="flex flex-col items-center justify-center p-6 bg-yellow-500/10 rounded-lg border border-yellow-500/20 mb-4 animate-pulse">
+            <p className="text-yellow-500 font-bold text-lg uppercase tracking-widest text-center">Waiting Confirmation</p>
+            <p className="text-xs text-gray-400 text-center mt-1">Kitchen is reviewing your order...</p>
+        </div>
+    );
+}
+if (order.status === 'Rejected') {
+    return (
+        <div className="flex flex-col items-center justify-center p-6 bg-red-900/20 rounded-lg border border-red-500/20 mb-4">
+            <p className="text-red-500 font-bold text-lg uppercase tracking-widest text-center">Order Rejected</p>
+            <p className="text-xs text-gray-400 text-center mt-1">We cannot fulfill this order right now. Please check with staff.</p>
+        </div>
+    );
+}
 
-    // Logic: 0-30 (30m), 30-50 (20m), 50-60 (10m), 60-65 (5m), >65 (Free)
-    if (elapsedMinutes < 30) {
-        // Phase 1: 0-30
-        displayMs = (30 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 30;
-        phaseLabel = "Estimated Prep Time";
-    } else if (elapsedMinutes < 50) {
-        // Phase 2: 30-50 (Duration 20m)
-        // We want to count down from 20. 
-        // elapsedMs is e.g. 31 mins. 
-        // End target is 50 mins.
-        displayMs = (50 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 20;
-        phaseLabel = "Slight Delay... Processing";
-        isWarning = true;
-    } else if (elapsedMinutes < 60) {
-        // Phase 3: 50-60 (Duration 10m)
-        displayMs = (60 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 10;
-        phaseLabel = "Almost Ready...";
-        isWarning = true;
-    } else if (elapsedMinutes < 65) {
-        // Phase 4: 60-65 (Duration 5m)
-        displayMs = (65 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 5;
-        phaseLabel = "Final Touches...";
-        isWarning = true;
-        isCritical = true; // Blink text
-    } else {
-        // Phase 5: > 65
-        isFree = true;
-    }
+// ... (rest of the timer phase logic remains the same)
 
-    if (isFree) {
-        return (
-            <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
-                <div className="text-center animate-pulse">
-                    <p className="text-tashi-accent font-bold text-lg uppercase tracking-widest">It's On Us!</p>
-                    <p className="text-xs text-gray-400">Sorry for the delay. Your meal is free.</p>
-                </div>
-            </div>
-        );
-    }
 
-    const minutes = Math.floor((displayMs / 1000 / 60) % 60);
-    const seconds = Math.floor((displayMs / 1000) % 60);
+const elapsedMinutes = elapsedMs / 1000 / 60;
 
-    // Calculate progress (starts full, goes to empty for current phase)
-    // Avoid division by zero
-    const durationMs = totalPhaseDurationMin * 60 * 1000;
-    const progressPercent = Math.min(100, Math.max(0, (displayMs / durationMs) * 100));
+let displayMs = 0;
+let totalPhaseDurationMin = 30;
+let phaseLabel = "Estimated Prep Time";
+let isWarning = false;
+let isCritical = false;
+let isFree = false;
 
+// Logic: 0-30 (30m), 30-50 (20m), 50-60 (10m), 60-65 (5m), >65 (Free)
+if (elapsedMinutes < 30) {
+    // Phase 1: 0-30
+    displayMs = (30 * 60 * 1000) - elapsedMs;
+    totalPhaseDurationMin = 30;
+    phaseLabel = "Estimated Prep Time";
+} else if (elapsedMinutes < 50) {
+    // Phase 2: 30-50 (Duration 20m)
+    // We want to count down from 20. 
+    // elapsedMs is e.g. 31 mins. 
+    // End target is 50 mins.
+    displayMs = (50 * 60 * 1000) - elapsedMs;
+    totalPhaseDurationMin = 20;
+    phaseLabel = "Slight Delay... Processing";
+    isWarning = true;
+} else if (elapsedMinutes < 60) {
+    // Phase 3: 50-60 (Duration 10m)
+    displayMs = (60 * 60 * 1000) - elapsedMs;
+    totalPhaseDurationMin = 10;
+    phaseLabel = "Almost Ready...";
+    isWarning = true;
+} else if (elapsedMinutes < 65) {
+    // Phase 4: 60-65 (Duration 5m)
+    displayMs = (65 * 60 * 1000) - elapsedMs;
+    totalPhaseDurationMin = 5;
+    phaseLabel = "Final Touches...";
+    isWarning = true;
+    isCritical = true; // Blink text
+} else {
+    // Phase 5: > 65
+    isFree = true;
+}
+
+if (isFree) {
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
-            <div className={`flex items-end gap-1 font-mono leading-none ${isCritical ? 'animate-pulse text-red-500' : ''}`}>
-                <div className="text-3xl font-bold text-white">
-                    {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-                </div>
-            </div>
-            <p className={`text-[10px] uppercase font-bold mt-2 tracking-widest ${isWarning ? 'text-red-400' : 'text-gray-500'} ${isCritical ? 'animate-pulse' : ''}`}>
-                {phaseLabel}
-            </p>
-            <div className="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
-                <motion.div
-                    className={`h-full ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
-                    animate={{ width: `${progressPercent}%` }}
-                    transition={{ ease: "linear", duration: 1 }}
-                />
+            <div className="text-center animate-pulse">
+                <p className="text-tashi-accent font-bold text-lg uppercase tracking-widest">It's On Us!</p>
+                <p className="text-xs text-gray-400">Sorry for the delay. Your meal is free.</p>
             </div>
         </div>
     );
+}
+
+const minutes = Math.floor((displayMs / 1000 / 60) % 60);
+const seconds = Math.floor((displayMs / 1000) % 60);
+
+// Calculate progress (starts full, goes to empty for current phase)
+// Avoid division by zero
+const durationMs = totalPhaseDurationMin * 60 * 1000;
+const progressPercent = Math.min(100, Math.max(0, (displayMs / durationMs) * 100));
+
+return (
+    <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
+        <div className={`flex items-end gap-1 font-mono leading-none ${isCritical ? 'animate-pulse text-red-500' : ''}`}>
+            <div className="text-3xl font-bold text-white">
+                {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+            </div>
+        </div>
+        <p className={`text-[10px] uppercase font-bold mt-2 tracking-widest ${isWarning ? 'text-red-400' : 'text-gray-500'} ${isCritical ? 'animate-pulse' : ''}`}>
+            {phaseLabel}
+        </p>
+        <div className="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
+            <motion.div
+                className={`h-full ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ ease: "linear", duration: 1 }}
+            />
+        </div>
+    </div>
+);
 }

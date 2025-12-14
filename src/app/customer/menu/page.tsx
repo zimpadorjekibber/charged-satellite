@@ -1,7 +1,7 @@
 ﻿'use client';
 
-import { useStore, Category, MenuItem } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed } from 'lucide-react';
+import { useStore, Category, MenuItem, Table } from '@/lib/store';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -26,6 +26,7 @@ const itemVariants = {
 
 export default function MenuPage() {
     const menu = useStore((state) => state.menu);
+    const tables = useStore((state) => state.tables); // Added for table name lookup
     const cart = useStore((state) => state.cart);
     const orders = useStore((state) => state.orders); // Added
     const sessionId = useStore((state) => state.sessionId); // Added
@@ -470,6 +471,32 @@ export default function MenuPage() {
                     )}
                 </div>
             </div>
+
+            {/* Current Table Indicator - Only show if Table ID is set but not 'REQUEST' */}
+            {currentTableId && currentTableId !== 'REQUEST' && currentTableId !== 'Remote' && (
+                <div className="mx-4 mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-500/20 p-2 rounded-lg">
+                            <Utensils size={18} className="text-blue-400" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-blue-300 font-bold uppercase tracking-wider">Ordering for</p>
+                            <p className="text-white font-bold text-lg">Table {tables.find(t => t.id === currentTableId)?.name || currentTableId}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (confirm("Are you sure you want to change your table?")) {
+                                setTableId(null);
+                                window.location.reload(); // Force reload to ensure state is clean
+                            }
+                        }}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-gray-400 transition-colors"
+                    >
+                        Change
+                    </button>
+                </div>
+            )}
 
             {/* Chef's Special Section */}
             {(() => {
