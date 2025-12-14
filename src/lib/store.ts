@@ -277,6 +277,8 @@ export const useStore = create<AppState>()(
                 unsubscribers.push(onSnapshot(notifQuery, (snap) => {
                     const notifications = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Notification[];
                     set({ notifications });
+                }, (error) => {
+                    console.log("Notification listener paused (likely permissions):", error.code);
                 }));
 
                 // Reviews
