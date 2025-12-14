@@ -122,6 +122,7 @@ interface AppState {
     valleyUpdates: ValleyUpdate[];
     media: MediaItem[]; // New media gallery
     geoRadius: number;
+    callStaffRadius: number; // Geofence radius for Call Staff feature (in meters)
     contactInfo: ContactSettings;
     categoryOrder: string[]; // New: For custom category ordering
 
@@ -193,6 +194,7 @@ export const useStore = create<AppState>()(
             isListening: false,
             unsubscribers: [],
             geoRadius: 5,
+            callStaffRadius: 50, // Default: 50 meters
             categoryOrder: [], // Initial empty state
             contactInfo: {
                 phone: '+919876543210',
@@ -301,6 +303,7 @@ export const useStore = create<AppState>()(
                         const data = doc.data();
                         set({
                             geoRadius: data.geoRadius || 5,
+                            callStaffRadius: data.callStaffRadius || 50, // Load Call Staff radius
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }

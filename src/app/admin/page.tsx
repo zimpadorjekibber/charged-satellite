@@ -1057,6 +1057,45 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
+                            {/* Call Staff Radius Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Call Staff Geofencing</h2>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Call Staff Radius (meters)</label>
+                                        <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to use the "Call Staff" button. Beyond this, they'll see a direct phone number to call.</p>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative">
+                                            <input
+                                                id="call-staff-radius-input"
+                                                type="number"
+                                                defaultValue={useStore.getState().callStaffRadius || 50}
+                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                const input = document.getElementById('call-staff-radius-input') as HTMLInputElement;
+                                                if (input) {
+                                                    const val = parseFloat(input.value);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        useStore.getState().updateSettings({ callStaffRadius: val });
+                                                        alert("Call Staff radius updated successfully!");
+                                                    } else {
+                                                        alert("Please enter a valid number greater than 0.");
+                                                    }
+                                                }
+                                            }}
+                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        >
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Contact Settings */}
                             {/* Contact Settings */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">

@@ -331,8 +331,8 @@ export default function MenuPage() {
             return;
         }
 
-        // GEOFENCE CHECK: Only allow in-app "Call Staff" if within 50 meters
-        const CALL_STAFF_RADIUS_METERS = 50;
+        // GEOFENCE CHECK: Only allow in-app "Call Staff" if within configured radius
+        const callStaffRadius = useStore.getState().callStaffRadius || 50; // Get from settings, default 50m
 
         try {
             const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
@@ -346,12 +346,12 @@ export default function MenuPage() {
                     const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
                     const distanceMeters = distanceKm * 1000;
 
-                    console.log(`Call Staff Geofence: Distance = ${distanceMeters.toFixed(0)}m, Limit = ${CALL_STAFF_RADIUS_METERS}m`);
+                    console.log(`Call Staff Geofence: Distance = ${distanceMeters.toFixed(0)}m, Limit = ${callStaffRadius}m`);
 
-                    if (distanceMeters > CALL_STAFF_RADIUS_METERS) {
+                    if (distanceMeters > callStaffRadius) {
                         // Customer is too far - show phone number for direct call
                         const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
-                        if (confirm(`You are ${distanceMeters.toFixed(0)}m away from the restaurant.\n\nThe "Call Staff" feature is only available when you're at the restaurant (within ${CALL_STAFF_RADIUS_METERS}m).\n\nWould you like to call us directly at ${phoneNumber}?`)) {
+                        if (confirm(`You are ${distanceMeters.toFixed(0)}m away from the restaurant.\n\nThe "Call Staff" feature is only available when you're at the restaurant (within ${callStaffRadius}m).\n\nWould you like to call us directly at ${phoneNumber}?`)) {
                             window.location.href = `tel:${phoneNumber}`;
                         }
                         return;
