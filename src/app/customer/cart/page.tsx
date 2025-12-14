@@ -55,6 +55,16 @@ export default function CartPage() {
 
                         console.log(`Geofence Check: User at (${userLat}, ${userLon}), Store at (${storeCoords.lat}, ${storeCoords.lon}), Dist: ${distance.toFixed(3)}km, Limit: ${geoRadius}km`);
 
+                        // NEW: Check if they're outside 50m radius → require advance payment
+                        const distanceMeters = distance * 1000;
+                        const ADVANCE_PAYMENT_RADIUS_METERS = state.callStaffRadius || 50;
+                        if (distanceMeters > ADVANCE_PAYMENT_RADIUS_METERS) {
+                            console.log(`Customer is ${distanceMeters.toFixed(0)}m away (>${ADVANCE_PAYMENT_RADIUS_METERS}m), requiring advance payment`);
+                            setIsOrdering(false);
+                            setShowPaymentModal(true); // Show 50% advance payment modal
+                            return;
+                        }
+
                         if (distance > geoRadius) {
                             alert(`You are out of our service area. \n\nYour distance: ${distance.toFixed(2)}km\nLimit: ${geoRadius}km\n\nYou can still browse our menu, but we cannot accept orders from your current location.`);
                             setIsOrdering(false);
