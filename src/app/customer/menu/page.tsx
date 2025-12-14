@@ -38,6 +38,7 @@ export default function MenuPage() {
     const notifications = useStore((state) => state.notifications);
     const addNotification = useStore((state) => state.addNotification);
     const cancelNotification = useStore((state) => state.cancelNotification);
+    const resolveNotification = useStore((state) => state.resolveNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const contactInfo = useStore((state) => state.contactInfo);
     const categoryOrder = useStore((state) => state.categoryOrder);
@@ -286,7 +287,8 @@ export default function MenuPage() {
     const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
 
     // Check if there is already a pending call for this table
-    const hasPendingCall = notifications.some(n => n.tableId === callTableId && n.type === 'call_staff' && n.status === 'pending');
+    const pendingCallNotification = notifications.find(n => n.tableId === callTableId && n.type === 'call_staff' && n.status === 'pending');
+    const hasPendingCall = !!pendingCallNotification;
 
     // Check for active order (Expanded definition)
     const hasActiveOrder = orders.some(o =>
@@ -336,7 +338,9 @@ export default function MenuPage() {
             const lastOrder = myOrders[0];
             const tableIdToUse = currentTableId || lastOrder?.tableId || 'REQUEST';
 
-            if (hasPendingCall && tableIdToUse) {
+            if (pendingCallNotification) {
+                resolveNotification(pendingCallNotification.id);
+            } else if (hasPendingCall && tableIdToUse) {
                 cancelNotification(tableIdToUse, 'call_staff');
             }
             return;
