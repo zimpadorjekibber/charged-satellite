@@ -96,8 +96,52 @@ export default function CartPage() {
         }
     };
 
-    const handlePlaceOrder = () => {
+    const handlePlaceOrder = async () => {
+        // NEW: Check if customer is within restaurant radius but hasn't scanned a table
         if (!currentTableId) {
+            const state = useStore.getState();
+            const { contactInfo, callStaffRadius } = state;
+            const CHECK_RADIUS_METERS = callStaffRadius || 50; // Use same radius as Call Staff
+
+            // Try to check if they're physically at the restaurant
+            if (contactInfo.mapsLocation) {
+                try {
+                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+                    const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+
+                    if (storeCoords) {
+                        try {
+                            const pos = await getCurrentPosition();
+                            const userLat = pos.coords.latitude;
+                            const userLon = pos.coords.longitude;
+                            const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+                            const distanceMeters = distanceKm * 1000;
+
+                            console.log(`Order Placement Check: Distance = ${distanceMeters.toFixed(0)}m, Radius = ${CHECK_RADIUS_METERS}m`);
+
+                            // If they're WITHIN restaurant radius but NO table scanned
+                            if (distanceMeters <= CHECK_RADIUS_METERS) {
+                                alert(`You are at the restaurant!\n\nPlease scan any Table QR code to place your order.\n\nThis helps our staff serve you better.`);
+                                return; // Block order, ask them to scan table
+                            }
+
+                            // If they're FAR (remote customer), continue to show table modal (existing flow)
+                            // which will show payment modal with 50% advance
+                            setShowTableModal(true);
+                            return;
+                        } catch (geoError) {
+                            console.error("Location check error:", geoError);
+                            // If location fails, assume remote customer, show table modal
+                            setShowTableModal(true);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Location module error:", err);
+                }
+            }
+
+            // Fallback: if no location configured, show table modal
             setShowTableModal(true);
         } else {
             submitOrder(currentTableId);
