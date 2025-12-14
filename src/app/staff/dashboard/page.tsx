@@ -447,7 +447,7 @@ export default function StaffDashboard() {
 
 // Helper Functions for KOT and Bill
 // Custom KOT Printing Logic (Mobile-friendly, stays on screen)
-const handlePrintKOT = (order: any) => {
+const handlePrintKOT = (order: any, autoPrint = false) => {
     const printWindow = window.open('', '_blank', 'width=500,height=800');
     if (!printWindow) return;
 
@@ -694,6 +694,15 @@ const handlePrintKOT = (order: any) => {
         </body>
     </html>
     `);
+    if (autoPrint) {
+        printWindow.document.write(`
+            <script>
+                window.onload = function() {
+                    setTimeout(function() { window.print(); }, 500);
+                };
+            </script>
+        `);
+    }
     printWindow.document.close();
 };
 
@@ -1277,7 +1286,11 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
                             <div className="flex gap-2">
                                 {isNew && (
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); onUpdateStatus('Preparing'); }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onUpdateStatus('Preparing');
+                                            handlePrintKOT(order, true);
+                                        }}
                                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-orange-200 active:scale-95"
                                     >
                                         <Utensils size={18} className="inline mr-2" />
