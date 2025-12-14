@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useStore, Category, MenuItem, Table } from '@/lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils } from 'lucide-react';
@@ -861,7 +861,7 @@ export default function MenuPage() {
                                                             <p className="text-sm text-gray-300 leading-relaxed">
                                                                 <span className="font-semibold text-white">{update.title}</span>
                                                                 {update.description && (
-                                                                    <span className="text-gray-400"> â€” {update.description}</span>
+                                                                    <span className="text-gray-400"> — {update.description}</span>
                                                                 )}
                                                             </p>
                                                             {update.status && update.status.toLowerCase() !== 'create' && (
@@ -889,7 +889,7 @@ export default function MenuPage() {
                                             ))}
                                         </motion.ul>
                                     </div>
-                                    <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} â€¢ Ask staff for details</p>
+                                    <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
                                 </div>
                             </motion.div>
                         </div>
