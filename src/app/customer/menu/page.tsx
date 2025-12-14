@@ -350,6 +350,9 @@ export default function MenuPage() {
         const callStaffRadius = useStore.getState().callStaffRadius || 50; // Get from settings, default 50m
 
         setIsLocating(true); // START LOADING
+        // alert("DEBUG: 1. Starting Call Staff Logic");
+
+        // Safety timeout: If everything hangs, reset button after 8 seconds
 
         // Safety timeout: If everything hangs, reset button after 8 seconds
         setTimeout(() => setIsLocating(false), 8000);
@@ -361,6 +364,7 @@ export default function MenuPage() {
             if (storeCoords) {
                 try {
                     const pos = await getCurrentPosition();
+                    // alert("DEBUG: 2. Got GPS Position");
                     const userLat = pos.coords.latitude;
                     const userLon = pos.coords.longitude;
                     const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
@@ -381,6 +385,7 @@ export default function MenuPage() {
                     // Fallback: If location check fails (weak signal/timeout), 
                     // we AUTOMATICALLY allow the call to proceed.
                     // This avoids blocking the user if 'confirm' dialogs are disabled/ignored on device.
+                    // alert("DEBUG: 3. Location Failed (Weak Signal) - Auto Allowing");
                 }
             }
         } catch (err) {
@@ -392,34 +397,42 @@ export default function MenuPage() {
         // If we reach here, customer is within 50m - proceed with in-app notification
         // Play feedback sound for customer
         // Assuming playCallSound is defined elsewhere or replaced by direct audio control
-        if (callSoundRef.current) {
-            callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
-        }
-        setIsCalling(true);
-
-        // Find recent customer details from previous orders
-        const myOrders = orders.filter(o => o.sessionId === sessionId);
-        const lastOrder = myOrders[0]; // Orders are sorted desc
-
-        // Use currentTableId if available, otherwise fallback to last order's table
-        const effectiveTableId = currentTableId || lastOrder?.tableId;
-
-        // Allow calling even without table (use 'REQUEST' for walk-ins)
-        const finalTableId = effectiveTableId || 'REQUEST';
-
         try {
+            if (callSoundRef.current) {
+                callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
+            }
+
+            // Optimistic Update: Assume success immediately
+            setIsCalling(true);
+
+            // Find recent customer details from previous orders
+            const myOrders = orders.filter(o => o.sessionId === sessionId);
+            const lastOrder = myOrders[0];
+
+            const effectiveTableId = currentTableId || lastOrder?.tableId;
+            const finalTableId = effectiveTableId || 'REQUEST';
+
             console.log("Adding notification for:", finalTableId);
+
+            // Handle the async notification call properly
+            // We do NOT await it, so the UI remains unblocked.
+            // But we catch errors to revert state if needed.
             addNotification(finalTableId, 'call_staff', {
                 customerName: lastOrder?.customerName || 'Guest',
                 customerPhone: lastOrder?.customerPhone
+            })?.catch((error: any) => {
+                console.error("Failed to add notification (Async):", error);
+                // alert("Failed to send call. Please try again.");
+                setIsCalling(false);
+                if (callSoundRef.current) callSoundRef.current.pause();
             });
-        } catch (e) {
-            console.error("Failed to call staff:", e);
-            alert("Failed to send notification. Please try calling the number directly.");
+
+        } catch (criticalError) {
+            // Catch-all for any unexpected sync errors
+            console.error("Critical Call Staff Error:", criticalError);
+            setIsLocating(false);
             setIsCalling(false);
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-            }
+            // alert("Something went wrong. Please try refreshing.");
         }
     };
 
