@@ -131,7 +131,7 @@ interface AppState {
     initialize: () => void;
     cleanup: () => void;
 
-    setTableId: (id: string) => void;
+    setTableId: (id: string | null) => void;
     addTable: (name: string) => Promise<void>;
     updateTable: (id: string, name: string) => void;
     removeTable: (id: string) => void;
