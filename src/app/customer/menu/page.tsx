@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useStore, Category, MenuItem, Table, Order } from '@/lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2 } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -33,6 +33,7 @@ export default function MenuPage() {
     const sessionId = useStore((state) => state.sessionId); // Added
     const addToCart = useStore((state) => state.addToCart);
     const removeFromCart = useStore((state) => state.removeFromCart);
+    const [isCancelling, setIsCancelling] = useState(false);
     const currentTableId = useStore((state) => state.currentTableId);
     const setTableId = useStore((state) => state.setTableId);
     const notifications = useStore((state) => state.notifications);
@@ -353,10 +354,28 @@ export default function MenuPage() {
 
         // Prevent spamming if there's already a pending server-side call
         if (hasPendingCall) {
-            // Just show them the UI again, don't create duplicate notification
-            setIsCalling(true);
-            if (callSoundRef.current && callSoundRef.current.paused) {
-                callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
+            // User wants to cut the call
+            if (pendingCallNotification) {
+                setIsCancelling(true);
+                // Resolve the specific notification
+                resolveNotification(pendingCallNotification.id)
+                    .then(() => {
+                        console.log("Call cancelled (resolved notification)");
+                    })
+                    .catch(err => console.error("Failed to cancel call", err))
+                    .finally(() => {
+                        setIsCancelling(false);
+                        setIsCalling(false);
+                        if (callSoundRef.current) {
+                            callSoundRef.current.pause();
+                        }
+                    });
+            } else {
+                // Fallback: just reset UI
+                setIsCalling(false);
+                if (callSoundRef.current) {
+                    callSoundRef.current.pause();
+                }
             }
             return;
         }
@@ -459,23 +478,27 @@ export default function MenuPage() {
                     {/* Call Staff Button */}
                     <button
                         onClick={handleCallStaff}
-                        disabled={isLocating}
+                        disabled={isLocating || isCancelling}
                         className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
                             ? 'bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse'
-                            : isLocating
-                                ? 'bg-neutral-800 text-gray-400 cursor-wait'
-                                : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
+                            : isCancelling
+                                ? 'bg-gray-700 text-gray-300 cursor-wait'
+                                : isLocating
+                                    ? 'bg-neutral-800 text-gray-400 cursor-wait'
+                                    : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
                             }`}
                     >
                         {isLocating ? (
                             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : isCancelling ? (
+                            <Loader2 size={24} className="animate-spin" />
                         ) : isCalling ? (
                             <X size={24} />
                         ) : (
                             <Phone size={24} />
                         )}
                         <span className="text-[10px] uppercase tracking-wider font-bold">
-                            {isLocating ? 'Locating...' : isCalling ? 'Cut Call' : 'Call Staff'}
+                            {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : 'Call Staff'}
                         </span>
                     </button>
 
