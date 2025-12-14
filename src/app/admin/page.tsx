@@ -39,6 +39,14 @@ export default function AdminDashboard() {
 
     // Sound Logic
     const [soundEnabled, setSoundEnabled] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audioRef.current.preload = 'auto';
+        }
+    }, []);
     // Theme removed - forcing Premium Dark Mode
 
     const prevOrdersLength = useRef(0);
@@ -61,29 +69,35 @@ export default function AdminDashboard() {
     }, []);
 
     useEffect(() => {
-        if (!soundEnabled) return;
-
         const pendingOrders = orders.filter(o => o.status === 'Pending').length;
         const pendingNotifs = notifications.filter(n => n.status === 'pending').length;
 
-        if (pendingOrders > prevOrdersLength.current || pendingNotifs > prevNotifLength.current) {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.play().catch(e => console.error("Audio play failed", e));
+        // If sound enabled, check specifically for INCREASE
+        if (soundEnabled) {
+            if (pendingOrders > prevOrdersLength.current || pendingNotifs > prevNotifLength.current) {
+                if (audioRef.current) {
+                    audioRef.current.currentTime = 0;
+                    audioRef.current.play().catch(e => console.error("Audio play failed", e));
+                }
+            }
         }
 
+        // Always update refs to current state so we track from NOW
         prevOrdersLength.current = pendingOrders;
         prevNotifLength.current = pendingNotifs;
     }, [orders, notifications, soundEnabled]);
 
     const toggleSound = () => {
         if (!soundEnabled) {
-            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.play().then(() => {
-                setSoundEnabled(true);
-            }).catch(e => {
-                console.error("Audio permission denied", e);
-                alert("Please interact with the document first or check browser permissions.");
-            });
+            if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play().then(() => {
+                    setSoundEnabled(true);
+                }).catch(e => {
+                    console.error("Audio permission denied", e);
+                    alert("Please interact with the document first or check browser permissions.");
+                });
+            }
         } else {
             setSoundEnabled(false);
         }
