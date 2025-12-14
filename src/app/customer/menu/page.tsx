@@ -371,12 +371,11 @@ export default function MenuPage() {
                     }
                 } catch (locError) {
                     console.error("Geolocation Error for Call Staff:", locError);
-                    // If location fails, show phone number as fallback
-                    const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
-                    if (confirm(`Unable to verify your location.\n\nThe "Call Staff" button is only available when you're at the restaurant.\n\nWould you like to call us directly at ${phoneNumber}?`)) {
-                        window.location.href = `tel:${phoneNumber}`;
+                    // Weak Signal / Timeout Fallback:
+                    if (!confirm("We couldn't verify your precise location (GPS signal weak).\n\nAre you currently at the restaurant?\n\nClick OK to Call Staff.")) {
+                        return;
                     }
-                    return;
+                    // Allow to proceed
                 }
             }
         } catch (err) {
