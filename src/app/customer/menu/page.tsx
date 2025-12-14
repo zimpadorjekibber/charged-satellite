@@ -287,7 +287,12 @@ export default function MenuPage() {
     const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
 
     // Check if there is already a pending call for this table
-    const pendingCallNotification = notifications.find(n => n.tableId === callTableId && n.type === 'call_staff' && n.status === 'pending');
+    const pendingCallNotification = notifications.find(n =>
+        n.tableId === callTableId &&
+        n.type === 'call_staff' &&
+        n.status === 'pending' &&
+        (callTableId !== 'REQUEST' || n.sessionId === sessionId)
+    );
     const hasPendingCall = !!pendingCallNotification;
 
     // Check for active order (Expanded definition)
@@ -421,7 +426,8 @@ export default function MenuPage() {
             console.log("Adding notification for:", finalTableId);
             addNotification(finalTableId, 'call_staff', {
                 customerName: lastOrder?.customerName || 'Guest',
-                customerPhone: lastOrder?.customerPhone || ''
+                customerPhone: lastOrder?.customerPhone || '',
+                sessionId: sessionId || undefined
             });
         } catch (e) {
             console.error("Failed to call staff:", e);

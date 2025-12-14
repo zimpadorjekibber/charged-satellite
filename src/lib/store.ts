@@ -76,6 +76,7 @@ export interface Notification {
     createdAt: string;
     customerName?: string;
     customerPhone?: string;
+    sessionId?: string;
 }
 
 export interface Review {
@@ -156,7 +157,7 @@ interface AppState {
     updateOrderTable: (orderId: string, tableId: string) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
 
-    addNotification: (tableId: string, type: 'call_staff' | 'bill_request', details?: { customerName?: string, customerPhone?: string }) => void;
+    addNotification: (tableId: string, type: 'call_staff' | 'bill_request', details?: { customerName?: string, customerPhone?: string, sessionId?: string }) => void;
     resolveNotification: (notificationId: string) => void;
     cancelNotification: (tableId: string, type: 'call_staff' | 'bill_request') => Promise<void>;
 
@@ -502,7 +503,8 @@ export const useStore = create<AppState>()(
                     status: 'pending',
                     createdAt: new Date().toISOString(),
                     customerName: details?.customerName,
-                    customerPhone: details?.customerPhone
+                    customerPhone: details?.customerPhone,
+                    sessionId: details?.sessionId
                 });
             },
 
