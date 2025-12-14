@@ -36,7 +36,6 @@ export default function MenuPage() {
     const setTableId = useStore((state) => state.setTableId);
     const notifications = useStore((state) => state.notifications);
     const addNotification = useStore((state) => state.addNotification);
-    const cancelNotification = useStore((state) => state.cancelNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const contactInfo = useStore((state) => state.contactInfo);
     const categoryOrder = useStore((state) => state.categoryOrder);
@@ -329,7 +328,7 @@ export default function MenuPage() {
             const tableIdToUse = currentTableId || lastOrder?.tableId;
 
             if (hasPendingCall && tableIdToUse) {
-                cancelNotification(tableIdToUse, 'call_staff');
+                // cancelNotification(tableIdToUse, 'call_staff'); // Function doesn't exist yet
             }
             return;
         }
