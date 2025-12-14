@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useStore, Category, MenuItem, Table } from '@/lib/store';
+import { useStore, Category, MenuItem, Table, Order } from '@/lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -280,7 +280,13 @@ export default function MenuPage() {
     };
 
     // Check if there is already a pending call for this table
-    const hasPendingCall = notifications.some(n => n.tableId === currentTableId && n.type === 'call_staff' && n.status === 'pending');
+    // Calculate effective table ID (handles Remote/Request cases)
+    const myOrders = orders.filter((o: Order) => o.sessionId === sessionId);
+    const lastOrder = myOrders[0];
+    const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
+
+    // Check if there is already a pending call for this table
+    const hasPendingCall = notifications.some(n => n.tableId === callTableId && n.type === 'call_staff' && n.status === 'pending');
 
     // Check for active order (Expanded definition)
     const hasActiveOrder = orders.some(o =>
@@ -328,7 +334,7 @@ export default function MenuPage() {
             // Cancel the server-side notification so staff's phone stops ringing too
             const myOrders = orders.filter(o => o.sessionId === sessionId);
             const lastOrder = myOrders[0];
-            const tableIdToUse = currentTableId || lastOrder?.tableId;
+            const tableIdToUse = currentTableId || lastOrder?.tableId || 'REQUEST';
 
             if (hasPendingCall && tableIdToUse) {
                 cancelNotification(tableIdToUse, 'call_staff');
