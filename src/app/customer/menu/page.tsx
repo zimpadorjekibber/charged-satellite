@@ -36,6 +36,7 @@ export default function MenuPage() {
     const setTableId = useStore((state) => state.setTableId);
     const notifications = useStore((state) => state.notifications);
     const addNotification = useStore((state) => state.addNotification);
+    const cancelNotification = useStore((state) => state.cancelNotification);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const contactInfo = useStore((state) => state.contactInfo);
     const categoryOrder = useStore((state) => state.categoryOrder);
@@ -328,7 +329,7 @@ export default function MenuPage() {
             const tableIdToUse = currentTableId || lastOrder?.tableId;
 
             if (hasPendingCall && tableIdToUse) {
-                // cancelNotification(tableIdToUse, 'call_staff'); // Function doesn't exist yet
+                cancelNotification(tableIdToUse, 'call_staff');
             }
             return;
         }
@@ -400,10 +401,20 @@ export default function MenuPage() {
         // Allow calling even without table (use 'REQUEST' for walk-ins)
         const finalTableId = effectiveTableId || 'REQUEST';
 
-        addNotification(finalTableId, 'call_staff', {
-            customerName: lastOrder?.customerName,
-            customerPhone: lastOrder?.customerPhone
-        });
+        try {
+            console.log("Adding notification for:", finalTableId);
+            addNotification(finalTableId, 'call_staff', {
+                customerName: lastOrder?.customerName || 'Guest',
+                customerPhone: lastOrder?.customerPhone
+            });
+        } catch (e) {
+            console.error("Failed to call staff:", e);
+            alert("Failed to send notification. Please try calling the number directly.");
+            setIsCalling(false);
+            if (callSoundRef.current) {
+                callSoundRef.current.pause();
+            }
+        }
     };
 
     return (

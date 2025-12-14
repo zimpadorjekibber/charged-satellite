@@ -158,7 +158,7 @@ interface AppState {
 
     addNotification: (tableId: string, type: 'call_staff' | 'bill_request', details?: { customerName?: string, customerPhone?: string }) => void;
     resolveNotification: (notificationId: string) => void;
-    cancelNotification: (tableId: string, type: string) => void;
+    cancelNotification: (tableId: string, type: 'call_staff' | 'bill_request') => Promise<void>;
 
     addReview: (review: Omit<Review, 'id' | 'createdAt'>) => void;
 
