@@ -314,7 +314,7 @@ export default function MenuPage() {
     }, [hasPendingCall, isCalling]);
 
     const handleCallStaff = async () => {
-        // If already calling, allow "Cut Call" (local only)
+        // If already calling, allow "Cut Call" - This cancels the notification on BOTH sides
         if (isCalling) {
             // Stop local audio and visual feedback
             if (callSoundRef.current) {
@@ -322,12 +322,25 @@ export default function MenuPage() {
                 callSoundRef.current.currentTime = 0;
             }
             setIsCalling(false);
+
+            // Cancel the server-side notification so staff's phone stops ringing too
+            const myOrders = orders.filter(o => o.sessionId === sessionId);
+            const lastOrder = myOrders[0];
+            const tableIdToUse = currentTableId || lastOrder?.tableId;
+
+            if (hasPendingCall && tableIdToUse) {
+                cancelNotification(tableIdToUse, 'call_staff');
+            }
             return;
         }
 
         // Prevent spamming if there's already a pending server-side call
         if (hasPendingCall) {
-            alert("You already have an active call. Staff will respond shortly.");
+            // Just show them the UI again, don't create duplicate notification
+            setIsCalling(true);
+            if (callSoundRef.current && callSoundRef.current.paused) {
+                callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
+            }
             return;
         }
 
@@ -385,17 +398,10 @@ export default function MenuPage() {
         // Use currentTableId if available, otherwise fallback to last order's table
         const effectiveTableId = currentTableId || lastOrder?.tableId;
 
-        if (!effectiveTableId) {
-            alert("No table information found. Please scan a QR code first.");
-            setIsCalling(false);
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-                callSoundRef.current.currentTime = 0;
-            }
-            return;
-        }
+        // Allow calling even without table (use 'REQUEST' for walk-ins)
+        const finalTableId = effectiveTableId || 'REQUEST';
 
-        addNotification(effectiveTableId, 'call_staff', {
+        addNotification(finalTableId, 'call_staff', {
             customerName: lastOrder?.customerName,
             customerPhone: lastOrder?.customerPhone
         });
