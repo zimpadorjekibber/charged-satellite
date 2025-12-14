@@ -288,16 +288,16 @@ export default function MenuPage() {
 
     // Local state for "Calling" visual/audio feedback
     const [isCalling, setIsCalling] = useState(false);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const callSoundRef = useRef<HTMLAudioElement | null>(null);
 
     // Initialize Audio
     useEffect(() => {
-        audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audioRef.current.loop = true; // Loop the ring sound
+        callSoundRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        callSoundRef.current.loop = true; // Loop the ring sound
         return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
+            if (callSoundRef.current) {
+                callSoundRef.current.pause();
+                callSoundRef.current = null;
             }
         };
     }, []);
@@ -306,51 +306,99 @@ export default function MenuPage() {
     useEffect(() => {
         if (!hasPendingCall && isCalling) {
             setIsCalling(false);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
+            if (callSoundRef.current) {
+                callSoundRef.current.pause();
+                callSoundRef.current.currentTime = 0;
             }
         }
     }, [hasPendingCall, isCalling]);
 
-    const handleCallStaff = () => {
-        if (!currentTableId) {
-            alert("Please scan a table QR code or select a table to call staff.");
-            return;
-        }
-
-        // REQUIREMENT: Must have active order to call staff
-        if (!hasActiveOrder) {
-            alert("You can call staff only if you have an active order.");
-            return;
-        }
-
+    const handleCallStaff = async () => {
+        // If already calling, allow "Cut Call" (local only)
         if (isCalling) {
-            // ACTION: CUT CALL (Stop local ring, but keep notification active)
+            // Stop local audio and visual feedback
+            if (callSoundRef.current) {
+                callSoundRef.current.pause();
+                callSoundRef.current.currentTime = 0;
+            }
             setIsCalling(false);
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            }
-        } else {
-            // ACTION: START CALL
-            setIsCalling(true);
-            if (audioRef.current) {
-                audioRef.current.play().catch(e => console.error("Audio play failed", e));
-            }
-
-            // Only send a new notification if one isn't already pending
-            if (!hasPendingCall) {
-                // Find recent customer details from previous orders
-                const myOrders = orders.filter(o => o.sessionId === sessionId);
-                const lastOrder = myOrders[0]; // Orders are sorted desc
-
-                addNotification(currentTableId, 'call_staff', {
-                    customerName: lastOrder?.customerName,
-                    customerPhone: lastOrder?.customerPhone
-                });
-            }
+            return;
         }
+
+        // Prevent spamming if there's already a pending server-side call
+        if (hasPendingCall) {
+            alert("You already have an active call. Staff will respond shortly.");
+            return;
+        }
+
+        // GEOFENCE CHECK: Only allow in-app "Call Staff" if within 50 meters
+        const CALL_STAFF_RADIUS_METERS = 50;
+
+        try {
+            const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+            const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+
+            if (storeCoords) {
+                try {
+                    const pos = await getCurrentPosition();
+                    const userLat = pos.coords.latitude;
+                    const userLon = pos.coords.longitude;
+                    const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+                    const distanceMeters = distanceKm * 1000;
+
+                    console.log(`Call Staff Geofence: Distance = ${distanceMeters.toFixed(0)}m, Limit = ${CALL_STAFF_RADIUS_METERS}m`);
+
+                    if (distanceMeters > CALL_STAFF_RADIUS_METERS) {
+                        // Customer is too far - show phone number for direct call
+                        const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
+                        if (confirm(`You are ${distanceMeters.toFixed(0)}m away from the restaurant.\n\nThe "Call Staff" feature is only available when you're at the restaurant (within ${CALL_STAFF_RADIUS_METERS}m).\n\nWould you like to call us directly at ${phoneNumber}?`)) {
+                            window.location.href = `tel:${phoneNumber}`;
+                        }
+                        return;
+                    }
+                } catch (locError) {
+                    console.error("Geolocation Error for Call Staff:", locError);
+                    // If location fails, show phone number as fallback
+                    const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
+                    if (confirm(`Unable to verify your location.\n\nThe "Call Staff" button is only available when you're at the restaurant.\n\nWould you like to call us directly at ${phoneNumber}?`)) {
+                        window.location.href = `tel:${phoneNumber}`;
+                    }
+                    return;
+                }
+            }
+        } catch (err) {
+            console.error("Location module error:", err);
+        }
+
+        // If we reach here, customer is within 50m - proceed with in-app notification
+        // Play feedback sound for customer
+        // Assuming playCallSound is defined elsewhere or replaced by direct audio control
+        if (callSoundRef.current) {
+            callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
+        }
+        setIsCalling(true);
+
+        // Find recent customer details from previous orders
+        const myOrders = orders.filter(o => o.sessionId === sessionId);
+        const lastOrder = myOrders[0]; // Orders are sorted desc
+
+        // Use currentTableId if available, otherwise fallback to last order's table
+        const effectiveTableId = currentTableId || lastOrder?.tableId;
+
+        if (!effectiveTableId) {
+            alert("No table information found. Please scan a QR code first.");
+            setIsCalling(false);
+            if (callSoundRef.current) {
+                callSoundRef.current.pause();
+                callSoundRef.current.currentTime = 0;
+            }
+            return;
+        }
+
+        addNotification(effectiveTableId, 'call_staff', {
+            customerName: lastOrder?.customerName,
+            customerPhone: lastOrder?.customerPhone
+        });
     };
 
     return (
