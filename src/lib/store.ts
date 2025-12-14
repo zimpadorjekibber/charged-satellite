@@ -234,37 +234,40 @@ export const useStore = create<AppState>()(
                     // AUTOMATIC CLEANUP LOGIC
                     // 1. Unattended Pending Orders (> 10 mins)
                     // 2. Previous Day Orders
-                    const now = new Date();
-                    const tenMinsAgo = new Date(now.getTime() - 10 * 60 * 1000);
-                    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+                    // SAFETY: Only allow Staff/Admin to perform cleanup to avoid spamming from customer devices
+                    const state = get();
+                    const isStaffOrAdmin = state.currentUser?.role === 'admin' || state.currentUser?.role === 'staff';
 
-                    orders.forEach(async (order) => {
-                        const orderDate = new Date(order.createdAt);
+                    if (isStaffOrAdmin) {
+                        const now = new Date();
+                        const tenMinsAgo = new Date(now.getTime() - 10 * 60 * 1000);
+                        const todayStart = new Date(now.setHours(0, 0, 0, 0));
 
-                        // Condition 1: Pending > 10 mins
-                        if (order.status === 'Pending' && orderDate < tenMinsAgo) {
-                            console.log('Auto-deleting abandoned order:', order.id);
-                            await deleteDoc(doc(db, 'orders', order.id));
-                        }
+                        orders.forEach(async (order) => {
+                            const orderDate = new Date(order.createdAt);
 
-                        // Condition 2: Old Orders (Previous Days) -> ARCHIVE
-                        // We keep orders from today in active view. Yesterday and older go to archive.
-                        // EXCEPT 'Pending' ones that are old (they are just abandoned junk, so we skip archiving them or archive them as abandoned? User wants total sales, so only Paid/Served matters really, but let's archive everything for safety).
-                        // Condition 2: Old Orders (Previous Days) -> ARCHIVE
-                        // Only archive if the order is FINALIZED (Paid or Rejected).
-                        // Ongoing orders (Preparing, Served) should remain on the board (e.g. post-midnight).
-                        if (orderDate < todayStart) {
-                            if (order.status === 'Paid' || order.status === 'Rejected') {
-                                console.log('Archiving old finished order:', order.id);
+                            // Condition 1: Pending > 10 mins
+                            if (order.status === 'Pending' && orderDate < tenMinsAgo) {
+                                console.log('Auto-deleting abandoned order:', order.id);
                                 try {
-                                    await setDoc(doc(db, 'archived_orders', order.id), order);
                                     await deleteDoc(doc(db, 'orders', order.id));
-                                } catch (err) {
-                                    console.error("Failed to archive/delete", err);
+                                } catch (e) { console.error('Cleanup failed', e); }
+                            }
+
+                            // Condition 2: Old Orders (Previous Days) -> ARCHIVE
+                            if (orderDate < todayStart) {
+                                if (order.status === 'Paid' || order.status === 'Rejected') {
+                                    console.log('Archiving old finished order:', order.id);
+                                    try {
+                                        await setDoc(doc(db, 'archived_orders', order.id), order);
+                                        await deleteDoc(doc(db, 'orders', order.id));
+                                    } catch (err) {
+                                        console.error("Failed to archive/delete", err);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }));
 
                 // Notifications
