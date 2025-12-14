@@ -378,11 +378,9 @@ export default function MenuPage() {
                     }
                 } catch (locError) {
                     console.error("Geolocation Error for Call Staff:", locError);
-                    // Weak Signal / Timeout Fallback:
-                    if (!confirm("We couldn't verify your precise location (GPS signal weak).\n\nAre you currently at the restaurant?\n\nClick OK to Call Staff.")) {
-                        return;
-                    }
-                    // Allow to proceed
+                    // Fallback: If location check fails (weak signal/timeout), 
+                    // we AUTOMATICALLY allow the call to proceed.
+                    // This avoids blocking the user if 'confirm' dialogs are disabled/ignored on device.
                 }
             }
         } catch (err) {
