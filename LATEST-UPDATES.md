@@ -46,6 +46,20 @@
 
 ---
 
+### 3. Automatic KOT Printing 🖨️
+**Problem**: Staff had to manually click "Print" in the popup window for every KOT.
+
+**Solution**: The KOT popup now automatically triggers the system print dialog when it opens, streamlining the kitchen workflow.
+
+**Flow**:
+1. Staff clicks "Start Preparation"
+2. KOT popup opens
+3. System print dialog opens immediately
+
+**Files Modified**: `src/app/staff/dashboard/page.tsx`
+
+---
+
 ## Testing
 
 ### Remote Order Timer
