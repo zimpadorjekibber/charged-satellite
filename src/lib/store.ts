@@ -426,8 +426,10 @@ export const useStore = create<AppState>()(
 
             placeOrder: async (customerName, customerPhone, tableId) => {
                 const state = get();
-                const activeTableId = tableId || state.currentTableId;
-                if (state.cart.length === 0 || !activeTableId) return;
+                // If no specific table is set, default to 'REQUEST' (Remote/Takeaway)
+                const activeTableId = tableId || state.currentTableId || 'REQUEST';
+
+                if (state.cart.length === 0) return;
                 const total = state.cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
                 const orderData = {
@@ -449,10 +451,20 @@ export const useStore = create<AppState>()(
                 const updates: any = { status };
                 if (status === 'Preparing') {
                     // Check if already has acceptedAt to avoid overwriting
-                    const orderStr = get().orders.find(o => o.id === orderId);
-                    // For remote orders (tableId = 'REQUEST'), do NOT set acceptedAt yet
-                    // It will be set when customer arrives and table is assigned
-                    if (orderStr && !orderStr.acceptedAt && orderStr.tableId !== 'REQUEST') {
+                    const orderState = get().orders.find(o => o.id === orderId);
+
+                    // For remote orders (tableId = 'REQUEST'), do NOT set acceptedAt yet.
+                    // Instead, we might set a 'preparingAt' timestamp if needed, but the main 'acceptedAt' 
+                    // that triggers the 30min timer should happen when the table is ASSIGNED.
+                    // However, if the business wants to start cooking immediately, maybe we DO set it?
+                    // User requirement: "starts 30 minutes countdown itself not leaving staff to assign table Number"
+                    // Implication: Don't start the countdown (which relies on acceptedAt/createdAt) until table assigned?
+                    // actually, the countdown UI uses `acceptedAt || createdAt`. 
+                    // If we want to DELAY the countdown, we should ensure `acceptedAt` is ONLY set when a real table is assigned.
+
+                    const isRemote = orderState?.tableId === 'REQUEST' || orderState?.tableId === 'Remote';
+
+                    if (orderState && !orderState.acceptedAt && !isRemote) {
                         updates.acceptedAt = new Date().toISOString();
                     }
                 }

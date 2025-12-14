@@ -40,8 +40,11 @@ export default function OrderStatusPage() {
     }, [initialize]);
 
     // Auto-redirect to feedback page when an order is marked as Paid
+    // Auto-redirect to feedback page when an order is marked as Paid
+    // FIX: Only redirect if there are NO active orders remaining. 
+    // This prevents interrupting the user if they have one completed order but another one still coming.
     useEffect(() => {
-        if (myPaidOrders.length > 0) {
+        if (myPaidOrders.length > 0 && myOrders.length === 0) {
             // Find the most recent paid order that we haven't processed yet
             const latestPaidOrder = myPaidOrders
                 .filter(o => !processedPaidOrders.current.has(o.id))
@@ -61,7 +64,7 @@ export default function OrderStatusPage() {
                 router.push(`/customer/feedback?${params.toString()}`);
             }
         }
-    }, [myPaidOrders, router]);
+    }, [myPaidOrders, myOrders.length, router]);
 
 
     if (myOrders.length === 0) {

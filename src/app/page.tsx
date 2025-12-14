@@ -11,6 +11,10 @@ export default function Home() {
   const images = ['/tashizom-winter.jpg', '/tashizom-summer.jpg'];
 
   useEffect(() => {
+    // Clear previous table session for generic app entry
+    // This prevents "sticky" table IDs when scanning the general App QR
+    useStore.getState().setTableId(null);
+
     // Record generic visit / app scan
     useStore.getState().recordScan('app_qr', { path: '/' });
   }, []);
