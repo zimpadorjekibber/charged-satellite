@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect, useRef, memo } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
+import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '@/lib/location';
 
 // Animation Variants
 const containerVariants = {
@@ -349,8 +350,12 @@ export default function MenuPage() {
         const callStaffRadius = useStore.getState().callStaffRadius || 50; // Get from settings, default 50m
 
         setIsLocating(true); // START LOADING
+
+        // Safety timeout: If everything hangs, reset button after 8 seconds
+        setTimeout(() => setIsLocating(false), 8000);
+
         try {
-            const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+            // Static import used above - no network request needed here
             const storeCoords = parseCoordinates(contactInfo.mapsLocation);
 
             if (storeCoords) {
