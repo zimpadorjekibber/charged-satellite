@@ -50,7 +50,7 @@ export default function CartPage() {
             // Only enforce if coordinates are set in admin settings
             if (contactInfo.mapsLocation && geoRadius > 0) {
                 try {
-                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('../../../lib/location');
                     const storeCoords = parseCoordinates(contactInfo.mapsLocation);
 
                     if (storeCoords) {
@@ -122,7 +122,7 @@ export default function CartPage() {
             // Try to check if they're physically at the restaurant
             if (contactInfo.mapsLocation) {
                 try {
-                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('@/lib/location');
+                    const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('../../../lib/location');
                     const storeCoords = parseCoordinates(contactInfo.mapsLocation);
 
                     if (storeCoords) {

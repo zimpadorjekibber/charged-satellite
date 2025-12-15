@@ -1403,38 +1403,39 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
     );
 }
 
-const orders = useStore((state: any) => state.orders);
-const currentTableId = useStore((state: any) => state.currentTableId);
-const sessionId = useStore((state: any) => state.sessionId);
+const MiniOrderTimer = memo(function MiniOrderTimer() {
+    const orders = useStore((state: any) => state.orders);
+    const currentTableId = useStore((state: any) => state.currentTableId);
+    const sessionId = useStore((state: any) => state.sessionId);
 
-// Find the latest active order for THIS session
-// FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
-const activeOrder = orders
-    .filter(o =>
-        o.sessionId === sessionId &&
-        (o.status === 'Pending' || o.status === 'Preparing')
-    )
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+    // Find the latest active order for THIS session
+    // FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
+    const activeOrder = orders
+        .filter(o =>
+            o.sessionId === sessionId &&
+            (o.status === 'Pending' || o.status === 'Preparing')
+        )
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
-if (!activeOrder) return null;
+    if (!activeOrder) return null;
 
-return (
-    <Link href="/customer/status">
-        <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
-        >
-            <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
-            <div className="flex flex-col leading-none">
-                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                    {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
-                </span>
-                <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
-            </div>
-        </motion.div>
-    </Link>
-);
+    return (
+        <Link href="/customer/status">
+            <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
+            >
+                <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
+                <div className="flex flex-col leading-none">
+                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                        {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
+                    </span>
+                    <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
+                </div>
+            </motion.div>
+        </Link>
+    );
 });
 
 function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {

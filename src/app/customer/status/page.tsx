@@ -18,14 +18,14 @@ export default function OrderStatusPage() {
     const processedPaidOrders = useRef<Set<string>>(new Set());
 
     // Filter orders: Match Session ID primarily
-    const myOrders = orders.filter(o =>
+    const myOrders = orders.filter((o: any) =>
         (o.sessionId === sessionId) &&
         o.status !== 'Rejected' &&
         o.status !== 'Paid'
     );
 
     // Find recently paid orders for this session
-    const myPaidOrders = orders.filter(o =>
+    const myPaidOrders = orders.filter((o: any) =>
         (o.sessionId === sessionId) &&
         o.status === 'Paid'
     );
@@ -47,8 +47,8 @@ export default function OrderStatusPage() {
         if (myPaidOrders.length > 0 && myOrders.length === 0) {
             // Find the most recent paid order that we haven't processed yet
             const latestPaidOrder = myPaidOrders
-                .filter(o => !processedPaidOrders.current.has(o.id))
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+                .filter((o: any) => !processedPaidOrders.current.has(o.id))
+                .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
             if (latestPaidOrder) {
                 // Mark this order as processed
@@ -133,7 +133,7 @@ export default function OrderStatusPage() {
             </h2>
 
             <div className="space-y-6">
-                {myOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order) => (
+                {myOrders.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order: any) => (
                     <OrderTracker key={order.id} order={order} isRemote={order.tableId === 'REQUEST'} />
                 ))}
             </div>
