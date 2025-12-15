@@ -66,9 +66,12 @@ export default function CartPage() {
                         const ADVANCE_PAYMENT_RADIUS_METERS = state.callStaffRadius || 50;
                         if (distanceMeters > ADVANCE_PAYMENT_RADIUS_METERS) {
                             console.log(`Customer is ${distanceMeters.toFixed(0)}m away (>${ADVANCE_PAYMENT_RADIUS_METERS}m), requiring advance payment`);
-                            setIsOrdering(false);
-                            setShowPaymentModal(true); // Show 50% advance payment modal
-                            return;
+                            // FIX: If we are already paying (isPrePaid=true), DO NOT stop the flow.
+                            if (!isPrePaid) {
+                                setIsOrdering(false);
+                                setShowPaymentModal(true); // Show 50% advance payment modal
+                                return;
+                            }
                         }
 
                         if (distance > geoRadius) {
