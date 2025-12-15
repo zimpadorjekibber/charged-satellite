@@ -336,8 +336,9 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
 
     useEffect(() => {
         const update = () => {
-            // ... existing timer logic but using effectiveStart
+            if (!effectiveStart) return;
             const created = new Date(effectiveStart).getTime();
+            if (isNaN(created)) return; // Safety check
             const now = new Date().getTime();
             setElapsedMs(Math.max(0, now - created));
         };
