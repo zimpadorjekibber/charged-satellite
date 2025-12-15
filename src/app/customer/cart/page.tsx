@@ -37,7 +37,7 @@ export default function CartPage() {
     }, [storedCustomerDetails]);
 
     // Calculate Total
-    const total = cart.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    const total = cart.reduce((sum: any, item: any) => sum + (item.price * item.quantity), 0);
     const grandTotal = total;
 
     const currentTableId = useStore((state: any) => state.currentTableId);

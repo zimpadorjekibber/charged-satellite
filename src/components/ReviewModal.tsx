@@ -23,18 +23,19 @@ export default function ReviewModal() {
         const previousOrders = new Map();
 
         // Track current orders
-        orders.forEach((order: any) => {
-            if (order.sessionId === sessionId) {
-                previousOrders.set(order.id, order);
-            }
+        const myOrders = orders.filter((o: any) => o.sessionId === sessionId);
+        myOrders.forEach((order: any) => {
+            previousOrders.set(order.id, order);
         });
 
         // Store reference
         const checkInterval = setInterval(() => {
-            const currentIds = new Set(orders.filter((o: any) => o.sessionId === sessionId).map((o: any) => o.id));
+            const currentOrders = orders.filter((o: any) => o.sessionId === sessionId);
+            const currentIds = new Set(currentOrders.map((o: any) => o.id));
 
             // Check if any order was removed
-            previousOrders.forEach((order: any, id: string) => {
+            const entriesArray = Array.from(previousOrders.entries());
+            entriesArray.forEach(([id, order]) => {
                 if (!currentIds.has(id)) {
                     // Order was deleted/completed - show review modal
                     setCompletedOrderId(id);
@@ -44,10 +45,8 @@ export default function ReviewModal() {
             });
 
             // Update tracking
-            orders.forEach((order: any) => {
-                if (order.sessionId === sessionId) {
-                    previousOrders.set(order.id, order);
-                }
+            currentOrders.forEach((order: any) => {
+                previousOrders.set(order.id, order);
             });
         }, 1000);
 
@@ -132,8 +131,8 @@ export default function ReviewModal() {
                                             <Star
                                                 size={40}
                                                 className={`transition-colors ${star <= (hoverRating || rating)
-                                                        ? 'text-orange-500 fill-orange-500'
-                                                        : 'text-gray-300'
+                                                    ? 'text-orange-500 fill-orange-500'
+                                                    : 'text-gray-300'
                                                     }`}
                                             />
                                         </button>
