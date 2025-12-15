@@ -1,6 +1,6 @@
 'use client';
 
-import { useStore, Order, OrderStatus } from '@/lib/store';
+import { useStore, Order, OrderStatus } from '../../../lib/store';
 import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';

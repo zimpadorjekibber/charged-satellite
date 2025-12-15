@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { useRouter } from 'next/navigation';
-import { useStore } from '@/lib/store';
+import { useStore } from '../../lib/store';
 import { X, Loader2, Camera, ScanLine, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 

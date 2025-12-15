@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useStore } from '@/lib/store';
+import { useStore } from '../../../lib/store';
 import { Trash2, ArrowRight, ShoppingBag, Utensils, Check, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

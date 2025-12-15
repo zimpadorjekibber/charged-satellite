@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useStore, Order } from '@/lib/store';
+import { useStore, Order } from '../../../lib/store';
 import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';

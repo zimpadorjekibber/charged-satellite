@@ -1,13 +1,13 @@
 ﻿'use client';
 
-import { useStore, Category, MenuItem, Table, Order } from '@/lib/store';
+import { useStore, Category, MenuItem, Table, Order } from '../../../lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2 } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect, useRef, memo } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
-import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '@/lib/location';
+import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '../../../lib/location';
 
 // Animation Variants
 const containerVariants = {
