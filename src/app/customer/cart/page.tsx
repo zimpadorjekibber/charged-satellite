@@ -9,12 +9,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartPage() {
-    const cart = useStore((state) => state.cart);
-    const removeFromCart = useStore((state) => state.removeFromCart);
-    const placeOrder = useStore((state) => state.placeOrder);
+    const cart = useStore((state: any) => state.cart);
+    const removeFromCart = useStore((state: any) => state.removeFromCart);
+    const placeOrder = useStore((state: any) => state.placeOrder);
     // New: Sync with store for persistence
-    const setStoreCustomerDetails = useStore((state) => state.setCustomerDetails);
-    const storedCustomerDetails = useStore((state) => state.customerDetails);
+    const setStoreCustomerDetails = useStore((state: any) => state.setCustomerDetails);
+    const storedCustomerDetails = useStore((state: any) => state.customerDetails);
 
     const router = useRouter();
 
@@ -28,10 +28,10 @@ export default function CartPage() {
     const [manualTableInput, setManualTableInput] = useState('');
 
     // Calculate Total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = cart.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     const grandTotal = total;
 
-    const currentTableId = useStore((state) => state.currentTableId);
+    const currentTableId = useStore((state: any) => state.currentTableId);
 
     const submitOrder = async (finalTableId: string, isPrePaid = false) => {
         // 2. Personal Info Check
@@ -197,7 +197,7 @@ export default function CartPage() {
 
             <div className="space-y-4 mb-8">
                 <AnimatePresence>
-                    {cart.map((item) => (
+                    {(cart as any[]).map((item: any) => (
                         <motion.div
                             layout
                             key={item.menuItemId}

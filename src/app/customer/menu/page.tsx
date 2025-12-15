@@ -26,27 +26,27 @@ const itemVariants = {
 };
 
 export default function MenuPage() {
-    const menu = useStore((state) => state.menu);
-    const tables = useStore((state) => state.tables); // Added for table name lookup
-    const cart = useStore((state) => state.cart);
-    const orders = useStore((state) => state.orders); // Added
-    const sessionId = useStore((state) => state.sessionId); // Added
-    const addToCart = useStore((state) => state.addToCart);
-    const removeFromCart = useStore((state) => state.removeFromCart);
+    const menu = useStore((state: any) => state.menu);
+    const tables = useStore((state: any) => state.tables); // Added for table name lookup
+    const cart = useStore((state: any) => state.cart);
+    const orders = useStore((state: any) => state.orders); // Added
+    const sessionId = useStore((state: any) => state.sessionId); // Added
+    const addToCart = useStore((state: any) => state.addToCart);
+    const removeFromCart = useStore((state: any) => state.removeFromCart);
     const [isCancelling, setIsCancelling] = useState(false);
-    const currentTableId = useStore((state) => state.currentTableId);
-    const setTableId = useStore((state) => state.setTableId);
-    const notifications = useStore((state) => state.notifications);
-    const addNotification = useStore((state) => state.addNotification);
-    const cancelNotification = useStore((state) => state.cancelNotification);
-    const resolveNotification = useStore((state) => state.resolveNotification);
-    const valleyUpdates = useStore((state) => state.valleyUpdates);
-    const contactInfo = useStore((state) => state.contactInfo);
-    const categoryOrder = useStore((state) => state.categoryOrder);
-    const addReview = useStore((state) => state.addReview);
+    const currentTableId = useStore((state: any) => state.currentTableId);
+    const setTableId = useStore((state: any) => state.setTableId);
+    const notifications = useStore((state: any) => state.notifications);
+    const addNotification = useStore((state: any) => state.addNotification);
+    const cancelNotification = useStore((state: any) => state.cancelNotification);
+    const resolveNotification = useStore((state: any) => state.resolveNotification);
+    const valleyUpdates = useStore((state: any) => state.valleyUpdates);
+    const contactInfo = useStore((state: any) => state.contactInfo);
+    const categoryOrder = useStore((state: any) => state.categoryOrder);
+    const addReview = useStore((state: any) => state.addReview);
 
     // Dynamic Categories derived from Menu
-    const allCategories = Array.from(new Set(menu.map(item => item.category))) as string[];
+    const allCategories = Array.from(new Set(menu.map((item: any) => item.category))) as string[];
 
     // Define a preferred order for standard categories
     const PREFERRED_ORDER = [
@@ -959,8 +959,8 @@ export default function MenuPage() {
                                             setTimeout(() => window.location.reload(), 100);
                                         }}
                                         className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
-                                                ? 'bg-tashi-accent text-black border-tashi-accent'
-                                                : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+                                            ? 'bg-tashi-accent text-black border-tashi-accent'
+                                            : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
                                             }`}
                                     >
                                         {table.name}
@@ -1403,39 +1403,38 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
     );
 }
 
-const MiniOrderTimer = memo(function MiniOrderTimer() {
-    const orders = useStore((state) => state.orders);
-    const currentTableId = useStore((state) => state.currentTableId);
-    const sessionId = useStore((state) => state.sessionId);
+const orders = useStore((state: any) => state.orders);
+const currentTableId = useStore((state: any) => state.currentTableId);
+const sessionId = useStore((state: any) => state.sessionId);
 
-    // Find the latest active order for THIS session
-    // FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
-    const activeOrder = orders
-        .filter(o =>
-            o.sessionId === sessionId &&
-            (o.status === 'Pending' || o.status === 'Preparing')
-        )
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+// Find the latest active order for THIS session
+// FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
+const activeOrder = orders
+    .filter(o =>
+        o.sessionId === sessionId &&
+        (o.status === 'Pending' || o.status === 'Preparing')
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
-    if (!activeOrder) return null;
+if (!activeOrder) return null;
 
-    return (
-        <Link href="/customer/status">
-            <motion.div
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
-            >
-                <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
-                <div className="flex flex-col leading-none">
-                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                        {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
-                    </span>
-                    <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
-                </div>
-            </motion.div>
-        </Link>
-    );
+return (
+    <Link href="/customer/status">
+        <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
+        >
+            <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
+            <div className="flex flex-col leading-none">
+                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                    {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
+                </span>
+                <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
+            </div>
+        </motion.div>
+    </Link>
+);
 });
 
 function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {

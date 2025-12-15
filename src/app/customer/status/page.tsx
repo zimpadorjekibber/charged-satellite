@@ -9,9 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 export default function OrderStatusPage() {
-    const orders = useStore((state) => state.orders);
-    const currentTableId = useStore((state) => state.currentTableId);
-    const sessionId = useStore((state) => state.sessionId);
+    const orders = useStore((state: any) => state.orders);
+    const currentTableId = useStore((state: any) => state.currentTableId);
+    const sessionId = useStore((state: any) => state.sessionId);
     const router = useRouter();
 
     // Track which orders we've already seen as paid to avoid duplicate redirects
@@ -148,7 +148,7 @@ export default function OrderStatusPage() {
 }
 
 function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) {
-    const addReview = useStore((state) => state.addReview);
+    const addReview = useStore((state: any) => state.addReview);
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
     // Review State
