@@ -82,13 +82,12 @@ export default function StaffDashboard() {
 
         try {
             const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3');
+            audio.loop = true;
             audio.volume = 1.0;
             currentAudioRef.current = audio;
             setIsRinging(true);
 
-            audio.addEventListener('ended', () => {
-                setIsRinging(false);
-            });
+            // Audio loop enabled, so we don't auto-stop on 'ended'
 
             audio.play().catch(e => {
                 console.error("Audio play failed", e);

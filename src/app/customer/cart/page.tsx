@@ -2,7 +2,7 @@
 'use client';
 
 import { useStore } from '@/lib/store';
-import { Trash2, ArrowRight, ShoppingBag, Utensils, Check } from 'lucide-react';
+import { Trash2, ArrowRight, ShoppingBag, Utensils, Check, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -19,6 +19,7 @@ export default function CartPage() {
     const [customerPhone, setCustomerPhone] = useState('');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [showScanModal, setShowScanModal] = useState(false);
     const [manualTableInput, setManualTableInput] = useState('');
 
     // Calculate Total
@@ -131,7 +132,7 @@ export default function CartPage() {
 
                             // If they're WITHIN restaurant radius but NO table scanned
                             if (distanceMeters <= CHECK_RADIUS_METERS) {
-                                alert(`You are at the restaurant!\n\nPlease scan any Table QR code to place your order.\n\nThis helps our staff serve you better.`);
+                                setShowScanModal(true);
                                 return; // Block order, ask them to scan table
                             }
 
@@ -465,6 +466,62 @@ export default function CartPage() {
                                 <p className="text-[10px] text-gray-500">
                                     Show the payment screenshot to staff upon arrival.
                                 </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Scan Prompt Modal */}
+            <AnimatePresence>
+                {showScanModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setShowScanModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-6"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="text-center">
+                                <div className="bg-tashi-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-tashi-accent animate-pulse">
+                                    <ScanLine size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">You are at the restaurant!</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    Please scan any Table QR code to place your order. This helps our staff serve you better.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        setShowScanModal(false);
+                                        router.push('/scanner');
+                                    }}
+                                    className="w-full bg-tashi-accent text-black hover:bg-yellow-500 py-4 rounded-xl font-bold text-lg shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                                >
+                                    <ScanLine size={20} /> Scan QR Code
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowScanModal(false);
+                                        // Fallback logic if scanning fails or they prefer manual?
+                                        // For now, allow them to proceed to manual flow if they insist (optional, but good UX)
+                                        // Or just close. User asked for "Scanner".
+                                        // Let's keep it strict as per request "he will have not to go from start"
+                                    }}
+                                    className="w-full text-gray-500 text-sm hover:text-white py-2"
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>

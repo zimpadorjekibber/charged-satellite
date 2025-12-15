@@ -197,6 +197,7 @@ export default function MenuPage() {
     const [showMap, setShowMap] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLocating, setIsLocating] = useState(false); // New loading state for Call Staff
+    const [showTableSelector, setShowTableSelector] = useState(false);
 
     // Review Modal State
     const [showReviewModal, setShowReviewModal] = useState(false);
@@ -321,6 +322,27 @@ export default function MenuPage() {
             }
         }
     }, [hasPendingCall, isCalling]);
+
+    // Continuous Vibration when Calling
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isCalling) {
+            // Initial vibration
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+
+            // Loop vibration every 2 seconds
+            interval = setInterval(() => {
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+            }, 2000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isCalling]);
 
     const handleCallStaff = async () => {
         // If already calling, allow "Cut Call" - This cancels the notification on BOTH sides
@@ -472,11 +494,19 @@ export default function MenuPage() {
                         </Link>
                     )}
                     {/* Call Staff Button */}
-                    <button
+                    <motion.button
                         onClick={handleCallStaff}
                         disabled={isLocating || isCancelling}
+                        animate={isCalling ? {
+                            x: [-4, 4, -4, 4, 0],
+                            transition: {
+                                repeat: Infinity,
+                                duration: 0.4,
+                                repeatDelay: 1
+                            }
+                        } : {}}
                         className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
-                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse'
+                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
                             : isCancelling
                                 ? 'bg-gray-700 text-gray-300 cursor-wait'
                                 : isLocating
@@ -496,7 +526,7 @@ export default function MenuPage() {
                         <span className="text-[10px] uppercase tracking-wider font-bold">
                             {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : 'Call Staff'}
                         </span>
-                    </button>
+                    </motion.button>
 
                     {/* Contact Button */}
                     <button
@@ -599,12 +629,7 @@ export default function MenuPage() {
                         </div>
                     </div>
                     <button
-                        onClick={() => {
-                            if (confirm("Are you sure you want to change your table?")) {
-                                setTableId(null);
-                                window.location.reload(); // Force reload to ensure state is clean
-                            }
-                        }}
+                        onClick={() => setShowTableSelector(true)}
                         className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-gray-400 transition-colors"
                     >
                         Change
@@ -907,6 +932,53 @@ export default function MenuPage() {
                     </div>
                 )
             }
+            {/* Table Selection Modal */}
+            <AnimatePresence>
+                {showTableSelector && (
+                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowTableSelector(false)}>
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="text-center mb-4">
+                                <h3 className="text-xl font-bold text-white font-serif">Select Your Table</h3>
+                                <p className="text-gray-400 text-sm">Tap your table number to switch</p>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3 overflow-y-auto p-1 custom-scrollbar">
+                                {tables.map((table) => (
+                                    <button
+                                        key={table.id}
+                                        onClick={() => {
+                                            setTableId(table.id);
+                                            setShowTableSelector(false);
+                                            // Reload page to ensure clean state for the new table session
+                                            setTimeout(() => window.location.reload(), 100);
+                                        }}
+                                        className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
+                                                ? 'bg-tashi-accent text-black border-tashi-accent'
+                                                : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+                                            }`}
+                                    >
+                                        {table.name}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => setShowTableSelector(false)}
+                                className="mt-4 w-full py-3 rounded-xl bg-neutral-800 text-gray-400 font-bold hover:bg-neutral-700 hover:text-white transition-colors text-sm uppercase tracking-wide"
+                            >
+                                Cancel
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* Navigation Selection Modal */}
             <AnimatePresence>
                 {showNavigationModal && (
