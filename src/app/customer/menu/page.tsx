@@ -396,7 +396,8 @@ export default function MenuPage() {
                     (n: any) => n.sessionId === sessionId && n.type === 'call_staff' && n.status === 'pending'
                 );
                 if (activeCall) {
-                    cancelNotification(activeCall.id);
+                    // Use resolveNotification with the ID (not cancelNotification)
+                    await resolveNotification(activeCall.id);
                 }
                 setIsCalling(false);
                 if (callSoundRef.current) {

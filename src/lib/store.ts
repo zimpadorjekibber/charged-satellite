@@ -510,6 +510,19 @@ export const useStore = create<AppState>()(
 
 
             addNotification: async (tableId, type, details) => {
+                // PREVENT DUPLICATES: Check if there's already a pending notification for this session
+                const state = get();
+                const existingNotification = state.notifications.find(
+                    n => n.sessionId === details?.sessionId &&
+                        n.type === type &&
+                        n.status === 'pending'
+                );
+
+                if (existingNotification) {
+                    console.log('Notification already exists for this session, skipping duplicate');
+                    return; // Don't create duplicate
+                }
+
                 // OPTIMISTIC UPDATE: Add notification to local state IMMEDIATELY
                 const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 const optimisticNotification = {
