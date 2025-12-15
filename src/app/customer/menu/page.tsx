@@ -65,6 +65,7 @@ export default function MenuPage() {
 
     // Seasonal filtering: Hide cold beverages in winter (Oct-Apr), show only in summer (May-Sep)
     const isSummerSeason = () => {
+        if (typeof window === 'undefined') return true; // Always true during SSR
         const month = new Date().getMonth(); // 0 = January, 11 = December
         // May = 4, June = 5, July = 6, August = 7, September = 8
         return month >= 4 && month <= 8;
@@ -73,8 +74,11 @@ export default function MenuPage() {
     // Summer-only categories
     const SUMMER_ONLY_CATEGORIES = ['Cold Beverages & Shakes', 'Cold Beverages', 'Shakes', 'Cold Drinks'];
 
-    // Filter categories based on season
+    // Filter categories based on season (safe for SSR - always show all during SSR)
     const seasonalCategories = allCategories.filter(category => {
+        // During SSR, show all categories to prevent hydration mismatch
+        if (typeof window === 'undefined') return true;
+
         // If it's a summer-only category, only show during summer
         if (SUMMER_ONLY_CATEGORIES.some(summerCat =>
             category.toLowerCase().includes(summerCat.toLowerCase())
@@ -108,6 +112,7 @@ export default function MenuPage() {
 
     // Time-based default category
     const getDefaultCategory = (): Category => {
+        if (typeof window === 'undefined') return 'Starters'; // Safe SSR default
         const hour = new Date().getHours();
 
         // Helper to find actual category name (case-insensitive)
