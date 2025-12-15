@@ -151,10 +151,19 @@ export default function MenuPage() {
         return lunchDinnerOptions || starterOptions || CATEGORIES[0] || 'Starters';
     };
 
-    const [activeCategory, setActiveCategory] = useState<Category>(getDefaultCategory());
+    // Initialize with safe fallback to prevent hydration mismatch
+    const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[0] || 'Starters');
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemContext, setSelectedItemContext] = useState<MenuItem[]>([]);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
+
+    // Set time-based default category after mount to avoid hydration errors
+    useEffect(() => {
+        const defaultCat = getDefaultCategory();
+        if (defaultCat && defaultCat !== activeCategory) {
+            setActiveCategory(defaultCat);
+        }
+    }, []); // Run once on mount
 
     // Ref for category scroll container
     const categoryScrollContainerRef = useRef<HTMLDivElement>(null);
