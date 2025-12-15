@@ -12,11 +12,16 @@ export default function CartPage() {
     const cart = useStore((state) => state.cart);
     const removeFromCart = useStore((state) => state.removeFromCart);
     const placeOrder = useStore((state) => state.placeOrder);
+    // New: Sync with store for persistence
+    const setStoreCustomerDetails = useStore((state) => state.setCustomerDetails);
+    const storedCustomerDetails = useStore((state) => state.customerDetails);
+
     const router = useRouter();
 
     const [isOrdering, setIsOrdering] = useState(false);
-    const [customerName, setCustomerName] = useState('');
-    const [customerPhone, setCustomerPhone] = useState('');
+    // Initialize from Store if available
+    const [customerName, setCustomerName] = useState(storedCustomerDetails?.name || '');
+    const [customerPhone, setCustomerPhone] = useState(storedCustomerDetails?.phone || '');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showScanModal, setShowScanModal] = useState(false);
@@ -28,7 +33,7 @@ export default function CartPage() {
 
     const currentTableId = useStore((state) => state.currentTableId);
 
-    const submitOrder = async (finalTableId: string) => {
+    const submitOrder = async (finalTableId: string, isPrePaid = false) => {
         // 2. Personal Info Check
         if (!customerName.trim() || !customerPhone.trim()) {
             alert("Please provide your name and phone number to confirm your order.");
@@ -92,7 +97,7 @@ export default function CartPage() {
                 useStore.getState().setTableId(finalTableId);
             }
 
-            await placeOrder(customerName, customerPhone, finalTableId);
+            await placeOrder(customerName, customerPhone, finalTableId, isPrePaid ? 'Pending' : 'None');
 
             // Verify order was placed (Cart should be empty)
             if (useStore.getState().cart.length === 0) {
@@ -232,14 +237,20 @@ export default function CartPage() {
                         type="text"
                         placeholder="Your Name"
                         value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
+                        onChange={(e) => {
+                            setCustomerName(e.target.value);
+                            setStoreCustomerDetails({ name: e.target.value, phone: customerPhone });
+                        }}
                         className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-tashi-accent"
                     />
                     <input
                         type="tel"
                         placeholder="Phone Number"
                         value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        onChange={(e) => {
+                            setCustomerPhone(e.target.value);
+                            setStoreCustomerDetails({ name: customerName, phone: e.target.value });
+                        }}
                         className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-tashi-accent"
                     />
                 </div>
@@ -447,7 +458,7 @@ export default function CartPage() {
                             <div className="space-y-3 pt-2">
                                 <button
                                     onClick={() => {
-                                        submitOrder('REQUEST');
+                                        submitOrder('REQUEST', true);
                                         setShowPaymentModal(false);
                                     }}
                                     className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-900/40 flex items-center justify-center gap-2 transition-all active:scale-95"
@@ -502,6 +513,8 @@ export default function CartPage() {
                             <div className="space-y-3">
                                 <button
                                     onClick={() => {
+                                        // Save before navigating
+                                        setStoreCustomerDetails({ name: customerName, phone: customerPhone });
                                         setShowScanModal(false);
                                         router.push('/scanner');
                                     }}

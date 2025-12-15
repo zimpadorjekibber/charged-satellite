@@ -66,6 +66,7 @@ export interface Order {
     customerName?: string;
     customerPhone?: string;
     sessionId?: string; // New field for tracking unique customer sessions
+    paymentStatus?: 'Pending' | 'Confirmed' | 'None'; // New: Track payment verification status for remote orders
 }
 
 export interface Notification {
@@ -152,8 +153,9 @@ interface AppState {
     removeFromCart: (itemId: string) => void;
     clearCart: () => void;
 
-    placeOrder: (customerName: string, customerPhone: string, tableId?: string) => Promise<void>;
+    placeOrder: (customerName: string, customerPhone: string, tableId?: string, paymentStatus?: 'Pending' | 'Confirmed' | 'None') => Promise<void>;
     updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
+    confirmPayment: (orderId: string) => Promise<void>; // New action
     updateOrderTable: (orderId: string, tableId: string) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
 
@@ -174,6 +176,10 @@ interface AppState {
 
     recordScan: (type: 'table_qr' | 'app_qr' | 'manual', details?: any) => Promise<void>;
     fetchScanStats: () => Promise<any[]>;
+
+
+    customerDetails: { name: string; phone: string; } | null;
+    setCustomerDetails: (details: { name: string; phone: string; }) => void;
 
     logout: () => void;
 }
@@ -197,6 +203,7 @@ export const useStore = create<AppState>()(
             geoRadius: 5,
             callStaffRadius: 50, // Default: 50 meters
             categoryOrder: [], // Initial empty state
+            customerDetails: null,
             contactInfo: {
                 phone: '+919876543210',
                 secondaryPhone: '+919418612295',
@@ -428,7 +435,7 @@ export const useStore = create<AppState>()(
             }),
             clearCart: () => set({ cart: [] }),
 
-            placeOrder: async (customerName, customerPhone, tableId) => {
+            placeOrder: async (customerName, customerPhone, tableId, paymentStatus = 'None') => {
                 const state = get();
                 // If no specific table is set, default to 'REQUEST' (Remote/Takeaway)
                 const activeTableId = tableId || state.currentTableId || 'REQUEST';
@@ -444,7 +451,8 @@ export const useStore = create<AppState>()(
                     totalAmount: total,
                     status: 'Pending',
                     createdAt: new Date().toISOString(),
-                    sessionId: state.sessionId || 'legacy'// Attach session ID
+                    sessionId: state.sessionId || 'legacy', // Attach session ID
+                    paymentStatus // Save payment status
                 };
 
                 await addDoc(collection(db, 'orders'), orderData);
@@ -473,6 +481,10 @@ export const useStore = create<AppState>()(
                     }
                 }
                 await updateDoc(doc(db, 'orders', orderId), updates);
+            },
+
+            confirmPayment: async (orderId) => {
+                await updateDoc(doc(db, 'orders', orderId), { paymentStatus: 'Confirmed' });
             },
 
             updateOrderTable: async (orderId, tableId) => {
@@ -599,6 +611,9 @@ export const useStore = create<AppState>()(
                     await updateDoc(doc(db, 'notifications', notif.id), { status: 'resolved' });
                 }
             },
+
+            setCustomerDetails: (details: { name: string; phone: string }) => set({ customerDetails: details }),
+
 
             addReview: async (review) => {
                 await addDoc(collection(db, 'reviews'), {

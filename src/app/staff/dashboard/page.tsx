@@ -12,6 +12,7 @@ export default function StaffDashboard() {
     const deleteOrder = useStore((state: any) => state.deleteOrder);
     const notifications = useStore((state: any) => state.notifications);
     const resolveNotification = useStore((state: any) => state.resolveNotification);
+    const confirmPayment = useStore((state: any) => state.confirmPayment);
 
     // Auth
     const currentUser = useStore((state: any) => state.currentUser);
@@ -435,6 +436,7 @@ export default function StaffDashboard() {
                                 isReady={activeFilter === 'ready'}
                                 isExpanded={expandedOrderIds.has(order.id)}
                                 onToggleExpand={() => toggleOrderExpansion(order.id)}
+                                onConfirmPayment={() => confirmPayment(order.id)}
                             />
                         ))
                     )}
@@ -1101,7 +1103,7 @@ Thank you for dining with us! 🙏`.trim();
 };
 
 // Order Card Component with Collapsible View
-function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isReady, isExpanded, onToggleExpand }: {
+function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isReady, isExpanded, onToggleExpand, onConfirmPayment }: {
     order: Order;
     onUpdateStatus: (status: OrderStatus) => void;
     onDelete?: () => void;
@@ -1110,6 +1112,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
     isReady: boolean;
     isExpanded?: boolean;
     onToggleExpand?: () => void;
+    onConfirmPayment?: () => void;
 }) {
     const tables = useStore((state: any) => state.tables);
     const updateOrderTable = useStore((state: any) => state.updateOrderTable);
@@ -1206,6 +1209,27 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
                                             </a>
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Payment Confirmation */}
+                            {order.paymentStatus === 'Pending' && (
+                                <div className="mb-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200 animate-pulse">
+                                    <h4 className="font-bold text-yellow-800 mb-2 flex items-center gap-2">
+                                        <CheckCircle2 size={18} /> Verify Payment
+                                    </h4>
+                                    <p className="text-sm text-yellow-700 mb-3">
+                                        Customer claims to have paid via UPI. Please verify and confirm to proceed.
+                                    </p>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onConfirmPayment) onConfirmPayment();
+                                        }}
+                                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Check size={20} /> Confirm Payment Received
+                                    </button>
                                 </div>
                             )}
 

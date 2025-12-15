@@ -294,15 +294,40 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     const [elapsedMs, setElapsedMs] = useState(0);
 
     // If it's a remote order and hasn't been accepted (table assigned), show waiting state
-    if (isRemote && !order.acceptedAt) {
-        return (
-            <div className="flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-lg border border-blue-500/20 mb-4 animate-pulse">
-                <p className="text-blue-400 font-bold text-lg uppercase tracking-widest text-center">Order Received</p>
-                <p className="text-xs text-gray-400 text-center mt-1">
-                    Waiting for table assignment to start cooking.
-                </p>
-            </div>
-        );
+    // If it's a remote order and hasn't been accepted (table assigned), show waiting state
+    if (isRemote) {
+        if (order.paymentStatus === 'Pending') {
+            return (
+                <div className="flex flex-col items-center justify-center p-6 bg-yellow-500/10 rounded-lg border border-yellow-500/20 mb-4 animate-pulse">
+                    <p className="text-yellow-500 font-bold text-lg uppercase tracking-widest text-center">Verifying Payment</p>
+                    <p className="text-xs text-gray-400 text-center mt-1">
+                        Please wait while we confirm your transaction...
+                    </p>
+                </div>
+            );
+        }
+
+        if (order.paymentStatus === 'Confirmed' && !order.acceptedAt) {
+            return (
+                <div className="flex flex-col items-center justify-center p-6 bg-green-500/10 rounded-lg border border-green-500/20 mb-4">
+                    <p className="text-green-500 font-bold text-lg uppercase tracking-widest text-center">Payment Confirmed</p>
+                    <p className="text-xs text-gray-400 text-center mt-1">
+                        Your order is confirmed! Staff will assign your table shortly.
+                    </p>
+                </div>
+            );
+        }
+
+        if (!order.acceptedAt) {
+            return (
+                <div className="flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-lg border border-blue-500/20 mb-4 animate-pulse">
+                    <p className="text-blue-400 font-bold text-lg uppercase tracking-widest text-center">Order Received</p>
+                    <p className="text-xs text-gray-400 text-center mt-1">
+                        Waiting for table assignment to start cooking.
+                    </p>
+                </div>
+            );
+        }
     }
 
     // Fallback for immediate orders (if somehow acceptedAt is missing but it's not remote, or legacy)
