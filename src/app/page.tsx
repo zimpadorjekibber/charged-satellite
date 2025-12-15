@@ -21,16 +21,16 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentImageIndex((prev: number) => (prev + 1) % images.length);
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [images.length]);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-tashi-darker relative overflow-hidden">
       {/* Background Slideshow */}
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentImageIndex}
             initial={{ opacity: 0, scale: 1.1 }}
