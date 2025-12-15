@@ -198,6 +198,8 @@ export default function MenuPage() {
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLocating, setIsLocating] = useState(false); // New loading state for Call Staff
     const [showTableSelector, setShowTableSelector] = useState(false);
+    const [callSuccessToast, setCallSuccessToast] = useState(false); // Success feedback for Call Staff
+    const [lastCallTime, setLastCallTime] = useState<number>(0); // Track last call timestamp
 
     // Review Modal State
     const [showReviewModal, setShowReviewModal] = useState(false);
@@ -367,27 +369,34 @@ export default function MenuPage() {
             return;
         }
 
-        // Prevent spamming if there's already a pending server-side call
-        if (hasPendingCall) {
-            // User wants to cut the call
-            if (pendingCallNotification) {
-                setIsCancelling(true);
-                // Resolve the specific notification
-                resolveNotification(pendingCallNotification.id)
-                    .then(() => {
-                        console.log("Call cancelled (resolved notification)");
-                    })
-                    .catch(err => console.error("Failed to cancel call", err))
-                    .finally(() => {
-                        setIsCancelling(false);
-                        setIsCalling(false);
-                        if (callSoundRef.current) {
-                            callSoundRef.current.pause();
-                        }
-                    });
-            } else {
-                // Fallback: just reset UI
+        // COOLDOWN CHECK: Prevent multiple rapid clicks
+        const now = Date.now();
+        const COOLDOWN_MS = 10000; // 10 seconds
+        if (now - lastCallTime < COOLDOWN_MS) {
+            const remainingSeconds = Math.ceil((COOLDOWN_MS - (now - lastCallTime)) / 1000);
+            alert(`Please wait ${remainingSeconds} seconds before calling again.\n\nYour previous call is still active.`);
+            return;
+        }
+
+        // If already calling, this is a "Cut Call" action
+        if (isCalling) {
+            setIsCancelling(true);
+            try {
+                // Find the active call notification for this session
+                const activeCall = notifications.find(
+                    (n: any) => n.sessionId === sessionId && n.type === 'call_staff' && n.status === 'pending'
+                );
+                if (activeCall) {
+                    cancelNotification(activeCall.id);
+                }
                 setIsCalling(false);
+                if (callSoundRef.current) {
+                    callSoundRef.current.pause();
+                }
+            } catch (e) {
+                console.error("Failed to cancel call:", e);
+            } finally {
+                setIsCancelling(false);
                 if (callSoundRef.current) {
                     callSoundRef.current.pause();
                 }
@@ -423,6 +432,7 @@ export default function MenuPage() {
                         if (confirm(`You are ${distanceMeters.toFixed(0)}m away from the restaurant.\n\nThe "Call Staff" feature is only available when you're at the restaurant (within ${callStaffRadius}m).\n\nWould you like to call us directly at ${phoneNumber}?`)) {
                             window.location.href = `tel:${phoneNumber}`;
                         }
+                        setIsLocating(false);
                         return;
                     }
                 } catch (locError) {
@@ -463,6 +473,11 @@ export default function MenuPage() {
                 customerPhone: lastOrder?.customerPhone || '',
                 sessionId: sessionId || undefined
             });
+
+            // SUCCESS FEEDBACK
+            setLastCallTime(Date.now()); // Update cooldown timer
+            setCallSuccessToast(true);
+            setTimeout(() => setCallSuccessToast(false), 3500); // Hide toast after 3.5 seconds
         } catch (e) {
             console.error("Failed to call staff:", e);
             alert("Failed to send notification. Please try calling the number directly.");
@@ -477,6 +492,28 @@ export default function MenuPage() {
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
             {/* Hidden Audio Element for Call Feedback */}
             <audio ref={callSoundRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
+
+            {/* Success Toast for Call Staff */}
+            <AnimatePresence>
+                {callSuccessToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -50 }}
+                        className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+                    >
+                        <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-green-500/50 border border-green-400/30 flex items-center gap-3 backdrop-blur-xl">
+                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                <Phone className="animate-pulse" size={20} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-lg">Staff Notified! ✓</p>
+                                <p className="text-sm text-green-100">Someone will be with you shortly</p>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Bottom Action Bar - Horizontal */}
             <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-md border-t border-white/10 pointer-events-auto">

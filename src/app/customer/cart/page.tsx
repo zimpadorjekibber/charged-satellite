@@ -1,11 +1,12 @@
 
 'use client';
 
+
 import { useStore } from '../../../lib/store';
 import { Trash2, ArrowRight, ShoppingBag, Utensils, Check, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartPage() {
@@ -19,13 +20,21 @@ export default function CartPage() {
     const router = useRouter();
 
     const [isOrdering, setIsOrdering] = useState(false);
-    // Initialize from Store if available
-    const [customerName, setCustomerName] = useState(storedCustomerDetails?.name || '');
-    const [customerPhone, setCustomerPhone] = useState(storedCustomerDetails?.phone || '');
+    // Initialize with empty strings to avoid hydration mismatch
+    const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showScanModal, setShowScanModal] = useState(false);
     const [manualTableInput, setManualTableInput] = useState('');
+
+    // Sync stored customer details on mount (prevents hydration mismatch)
+    useEffect(() => {
+        if (storedCustomerDetails) {
+            if (storedCustomerDetails.name) setCustomerName(storedCustomerDetails.name);
+            if (storedCustomerDetails.phone) setCustomerPhone(storedCustomerDetails.phone);
+        }
+    }, [storedCustomerDetails]);
 
     // Calculate Total
     const total = cart.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);

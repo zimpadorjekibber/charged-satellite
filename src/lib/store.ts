@@ -508,17 +508,54 @@ export const useStore = create<AppState>()(
                 await deleteDoc(doc(db, 'orders', orderId));
             },
 
+
             addNotification: async (tableId, type, details) => {
-                await addDoc(collection(db, 'notifications'), {
+                // OPTIMISTIC UPDATE: Add notification to local state IMMEDIATELY
+                const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                const optimisticNotification = {
+                    id: tempId,
                     tableId,
                     type,
-                    status: 'pending',
+                    status: 'pending' as const,
                     createdAt: new Date().toISOString(),
                     customerName: details?.customerName,
                     customerPhone: details?.customerPhone,
                     sessionId: details?.sessionId
-                });
+                };
+
+                // Update local state FIRST (instant feedback)
+                set((state) => ({
+                    notifications: [optimisticNotification, ...state.notifications]
+                }));
+
+                try {
+                    // Then sync to Firebase in background
+                    const docRef = await addDoc(collection(db, 'notifications'), {
+                        tableId,
+                        type,
+                        status: 'pending',
+                        createdAt: new Date().toISOString(),
+                        customerName: details?.customerName,
+                        customerPhone: details?.customerPhone,
+                        sessionId: details?.sessionId
+                    });
+
+                    // Replace temp notification with real one
+                    set((state) => ({
+                        notifications: state.notifications.map(n =>
+                            n.id === tempId ? { ...n, id: docRef.id } : n
+                        )
+                    }));
+                } catch (error) {
+                    console.error("Failed to add notification to Firebase:", error);
+                    // Remove optimistic update on failure
+                    set((state) => ({
+                        notifications: state.notifications.filter(n => n.id !== tempId)
+                    }));
+                    throw error;
+                }
             },
+
 
             recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}) => {
                 try {
