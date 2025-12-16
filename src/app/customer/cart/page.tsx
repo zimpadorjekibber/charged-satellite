@@ -516,36 +516,32 @@ export default function CartPage() {
                                 <div className="bg-tashi-accent/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-tashi-accent animate-pulse">
                                     <ScanLine size={32} />
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-2">You are at the restaurant!</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed">
-                                    Please scan any Table QR code to place your order. This helps our staff serve you better.
+                                <h3 className="text-xl font-bold text-white mb-2">Scan Table QR</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                                    To place your order, please use your <strong>Phone Camera</strong> to scan the QR code on your table.
                                 </p>
+                                <div className="bg-neutral-800 p-4 rounded-xl border border-white/5 text-xs text-left text-gray-400 space-y-2">
+                                    <p className="flex items-start gap-2">
+                                        <span className="bg-white/10 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold shrink-0">1</span>
+                                        <span>Open your phone's Camera app</span>
+                                    </p>
+                                    <p className="flex items-start gap-2">
+                                        <span className="bg-white/10 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold shrink-0">2</span>
+                                        <span>Scan the QR code on your table</span>
+                                    </p>
+                                    <p className="flex items-start gap-2">
+                                        <span className="bg-white/10 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold shrink-0">3</span>
+                                        <span>Return to this page and click "Place Order" again</span>
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="space-y-3">
                                 <button
-                                    onClick={() => {
-                                        // Save before navigating
-                                        setStoreCustomerDetails({ name: customerName, phone: customerPhone });
-                                        setShowScanModal(false);
-                                        router.push('/scanner');
-                                    }}
-                                    className="w-full bg-tashi-accent text-black hover:bg-yellow-500 py-4 rounded-xl font-bold text-lg shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                                    onClick={() => setShowScanModal(false)}
+                                    className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-bold transition-all"
                                 >
-                                    <ScanLine size={20} /> Scan QR Code
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        setShowScanModal(false);
-                                        // Fallback logic if scanning fails or they prefer manual?
-                                        // For now, allow them to proceed to manual flow if they insist (optional, but good UX)
-                                        // Or just close. User asked for "Scanner".
-                                        // Let's keep it strict as per request "he will have not to go from start"
-                                    }}
-                                    className="w-full text-gray-500 text-sm hover:text-white py-2"
-                                >
-                                    Cancel
+                                    Close
                                 </button>
                             </div>
                         </motion.div>
