@@ -687,11 +687,27 @@ const handlePrintKOT = (order: any, autoPrint = false) => {
                     <button class="btn btn-print" onclick="window.print()">
                         🖨️ PRINT KOT
                     </button>
+                    <button class="btn btn-share" onclick="shareKOT()">
+                        📱 SHARE
+                    </button>
                     <button class="btn btn-close" onclick="window.close()">
                         ✖️ CLOSE
                     </button>
                 </div>
             </div>
+            <script>
+                function shareKOT() {
+                    const text = "*👨‍🍳 KOT ORDER*\\n" +
+                        "==============\\n" +
+                        "*Table:* ${tableName}\\n" +
+                        "*KOT #:* ${order.id.slice(0, 6)}\\n" +
+                        "*Time:* ${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}\\n" +
+                        "--------------\\n" +
+                        "${order.items.map((i: any) => `${i.quantity}x ${i.name}`).join('\\n')}\\n" +
+                        "==============\\n";
+                    window.location.href = "https://wa.me/?text=" + encodeURIComponent(text);
+                }
+            </script>
         </body>
     </html>
     `);
@@ -914,6 +930,10 @@ const handlePrintBill = (order: any) => {
                     background: #DAA520;
                     color: white;
                 }
+                .btn-share {
+                    background: #25D366; /* WhatsApp Green */
+                    color: white;
+                }
                 .btn-close {
                     background: #6c757d;
                     color: white;
@@ -1019,11 +1039,30 @@ const handlePrintBill = (order: any) => {
                     <button class="btn btn-print" onclick="window.print()">
                         🖨️ PRINT BILL
                     </button>
+                    <button class="btn btn-share" onclick="shareBill()">
+                        📱 SHARE
+                    </button>
                     <button class="btn btn-close" onclick="window.close()">
                         ✖️ CLOSE
                     </button>
                 </div>
             </div>
+            <script>
+                function shareBill() {
+                    const text = "*🧾 BILL RECEIPT*\\n" +
+                        "📍 TashiZom, Kibber\\n\\n" +
+                        "*Table:* ${tableName}\\n" +
+                        "*Bill #:* ${order.id.slice(0, 6)}\\n" +
+                        "*Date:* ${new Date().toLocaleDateString('en-IN')}\\n" +
+                        "------------------\\n" +
+                        "${order.items.map((i: any) => `${i.quantity}x ${i.name} - ₹${i.price * i.quantity}`).join('\\n')}\\n" +
+                        "------------------\\n" +
+                        "*TOTAL: ₹${order.totalAmount}*\\n" +
+                        "------------------\\n" +
+                        "Thank you for dining with us! 🙏";
+                    window.location.href = "https://wa.me/?text=" + encodeURIComponent(text);
+                }
+            </script>
         </body>
     </html>
     `);
