@@ -170,7 +170,7 @@ export default function ReviewModal() {
                                     value={customerName}
                                     onChange={(e) => setCustomerName(e.target.value)}
                                     placeholder="Enter your name"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-gray-900 bg-white placeholder-gray-400"
                                 />
                             </div>
 
@@ -184,7 +184,7 @@ export default function ReviewModal() {
                                     onChange={(e) => setComment(e.target.value)}
                                     placeholder="Tell us about your experience..."
                                     rows={4}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all text-gray-900 bg-white placeholder-gray-400"
                                 />
                             </div>
 
