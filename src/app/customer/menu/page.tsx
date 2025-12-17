@@ -546,32 +546,43 @@ export default function MenuPage() {
 
     return (
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
-            {/* Winter Water Conservation Alert */}
+            {/* Winter Water Conservation Alert - MODAL */}
             <AnimatePresence>
                 {showWinterNote && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="bg-red-900/90 border-b border-red-500/50 relative z-[60]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="max-w-md mx-auto px-4 py-3 flex items-start gap-3">
-                            <div className="p-2 bg-red-500/20 rounded-full animate-pulse shrink-0">
-                                <Sparkles className="text-red-400" size={18} />
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-neutral-900 border border-red-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
+                        >
+                            <div className="flex flex-col items-center text-center gap-4">
+                                <div className="p-4 bg-red-500/10 rounded-full animate-pulse">
+                                    <Sparkles className="text-red-400" size={32} />
+                                </div>
+
+                                <div>
+                                    <h3 className="text-xl font-bold text-red-200 mb-2">Winter Notice</h3>
+                                    <p className="text-sm text-gray-300 leading-relaxed">
+                                        Freezing temperatures make fetching water extremely difficult. <br /><br />
+                                        <span className="text-red-300 font-bold border-b border-red-500/30 pb-0.5">Please use bucket water sparingly.</span>
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={dismissWinterNote}
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-900/50 active:scale-95 mt-2"
+                                >
+                                    I Understand
+                                </button>
                             </div>
-                            <div className="flex-1">
-                                <h3 className="text-red-200 font-bold text-sm uppercase tracking-wider mb-1">Important Winter Notice</h3>
-                                <p className="text-xs text-red-100/90 leading-relaxed font-medium">
-                                    Freezing temperatures make fetching water extremely difficult. Please use the washroom bucket water sparingly. Do not waste. Thank you! 🙏
-                                </p>
-                            </div>
-                            <button
-                                onClick={dismissWinterNote}
-                                className="p-1 text-red-300 hover:text-white hover:bg-red-800 rounded-lg transition-colors"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
