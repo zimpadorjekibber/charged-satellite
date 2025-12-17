@@ -984,7 +984,30 @@ export default function MenuPage() {
                                                     {update.mediaUrl && (
                                                         <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
                                                             {update.mediaType === 'video' ? (
-                                                                <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />
+                                                                (() => {
+                                                                    // Helper to detect and format YouTube URLs
+                                                                    const getYouTubeId = (url: string) => {
+                                                                        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                                                                        const match = url.match(regExp);
+                                                                        return (match && match[2].length === 11) ? match[2] : null;
+                                                                    };
+                                                                    const youtubeId = getYouTubeId(update.mediaUrl || '');
+
+                                                                    if (youtubeId) {
+                                                                        return (
+                                                                            <iframe
+                                                                                src={`https://www.youtube.com/embed/${youtubeId}`}
+                                                                                className="w-full aspect-video"
+                                                                                title="YouTube video player"
+                                                                                frameBorder="0"
+                                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                                allowFullScreen
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                    // Fallback for direct MP4 files
+                                                                    return <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />;
+                                                                })()
                                                             ) : (
                                                                 <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
                                                             )}
