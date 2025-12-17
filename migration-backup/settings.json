@@ -1,0 +1,51 @@
+{
+  "global": {
+    "geoRadius": 10,
+    "categoryOrder": [
+      "Breakfast",
+      "Tea & Coffee",
+      "Toasts",
+      "Cereals",
+      "Omelets & Egg Dishes",
+      "Main Course (Vegetarian)",
+      "Main Course (Non-Vegetarian)",
+      "Indian Tawa/Tandoori Roti",
+      "Snacks & Starters",
+      "Chinese",
+      "Pancakes",
+      "Pizza & Pasta",
+      "Rice & Biryani",
+      "Sandwiches",
+      "Desserts",
+      "Soups & Salads",
+      "Cold Beverages & Shakes"
+    ],
+    "callStaffRadius": 35
+  },
+  "updates": {
+    "list": [
+      {
+        "title": "New Update",
+        "status": "Create",
+        "statusColor": "red",
+        "mediaUrl": "",
+        "id": "kc40zo",
+        "description": "Manali to Kaza is now closed for all types of vehicles"
+      },
+      {
+        "id": "y3bw5k",
+        "title": "New Update",
+        "status": "Create",
+        "mediaUrl": "",
+        "description": "Snow leopard sighting today near Kibber Wildlife Sanctuary area..",
+        "statusColor": "green"
+      }
+    ]
+  },
+  "contact": {
+    "secondaryPhone": "+919418612295",
+    "whatsapp": "+919736330290",
+    "mapsLocation": "32.329112,78.0080953",
+    "phone": "+919736330290"
+  }
+}

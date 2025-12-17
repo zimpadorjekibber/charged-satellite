@@ -2,13 +2,16 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
+// NEW Firebase Config - Charged Satellite (India)
+// Project: charged-satellite
 const firebaseConfig = {
-    apiKey: "AIzaSyAi2CbAp5-FvhVZ0FT5pVL4vXc5q4xK-W0",
-    authDomain: "charged-satellite-zimpad.firebaseapp.com",
-    projectId: "charged-satellite-zimpad",
-    storageBucket: "charged-satellite-zimpad.firebasestorage.app",
-    messagingSenderId: "410941736916",
-    appId: "1:410941736916:web:c1727d34a3ef71c3a93841"
+    apiKey: "AIzaSyAF6VUY2BhcJTACuoGKl7Q7trZGMm5UYF0",
+    authDomain: "charged-satellite.firebaseapp.com",
+    projectId: "charged-satellite",
+    storageBucket: "charged-satellite.firebasestorage.app",
+    messagingSenderId: "532982159192",
+    appId: "1:532982159192:web:bd82889beb87177df8f72d",
+    measurementId: "G-MEASUREMENT_ID" // Optional, will be added if you enabled Analytics
 };
 
 import { getStorage } from "firebase/storage";

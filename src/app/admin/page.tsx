@@ -867,9 +867,9 @@ export default function AdminDashboard() {
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Item Names</h3>
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Font Size</label>
-                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none">
+                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none" defaultValue="Standard (1rem)">
                                                 <option>Compact (0.9rem)</option>
-                                                <option selected>Standard (1rem)</option>
+                                                <option>Standard (1rem)</option>
                                                 <option>Large (1.1rem)</option>
                                             </select>
                                         </div>

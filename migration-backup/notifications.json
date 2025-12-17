@@ -1,0 +1,1632 @@
+[
+  {
+    "id": "0UqWv7rpMFPU4oyxHZgW",
+    "customerName": "Mama",
+    "type": "call_staff",
+    "customerPhone": "963852741",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T15:02:34.076Z"
+  },
+  {
+    "id": "1Ja0oK5TrcNWF4B3NaDL",
+    "customerPhone": "",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "createdAt": "2025-12-15T11:55:04.539Z",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "1QS67mF7sMwc1hV13Cz1",
+    "type": "call_staff",
+    "customerName": "Hi u9h",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "customerPhone": "88-52756",
+    "createdAt": "2025-12-14T18:21:03.953Z",
+    "status": "resolved"
+  },
+  {
+    "id": "1dOFtSCzATwxUhVmzqQ3",
+    "customerName": "Dolma",
+    "createdAt": "2025-12-13T08:06:02.606Z",
+    "customerPhone": "123456489",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "1dWY90U2QUflJqYsRDt6",
+    "type": "call_staff",
+    "createdAt": "2025-12-12T10:59:29.303Z",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "status": "resolved"
+  },
+  {
+    "id": "1td4hRzqREoKtjuBIdVV",
+    "createdAt": "2025-12-16T11:37:14.726Z",
+    "tableId": "REQUEST",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "status": "resolved"
+  },
+  {
+    "id": "2JIJiZOXAIUHx7Z1KFAv",
+    "customerName": "Mama",
+    "createdAt": "2025-12-14T15:01:24.075Z",
+    "status": "resolved",
+    "customerPhone": "963852741",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff"
+  },
+  {
+    "id": "36YAui6WMK2k6m4kl1fy",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "createdAt": "2025-12-16T11:12:40.881Z",
+    "status": "resolved",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "customerPhone": "94616186",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "46QVtlUKEE5vW3O47GBv",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-13T08:58:49.565Z"
+  },
+  {
+    "id": "4RI99oNwCJD8NBOsaUYz",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-13T04:39:50.100Z"
+  },
+  {
+    "id": "58PzD8NZ4FzOFgwNUWbO",
+    "type": "call_staff",
+    "customerPhone": "123456489",
+    "customerName": "Dolma",
+    "status": "resolved",
+    "createdAt": "2025-12-13T08:05:17.908Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E"
+  },
+  {
+    "id": "5tc0tI7hXvbMlmMsSWu3",
+    "status": "resolved",
+    "createdAt": "2025-12-14T19:14:01.655Z",
+    "customerPhone": "",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "type": "call_staff",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "67nshCiigH8vBwemvmFS",
+    "type": "call_staff",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "customerName": "Hi u9h",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:21:19.459Z",
+    "customerPhone": "88-52756"
+  },
+  {
+    "id": "6SbiYGgLazd6xBEgxt6N",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-08T15:00:58.712Z"
+  },
+  {
+    "id": "6VhO12GPzdStNJ59gaxb",
+    "createdAt": "2025-12-13T14:26:43.446Z",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerPhone": "9418612295"
+  },
+  {
+    "id": "6y0VV4EfryCzQvAJCKKZ",
+    "type": "call_staff",
+    "createdAt": "2025-12-08T14:56:27.055Z",
+    "status": "resolved",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm"
+  },
+  {
+    "id": "708yXh8eZPybmMF89LAl",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-11T02:34:39.195Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm"
+  },
+  {
+    "id": "7MvE3H2eVf1jiEUXeTmI",
+    "type": "call_staff",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T12:26:32.506Z",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "8YJ8zheZQoX6M86cWM7m",
+    "tableId": "REQUEST",
+    "status": "resolved",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "customerPhone": "94616186",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-16T12:08:01.322Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "8sKFafbCTOHoEBuJSahI",
+    "type": "call_staff",
+    "createdAt": "2025-12-14T15:03:47.791Z",
+    "status": "resolved",
+    "customerName": "Mama",
+    "customerPhone": "963852741",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "8wsmygiYwXRNWMSW4vsE",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-13T09:04:43.910Z",
+    "status": "resolved",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "customerPhone": "123456789",
+    "type": "call_staff"
+  },
+  {
+    "id": "93s3KKBuA9jPR0eZ5h7F",
+    "status": "resolved",
+    "createdAt": "2025-12-14T15:03:54.192Z",
+    "customerName": "Mama",
+    "customerPhone": "963852741",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff"
+  },
+  {
+    "id": "98PwgiiHkN4F5ezb27f1",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T12:29:22.629Z",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "customerName": "Xhvmfu",
+    "customerPhone": "096830906",
+    "status": "resolved"
+  },
+  {
+    "id": "9OKjNvPaiOxOmfFemgeY",
+    "customerPhone": "",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T13:58:03.538Z",
+    "tableId": "REQUEST",
+    "status": "resolved",
+    "customerName": "Guest"
+  },
+  {
+    "id": "9OoK4cHRy2WduZaisLuE",
+    "tableId": "REQUEST",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Guest",
+    "customerPhone": "",
+    "createdAt": "2025-12-14T18:42:18.213Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "9Wf0maw8nxO4IS0E8bIe",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerPhone": "86837883568",
+    "status": "resolved",
+    "customerName": "Kcgou",
+    "createdAt": "2025-12-15T13:44:39.097Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "AFaN3xBQCtC6QKNSEXyv",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "createdAt": "2025-12-13T05:13:34.474Z",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "Aafn92KEzFUSw0VyP9Md",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "status": "resolved",
+    "createdAt": "2025-12-16T12:13:51.647Z",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "tableId": "REQUEST",
+    "type": "call_staff"
+  },
+  {
+    "id": "BIVJfzE2eAlqGjsLaUYa",
+    "createdAt": "2025-12-14T18:19:00.896Z",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "customerName": "Hi u9h",
+    "status": "resolved",
+    "customerPhone": "88-52756",
+    "type": "call_staff"
+  },
+  {
+    "id": "Bi6ORutieNLFb7VEqCID",
+    "customerPhone": "123456789",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T14:03:37.933Z",
+    "type": "call_staff",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "CKEWzFBYjSMxp1hx6N7a",
+    "customerName": "Guest",
+    "status": "resolved",
+    "customerPhone": "",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T18:33:27.053Z"
+  },
+  {
+    "id": "CKLkRliIxZDrlFpexD3d",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-13T08:55:47.232Z",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "status": "resolved"
+  },
+  {
+    "id": "CPgKfzYvOxk1Ouyo0GUq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T13:55:25.510Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "Csw7KW4v5Y8o9SEo6ESP",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "createdAt": "2025-12-16T11:55:03.012Z",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "tableId": "REQUEST",
+    "type": "call_staff"
+  },
+  {
+    "id": "CusvTeMngukDrispqLQE",
+    "createdAt": "2025-12-14T15:03:06.517Z",
+    "customerName": "Mama",
+    "type": "call_staff",
+    "customerPhone": "963852741",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "DWjlV64DMJfLJCOMJcWK",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "status": "resolved",
+    "type": "call_staff",
+    "createdAt": "2025-12-14T18:41:59.534Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": ""
+  },
+  {
+    "id": "E1rTNRp827efgG2Bkmpm",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-08T18:32:27.518Z"
+  },
+  {
+    "id": "EEIgPbkRxi0eo03RScwo",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T13:55:05.858Z",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "ESSSVcFzm2jaSflhmscd",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "createdAt": "2025-12-12T10:40:37.129Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "F0qgjlBMFajEmANB8xt9",
+    "status": "resolved",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff",
+    "createdAt": "2025-12-12T16:15:04.489Z"
+  },
+  {
+    "id": "FLR1mlk65T5w8ma4Z74N",
+    "createdAt": "2025-12-13T05:13:21.996Z",
+    "type": "call_staff",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "status": "resolved"
+  },
+  {
+    "id": "GpxRWRo6E91MEV3XEx22",
+    "type": "call_staff",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-15T13:36:16.370Z"
+  },
+  {
+    "id": "HqTjTMHzchjBEsCHJ1sS",
+    "type": "call_staff",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-16T11:16:00.686Z",
+    "status": "resolved",
+    "customerPhone": "94616186",
+    "tableId": "REQUEST"
+  },
+  {
+    "id": "HrdpKjV5CBuTxJGNRf93",
+    "createdAt": "2025-12-13T04:15:27.628Z",
+    "type": "call_staff",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "status": "resolved"
+  },
+  {
+    "id": "IC7zOUSn7FusxT8hLMJK",
+    "customerPhone": "",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:38:55.192Z",
+    "customerName": "Guest",
+    "tableId": "REQUEST",
+    "type": "call_staff"
+  },
+  {
+    "id": "ICBCR1HSDom9gJA3PQUF",
+    "createdAt": "2025-12-15T13:59:55.762Z",
+    "status": "resolved",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "customerPhone": "",
+    "customerName": "Guest",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "IrgajB3rnCTCvdVCpW4D",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-08T18:36:42.585Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm"
+  },
+  {
+    "id": "JWKTUeRoPIvtwdoPIanz",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved",
+    "customerPhone": "9418612295",
+    "createdAt": "2025-12-13T14:37:34.580Z",
+    "type": "call_staff",
+    "customerName": "Zimpa "
+  },
+  {
+    "id": "K8RMNsK4dZFmfggNhpNT",
+    "createdAt": "2025-12-12T12:42:31.845Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "LmXUcccqtYT4Dih3cfIq"
+  },
+  {
+    "id": "KT0vZ7xiqQOSb2zmCz7f",
+    "createdAt": "2025-12-11T21:20:41.637Z",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "KYzEAgG5IAgvfg3kraVI",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "type": "call_staff",
+    "createdAt": "2025-12-12T12:45:49.472Z",
+    "status": "resolved"
+  },
+  {
+    "id": "KZgTlZ9txDiCpPTw8vvj",
+    "createdAt": "2025-12-13T07:55:45.508Z",
+    "type": "call_staff",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "status": "resolved"
+  },
+  {
+    "id": "KjSMxepORdiHPdujEpoa",
+    "createdAt": "2025-12-14T18:10:04.211Z",
+    "type": "call_staff",
+    "tableId": "kwmCA0setk1OiIUsAwrY",
+    "customerPhone": "9418612295",
+    "status": "resolved",
+    "customerName": "Vcvc"
+  },
+  {
+    "id": "Kyc1nem0lN9e72IyA6OP",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T12:32:12.396Z",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "L0mTpiNNquF2UNHS4p2D",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:47:06.470Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": ""
+  },
+  {
+    "id": "LG7dM3oOVnqwFWLimGVN",
+    "customerPhone": "",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-15T14:01:35.620Z",
+    "customerName": "Guest",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "LKdYdhyWXiAjQlJNnGyL",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff",
+    "createdAt": "2025-12-08T18:52:53.818Z"
+  },
+  {
+    "id": "LPICCiIWRartyyLdq9k4",
+    "createdAt": "2025-12-15T12:31:37.928Z",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "LgPcNm8bZnelbB73x72Q",
+    "type": "call_staff",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "createdAt": "2025-12-12T09:18:09.088Z",
+    "status": "resolved"
+  },
+  {
+    "id": "LkphjRF4WbmkNHMvqAdk",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "createdAt": "2025-12-15T14:04:12.138Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "type": "call_staff",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "LxnM2VMvHYJjyGujL2RW",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-13T09:05:01.835Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E"
+  },
+  {
+    "id": "M8WUogV5CyRnIkGPm3nD",
+    "customerPhone": "123456789",
+    "status": "resolved",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "customerName": "Zimpa",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T12:32:39.216Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "MAAuOd705w2AOLBB2hwy",
+    "status": "resolved",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "type": "call_staff",
+    "createdAt": "2025-12-08T15:39:21.956Z"
+  },
+  {
+    "id": "MAVF6MBpO0cDYsXZDNTK",
+    "customerPhone": "94616186",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "REQUEST",
+    "createdAt": "2025-12-16T11:08:46.804Z",
+    "customerName": "Zimpa",
+    "sessionId": "6lccpjvehlbmj873t0f"
+  },
+  {
+    "id": "MLEnMNuKviXVsnMlbUCH",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff",
+    "status": "resolved",
+    "customerPhone": "963852741",
+    "customerName": "Mama",
+    "createdAt": "2025-12-14T15:01:24.070Z"
+  },
+  {
+    "id": "NHI4PE398KVY17KtARbZ",
+    "type": "call_staff",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-15T12:30:49.539Z",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "alsu9tX0sB29noq3dAvt"
+  },
+  {
+    "id": "NWOK5KkLvO1UGgc4SbrJ",
+    "status": "resolved",
+    "createdAt": "2025-12-16T03:47:08.966Z",
+    "customerName": "Vobobk",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerPhone": "6883860606"
+  },
+  {
+    "id": "NZUsbmYBlZgiZitu0hEQ",
+    "customerPhone": "789654123",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "customerName": "Saka",
+    "status": "resolved",
+    "createdAt": "2025-12-13T17:52:51.719Z"
+  },
+  {
+    "id": "NmeFZEuMPHT5Z4SowsOz",
+    "type": "call_staff",
+    "status": "resolved",
+    "customerPhone": "123456489",
+    "customerName": "Dolma",
+    "createdAt": "2025-12-13T08:06:08.469Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E"
+  },
+  {
+    "id": "NrSarAukBev4wKjT6fHE",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "customerPhone": "94616186",
+    "status": "resolved",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "createdAt": "2025-12-16T11:38:45.671Z",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "O4ydmG2stObdHNOBKGWY",
+    "createdAt": "2025-12-08T18:32:53.155Z",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved"
+  },
+  {
+    "id": "OcIiKTRBN6q4SaMsgtcy",
+    "customerPhone": "123456789",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T08:58:52.833Z",
+    "type": "call_staff",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "OhqdfxjTidaEENGSNFks",
+    "status": "resolved",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-08T17:46:59.011Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "Ovabi2rbx3jzoaFef0KH",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T13:56:57.183Z"
+  },
+  {
+    "id": "PYpZECPWbtpBRcwmf9Mk",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "lcrgAxpLscsjZe88FySU",
+    "createdAt": "2025-12-15T14:31:35.008Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "PhDCZpRvjLsImrKphaCt",
+    "customerPhone": "",
+    "customerName": "Guest",
+    "createdAt": "2025-12-14T18:35:28.723Z",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "type": "call_staff"
+  },
+  {
+    "id": "PmkRdmUIviOHuXQ0P4O8",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:45:13.032Z",
+    "type": "call_staff",
+    "customerPhone": "",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "PwI6IWjy92Saw8yBHlEZ",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-12T10:02:40.810Z"
+  },
+  {
+    "id": "PwqmmjAktEnOw1DsDqZv",
+    "status": "resolved",
+    "type": "call_staff",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-15T11:44:44.809Z",
+    "customerName": "Zimpa",
+    "tableId": "LmXUcccqtYT4Dih3cfIq"
+  },
+  {
+    "id": "QFHhfuxm9MixnWM7uIyt",
+    "createdAt": "2025-12-15T12:31:58.085Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "RDlxPktDRYPlyGxnY9vu",
+    "createdAt": "2025-12-12T16:14:39.690Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "alsu9tX0sB29noq3dAvt"
+  },
+  {
+    "id": "RX7Vq0aWxurZkmaDuZbT",
+    "createdAt": "2025-12-12T09:48:00.447Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "alsu9tX0sB29noq3dAvt"
+  },
+  {
+    "id": "RrjcweuO9ROM9kwMraNG",
+    "createdAt": "2025-12-13T09:04:57.966Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E"
+  },
+  {
+    "id": "SH6RdAgZMn4mr03EFhUq",
+    "createdAt": "2025-12-13T05:05:31.876Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "u1oswWS0jE9BJUVsUNqB"
+  },
+  {
+    "id": "T26NWLmNllDkhPQNi4Ql",
+    "type": "call_staff",
+    "tableId": "REQUEST",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:55:56.203Z",
+    "customerPhone": "",
+    "customerName": "Guest"
+  },
+  {
+    "id": "UD074pDKXVxZQLvSbHBl",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T13:31:51.559Z",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "type": "call_staff",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "UUazasH1Ct6aOt0kBtA3",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T08:58:33.765Z",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "Uij88BBI9nk9W34WP2mJ",
+    "customerName": "Vcvc",
+    "type": "call_staff",
+    "createdAt": "2025-12-14T18:09:08.589Z",
+    "tableId": "kwmCA0setk1OiIUsAwrY",
+    "customerPhone": "9418612295",
+    "status": "resolved"
+  },
+  {
+    "id": "UosKNWe7zpZJn5fWMtrw",
+    "customerName": "KP",
+    "customerPhone": "7876635407",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "createdAt": "2025-12-14T08:32:26.293Z"
+  },
+  {
+    "id": "VIisYkxOSJi1gXDUgOal",
+    "createdAt": "2025-12-16T11:12:28.050Z",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "REQUEST",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "customerPhone": "94616186"
+  },
+  {
+    "id": "VV2SzVyfPZJh9GfHjqjC",
+    "createdAt": "2025-12-14T12:44:43.171Z",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "status": "resolved",
+    "customerPhone": "963852741",
+    "customerName": "Mama"
+  },
+  {
+    "id": "VnZcbbJVlF2SRO8ZHokH",
+    "tableId": "3",
+    "createdAt": "2025-12-12T07:11:26.509Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "VrVFrrpI9nZH0rFQOuWF",
+    "customerName": "Zimpa",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T13:05:56.052Z",
+    "status": "resolved",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "type": "call_staff",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "VrbiravzSi0fAu9R0MJE",
+    "tableId": "REQUEST",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-16T11:17:21.538Z",
+    "customerPhone": "94616186",
+    "sessionId": "6lccpjvehlbmj873t0f"
+  },
+  {
+    "id": "WKBYdC2zSOvxpJUYz6U1",
+    "customerPhone": "",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "status": "resolved",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "customerName": "Guest",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T14:20:54.688Z"
+  },
+  {
+    "id": "WUiMEfXn8LBB5EIr813r",
+    "createdAt": "2025-12-13T07:50:50.875Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "WxLOE7Nve9TC6kdA3J3Y",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T13:31:25.761Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "XKQcwoX31H4d0BjtiCXm",
+    "createdAt": "2025-12-13T07:32:37.080Z",
+    "type": "call_staff",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "status": "resolved"
+  },
+  {
+    "id": "XT8NUErcWcw02Milkr2s",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "createdAt": "2025-12-13T07:56:57.594Z",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "Xyf2wyjO4HR84rwVYBqh",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-08T17:47:12.549Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "Y8PUudVjBffaTIZpQR06",
+    "status": "resolved",
+    "customerPhone": "",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T18:35:11.772Z",
+    "type": "call_staff",
+    "customerName": "Guest"
+  },
+  {
+    "id": "YGZ8ZFC1wKYhMjQ9VueN",
+    "createdAt": "2025-12-16T12:13:21.551Z",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "type": "call_staff",
+    "tableId": "REQUEST",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "status": "resolved"
+  },
+  {
+    "id": "YO34JqMjatpvKhZFPQCq",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T14:04:51.906Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "LmXUcccqtYT4Dih3cfIq"
+  },
+  {
+    "id": "YRTWuuCumE7K6v9aFOHL",
+    "customerName": "KP",
+    "type": "call_staff",
+    "createdAt": "2025-12-14T08:40:01.439Z",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "status": "resolved",
+    "customerPhone": "7876635407"
+  },
+  {
+    "id": "YZHDFILVrZDKgfqYbfQl",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerName": "Opop",
+    "customerPhone": "9412375868",
+    "createdAt": "2025-12-14T14:18:12.084Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "Yml3WnhXAopv8Ex5yY7i",
+    "status": "resolved",
+    "createdAt": "2025-12-16T11:16:53.601Z",
+    "type": "call_staff",
+    "customerPhone": "94616186",
+    "tableId": "REQUEST",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "ZDGb0dICYvCXCnLQx5FU",
+    "type": "call_staff",
+    "tableId": "JSho01r4IyuXvhjjS9qs",
+    "customerPhone": "8635266666",
+    "customerName": "Vytp",
+    "createdAt": "2025-12-14T14:44:26.959Z",
+    "status": "resolved"
+  },
+  {
+    "id": "Zxa6VJ87to3tbZ8U1pTA",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-13T09:05:05.922Z"
+  },
+  {
+    "id": "a51uaIrWNh7Rq0OAS291",
+    "createdAt": "2025-12-14T19:52:10.278Z",
+    "status": "resolved",
+    "tableId": "REQUEST",
+    "customerPhone": "",
+    "type": "call_staff",
+    "customerName": "Guest",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "aTy5osnDOuhJ9sgHPesa",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T12:31:22.275Z",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff"
+  },
+  {
+    "id": "c3rFsG6mkKav4oLqCRL2",
+    "customerPhone": "",
+    "createdAt": "2025-12-14T18:56:06.843Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "cCEcos4FgTQrJUxJQogi",
+    "status": "resolved",
+    "createdAt": "2025-12-10T07:06:16.852Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "type": "call_staff"
+  },
+  {
+    "id": "clP1IVLKJnHVZQVtZDOH",
+    "createdAt": "2025-12-08T18:32:48.266Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm"
+  },
+  {
+    "id": "cmCrxP665yysWB10QmMR",
+    "createdAt": "2025-12-12T14:02:09.745Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "LmXUcccqtYT4Dih3cfIq"
+  },
+  {
+    "id": "czpvOy4epP1aNjKLNj0e",
+    "createdAt": "2025-12-13T14:26:53.774Z",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerName": "Zimpa",
+    "customerPhone": "9418612295",
+    "status": "resolved"
+  },
+  {
+    "id": "d4N5G5Q0GcwdZVGAgZ4e",
+    "createdAt": "2025-12-13T14:26:32.862Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerPhone": "9418612295"
+  },
+  {
+    "id": "dkDkVkf6eKxqKEWJU50u",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "customerName": "Guest",
+    "customerPhone": "",
+    "createdAt": "2025-12-14T18:55:24.287Z",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "dlMAWWEkylKv3vAaiBNm",
+    "customerPhone": "123456789",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T08:57:11.904Z",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "status": "resolved"
+  },
+  {
+    "id": "eLVo5Opm13mcG8HAU92g",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerPhone": "963852741",
+    "createdAt": "2025-12-14T18:36:32.961Z",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerName": "Mama"
+  },
+  {
+    "id": "evJ4191T0V5m5gSyfgTQ",
+    "type": "call_staff",
+    "customerPhone": "",
+    "status": "resolved",
+    "customerName": "Guest",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "createdAt": "2025-12-15T03:24:42.960Z"
+  },
+  {
+    "id": "fLR2x2YwD0HEjd7OgNNI",
+    "customerName": "Guest",
+    "status": "resolved",
+    "customerPhone": "",
+    "sessionId": "p0uott9nn1bmj5uw7jz",
+    "createdAt": "2025-12-15T03:19:14.370Z",
+    "tableId": "REQUEST",
+    "type": "call_staff"
+  },
+  {
+    "id": "fMuCup1EBuDptUp0YxRR",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-10T17:36:14.145Z"
+  },
+  {
+    "id": "fQGWTDJFRzPgCL38j0sa",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "customerName": "Cjvigk",
+    "type": "call_staff",
+    "customerPhone": "9838353",
+    "createdAt": "2025-12-16T11:23:08.143Z",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "status": "resolved"
+  },
+  {
+    "id": "fe5u5BkoH0LcNOkauWmJ",
+    "tableId": "kwmCA0setk1OiIUsAwrY",
+    "createdAt": "2025-12-14T18:09:29.470Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "customerName": "Vcvc",
+    "customerPhone": "9418612295"
+  },
+  {
+    "id": "fkke4g8j5PQALeqXcgCX",
+    "type": "call_staff",
+    "tableId": "JSho01r4IyuXvhjjS9qs",
+    "createdAt": "2025-12-10T10:57:55.156Z",
+    "status": "resolved"
+  },
+  {
+    "id": "fkvZDkGoks7O09wKWmTu",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-08T17:46:05.926Z",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "fmlnFvwVtlI8c44a6YxR",
+    "customerName": "Zimpa",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": "123456789",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T12:20:33.248Z"
+  },
+  {
+    "id": "g204IFBhLhJRJKMjj8Oz",
+    "status": "resolved",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "createdAt": "2025-12-13T07:57:05.042Z"
+  },
+  {
+    "id": "gNgF5BvSDfp6H1rAK8Ov",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "createdAt": "2025-12-16T11:19:31.252Z",
+    "type": "call_staff",
+    "tableId": "REQUEST",
+    "status": "resolved",
+    "sessionId": "6lccpjvehlbmj873t0f"
+  },
+  {
+    "id": "giiUyK0MHgL2qvhdVxG7",
+    "createdAt": "2025-12-12T10:40:09.379Z",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "hDpiWxQaHlqY6uUBfgZ0",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-14T18:48:16.948Z",
+    "status": "resolved",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "customerPhone": "",
+    "customerName": "Guest"
+  },
+  {
+    "id": "hLfLvWPTMjp6ndIvR3WM",
+    "customerPhone": "123456789",
+    "status": "resolved",
+    "type": "call_staff",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T14:03:49.598Z",
+    "tableId": "LmXUcccqtYT4Dih3cfIq"
+  },
+  {
+    "id": "hafl7mbOCzFdgZsgL2pO",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T08:55:55.009Z",
+    "customerPhone": "123456789",
+    "type": "call_staff",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "hdZSicNKP2ljMZ5DbQ80",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T08:59:01.691Z",
+    "status": "resolved",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "hyvlAGD6MrP3iBNZj0tl",
+    "createdAt": "2025-12-12T09:45:55.894Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "alsu9tX0sB29noq3dAvt"
+  },
+  {
+    "id": "j9cPJqKhR084XKyDC5jk",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T13:06:26.502Z",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "status": "resolved"
+  },
+  {
+    "id": "jg2cUIDFw2m7WSvnmeia",
+    "customerPhone": "963852741",
+    "customerName": "Mama",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T15:03:06.523Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "jwOxMC36C98ZmodGiqHO",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-10T11:49:16.118Z",
+    "status": "resolved"
+  },
+  {
+    "id": "jx8peyXFBv5MogU5LPa7",
+    "customerName": "Zimpa",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerPhone": "123456789",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-13T08:57:28.456Z"
+  },
+  {
+    "id": "jzZk5fmf1Y8JTnGaJL3D",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-13T09:04:50.239Z",
+    "customerName": "Zimpa",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "status": "resolved"
+  },
+  {
+    "id": "k1pEIFiLhg2HeXsrltPj",
+    "status": "resolved",
+    "tableId": "u1oswWS0jE9BJUVsUNqB",
+    "createdAt": "2025-12-13T04:15:48.588Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "kbLmBpzE9ni63KGLATEr",
+    "status": "resolved",
+    "createdAt": "2025-12-16T11:38:25.668Z",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "customerPhone": "94616186",
+    "sessionId": "6lccpjvehlbmj873t0f"
+  },
+  {
+    "id": "km00gNkkfNehOYH1lSsg",
+    "status": "resolved",
+    "type": "call_staff",
+    "createdAt": "2025-12-13T05:13:42.147Z",
+    "tableId": "u1oswWS0jE9BJUVsUNqB"
+  },
+  {
+    "id": "km2wMLBEN8zZm9wCji9y",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T14:04:26.986Z",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "lFWP7HKec5QNXEFz6Ynv",
+    "tableId": "lcrgAxpLscsjZe88FySU",
+    "customerPhone": "123456789",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T14:32:21.047Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff"
+  },
+  {
+    "id": "lc8FbJT2vsDAtvCw9RLX",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-15T14:24:44.807Z",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa",
+    "tableId": "lcrgAxpLscsjZe88FySU",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "ls1Qzpvwqkuz11vDwrpJ",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "customerPhone": "123456789",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-13T15:41:05.103Z"
+  },
+  {
+    "id": "lyCNAulnTupc1tipjSpw",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-15T14:04:41.196Z",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "m7kTmBLHGLs85UBE8x76",
+    "createdAt": "2025-12-15T12:30:57.594Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "mS4I95rG8Fs4s1T5g8XO",
+    "tableId": "REQUEST",
+    "customerName": "Guest",
+    "status": "resolved",
+    "type": "call_staff",
+    "createdAt": "2025-12-14T18:39:42.050Z",
+    "customerPhone": ""
+  },
+  {
+    "id": "nMV4ftYlTOFBxqqdSVjl",
+    "customerPhone": "963852741",
+    "createdAt": "2025-12-14T12:45:10.513Z",
+    "customerName": "Mama",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "nSsyJUfUpMZ2w5PUEEWo",
+    "status": "resolved",
+    "createdAt": "2025-12-10T06:40:39.927Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "type": "call_staff"
+  },
+  {
+    "id": "nZticQfmUv5QVObxmlAW",
+    "type": "call_staff",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-15T12:25:36.126Z",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "noWJgcveodW7W4AE27Mu",
+    "type": "call_staff",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "createdAt": "2025-12-15T12:26:10.410Z",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be"
+  },
+  {
+    "id": "oOixmSWfu30WORh7PIGK",
+    "createdAt": "2025-12-13T07:26:59.662Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "p1uYbahN2LhLRiZNfGxv",
+    "status": "resolved",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "createdAt": "2025-12-10T06:55:40.509Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "pq73AkgZUvbtgZB7Tl6g",
+    "customerName": "Mama",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T15:01:38.755Z",
+    "customerPhone": "963852741",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "qILOzCWTCaD73CPfPAY8",
+    "createdAt": "2025-12-13T17:52:44.194Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "type": "call_staff",
+    "customerName": "Saka",
+    "status": "resolved",
+    "customerPhone": "789654123"
+  },
+  {
+    "id": "qfC9JDlhSx4pjTFKHlSH",
+    "createdAt": "2025-12-13T07:55:17.527Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E"
+  },
+  {
+    "id": "rDVqkC0lDfWo7rLnW4MH",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "customerPhone": "88-52756",
+    "customerName": "Hi u9h",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-14T18:18:24.472Z"
+  },
+  {
+    "id": "sY72M9fk4xavV4eizPSk",
+    "status": "resolved",
+    "createdAt": "2025-12-13T08:59:30.519Z",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerPhone": "123456789",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "sYWRTUq3ePTVq5Hizb7x",
+    "customerPhone": "86837883568",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "customerName": "Kcgou",
+    "createdAt": "2025-12-15T13:44:18.255Z",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff"
+  },
+  {
+    "id": "smorbRk3XLqAfavmpYIi",
+    "customerName": "Mama",
+    "createdAt": "2025-12-14T15:02:40.612Z",
+    "status": "resolved",
+    "type": "call_staff",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "customerPhone": "963852741"
+  },
+  {
+    "id": "tXCYKk5W27hbGE8RPUn7",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved",
+    "createdAt": "2025-12-08T15:39:38.089Z"
+  },
+  {
+    "id": "tnBoGc1Y53DL5NknhFQF",
+    "createdAt": "2025-12-15T13:32:34.018Z",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "customerName": "Zimpa",
+    "status": "resolved",
+    "customerPhone": "123456789",
+    "type": "call_staff"
+  },
+  {
+    "id": "u7oEJ1Q7Ya8JDss2ZdTX",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "createdAt": "2025-12-15T12:21:12.804Z",
+    "status": "resolved"
+  },
+  {
+    "id": "uVLLXhSNT8PP5g5kEcgg",
+    "status": "resolved",
+    "customerPhone": "",
+    "type": "call_staff",
+    "customerName": "Guest",
+    "tableId": "REQUEST",
+    "createdAt": "2025-12-14T18:39:29.076Z"
+  },
+  {
+    "id": "uWYis0iZUXQDidB68YZ0",
+    "status": "resolved",
+    "tableId": "lcrgAxpLscsjZe88FySU",
+    "type": "call_staff",
+    "createdAt": "2025-12-12T16:08:44.236Z"
+  },
+  {
+    "id": "upnz8UitZJzRrwLXBmVj",
+    "type": "call_staff",
+    "customerName": "Mama",
+    "status": "resolved",
+    "customerPhone": "963852741",
+    "createdAt": "2025-12-14T13:14:31.675Z",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "uzLs8OrLFlLSABvIB5V5",
+    "customerName": "Zimpa",
+    "tableId": "REQUEST",
+    "createdAt": "2025-12-16T11:37:56.567Z",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "status": "resolved",
+    "customerPhone": "94616186",
+    "type": "call_staff"
+  },
+  {
+    "id": "vIKUxUDL9gkzwOPg3NWY",
+    "status": "resolved",
+    "sessionId": "6lccpjvehlbmj873t0f",
+    "tableId": "REQUEST",
+    "customerPhone": "94616186",
+    "createdAt": "2025-12-16T11:55:13.578Z",
+    "type": "call_staff",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "vfJw4gfYNiTHLSxmRYNl",
+    "type": "call_staff",
+    "status": "resolved",
+    "createdAt": "2025-12-09T09:59:22.997Z",
+    "tableId": "t1"
+  },
+  {
+    "id": "vtWNtR7Od66pui8lyjOz",
+    "type": "call_staff",
+    "createdAt": "2025-12-08T14:56:34.842Z",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved"
+  },
+  {
+    "id": "wRyeL7uaHESUXInPn43R",
+    "status": "resolved",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-14T19:14:17.177Z",
+    "tableId": "REQUEST",
+    "type": "call_staff",
+    "customerPhone": "",
+    "customerName": "Guest"
+  },
+  {
+    "id": "wZ3E0RTu7gXNYPgq7JaP",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "createdAt": "2025-12-13T07:26:44.632Z",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "x7WjR3SXY9XAbBGFwfyR",
+    "createdAt": "2025-12-13T07:57:12.228Z",
+    "tableId": "KGzpzWmwvPD9TwFmsU6E",
+    "status": "resolved",
+    "type": "call_staff"
+  },
+  {
+    "id": "xIzvR2rzl1tXtXg28omj",
+    "tableId": "alsu9tX0sB29noq3dAvt",
+    "type": "call_staff",
+    "customerName": "Zimpa",
+    "customerPhone": "123456789",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "createdAt": "2025-12-15T12:31:50.310Z",
+    "status": "resolved"
+  },
+  {
+    "id": "xQdqdC5YdODDu3VIzk8a",
+    "type": "call_staff",
+    "status": "resolved",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU",
+    "createdAt": "2025-12-14T15:03:11.987Z",
+    "customerPhone": "963852741",
+    "customerName": "Mama"
+  },
+  {
+    "id": "xyij6cGuBk6MMXZurhgV",
+    "customerPhone": "123456789",
+    "createdAt": "2025-12-13T15:40:30.100Z",
+    "type": "call_staff",
+    "status": "resolved",
+    "customerName": "Santosh ",
+    "tableId": "OAIrwvH3hPkw5A2JFjFU"
+  },
+  {
+    "id": "ySJQRRIpjaUaFH68BV7m",
+    "status": "resolved",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "createdAt": "2025-12-12T12:42:48.049Z",
+    "type": "call_staff"
+  },
+  {
+    "id": "zAJ79YEMYkked5xPvhiP",
+    "createdAt": "2025-12-12T09:28:58.837Z",
+    "type": "call_staff",
+    "tableId": "gT3jHNGe2OKloAmBk8Nm",
+    "status": "resolved"
+  },
+  {
+    "id": "zCOSYqwmf5ZeAUgW11Z1",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "type": "call_staff",
+    "createdAt": "2025-12-15T12:19:38.527Z",
+    "customerPhone": "123456789",
+    "status": "resolved",
+    "customerName": "Zimpa"
+  },
+  {
+    "id": "zKV89Ybehlbnya17Y0Jy",
+    "createdAt": "2025-12-14T08:39:21.584Z",
+    "customerPhone": "7876635407",
+    "status": "resolved",
+    "customerName": "KP",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "type": "call_staff"
+  },
+  {
+    "id": "zUoV0T1HOX56tGqTmsxk",
+    "sessionId": "3mpziaun1emj5pr7be",
+    "tableId": "LmXUcccqtYT4Dih3cfIq",
+    "status": "resolved",
+    "createdAt": "2025-12-15T13:31:07.710Z",
+    "customerName": "Zimpa",
+    "type": "call_staff",
+    "customerPhone": "123456789"
+  },
+  {
+    "id": "zqNvjNvbyQF6K6REP15c",
+    "status": "resolved",
+    "customerPhone": "7876635407",
+    "type": "call_staff",
+    "tableId": "AmbSEDMClzHU7SLczHvr",
+    "createdAt": "2025-12-14T08:43:33.285Z",
+    "customerName": "KP"
+  }
+]
