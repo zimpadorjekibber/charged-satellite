@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore, Order, OrderStatus } from '../../../lib/store';
-import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText, Trash2 } from 'lucide-react';
+import { Bell, Check, Clock, Utensils, ChefHat, User, ArrowLeft, LogOut, Menu as MenuIcon, X, Phone, TrendingUp, TrendingDown, Package, CheckCircle2, Volume2, VolumeX, Printer, Share2, Receipt, FileText, Trash2, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -27,6 +27,8 @@ export default function StaffDashboard() {
     const [activeFilter, setActiveFilter] = useState<'new' | 'preparing' | 'ready'>('new');
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set());
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     // Sound notification
     const [prevPendingCount, setPrevPendingCount] = useState(0);
@@ -290,11 +292,11 @@ export default function StaffDashboard() {
                                 {isSoundEnabled ? 'Sound ON' : 'Sound OFF'}
                             </button>
                             <button
-                                onClick={logout}
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="Logout"
+                                onClick={() => setShowSettingsModal(true)}
+                                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Settings"
                             >
-                                <LogOut size={20} />
+                                <Settings size={22} />
                             </button>
                         </div>
                     </div>
@@ -442,6 +444,103 @@ export default function StaffDashboard() {
                     )}
                 </div>
             </main>
+
+            {/* Settings Modal */}
+            <AnimatePresence>
+                {showSettingsModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setShowSettingsModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button onClick={() => setShowSettingsModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                                <X size={24} />
+                            </button>
+
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                <Settings className="text-gray-500" /> Settings
+                            </h2>
+
+                            {/* Profile Info */}
+                            <div className="bg-gray-50 p-4 rounded-xl mb-6 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <User size={24} className="text-orange-600" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900 text-lg">{currentUser?.name || 'Staff'}</p>
+                                    <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Logged In</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {/* Sound Toggle Duplicate for Mobile */}
+                                <button
+                                    onClick={toggleSound}
+                                    className={`w-full py-3 px-4 rounded-xl border flex items-center justify-between transition-colors ${isSoundEnabled
+                                        ? 'bg-green-50 border-green-200 text-green-700'
+                                        : 'bg-red-50 border-red-200 text-red-700'
+                                        }`}
+                                >
+                                    <span className="font-bold flex items-center gap-2">
+                                        {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                                        Sound Notifications
+                                    </span>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded bg-white/50 border ${isSoundEnabled ? 'border-green-200' : 'border-red-200'}`}>
+                                        {isSoundEnabled ? 'ON' : 'OFF'}
+                                    </span>
+                                </button>
+
+                                {/* Logout Section */}
+                                <div className="pt-4 border-t border-gray-100">
+                                    {!showLogoutConfirm ? (
+                                        <button
+                                            onClick={() => setShowLogoutConfirm(true)}
+                                            className="w-full bg-red-50 text-red-600 font-bold py-4 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center justify-center gap-2 group"
+                                        >
+                                            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" /> Request Logout
+                                        </button>
+                                    ) : (
+                                        <div className="bg-red-50 p-4 rounded-xl border border-red-200 text-center animate-pulse">
+                                            <p className="text-red-800 font-bold mb-3 text-lg">⚠️ Are you sure?</p>
+                                            <p className="text-red-600 text-xs mb-4">You will need to re-enter credentials to access the dashboard.</p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setShowLogoutConfirm(false)}
+                                                    className="flex-1 bg-white border border-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        logout();
+                                                        setShowSettingsModal(false);
+                                                    }}
+                                                    className="flex-1 bg-red-600 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-red-700"
+                                                >
+                                                    Yes, Logout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <p className="text-center text-[10px] text-gray-400 mt-6 font-mono">
+                                Charged Satellite v2.0 • {new Date().getFullYear()}
+                            </p>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
     );
 }
