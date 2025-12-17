@@ -407,20 +407,16 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
         isWarning = true;
         isCritical = true; // Blink text
     } else {
-        // Phase 5: > 65
-        isFree = true;
+        // Phase 5: > 65 (Previously Free Food)
+        // Now just show generic delay message
+        displayMs = 0;
+        totalPhaseDurationMin = 1;
+        phaseLabel = "Running Late - Please ask staff";
+        isWarning = true;
+        isCritical = true;
     }
 
-    if (isFree) {
-        return (
-            <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
-                <div className="text-center animate-pulse">
-                    <p className="text-tashi-accent font-bold text-lg uppercase tracking-widest">It's On Us!</p>
-                    <p className="text-xs text-gray-400">Sorry for the delay. Your meal is free.</p>
-                </div>
-            </div>
-        );
-    }
+    /* REMOVED FREE FOOD BLOCK */
 
     const minutes = Math.floor((displayMs / 1000 / 60) % 60);
     const seconds = Math.floor((displayMs / 1000) % 60);
@@ -428,7 +424,7 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     // Calculate progress (starts full, goes to empty for current phase)
     // Avoid division by zero
     const durationMs = totalPhaseDurationMin * 60 * 1000;
-    const progressPercent = Math.min(100, Math.max(0, (displayMs / durationMs) * 100));
+    const progressPercent = durationMs > 0 ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
