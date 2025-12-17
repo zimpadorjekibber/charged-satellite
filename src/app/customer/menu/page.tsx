@@ -562,8 +562,7 @@ export default function MenuPage() {
                             <div className="flex-1">
                                 <h3 className="text-red-200 font-bold text-sm uppercase tracking-wider mb-1">Important Winter Notice</h3>
                                 <p className="text-xs text-red-100/90 leading-relaxed font-medium">
-                                    Due to freezing temperatures in Spiti Valley, running water is unavailable.
-                                    We provide buckets of water for your convenience. Please use it thoughtfully. Your cooperation helps us sustain operations in this harsh winter. Thank you! 🙏
+                                    Freezing temperatures make fetching water extremely difficult. Please use the washroom bucket water sparingly. Do not waste. Thank you! 🙏
                                 </p>
                             </div>
                             <button
