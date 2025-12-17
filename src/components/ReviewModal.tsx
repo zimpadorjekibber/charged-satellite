@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, X, Send } from 'lucide-react';
 import { useStore } from '@/lib/store';
@@ -18,39 +18,46 @@ export default function ReviewModal() {
     const sessionId = useStore((state: any) => state.sessionId);
     const addReview = useStore((state: any) => state.addReview);
 
-    // Listen for orders being deleted/completed
+    // Use useRef to persist the previous state of orders across renders
+    const prevOrdersRef = useRef<Map<string, any>>(new Map());
+    const isFirstRun = useRef(true);
+
+    // Check for order completions whenever 'orders' changes
     useEffect(() => {
-        const previousOrders = new Map();
+        const currentMyOrders = orders.filter((o: any) => o.sessionId === sessionId);
+        const currentIds = new Set(currentMyOrders.map((o: any) => o.id));
 
-        // Track current orders
-        const myOrders = orders.filter((o: any) => o.sessionId === sessionId);
-        myOrders.forEach((order: any) => {
-            previousOrders.set(order.id, order);
-        });
+        // Skip detection on initial mount/load
+        if (isFirstRun.current) {
+            currentMyOrders.forEach((order: any) => {
+                prevOrdersRef.current.set(order.id, order);
+            });
+            isFirstRun.current = false;
+            return;
+        }
 
-        // Store reference
-        const checkInterval = setInterval(() => {
-            const currentOrders = orders.filter((o: any) => o.sessionId === sessionId);
-            const currentIds = new Set(currentOrders.map((o: any) => o.id));
-
-            // Check if any order was removed
-            const entriesArray = Array.from(previousOrders.entries());
-            entriesArray.forEach(([id, order]) => {
-                if (!currentIds.has(id)) {
-                    // Order was deleted/completed - show review modal
+        // Compare with previous state to find removed orders
+        const previousOrders = prevOrdersRef.current;
+        previousOrders.forEach((order: any, id: string) => {
+            if (!currentIds.has(id)) {
+                // Order was removed (Completed/Paid/Deleted)
+                // Filter out 'Rejected' or 'Cancelled' if you don't want reviews for those
+                // For now, we assume removal = Done = Ask for review
+                if (order.status !== 'Rejected' && order.status !== 'Cancelled') {
+                    console.log("Order completed, triggering review:", id);
                     setCompletedOrderId(id);
                     setShowModal(true);
-                    previousOrders.delete(id);
                 }
-            });
+            }
+        });
 
-            // Update tracking
-            currentOrders.forEach((order: any) => {
-                previousOrders.set(order.id, order);
-            });
-        }, 1000);
+        // Update ref for next render
+        const newMap = new Map();
+        currentMyOrders.forEach((order: any) => {
+            newMap.set(order.id, order);
+        });
+        prevOrdersRef.current = newMap;
 
-        return () => clearInterval(checkInterval);
     }, [orders, sessionId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
