@@ -208,6 +208,29 @@ export default function CartPage() {
             </h2>
 
             <div className="space-y-4 mb-8">
+                {/* Early Warning for Guest/Remote Users */}
+                {(!currentTableId || currentTableId === 'REQUEST' || currentTableId === 'Remote') && (
+                    <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex gap-4 items-start">
+                        <div className="bg-orange-500/20 p-2 rounded-lg shrink-0">
+                            <ScanLine size={24} className="text-orange-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-orange-400 font-bold text-sm uppercase tracking-wide mb-1">
+                                Dine-In Customer?
+                            </h3>
+                            <p className="text-gray-400 text-xs leading-relaxed mb-3">
+                                You appear to be in <strong>Remote/Guest Mode</strong>. If you are at the cafe, please scan the QR code on your table to place your order directly.
+                            </p>
+                            <button
+                                onClick={() => setShowScanModal(true)}
+                                className="text-xs font-bold bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                            >
+                                Scan Table QR Now
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <AnimatePresence>
                     {(cart as any[]).map((item: any) => (
                         <motion.div

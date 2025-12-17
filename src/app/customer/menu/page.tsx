@@ -397,19 +397,36 @@ export default function MenuPage() {
             setIsCancelling(true);
             try {
                 // Find the active call notification for this session
-                const activeCall = notifications.find(
+                let activeCall = notifications.find(
                     (n: any) => n.sessionId === sessionId && n.type === 'call_staff' && n.status === 'pending'
                 );
-                if (activeCall) {
-                    // Use resolveNotification with the ID (not cancelNotification)
-                    await resolveNotification(activeCall.id);
+
+                // Fallback: Check by tableId if session match fails (e.g. strict session mismatch)
+                if (!activeCall && (currentTableId || lastOrder?.tableId)) {
+                    const checkTableId = currentTableId || lastOrder?.tableId;
+                    activeCall = notifications.find(
+                        (n: any) => n.tableId === checkTableId && n.type === 'call_staff' && n.status === 'pending'
+                    );
                 }
+
+                if (activeCall && !activeCall.id.startsWith('temp_')) {
+                    console.log("Cancelling Call with ID:", activeCall.id);
+                    await resolveNotification(activeCall.id);
+                } else {
+                    // Fallback to table-based cancellation if ID is temp or not found
+                    const tableIdToUse = currentTableId || lastOrder?.tableId || 'REQUEST';
+                    console.log("Cancelling Call by Table ID:", tableIdToUse);
+                    await cancelNotification(tableIdToUse, 'call_staff');
+                }
+
                 setIsCalling(false);
                 if (callSoundRef.current) {
                     callSoundRef.current.pause();
                 }
             } catch (e) {
                 console.error("Failed to cancel call:", e);
+                // Force UI reset anyway
+                setIsCalling(false);
             } finally {
                 setIsCancelling(false);
                 if (callSoundRef.current) {
