@@ -221,6 +221,30 @@ export default function MenuPage() {
     const [reviewComment, setReviewComment] = useState('');
     const [reviewName, setReviewName] = useState('');
 
+    // Winter Notification Logic
+    const [showWinterNote, setShowWinterNote] = useState(false);
+
+    useEffect(() => {
+        const now = new Date();
+        const month = now.getMonth(); // 0 = Jan, 11 = Dec
+        // Nov (10), Dec(11), Jan(0), Feb(1), Mar(2), Apr(3)
+        // If current month is >= 10 OR <= 3, it's Winter in Spiti.
+        const isWinter = month >= 10 || month <= 3;
+
+        if (isWinter) {
+            // Check if already dismissed in this session
+            const dismissed = sessionStorage.getItem('winterNoteDismissed');
+            if (!dismissed) {
+                setShowWinterNote(true);
+            }
+        }
+    }, []);
+
+    const dismissWinterNote = () => {
+        setShowWinterNote(false);
+        sessionStorage.setItem('winterNoteDismissed', 'true');
+    };
+
     // Scroll Spy & Navigation Logic
     useEffect(() => {
         const observerOptions = {
@@ -522,6 +546,37 @@ export default function MenuPage() {
 
     return (
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
+            {/* Winter Water Conservation Alert */}
+            <AnimatePresence>
+                {showWinterNote && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-red-900/90 border-b border-red-500/50 relative z-[60]"
+                    >
+                        <div className="max-w-md mx-auto px-4 py-3 flex items-start gap-3">
+                            <div className="p-2 bg-red-500/20 rounded-full animate-pulse shrink-0">
+                                <Sparkles className="text-red-400" size={18} />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-red-200 font-bold text-sm uppercase tracking-wider mb-1">Important Winter Notice</h3>
+                                <p className="text-xs text-red-100/90 leading-relaxed font-medium">
+                                    Due to freezing temperatures in Spiti Valley (Dec-Apr), managing running water is extremely challenging.
+                                    Please use water sparingly in the washrooms. Do not waste. Your cooperation helps us sustain operations in this harsh winter. Thank you! 🙏
+                                </p>
+                            </div>
+                            <button
+                                onClick={dismissWinterNote}
+                                className="p-1 text-red-300 hover:text-white hover:bg-red-800 rounded-lg transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Hidden Audio Element for Call Feedback */}
             <audio ref={callSoundRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
 
