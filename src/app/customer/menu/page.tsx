@@ -524,16 +524,17 @@ export default function MenuPage() {
         const finalTableId = effectiveTableId || 'REQUEST';
 
         try {
+            // Trigger Telegram Alert IMMEDIATELY (Fire and Forget)
+            const customerName = lastOrder?.customerName || 'Guest';
+            // execute async without awaiting to prevent blocking
+            sendTelegramAlert(`🔔 <b>STAFF CALLED!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`).catch(err => console.error("TG Error:", err));
+
             console.log("Adding notification for:", finalTableId);
             addNotification(finalTableId, 'call_staff', {
                 customerName: lastOrder?.customerName || 'Guest',
                 customerPhone: lastOrder?.customerPhone || '',
                 sessionId: sessionId || undefined
             });
-
-            // Trigger Telegram Alert
-            const customerName = lastOrder?.customerName || 'Guest';
-            sendTelegramAlert(`🔔 <b>STAFF CALLED!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`);
 
             // SUCCESS FEEDBACK
             setLastCallTime(Date.now()); // Update cooldown timer

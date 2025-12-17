@@ -119,10 +119,10 @@ export default function CartPage() {
                 `💰 Total: ₹${grandTotal}\n\n` +
                 `<b>Items:</b>\n${orderSummary}`;
 
-            await placeOrder(customerName, customerPhone, finalTableId, isPrePaid ? 'Pending' : 'None');
+            // Send Telegram Alert IMMEDIATELY (Async call, no await)
+            sendTelegramAlert(telegramMsg).catch(e => console.error("TG Error:", e));
 
-            // Send Telegram Alert (Non-blocking)
-            sendTelegramAlert(telegramMsg);
+            await placeOrder(customerName, customerPhone, finalTableId, isPrePaid ? 'Pending' : 'None');
 
             // Verify order was placed (Cart should be empty)
             if (useStore.getState().cart.length === 0) {
