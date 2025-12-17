@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useState, useEffect, useRef, memo } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
 import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '../../../lib/location';
+import { sendTelegramAlert } from '../../../lib/telegram';
 
 // Animation Variants
 const containerVariants = {
@@ -529,6 +530,10 @@ export default function MenuPage() {
                 customerPhone: lastOrder?.customerPhone || '',
                 sessionId: sessionId || undefined
             });
+
+            // Trigger Telegram Alert
+            const customerName = lastOrder?.customerName || 'Guest';
+            sendTelegramAlert(`🔔 <b>STAFF CALLED!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`);
 
             // SUCCESS FEEDBACK
             setLastCallTime(Date.now()); // Update cooldown timer

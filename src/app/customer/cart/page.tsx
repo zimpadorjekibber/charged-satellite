@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { sendTelegramAlert } from '../../../lib/telegram';
+
 export default function CartPage() {
     const cart = useStore((state: any) => state.cart);
     const removeFromCart = useStore((state: any) => state.removeFromCart);
@@ -109,7 +111,18 @@ export default function CartPage() {
                 useStore.getState().setTableId(finalTableId);
             }
 
+            // Prepare Telegram Message BEFORE clearing cart
+            const orderSummary = cart.map((i: any) => `- ${i.quantity}x ${i.name}`).join('\n');
+            const telegramMsg = `📝 <b>NEW ORDER!</b>\n\n` +
+                `🆔 Table: <b>${finalTableId}</b>\n` +
+                `👤 Customer: ${customerName} (${customerPhone})\n` +
+                `💰 Total: ₹${grandTotal}\n\n` +
+                `<b>Items:</b>\n${orderSummary}`;
+
             await placeOrder(customerName, customerPhone, finalTableId, isPrePaid ? 'Pending' : 'None');
+
+            // Send Telegram Alert (Non-blocking)
+            sendTelegramAlert(telegramMsg);
 
             // Verify order was placed (Cart should be empty)
             if (useStore.getState().cart.length === 0) {
