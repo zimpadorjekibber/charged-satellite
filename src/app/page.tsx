@@ -66,12 +66,12 @@ export default function Home() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5, type: 'spring', stiffness: 100 }}
-        className="absolute top-2 left-1/2 -translate-x-1/2 z-50 rounded-full shadow-2xl bg-black/50 p-1 backdrop-blur-sm border border-amber-500/30"
+        className="absolute top-0 left-[42%] -translate-x-1/2 z-50 rounded-full shadow-2xl border-2 border-amber-500/50"
       >
         <img
           src="/logo_crest.png"
           alt="TashiZom Crest"
-          className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover"
+          className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover scale-[1.2]"
         />
       </motion.div>
       <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12">
