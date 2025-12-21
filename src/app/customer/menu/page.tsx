@@ -159,6 +159,13 @@ export default function MenuPage() {
 
     // Initialize with safe fallback to prevent hydration mismatch
     const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[0] || 'Starters');
+
+    // Helper to detect and format YouTube URLs
+    const getYouTubeId = (url: string) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemContext, setSelectedItemContext] = useState<MenuItem[]>([]);
     const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
@@ -221,6 +228,7 @@ export default function MenuPage() {
     const [reviewRating, setReviewRating] = useState(5);
     const [reviewComment, setReviewComment] = useState('');
     const [reviewName, setReviewName] = useState('');
+    const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: 'video' | 'image'; title?: string } | null>(null);
 
     // Winter Notification Logic
     const [showWinterNote, setShowWinterNote] = useState(false);
@@ -1043,7 +1051,7 @@ export default function MenuPage() {
                                         initial="hidden"
                                         animate={showAllUpdates ? "show" : "hidden"}
                                     >
-                                        {valleyUpdates.map((update, idx) => (
+                                        {valleyUpdates.map((update: any, idx: number) => (
                                             <motion.li
                                                 key={idx}
                                                 variants={itemVariants}
@@ -1079,7 +1087,23 @@ export default function MenuPage() {
                                                     </div>
                                                     {/* Show media if available */}
                                                     {update.mediaUrl && (
-                                                        <div className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black">
+                                                        <div
+                                                            className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black cursor-pointer group/media relative"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setFullScreenMedia({
+                                                                    url: update.mediaUrl!,
+                                                                    type: update.mediaType === 'video' ? 'video' : 'image',
+                                                                    title: update.title
+                                                                });
+                                                            }}
+                                                        >
+                                                            {/* Play Overlay */}
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/media:opacity-100 transition-opacity flex items-center justify-center z-10">
+                                                                <div className="w-12 h-12 bg-tashi-accent rounded-full flex items-center justify-center text-tashi-dark shadow-xl scale-90 group-hover/media:scale-100 transition-transform">
+                                                                    {update.mediaType === 'video' ? <Plus size={24} className="rotate-45" /> : <Info size={24} />}
+                                                                </div>
+                                                            </div>
                                                             {update.mediaType === 'video' ? (
                                                                 (() => {
                                                                     // Helper to detect and format YouTube URLs
@@ -1401,6 +1425,77 @@ export default function MenuPage() {
                                 </button>
                             </div>
                         </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Full Screen Media Overlay (Plays inside app) */}
+            <AnimatePresence>
+                {fullScreenMedia && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center touch-none"
+                    >
+                        {/* Header with Title and Close */}
+                        <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+                            <div className="flex-1">
+                                <h4 className="text-white font-serif font-bold text-lg">{fullScreenMedia.title || 'Valley Update'}</h4>
+                                <p className="text-gray-400 text-[10px] uppercase tracking-widest">TashiZom Newsroom</p>
+                            </div>
+                            <button
+                                onClick={() => setFullScreenMedia(null)}
+                                className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white transition-all transform hover:rotate-90"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Content Container */}
+                        <motion.div
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="w-full h-full flex items-center justify-center p-2"
+                        >
+                            {fullScreenMedia.type === 'video' ? (
+                                (() => {
+                                    const youtubeId = getYouTubeId(fullScreenMedia.url);
+                                    if (youtubeId) {
+                                        return (
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                                                className="w-full aspect-video max-w-4xl shadow-2xl rounded-xl border border-white/5"
+                                                title="YouTube video player"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowFullScreen
+                                            />
+                                        );
+                                    }
+                                    return (
+                                        <video
+                                            src={fullScreenMedia.url}
+                                            controls
+                                            autoPlay
+                                            playsInline
+                                            className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
+                                        />
+                                    );
+                                })()
+                            ) : (
+                                <img
+                                    src={fullScreenMedia.url}
+                                    alt="Full screen view"
+                                    className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
+                                />
+                            )}
+                        </motion.div>
+
+                        {/* Backdrop Blur Helper */}
+                        <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
+                            <p className="text-gray-500 text-[10px] uppercase">Scroll to exit or use the back button</p>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
