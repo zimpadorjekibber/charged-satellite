@@ -61,7 +61,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- CONTENT OVERLAY (Always Visible) --- */}
+      {/* Top Center Crest Logo */}
+      <motion.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 100 }}
+        className="absolute top-2 left-1/2 -translate-x-1/2 z-50 rounded-full shadow-2xl bg-black/50 p-1 backdrop-blur-sm border border-amber-500/30"
+      >
+        <img
+          src="/logo_crest.png"
+          alt="TashiZom Crest"
+          className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover"
+        />
+      </motion.div>
       <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12">
         {/* Noise overlay */}
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none mix-blend-overlay"></div>
