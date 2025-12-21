@@ -52,7 +52,6 @@ function ScanPageContent() {
 
         // Check if Geolocation is supported
         if (!navigator.geolocation) {
-            console.warn("Geolocation not supported. Proceeding...");
             proceed();
             return;
         }
@@ -68,7 +67,6 @@ function ScanPageContent() {
                     RESTAURANT_LOCATION.lng
                 );
 
-                console.log(`User distance: ${dist.toFixed(2)}km, Allowed: ${geoRadius}km`);
 
                 if (dist > geoRadius) {
                     setError(`You are ${dist.toFixed(2)}km away. Orders are restricted to within ${geoRadius}km of the restaurant.`);
@@ -78,7 +76,6 @@ function ScanPageContent() {
                 }
             },
             (err) => {
-                console.error("Geolocation Error:", err);
                 // If denied or error, we might want to block or allow. 
                 // Currently blocking if we can't verify location for strict mode.
                 // But for better UX on random devices/errors, we might show a warning.

@@ -226,20 +226,48 @@ export default function MenuPage() {
     const [showWinterNote, setShowWinterNote] = useState(false);
 
     useEffect(() => {
-        const now = new Date();
-        const month = now.getMonth(); // 0 = Jan, 11 = Dec
-        // Nov (10), Dec(11), Jan(0), Feb(1), Mar(2), Apr(3)
-        // If current month is >= 10 OR <= 3, it's Winter in Spiti.
-        const isWinter = month >= 10 || month <= 3;
+        const checkWinterWarning = async () => {
+            const now = new Date();
+            const month = now.getMonth(); // 0 = Jan, 11 = Dec
+            // Winter: Nov (10) - Apr (3)
+            const isWinter = month >= 10 || month <= 3;
 
-        if (isWinter) {
-            // Check if already dismissed in this session
-            const dismissed = sessionStorage.getItem('winterNoteDismissed');
-            if (!dismissed) {
-                setShowWinterNote(true);
+            if (isWinter) {
+                // Check if already dismissed
+                const dismissed = sessionStorage.getItem('winterNoteDismissed');
+                if (dismissed) return;
+
+                // 1. Check Indoor (Table Assigned)
+                // Must have a valid table ID that is not 'REQUEST' (Walk-in) or 'Remote' (Home delivery)
+                const isIndoor = currentTableId && currentTableId !== 'REQUEST' && currentTableId !== 'Remote';
+
+                if (!isIndoor) return;
+
+                // 2. Check Geofence
+                const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+                if (!storeCoords) return;
+
+                const callStaffRadius = useStore.getState().callStaffRadius || 50;
+
+                try {
+                    const pos = await getCurrentPosition();
+                    const userLat = pos.coords.latitude;
+                    const userLon = pos.coords.longitude;
+                    const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+                    const distanceMeters = distanceKm * 1000;
+
+
+                    if (distanceMeters <= callStaffRadius) {
+                        setShowWinterNote(true);
+                    }
+                } catch (e) {
+                    console.warn("Location check failed for Winter Warning. Skipping display.", e);
+                }
             }
-        }
-    }, []);
+        };
+
+        checkWinterWarning();
+    }, [currentTableId, contactInfo.mapsLocation]);
 
     const dismissWinterNote = () => {
         setShowWinterNote(false);
@@ -309,7 +337,6 @@ export default function MenuPage() {
 
             // If we have a real table assigned and it differs from our local state
             if (isRealTable && activeOrder.tableId !== currentTableId) {
-                console.log('Syncing assigned table:', activeOrder.tableId);
                 setTableId(activeOrder.tableId);
 
                 // Optional: We could trigger a notification here
@@ -481,7 +508,6 @@ export default function MenuPage() {
                     const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
                     const distanceMeters = distanceKm * 1000;
 
-                    console.log(`Call Staff Geofence: Distance = ${distanceMeters.toFixed(0)}m, Limit = ${callStaffRadius}m`);
 
                     if (distanceMeters > callStaffRadius) {
                         // Customer is too far - show phone number for direct call

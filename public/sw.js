@@ -34,13 +34,14 @@ self.addEventListener('fetch', (event) => {
             caches.open(IMAGE_CACHE_NAME).then((cache) => {
                 return cache.match(event.request).then((cachedResponse) => {
                     if (cachedResponse) {
-                        // Return cached image, but allow re-fetching in background if needed (optional)
-                        // For now, Cache First is fastest for "loading quickly".
                         return cachedResponse;
                     }
                     return fetch(event.request).then((networkResponse) => {
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
+                    }).catch((err) => {
+                        console.error('Image fetch failed:', err);
+                        return new Response('', { status: 408, statusText: 'Request Timed Out' });
                     });
                 });
             })

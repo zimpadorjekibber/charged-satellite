@@ -260,21 +260,19 @@ export const useStore = create<AppState>()(
 
                             // Condition 1: Pending > 10 mins
                             if (order.status === 'Pending' && orderDate < tenMinsAgo) {
-                                console.log('Auto-deleting abandoned order:', order.id);
                                 try {
                                     await deleteDoc(doc(db, 'orders', order.id));
-                                } catch (e) { console.error('Cleanup failed', e); }
+                                } catch (e) { /* Cleanup failed silently in production */ }
                             }
 
                             // Condition 2: Old Orders (Previous Days) -> ARCHIVE
                             if (orderDate < todayStart) {
                                 if (order.status === 'Paid' || order.status === 'Rejected') {
-                                    console.log('Archiving old finished order:', order.id);
                                     try {
                                         await setDoc(doc(db, 'archived_orders', order.id), order);
                                         await deleteDoc(doc(db, 'orders', order.id));
                                     } catch (err) {
-                                        console.error("Failed to archive/delete", err);
+                                        // Silent fail
                                     }
                                 }
                             }
@@ -288,7 +286,7 @@ export const useStore = create<AppState>()(
                     const notifications = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Notification[];
                     set({ notifications });
                 }, (error) => {
-                    console.log("Notification listener paused (likely permissions):", error.code);
+                    // Silent fail for permissions
                 }));
 
                 // Reviews
@@ -519,7 +517,6 @@ export const useStore = create<AppState>()(
                 );
 
                 if (existingNotification) {
-                    console.log('Notification already exists for this session, skipping duplicate');
                     return; // Don't create duplicate
                 }
 

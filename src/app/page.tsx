@@ -1,142 +1,155 @@
 'use client';
 
 import Link from 'next/link';
-import { UtensilsCrossed, ChefHat, ShieldCheck, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 
 export default function Home() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = ['/tashizom-winter.jpg', '/tashizom-summer.jpg'];
+  const [showFood, setShowFood] = useState(true); // Toggle between Food and Buildings
 
   useEffect(() => {
     // Clear previous table session for generic app entry
-    // This prevents "sticky" table IDs when scanning the general App QR
     useStore.getState().setTableId(null);
-
-    // Record generic visit / app scan
     useStore.getState().recordScan('app_qr', { path: '/' });
   }, []);
 
+  // Toggle between Food view and Building view every 5 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      setShowFood((prev) => !prev);
     }, 5000);
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-tashi-darker relative overflow-hidden">
-      {/* Background Slideshow */}
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentImageIndex}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            {/* Using standard img tag for simplicity with external/local files if Image component has config issues, 
-                 but Next.js Image is better. We'll use a div with background-image for easy cover behavior 
-                 OR Next.js Image with fill. Let's use Next.js Image. */}
-            <div className="absolute inset-0 bg-black/60 z-10" /> {/* Dark overlay */}
-            <img
-              src={images[currentImageIndex]}
-              alt="Tashizom Restaurant"
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-        </AnimatePresence>
+    <main className="h-[100dvh] flex flex-col items-center justify-center bg-black relative overflow-hidden">
+
+      {/* --- MODE 1: FULL SCREEN FOOD BACKGROUND --- */}
+      <div
+        className={`absolute inset-0 z-0 transition-opacity duration-[2000ms] ease-in-out ${showFood ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <div className="absolute inset-0 bg-black/60 z-10" />
+        <img
+          src="/tashizom-new-bg.jpg"
+          alt="Food Spread"
+          className="w-full h-full object-cover object-center"
+        />
+      </div>
+
+      {/* --- MODE 2: 3-SECTION BUILDING SPLIT (Summer, Winter, Night) --- */}
+      <div
+        className={`absolute inset-0 z-10 flex flex-col transition-opacity duration-[2000ms] ease-in-out ${!showFood ? 'opacity-100' : 'opacity-0'}`}
+      >
+        {/* Top: Summer */}
+        <div className="flex-1 relative overflow-hidden group border-b border-black/20">
+          <div className="absolute inset-0 bg-black/20 z-10" />
+          <img src="/tashizom-summer.jpg" alt="Summer View" className="w-full h-full object-cover object-center" />
+        </div>
+
+        {/* Middle: Winter */}
+        <div className="flex-1 relative overflow-hidden group border-y border-black/20">
+          <div className="absolute inset-0 bg-black/20 z-10" />
+          <img src="/tashizom-winter.jpg" alt="Winter View" className="w-full h-full object-cover object-center" />
+        </div>
+
+        {/* Bottom: Night */}
+        <div className="flex-1 relative overflow-hidden group border-t border-black/20">
+          <div className="absolute inset-0 bg-black/20 z-10" />
+          <img src="/tashizom-night.jpg" alt="Night View" className="w-full h-full object-cover object-center" />
+        </div>
+      </div>
+
+      {/* --- CONTENT OVERLAY (Always Visible) --- */}
+      <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12">
         {/* Noise overlay */}
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] z-20 pointer-events-none mix-blend-overlay"></div>
-      </div>
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none mix-blend-overlay"></div>
 
-      {/* Decorative Corners - TashiZom Style */}
-      <div className="absolute top-0 left-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none mix-blend-multiply">
-        <img src="/tashi-corner.png" alt="decorative corner" className="w-full h-full object-contain drop-shadow-lg" />
-      </div>
-      <div className="absolute top-0 right-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none mix-blend-multiply">
-        <img src="/tashi-corner.png" alt="decorative corner" className="w-full h-full object-contain -scale-x-100 drop-shadow-lg" />
-      </div>
-      <div className="absolute bottom-0 left-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none mix-blend-multiply">
-        <img src="/tashi-corner.png" alt="decorative corner" className="w-full h-full object-contain -scale-y-100 drop-shadow-lg" />
-      </div>
-      <div className="absolute bottom-0 right-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none mix-blend-multiply">
-        <img src="/tashi-corner.png" alt="decorative corner" className="w-full h-full object-contain rotate-180 drop-shadow-lg" />
-      </div>
+        {/* Top Section Content (Summer) */}
+        <div className="flex-1 flex flex-col items-center justify-start pt-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="pointer-events-auto text-center"
+          >
+            <h1 className="text-6xl md:text-8xl font-bold text-tashi-accent drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] tracking-tighter font-serif">
+              TashiZom
+            </h1>
+          </motion.div>
+        </div>
 
+        {/* Middle Section Content (Winter/Snow) */}
+        <div className="flex-1 flex flex-col items-center justify-between py-6">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="pointer-events-auto text-center mt-2"
+          >
+            <p className="text-xl md:text-3xl text-amber-900 font-serif italic font-bold tracking-widest drop-shadow-sm px-4">
+              Multi-Cuisine Restaurant
+            </p>
+          </motion.div>
 
-
-      <div className="relative z-30 w-full max-w-5xl text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-5xl md:text-8xl font-bold mb-2 text-tashi-accent drop-shadow-2xl tracking-tight font-serif">
-            TashiZom
-          </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-16 font-light tracking-[0.3em] uppercase opacity-90 text-shadow-sm">
-            Kibber • Spiti Valley
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="flex flex-col items-center gap-6 max-w-md mx-auto"
-        >
-          <div className="p-8 text-center">
-            <div className="w-48 h-48 mx-auto mb-6 flex items-center justify-center">
-              <UtensilsCrossed size={48} className="text-gray-300 opacity-80" />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="flex flex-col items-center mb-2"
+          >
+            <div className="text-white font-serif tracking-[0.4em] uppercase text-sm md:text-base font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+              Kibber
             </div>
-            <p className="text-gray-200 mb-6 font-medium">Please scan the QR code on your table to browse the menu and place orders.</p>
+            <div className="text-white/90 font-serif text-xs md:text-sm tracking-[0.1em] mt-1 italic font-medium drop-shadow-md">
+              (All Season Open)
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Bottom Section Content (Night) */}
+        <div className="flex-1 flex flex-col items-center justify-start pt-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="pointer-events-auto text-center"
+          >
             <Link
               href="/customer/menu"
-              className="inline-flex items-center gap-2 bg-tashi-accent text-tashi-dark px-8 py-3 rounded-full font-bold hover:bg-white hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-2 bg-tashi-accent text-tashi-dark px-6 py-2.5 rounded-lg font-bold hover:bg-white hover:scale-105 transition-all duration-300 shadow-xl text-base md:text-lg border border-amber-400/30"
             >
               Preview Menu
-              <ArrowRight size={18} />
+              <ArrowRight size={20} />
             </Link>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Fixed Footer Links - High Z-Index for Clickability */}
-      <div className="absolute bottom-10 left-0 w-full flex flex-col items-center gap-4 z-50 pointer-events-auto">
-        <span className="text-[10px] text-gray-400 font-mono">ANTIGRAVITY SYSTEMS v1.0</span>
+      {/* Decorative Corners - True Transparent PNG */}
+      {/* Top Left */}
+      <div className="absolute top-0 left-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none">
+        <img src="/tashi-corner.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="" className="w-full h-full object-contain filter invert-[.25] sepia saturate-[5] hue-rotate-[20deg] brightness-[1.1] contrast-[1.2] drop-shadow-lg" />
       </div>
+      {/* Top Right */}
+      <div className="absolute top-0 right-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none">
+        <img src="/tashi-corner.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="" className="w-full h-full object-contain -scale-x-100 filter invert-[.25] sepia saturate-[5] hue-rotate-[20deg] brightness-[1.1] contrast-[1.2] drop-shadow-lg" />
+      </div>
+      {/* Bottom Left */}
+      <div className="absolute bottom-0 left-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none">
+        <img src="/tashi-corner.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="" className="w-full h-full object-contain -scale-y-100 filter invert-[.25] sepia saturate-[5] hue-rotate-[20deg] brightness-[1.1] contrast-[1.2] drop-shadow-lg" />
+      </div>
+      {/* Bottom Right */}
+      <div className="absolute bottom-0 right-0 z-40 w-24 h-24 md:w-32 md:h-32 pointer-events-none">
+        <img src="/tashi-corner.png" onError={(e) => e.currentTarget.style.display = 'none'} alt="" className="w-full h-full object-contain rotate-180 filter invert-[.25] sepia saturate-[5] hue-rotate-[20deg] brightness-[1.1] contrast-[1.2] drop-shadow-lg" />
+      </div>
+
+      {/* Fixed Footer */}
+      <div className="absolute bottom-4 w-full flex justify-center z-50 pointer-events-none">
+        <span className="text-[9px] text-gray-400 font-mono opacity-60 drop-shadow-md">ANTIGRAVITY SYSTEMS v1.0</span>
+      </div>
+
     </main>
   );
-}
-
-function RoleCard({ href, title, icon, desc, color, delay }: { href: string; title: string; icon: React.ReactNode; desc: string; color: string; delay: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay, duration: 0.5 }}
-    >
-      <Link href={href} className={`group block relative p-8 rounded-3xl bg-white/[0.03] border border-white/5 backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 ${color}`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
-
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-6 p-4 rounded-2xl bg-black/20 text-gray-300 group-hover:text-white group-hover:scale-110 transition-all duration-300 ring-1 ring-white/5">
-            {icon}
-          </div>
-          <h2 className="text-xl font-bold text-gray-200 group-hover:text-white mb-2 transition-colors">{title}</h2>
-          <p className="text-sm text-gray-500 group-hover:text-gray-400 mb-6 transition-colors">{desc}</p>
-
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 group-hover:text-tashi-accent transition-colors">
-            <span>Access</span>
-            <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  )
 }

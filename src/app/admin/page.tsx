@@ -122,15 +122,43 @@ export default function AdminDashboard() {
     const [editingItem, setEditingItem] = useState<any>(null); // State for editing item
     const [menuSearchQuery, setMenuSearchQuery] = useState(''); // Search filter for menu
     const [menuCategoryFilter, setMenuCategoryFilter] = useState<string>('All'); // Category filter
-    const [localGallery, setLocalGallery] = useState<any[]>([]);
+    const [showGalleryPicker, setShowGalleryPicker] = useState(false); // State for gallery picker modal
 
-    useEffect(() => {
-        // Use static manifest for reliable listing on edge
-        fetch('/gallery-manifest.json')
-            .then(res => res.json())
-            .then(data => setLocalGallery(data))
-            .catch(err => console.error('Failed to load gallery manifest', err));
-    }, []);
+    // Helper to check if image is used in menu
+    const isImageUsed = (source: string) => {
+        if (!source) return false;
+        const fileName = source.split('/').pop()?.split('?')[0]; // Handle query params if any
+        if (!fileName) return false;
+
+        return menu.some(m => {
+            if (!m.image) return false;
+            // Check exact match
+            if (m.image === source) return true;
+            // Check filename match (handles different base URLs or relative/absolute mismatch)
+            if (m.image.includes(fileName)) return true;
+            return false;
+        });
+    };
+
+    const handleDeleteLocal = async (path: string) => {
+        if (!confirm('Permanently delete this file? This cannot be undone.')) return;
+
+        try {
+            const res = await fetch('/api/media/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath: path })
+            });
+            if (res.ok) {
+                setLocalGallery(prev => prev.filter(p => p.path !== path));
+            } else {
+                alert('Failed to delete file');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error deleting file');
+        }
+    };
 
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -526,35 +554,52 @@ export default function AdminDashboard() {
                                         <p className="text-xs text-gray-600">Upload photos to use them in your app.</p>
                                     </div>
                                 ) : (
-                                    useStore.getState().media?.map((item) => (
-                                        <div key={item.id} className="group relative bg-gray-50 rounded-lg overflow-hidden border border-gray-200 aspect-square">
-                                            <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
-                                                <button
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(item.url);
-                                                        alert('URL Copied!');
-                                                    }}
-                                                    className="bg-white text-black text-xs font-bold px-3 py-2 rounded full-width hover:bg-gray-200"
-                                                >
-                                                    Copy URL
-                                                </button>
-                                                <button
-                                                    onClick={async () => {
-                                                        if (confirm('Delete this image from gallery list? (File remains in storage)')) {
+                                    useStore.getState().media?.map((item) => {
+                                        const isUsed = isImageUsed(item.url);
+                                        return (
+                                            <div key={item.id} className={`group relative bg-gray-50 rounded-lg overflow-hidden border transition-all ${isUsed ? 'border-green-500/50 ring-1 ring-green-500/20' : 'border-gray-200'}`}>
+                                                <div className="aspect-square relative">
+                                                    <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                                    {isUsed ? (
+                                                        <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-10 flex items-center gap-1">
+                                                            <span>✓</span> IN USE
+                                                        </div>
+                                                    ) : (
+                                                        <div className="absolute top-2 right-2 bg-gray-500/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+                                                            Unused
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(item.url);
+                                                            alert('URL Copied!');
+                                                        }}
+                                                        className="bg-white text-black text-xs font-bold px-3 py-2 rounded full-width hover:bg-gray-200"
+                                                    >
+                                                        Copy URL
+                                                    </button>
+                                                    <button
+                                                        onClick={async () => {
+                                                            if (isUsed) {
+                                                                if (!confirm('⚠️ WARNING: This image is currently USED in your menu!\n\nDeleting it might break the menu image.\n\nAre you sure?')) return;
+                                                            } else {
+                                                                if (!confirm('Delete this image reference?')) return;
+                                                            }
                                                             await useStore.getState().deleteMedia(item.id);
-                                                        }
-                                                    }}
-                                                    className="bg-red-500/20 text-red-400 border border-red-500/50 p-2 rounded hover:bg-red-500 hover:text-white"
-                                                >
-                                                    <Trash size={16} />
-                                                </button>
+                                                        }}
+                                                        className={`border p-2 rounded hover:text-white transition-colors ${isUsed ? 'bg-red-500/10 text-red-300 border-red-500/30 hover:bg-red-500' : 'bg-white/10 text-white border-white/20 hover:bg-red-500 hover:border-red-500'}`}
+                                                    >
+                                                        <Trash size={16} />
+                                                    </button>
+                                                </div>
+                                                <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1">
+                                                    <p className="text-[10px] text-gray-400 truncate">{item.name}</p>
+                                                </div>
                                             </div>
-                                            <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1">
-                                                <p className="text-[10px] text-gray-400 truncate">{item.name}</p>
-                                            </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 )}
                             </div>
 
@@ -571,32 +616,56 @@ export default function AdminDashboard() {
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                        {localGallery.map((file, idx) => (
-                                            <div key={idx} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden group relative">
-                                                <div className="aspect-square bg-gray-100 relative">
-                                                    <img
-                                                        src={file.path}
-                                                        alt={file.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                                                        <button
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(file.path);
-                                                                alert('Path copied: ' + file.path);
-                                                            }}
-                                                            className="bg-white text-black font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transform scale-90 group-hover:scale-100 transition-all"
-                                                        >
-                                                            Copy Path
-                                                        </button>
+                                        {localGallery.map((file, idx) => {
+                                            const isUsed = isImageUsed(file.path);
+                                            return (
+                                                <div key={idx} className={`bg-white rounded-lg border shadow-sm overflow-hidden group relative transition-all ${isUsed ? 'border-green-500/50 ring-1 ring-green-500/20' : 'border-gray-200 opacity-80 hover:opacity-100'}`}>
+                                                    <div className="aspect-square bg-gray-100 relative">
+                                                        <img
+                                                            src={file.path}
+                                                            alt={file.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        {isUsed ? (
+                                                            <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-10 flex items-center gap-1">
+                                                                <span>✓</span> IN USE
+                                                            </div>
+                                                        ) : (
+                                                            <div className="absolute top-2 right-2 bg-gray-500/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+                                                                Unused
+                                                            </div>
+                                                        )}
+
+                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2 items-center justify-center p-4">
+                                                            <button
+                                                                onClick={() => {
+                                                                    navigator.clipboard.writeText(file.path);
+                                                                    alert('Path copied: ' + file.path);
+                                                                }}
+                                                                className="bg-white text-black font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transform scale-90 group-hover:scale-100 transition-all w-full"
+                                                            >
+                                                                Copy Path
+                                                            </button>
+                                                            {!isUsed && (
+                                                                <button
+                                                                    onClick={() => handleDeleteLocal(file.path)}
+                                                                    className="bg-red-500 text-white font-bold uppercase text-xs px-4 py-2 rounded-lg hover:bg-red-600 transform scale-90 group-hover:scale-100 transition-all w-full flex items-center justify-center gap-2"
+                                                                >
+                                                                    <Trash size={14} /> Delete
+                                                                </button>
+                                                            )}
+                                                            {isUsed && (
+                                                                <p className="text-green-300 text-[10px] font-bold text-center">In Use</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-2">
+                                                        <p className="text-[10px] text-gray-900 truncate" title={file.name}>{file.name}</p>
+                                                        <p className="text-[9px] text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
                                                     </div>
                                                 </div>
-                                                <div className="p-2">
-                                                    <p className="text-[10px] text-gray-900 truncate" title={file.name}>{file.name}</p>
-                                                    <p className="text-[9px] text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -1113,7 +1182,6 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Contact Settings */}
-                            {/* Contact Settings */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
                                 <p className="text-sm text-gray-500 mb-6">Update your restaurant contact details that appear in the customer menu.</p>
@@ -1195,7 +1263,6 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Table Management */}
-                            {/* Table Management */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
@@ -1265,7 +1332,6 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
-                            {/* Menu Management */}
                             {/* Menu Management */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
@@ -1435,7 +1501,6 @@ export default function AdminDashboard() {
                                                     newItem.image = image;
                                                 }
 
-                                                console.log("Attempting to add item:", newItem); // Debug Log
 
                                                 await useStore.getState().addMenuItem(newItem);
 
@@ -1591,6 +1656,79 @@ export default function AdminDashboard() {
                                     onEdit={setEditingItem}
                                 />
 
+                                {/* GALLERY PICKER MODAL */}
+                                {showGalleryPicker && (
+                                    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+                                            <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                                <h3 className="font-bold text-gray-800">Select Image</h3>
+                                                <button onClick={() => setShowGalleryPicker(false)} className="p-2 hover:bg-gray-200 rounded-full">
+                                                    <X size={20} />
+                                                </button>
+                                            </div>
+                                            <div className="flex-1 overflow-auto p-6 space-y-8">
+                                                {/* Local Gallery */}
+                                                <section>
+                                                    <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
+                                                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                        {localGallery.map((file, idx) => (
+                                                            <button
+                                                                key={`local-${idx}`}
+                                                                onClick={() => {
+                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                    if (input) {
+                                                                        input.value = file.path;
+                                                                        // Trigger preview update if we were using state, but here we just update input.
+                                                                        // We can force a re-render or just let the user see the input change.
+                                                                        // To update preview, we might need a little state in the form, but let's stick to simple input update first.
+                                                                        // Actually, let's trigger an event to update the preview if we add one.
+                                                                        const event = new Event('input', { bubbles: true });
+                                                                        input.dispatchEvent(event);
+                                                                    }
+                                                                    setShowGalleryPicker(false);
+                                                                }}
+                                                                className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                            >
+                                                                <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                                    Select
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </section>
+
+                                                {/* Firebase Gallery */}
+                                                <section>
+                                                    <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
+                                                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                        {useStore.getState().media?.map((item) => (
+                                                            <button
+                                                                key={item.id}
+                                                                onClick={() => {
+                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                    if (input) {
+                                                                        input.value = item.url;
+                                                                        const event = new Event('input', { bubbles: true });
+                                                                        input.dispatchEvent(event);
+                                                                    }
+                                                                    setShowGalleryPicker(false);
+                                                                }}
+                                                                className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                            >
+                                                                <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                                    Select
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* EDIT ITEM MODAL */}
                                 {editingItem && (
                                     <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1650,33 +1788,81 @@ export default function AdminDashboard() {
 
                                                 <div>
                                                     <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
-                                                    <div className="flex gap-2">
-                                                        <input name="image" id="edit-item-image-url" defaultValue={editingItem.image} placeholder="Paste new image URL or upload" className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                        <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                onChange={async (e) => {
-                                                                    const file = e.target.files?.[0];
-                                                                    if (file) {
-                                                                        if (confirm(`Upload ${file.name}?`)) {
-                                                                            try {
-                                                                                const url = await useStore.getState().uploadImage(file, true);
-                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                if (input) input.value = url;
-                                                                            } catch (err) {
-                                                                                alert('Upload failed');
-                                                                                console.error(err);
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex gap-2">
+                                                            <div className="flex-1 relative">
+                                                                <input
+                                                                    name="image"
+                                                                    id="edit-item-image-url"
+                                                                    defaultValue={editingItem.image}
+                                                                    placeholder="Paste URL or Select..."
+                                                                    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
+                                                                    onChange={(e) => {
+                                                                        // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
+                                                                        // Since it's uncontrolled, we use a simple ref-like approach for preview.
+                                                                        const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                        if (img) img.src = e.target.value;
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowGalleryPicker(true)}
+                                                                className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
+                                                            >
+                                                                <Grid size={16} /> Gallery
+                                                            </button>
+                                                            <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="hidden"
+                                                                    onChange={async (e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) {
+                                                                            if (confirm(`Upload ${file.name}?`)) {
+                                                                                try {
+                                                                                    const url = await useStore.getState().uploadImage(file, true);
+                                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                                    if (input) {
+                                                                                        input.value = url;
+                                                                                        // Dispatch input event for any listeners
+                                                                                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                                                                                    }
+                                                                                    if (img) img.src = url;
+                                                                                } catch (err) {
+                                                                                    alert('Upload failed');
+                                                                                    console.error(err);
+                                                                                }
                                                                             }
                                                                         }
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <Upload size={20} />
-                                                        </label>
+                                                                    }}
+                                                                />
+                                                                <Upload size={20} />
+                                                            </label>
+                                                        </div>
+
+                                                        {/* Image Preview */}
+                                                        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
+                                                            <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
+                                                                <img
+                                                                    id="edit-item-preview"
+                                                                    src={editingItem.image || '/images/placeholders/default.png'}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                                        (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
+                                                                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">
+                                                                Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <p className="text-[10px] text-yellow-500/70 mt-1">💡 Paste a link or click upload icon to pick a file.</p>
                                                 </div>
 
                                                 <div>

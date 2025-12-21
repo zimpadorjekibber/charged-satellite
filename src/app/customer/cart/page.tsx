@@ -70,13 +70,11 @@ export default function CartPage() {
                         const userLon = pos.coords.longitude;
                         const distance = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
 
-                        console.log(`Geofence Check: User at (${userLat}, ${userLon}), Store at (${storeCoords.lat}, ${storeCoords.lon}), Dist: ${distance.toFixed(3)}km, Limit: ${geoRadius}km`);
 
                         // NEW: Check if they're outside 50m radius → require advance payment
                         const distanceMeters = distance * 1000;
                         const ADVANCE_PAYMENT_RADIUS_METERS = state.callStaffRadius || 50;
                         if (distanceMeters > ADVANCE_PAYMENT_RADIUS_METERS) {
-                            console.log(`Customer is ${distanceMeters.toFixed(0)}m away (>${ADVANCE_PAYMENT_RADIUS_METERS}m), requiring advance payment`);
                             // FIX: If we are already paying (isPrePaid=true), DO NOT stop the flow.
                             if (!isPrePaid) {
                                 setIsOrdering(false);
@@ -92,7 +90,6 @@ export default function CartPage() {
                         }
                     }
                 } catch (locError: any) {
-                    console.error("Geolocation Error:", locError);
                     if (locError instanceof Error && (locError.message.includes('permission') || (locError as any).code === 1)) {
                         alert("Location access is required to verify you are within our service area. Please allow location access to place an order.");
                     } else {
@@ -131,7 +128,6 @@ export default function CartPage() {
                 throw new Error("Order creation failed. Cart is still full.");
             }
         } catch (error) {
-            console.error("Order Error:", error);
             alert("Something went wrong placing your order. Please try again.");
             setIsOrdering(false);
         }
@@ -157,8 +153,6 @@ export default function CartPage() {
                             const userLon = pos.coords.longitude;
                             const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
                             const distanceMeters = distanceKm * 1000;
-
-                            console.log(`Order Placement Check: Distance = ${distanceMeters.toFixed(0)}m, Radius = ${CHECK_RADIUS_METERS}m`);
 
                             // If they're WITHIN restaurant radius but NO table scanned
                             if (distanceMeters <= CHECK_RADIUS_METERS) {

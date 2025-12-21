@@ -44,7 +44,6 @@ export default function ReviewModal() {
                 // Filter out 'Rejected' or 'Cancelled' if you don't want reviews for those
                 // For now, we assume removal = Done = Ask for review
                 if (order.status !== 'Rejected' && order.status !== 'Cancelled') {
-                    console.log("Order completed, triggering review:", id);
                     setCompletedOrderId(id);
                     setShowModal(true);
                 }
