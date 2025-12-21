@@ -102,10 +102,16 @@ export default function AdminDashboard() {
         }
     };
 
-    // ... rest of component
+    const media = useStore((state) => state.media);
+    const [localGallery, setLocalGallery] = useState<any[]>([]);
 
     useEffect(() => {
         initialize();
+        // Fetch local gallery manifest
+        fetch('/gallery-manifest.json')
+            .then(res => res.json())
+            .then(data => setLocalGallery(data))
+            .catch(err => console.error('Failed to load local gallery', err));
     }, [initialize]);
 
     // !! IMPORTANT FOR MOBILE TESTING !!
@@ -548,13 +554,13 @@ export default function AdminDashboard() {
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {useStore.getState().media?.length === 0 ? (
+                                {media?.length === 0 ? (
                                     <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-300 rounded-xl">
                                         <p className="text-gray-500 mb-2">No photos in gallery yet.</p>
                                         <p className="text-xs text-gray-600">Upload photos to use them in your app.</p>
                                     </div>
                                 ) : (
-                                    useStore.getState().media?.map((item) => {
+                                    media?.map((item) => {
                                         const isUsed = isImageUsed(item.url);
                                         return (
                                             <div key={item.id} className={`group relative bg-gray-50 rounded-lg overflow-hidden border transition-all ${isUsed ? 'border-green-500/50 ring-1 ring-green-500/20' : 'border-gray-200'}`}>
@@ -1702,7 +1708,7 @@ export default function AdminDashboard() {
                                                 <section>
                                                     <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
                                                     <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                                                        {useStore.getState().media?.map((item) => (
+                                                        {media?.map((item) => (
                                                             <button
                                                                 key={item.id}
                                                                 onClick={() => {
@@ -1810,7 +1816,7 @@ export default function AdminDashboard() {
                                                                 onClick={() => setShowGalleryPicker(true)}
                                                                 className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
                                                             >
-                                                                <Grid size={16} /> Gallery
+                                                                <ImageIcon size={16} /> Gallery
                                                             </button>
                                                             <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
                                                                 <input
