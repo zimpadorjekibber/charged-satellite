@@ -25,8 +25,18 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
-export default function AdminDashboard() {
+export default function AdminPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="animate-spin text-gray-400" size={32} /></div>}>
+            <AdminDashboard />
+        </Suspense>
+    );
+}
+
+function AdminDashboard() {
     const orders = useStore((state) => state.orders);
     const notifications = useStore((state) => state.notifications); // Ensure notifications are selected
     const tables = useStore((state) => state.tables);
@@ -359,8 +369,7 @@ export default function AdminDashboard() {
                         <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => handleTabChange('history')} />
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
-                        <TabButton active={activeTab === 'settings'} label="Admin Management" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
-                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
+                        <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
                         <TabButton active={activeTab === 'media'} label="Gallery" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
                     </div>
 
@@ -405,7 +414,6 @@ export default function AdminDashboard() {
                     <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
                     <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
                     <MobileTabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
-                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
                     <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
@@ -873,7 +881,7 @@ export default function AdminDashboard() {
                                     <div className="p-3 bg-orange-600 text-white rounded-xl shadow-lg ring-4 ring-orange-100 group-hover:scale-110 transition-transform">
                                         <ShoppingBag size={24} />
                                     </div>
-                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Local Gear</span>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Local Wear</span>
                                 </button>
 
                                 <button
