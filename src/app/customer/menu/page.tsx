@@ -1253,33 +1253,7 @@ export default function MenuPage() {
                         />
                     ))}
 
-                    {/* Fallback if no items added yet in DB */}
-                    {(!gearItems || gearItems.length === 0) && (
-                        <>
-                            <GearItemCard
-                                name="Ear Protection"
-                                price={450}
-                                items={[
-                                    { url: "/gallery/ear_warmer_product.png", label: "Product Shot", details: "Size: Free | Material: Yak Wool" },
-                                    { url: "/gallery/local_ear_warmer.png", label: "Man View", worn: true },
-                                    { url: "/gallery/local_ear_warmer.png", label: "Lifestyle", worn: true }
-                                ]}
-                                badge="Handmade"
-                                available={true}
-                            />
-                            <GearItemCard
-                                name="Woolen Beanie"
-                                price={650}
-                                items={[
-                                    { url: "/gallery/beanie_product.png", label: "Product Shot", details: "Size: M/L | Color: Blue Mix" },
-                                    { url: "/gallery/local_beanie.png", label: "Man View", worn: true },
-                                    { url: "/gallery/local_beanie.png", label: "Lifestyle", worn: true }
-                                ]}
-                                badge="Pure Wool"
-                                available={true}
-                            />
-                        </>
-                    )}
+
                 </div>
 
                 <div className="mt-4 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">

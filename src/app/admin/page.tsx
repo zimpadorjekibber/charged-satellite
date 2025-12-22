@@ -2118,7 +2118,7 @@ function GearManagementView() {
         >
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900 font-serif">Local Gear Management</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 font-serif">Cold Weather Gears</h2>
                     <p className="text-gray-500 text-sm">Manage items in the 'Cold Weather Gear' carousel</p>
                 </div>
                 <button
