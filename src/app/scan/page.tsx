@@ -47,11 +47,9 @@ function ScanPageContent() {
             return;
         }
 
-        // Record Scan
-        useStore.getState().recordScan('table_qr', { tableId });
-
         // Check if Geolocation is supported
         if (!navigator.geolocation) {
+            useStore.getState().recordScan('table_qr', { tableId });
             proceed();
             return;
         }
@@ -60,9 +58,14 @@ function ScanPageContent() {
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
+                const { latitude, longitude, accuracy } = position.coords;
+
+                // Record Scan with accurate GPS
+                useStore.getState().recordScan('table_qr', { tableId }, { lat: latitude, lng: longitude, accuracy });
+
                 const dist = calculateDistance(
-                    position.coords.latitude,
-                    position.coords.longitude,
+                    latitude,
+                    longitude,
                     RESTAURANT_LOCATION.lat,
                     RESTAURANT_LOCATION.lng
                 );
@@ -76,16 +79,12 @@ function ScanPageContent() {
                 }
             },
             (err) => {
-                // If denied or error, we might want to block or allow. 
-                // Currently blocking if we can't verify location for strict mode.
-                // But for better UX on random devices/errors, we might show a warning.
-                // However, user asked for restriction. Let's block if we can't verify, or ask to retry.
+                // Record scan even if location fails (will use IP fallback)
+                useStore.getState().recordScan('table_qr', { tableId });
+
                 if (err.code === 1) { // PERMISSION_DENIED
                     setError("Location permission denied. Please enable location services to place an order.");
                 } else {
-                    // Position unavailable or timeout
-                    // Ideally we should block, but in dev it might be annoying. 
-                    // Let's block but offer a 'retry' which reloads.
                     setError("Unable to retrieve location. Please ensure GPS is on.");
                 }
             },

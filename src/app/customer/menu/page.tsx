@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useStore, Category, MenuItem, Table, Order } from '../../../lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2 } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -26,8 +26,87 @@ const itemVariants = {
     show: { opacity: 1, y: 0 }
 };
 
+const GearItemCard = ({ name, price, items, badge, available }: { name: string, price: number, items: { url: string, label: string, details?: string, worn?: boolean }[], badge: string, available?: boolean }) => {
+    const [currentIdx, setCurrentIdx] = useState(0);
+
+    return (
+        <div className="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl flex flex-col h-full">
+            <div className="h-48 relative overflow-hidden group" onClick={() => setCurrentIdx((currentIdx + 1) % items.length)}>
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentIdx}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full"
+                    >
+                        <img
+                            src={items[currentIdx].url}
+                            alt={name}
+                            className={`w-full h-full object-cover ${!available ? 'grayscale opacity-50' : ''}`}
+                        />
+
+                        {/* Out of Stock Overlay */}
+                        {!available && (
+                            <div className="absolute inset-0 flex items-center justify-center p-2">
+                                <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-2xl border border-white/20 uppercase tracking-widest rotate-[-12deg]">
+                                    Out of Stock
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Overlay Details for Product Shot */}
+                        {!items[currentIdx].worn && items[currentIdx].details && (
+                            <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-2">
+                                <span className="text-[9px] font-bold text-white bg-tashi-accent/80 px-1.5 py-0.5 rounded w-fit mb-1 backdrop-blur-sm">
+                                    {items[currentIdx].details}
+                                </span>
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+
+                {/* Badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    <div className="bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/10 w-fit">
+                        {badge}
+                    </div>
+                </div>
+
+                <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-white/10 uppercase tracking-tighter">
+                    {items[currentIdx].label}
+                </div>
+
+                {/* Dots Indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                    {items.map((_, i) => (
+                        <div
+                            key={i}
+                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-tashi-accent w-4' : 'bg-white/30'}`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div className="p-3 flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 className="text-gray-100 font-bold text-[13px] mb-1 line-clamp-1">{name}</h3>
+                    <div className="flex justify-between items-center">
+                        <span className="text-tashi-accent font-bold font-serif">&#8377;{price}</span>
+                        <button className="text-[10px] bg-white/5 hover:bg-white/10 text-gray-400 px-2.5 py-1 rounded-full border border-white/10 transition-colors">
+                            Enquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function MenuPage() {
     const menu = useStore((state: any) => state.menu);
+    const gearItems = useStore((state: any) => state.gearItems);
     const tables = useStore((state: any) => state.tables); // Added for table name lookup
     const cart = useStore((state: any) => state.cart);
     const orders = useStore((state: any) => state.orders); // Added
@@ -44,6 +123,7 @@ export default function MenuPage() {
     const valleyUpdates = useStore((state: any) => state.valleyUpdates);
     const contactInfo = useStore((state: any) => state.contactInfo);
     const categoryOrder = useStore((state: any) => state.categoryOrder);
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
     const addReview = useStore((state: any) => state.addReview);
 
     // Dynamic Categories derived from Menu
@@ -335,7 +415,7 @@ export default function MenuPage() {
         if (!sessionId || !orders.length) return;
 
         // Find the most recent active order for this session
-        const activeOrder = orders.find(o =>
+        const activeOrder = orders.find((o: Order) =>
             o.sessionId === sessionId &&
             ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
         );
@@ -355,7 +435,7 @@ export default function MenuPage() {
 
 
     const getQuantity = (id: string) => {
-        return cart.find((i) => i.menuItemId === id)?.quantity || 0;
+        return cart.find((i: any) => i.menuItemId === id)?.quantity || 0;
     };
 
     // Check if there is already a pending call for this table
@@ -365,7 +445,7 @@ export default function MenuPage() {
     const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
 
     // Check if there is already a pending call for this table
-    const pendingCallNotification = notifications.find(n =>
+    const pendingCallNotification = notifications.find((n: any) =>
         n.tableId === callTableId &&
         n.type === 'call_staff' &&
         n.status === 'pending' &&
@@ -374,7 +454,7 @@ export default function MenuPage() {
     const hasPendingCall = !!pendingCallNotification;
 
     // Check for active order (Expanded definition)
-    const hasActiveOrder = orders.some(o =>
+    const hasActiveOrder = orders.some((o: Order) =>
         o.sessionId === sessionId &&
         ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
     );
@@ -421,6 +501,9 @@ export default function MenuPage() {
     }, [isCalling]);
 
     const handleCallStaff = async () => {
+        const myOrders = orders.filter((o: Order) => o.sessionId === sessionId);
+        const callLastOrder = myOrders[0];
+
         // If already calling, allow "Cut Call" - This cancels the notification on BOTH sides
         if (isCalling) {
             // Stop local audio and visual feedback
@@ -431,9 +514,7 @@ export default function MenuPage() {
             setIsCalling(false);
 
             // Cancel the server-side notification so staff's phone stops ringing too
-            const myOrders = orders.filter(o => o.sessionId === sessionId);
-            const lastOrder = myOrders[0];
-            const tableIdToUse = currentTableId || lastOrder?.tableId || 'REQUEST';
+            const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
 
             if (pendingCallNotification) {
                 resolveNotification(pendingCallNotification.id);
@@ -462,8 +543,8 @@ export default function MenuPage() {
                 );
 
                 // Fallback: Check by tableId if session match fails (e.g. strict session mismatch)
-                if (!activeCall && (currentTableId || lastOrder?.tableId)) {
-                    const checkTableId = currentTableId || lastOrder?.tableId;
+                if (!activeCall && (currentTableId || callLastOrder?.tableId)) {
+                    const checkTableId = currentTableId || callLastOrder?.tableId;
                     activeCall = notifications.find(
                         (n: any) => n.tableId === checkTableId && n.type === 'call_staff' && n.status === 'pending'
                     );
@@ -474,7 +555,7 @@ export default function MenuPage() {
                     await resolveNotification(activeCall.id);
                 } else {
                     // Fallback to table-based cancellation if ID is temp or not found
-                    const tableIdToUse = currentTableId || lastOrder?.tableId || 'REQUEST';
+                    const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
                     console.log("Cancelling Call by Table ID:", tableIdToUse);
                     await cancelNotification(tableIdToUse, 'call_staff');
                 }
@@ -548,8 +629,8 @@ export default function MenuPage() {
         setIsCalling(true);
 
         // Find recent customer details from previous orders
-        const myOrders = orders.filter(o => o.sessionId === sessionId);
-        const lastOrder = myOrders[0]; // Orders are sorted desc
+        const myOrdersForCall = orders.filter((o: Order) => o.sessionId === sessionId);
+        const lastOrderForCall = myOrdersForCall[0]; // Orders are sorted desc
 
         // Use currentTableId if available, otherwise fallback to last order's table
         const effectiveTableId = currentTableId || lastOrder?.tableId;
@@ -565,8 +646,8 @@ export default function MenuPage() {
 
             console.log("Adding notification for:", finalTableId);
             addNotification(finalTableId, 'call_staff', {
-                customerName: lastOrder?.customerName || 'Guest',
-                customerPhone: lastOrder?.customerPhone || '',
+                customerName: lastOrderForCall?.customerName || 'Guest',
+                customerPhone: lastOrderForCall?.customerPhone || '',
                 sessionId: sessionId || undefined
             });
 
@@ -720,7 +801,7 @@ export default function MenuPage() {
                     >
                         <Navigation size={24} />
                         <span className="text-[10px] uppercase tracking-wider font-bold">
-                            Navigate
+                            Direction
                         </span>
                     </button>
                 </div>
@@ -735,10 +816,11 @@ export default function MenuPage() {
                 {/* Review Shortcut */}
                 <button
                     onClick={() => setShowReviewModal(true)}
-                    className="ml-1 bg-neutral-900 border border-white/10 rounded-lg p-2 text-tashi-accent hover:bg-white/10 transition-colors shadow-lg shadow-black/20"
+                    className="ml-1 bg-neutral-900 border border-white/10 rounded-lg p-2 hover:bg-white/10 transition-colors shadow-lg shadow-black/20"
+                    style={{ color: menuAppearance.accentColor }}
                     aria-label="Write a Review"
                 >
-                    <Star size={18} />
+                    <Star size={18} fill={menuAppearance.accentColor} />
                 </button>
 
                 <div className="bg-neutral-900 border border-white/10 rounded-lg p-1 flex gap-1">
@@ -778,10 +860,11 @@ export default function MenuPage() {
                         >
                             {activeCategory === cat && (
                                 <div
-                                    className="absolute inset-0 bg-tashi-accent rounded-full shadow-[0_0_15px_rgba(218,165,32,0.4)]"
+                                    className="absolute inset-0 rounded-full shadow-lg"
+                                    style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 0 15px ${menuAppearance.accentColor}66` }}
                                 />
                             )}
-                            <span className="relative z-10">{cat}</span>
+                            <span className="relative z-10" style={{ fontSize: menuAppearance.categoryFontSize, color: activeCategory === cat ? (parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff') : menuAppearance.categoryColor }}>{cat}</span>
                         </button>
                     ))}
                     {CATEGORIES.length === 0 && (
@@ -799,7 +882,7 @@ export default function MenuPage() {
                         </div>
                         <div>
                             <p className="text-xs text-blue-300 font-bold uppercase tracking-wider">Ordering for</p>
-                            <p className="text-white font-bold text-lg">Table {tables.find(t => t.id === currentTableId)?.name || currentTableId}</p>
+                            <p className="text-white font-bold text-lg">Table {tables.find((t: any) => t.id === currentTableId)?.name || currentTableId}</p>
                         </div>
                     </div>
                     <button
@@ -813,7 +896,7 @@ export default function MenuPage() {
 
             {/* Chef's Special Section */}
             {(() => {
-                const chefSpecialItems = menu.filter(item => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)));
+                const chefSpecialItems = menu.filter((item: MenuItem) => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)));
                 if (chefSpecialItems.length === 0) return null;
                 return (
                     <ChefsSpecialSection
@@ -831,13 +914,13 @@ export default function MenuPage() {
                 {CATEGORIES.map((cat) => {
                     // Filter items for this category based on filterType
                     const categoryItems = menu
-                        .filter((item) => {
+                        .filter((item: MenuItem) => {
                             if (item.category !== cat) return false;
                             if (filterType === 'veg') return item.isVegetarian;
                             if (filterType === 'non-veg') return !item.isVegetarian;
                             return true;
                         })
-                        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)); // Sort by admin-defined order
+                        .sort((a: MenuItem, b: MenuItem) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)); // Sort by admin-defined order
 
                     if (categoryItems.length === 0) return null;
 
@@ -846,16 +929,16 @@ export default function MenuPage() {
                             {/* Typewriter Header */}
                             <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-black via-black/90 to-transparent backdrop-blur-sm -mx-2 px-2">
                                 <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/20" />
-                                <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest text-shadow-glow">
+                                <h2 className="font-bold font-serif uppercase tracking-widest text-shadow-glow" style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }}>
                                     {cat}
                                 </h2>
                                 <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/20" />
                             </div>
 
                             {/* Items WITH images - Display as cards */}
-                            {categoryItems.filter(item => item.image).length > 0 && (
+                            {categoryItems.filter((item: MenuItem) => item.image).length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                                    {categoryItems.filter(item => item.image).map((item) => (
+                                    {categoryItems.filter((item: MenuItem) => item.image).map((item: MenuItem) => (
                                         <MenuItemCard
                                             key={item.id}
                                             item={item}
@@ -869,9 +952,9 @@ export default function MenuPage() {
                             )}
 
                             {/* Items WITHOUT images - Display as compact list */}
-                            {categoryItems.filter(item => !item.image).length > 0 && (
+                            {categoryItems.filter((item: MenuItem) => !item.image).length > 0 && (
                                 <div className="space-y-2">
-                                    {categoryItems.filter(item => !item.image).map((item) => (
+                                    {categoryItems.filter((item: MenuItem) => !item.image).map((item: MenuItem) => (
                                         <MenuItemListRow
                                             key={item.id}
                                             item={item}
@@ -889,7 +972,7 @@ export default function MenuPage() {
 
                 {/* Empty State if EVERYTHING is filtered out */}
                 {menu.length > 0 && CATEGORIES.every(cat =>
-                    menu.filter(i => i.category === cat &&
+                    menu.filter((i: MenuItem) => i.category === cat &&
                         (filterType === 'veg' ? i.isVegetarian : filterType === 'non-veg' ? !i.isVegetarian : true)
                     ).length === 0) && (
                         <div className="text-center py-20 text-gray-500 italic">
@@ -1145,6 +1228,66 @@ export default function MenuPage() {
                     </div>
                 )
             }
+
+            {/* Cold Weather Gears - Local Support Section */}
+            <section className="mt-8 mx-4 mb-32">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
+                        <ShoppingBag size={20} />
+                    </div>
+                    <h2 className="text-xl font-bold font-serif text-white tracking-tight">
+                        Cold Weather Gears <span className="text-orange-400 text-sm font-sans font-normal ml-1">By Locals</span>
+                    </h2>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Render dynamic items from store */}
+                    {gearItems?.map((item: any) => (
+                        <GearItemCard
+                            key={item.id}
+                            name={item.name}
+                            price={item.price}
+                            items={item.items}
+                            badge={item.badge}
+                            available={item.available}
+                        />
+                    ))}
+
+                    {/* Fallback if no items added yet in DB */}
+                    {(!gearItems || gearItems.length === 0) && (
+                        <>
+                            <GearItemCard
+                                name="Ear Protection"
+                                price={450}
+                                items={[
+                                    { url: "/gallery/ear_warmer_product.png", label: "Product Shot", details: "Size: Free | Material: Yak Wool" },
+                                    { url: "/gallery/local_ear_warmer.png", label: "Man View", worn: true },
+                                    { url: "/gallery/local_ear_warmer.png", label: "Lifestyle", worn: true }
+                                ]}
+                                badge="Handmade"
+                                available={true}
+                            />
+                            <GearItemCard
+                                name="Woolen Beanie"
+                                price={650}
+                                items={[
+                                    { url: "/gallery/beanie_product.png", label: "Product Shot", details: "Size: M/L | Color: Blue Mix" },
+                                    { url: "/gallery/local_beanie.png", label: "Man View", worn: true },
+                                    { url: "/gallery/local_beanie.png", label: "Lifestyle", worn: true }
+                                ]}
+                                badge="Pure Wool"
+                                available={true}
+                            />
+                        </>
+                    )}
+                </div>
+
+                <div className="mt-4 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">
+                    <p className="text-[11px] text-gray-400 leading-relaxed italic">
+                        All items are hand-knitted by local Spiti women. Supporting these crafts helps sustain our mountain communities. Ask staff for available colors.
+                    </p>
+                </div>
+            </section>
             {/* Table Selection Modal */}
             <AnimatePresence>
                 {showTableSelector && (
@@ -1162,7 +1305,7 @@ export default function MenuPage() {
                             </div>
 
                             <div className="grid grid-cols-3 gap-3 overflow-y-auto p-1 custom-scrollbar">
-                                {tables.map((table) => (
+                                {tables.map((table: any) => (
                                     <button
                                         key={table.id}
                                         onClick={() => {
@@ -1172,9 +1315,10 @@ export default function MenuPage() {
                                             setTimeout(() => window.location.reload(), 100);
                                         }}
                                         className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
-                                            ? 'bg-tashi-accent text-black border-tashi-accent'
+                                            ? 'text-black'
                                             : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
                                             }`}
+                                        style={currentTableId === table.id ? { backgroundColor: menuAppearance.accentColor, borderColor: menuAppearance.accentColor } : {}}
                                     >
                                         {table.name}
                                     </button>
@@ -1204,7 +1348,7 @@ export default function MenuPage() {
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="text-center">
-                                <h3 className="text-xl font-bold text-white font-serif mb-2">Navigate</h3>
+                                <h3 className="text-xl font-bold text-white font-serif mb-2">Direction</h3>
                                 <p className="text-gray-400 text-sm">Choose your wayfinding method</p>
                             </div>
 
@@ -1220,7 +1364,7 @@ export default function MenuPage() {
                                         <MapPin size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Google Maps</p>
+                                        <p className="font-bold text-gray-200">Reach Us</p>
                                         <p className="text-xs text-gray-500">Live GPS Directions</p>
                                     </div>
                                 </a>
@@ -1233,7 +1377,7 @@ export default function MenuPage() {
                                     }}
                                     className="w-full flex items-center gap-4 bg-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group text-left"
                                 >
-                                    <div className="bg-tashi-accent/20 p-3 rounded-full text-tashi-accent group-hover:bg-tashi-accent group-hover:text-black transition-colors">
+                                    <div className="p-3 rounded-full transition-colors" style={{ backgroundColor: `${menuAppearance.accentColor}33`, color: menuAppearance.accentColor }}>
                                         <Navigation size={24} />
                                     </div>
                                     <div>
@@ -1506,6 +1650,7 @@ export default function MenuPage() {
 
 
 function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
     const isAvailable = item.available !== false;
 
     return (
@@ -1562,7 +1707,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
 
             <div className="flex-1 flex flex-col justify-between py-1">
                 <div onClick={(e) => { e.stopPropagation(); onSelect(); }} className="cursor-pointer">
-                    <h3 className="font-bold text-gray-100 text-lg leading-tight mb-1">{item.name}</h3>
+                    <h3 className="font-bold leading-tight mb-1" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
                     <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
                     {/* Status Text */}
                     <div className="flex items-center gap-2 mt-2">
@@ -1574,7 +1719,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                 </div>
 
                 <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
-                    <span className="font-serif text-xl text-tashi-accent">&#8377;{item.price}</span>
+                    <span className="font-serif text-xl" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
 
                     {quantity === 0 ? (
                         <motion.button
@@ -1582,15 +1727,16 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                             whileTap={isAvailable ? { scale: 0.9 } : {}}
                             onClick={isAvailable ? onAdd : undefined}
                             disabled={!isAvailable}
+                            style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
-                                ? 'bg-white/5 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                                ? 'bg-white/5 cursor-pointer'
                                 : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
                                 }`}
                         >
                             <Plus size={20} />
                         </motion.button>
                     ) : (
-                        <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                        <div className="flex items-center rounded-full px-1 py-1 shadow-lg" style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 4px 12px ${menuAppearance.accentColor}4D` }}>
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={onRemove}
@@ -1598,7 +1744,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                             >
                                 <Minus size={16} />
                             </motion.button>
-                            <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
+                            <span className="px-3 text-sm font-bold" style={{ color: parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff' }}>x{quantity}</span>
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={onAdd}
@@ -1615,6 +1761,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
 }
 
 function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
     const isAvailable = item.available !== false;
 
     return (
@@ -1639,9 +1786,9 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
 
             {/* Name and Price */}
             <div className="flex-1">
-                <h3 className="font-bold text-gray-100 text-base leading-tight">{item.name}</h3>
+                <h3 className="font-bold leading-tight" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                    <span className="font-serif text-lg text-tashi-accent">&#8377;{item.price}</span>
+                    <span className="font-serif text-lg" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
                     {!isAvailable && (
                         <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
                     )}
@@ -1656,8 +1803,9 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
                         whileTap={isAvailable ? { scale: 0.9 } : {}}
                         onClick={isAvailable ? onAdd : undefined}
                         disabled={!isAvailable}
+                        style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
-                            ? 'bg-tashi-primary/20 hover:bg-tashi-primary text-tashi-accent hover:text-white border-tashi-accent/30 cursor-pointer'
+                            ? 'bg-white/5 cursor-pointer'
                             : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
                             }`}
                     >
@@ -1695,11 +1843,11 @@ const MiniOrderTimer = memo(function MiniOrderTimer() {
     // Find the latest active order for THIS session
     // FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
     const activeOrder = orders
-        .filter(o =>
+        .filter((o: Order) =>
             o.sessionId === sessionId &&
             (o.status === 'Pending' || o.status === 'Preparing')
         )
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+        .sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
     if (!activeOrder) return null;
 
@@ -1747,6 +1895,8 @@ function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
     );
 }
 
+
+
 const ChefsSpecialSection = memo(function ChefsSpecialSection({
     items,
     addToCart,
@@ -1760,6 +1910,7 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
     getQuantity: (id: string) => number,
     setSelectedItem: (item: MenuItem) => void
 }) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
@@ -1775,11 +1926,11 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
     return (
         <section className="mb-8 mt-4">
             <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
-                <Sparkles className="text-tashi-accent animate-pulse" size={24} />
-                <h2 className="text-xl font-bold font-serif text-tashi-accent uppercase tracking-widest animate-pulse drop-shadow-[0_0_8px_rgba(218,165,32,0.5)]">
+                <Sparkles style={{ color: menuAppearance.accentColor }} className="animate-pulse" size={24} />
+                <h2 className="text-xl font-bold font-serif uppercase tracking-widest animate-pulse" style={{ color: menuAppearance.accentColor, filter: `drop-shadow(0 0 8px ${menuAppearance.accentColor}80)` }}>
                     Chef's Specials
                 </h2>
-                <div className="h-[1px] flex-1 bg-gradient-to-r from-tashi-accent/50 to-transparent" />
+                <div className="h-[1px] flex-1" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}80, transparent)` }} />
             </div>
 
             {/* Fixed Height Container for Zero Layout Shift */}
@@ -1793,57 +1944,74 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                         >
                             <div className="relative group h-full">
                                 {/* Flashing Border Effect */}
-                                <div className="absolute -inset-[2px] bg-gradient-to-r from-tashi-accent via-yellow-200 to-tashi-accent rounded-2xl opacity-75 blur-sm animate-pulse" />
+                                <div className="absolute -inset-[2px] rounded-2xl opacity-75 blur-sm animate-pulse" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}, #FFFFFF, ${menuAppearance.accentColor})` }} />
 
                                 <div
-                                    className="relative bg-neutral-900 border border-tashi-accent/50 rounded-2xl overflow-hidden p-3 flex gap-4 h-full shadow-xl"
+                                    className="relative bg-neutral-900 rounded-2xl overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.5)] group"
+                                    style={{ borderColor: `${menuAppearance.accentColor}4d`, borderWidth: '1px' }}
                                     onClick={() => isActive && setSelectedItem(item)}
                                 >
-                                    {/* Image */}
-                                    <div className="w-24 h-full flex-shrink-0 bg-black rounded-xl overflow-hidden relative border border-white/5">
+                                    {/* Full Background Image */}
+                                    <div className="absolute inset-0 z-0">
                                         {item.image ? (
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            <>
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                />
+                                                {/* Gradient Overlay for Legibility */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                                            </>
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold text-xs uppercase text-center p-1">No Image</div>
+                                            <div className="w-full h-full flex items-center justify-center bg-neutral-800 text-gray-700 font-bold text-xs uppercase">No Image</div>
                                         )}
-                                        <div className="absolute top-0 right-0 bg-tashi-accent text-black text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg animate-pulse">
-                                            SPECIAL
-                                        </div>
                                     </div>
 
-                                    {/* Info */}
-                                    <div className="flex-1 flex flex-col justify-between py-1">
-                                        <div>
-                                            <h3 className="font-bold text-white text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${item.isVegetarian ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-red-500/30 text-red-400 bg-red-500/10'}`}>
-                                                    {item.isVegetarian ? 'Veg' : 'Non-Veg'}
-                                                </span>
-                                                {item.isSpicy && (
-                                                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border border-red-500/30 text-red-400 bg-red-500/10">
-                                                        Spicy
-                                                    </span>
-                                                )}
-                                            </div>
+                                    {/* Floating Badges */}
+                                    <div className="absolute top-3 left-3 z-20 flex gap-2">
+                                        <div className="text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg" style={{ backgroundColor: menuAppearance.accentColor }}>
+                                            CHEF'S SPECIAL
                                         </div>
+                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full backdrop-blur-md border ${item.isVegetarian ? 'border-green-500/50 text-green-400 bg-green-500/20' : 'border-red-500/50 text-red-400 bg-red-500/20'}`}>
+                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                                        </span>
+                                    </div>
 
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-lg font-serif text-tashi-accent font-bold">&#8377;{item.price}</span>
+                                    {/* Content Overlay */}
+                                    <div className="absolute inset-0 z-20 p-4 flex flex-col justify-end">
+                                        <div className="flex justify-between items-end gap-2">
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-white text-xl leading-tight mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                                    {item.name}
+                                                </h3>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl font-serif font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ color: menuAppearance.accentColor }}>
+                                                        &#8377;{item.price}
+                                                    </span>
+                                                    {item.isSpicy && (
+                                                        <span className="text-[10px] font-bold text-red-400 drop-shadow-md flex items-center gap-0.5">
+                                                            🌶️ Spicy
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                            <div onClick={(e) => e.stopPropagation()}>
+                                            <div onClick={(e) => e.stopPropagation()} className="mb-0.5">
                                                 {getQuantity(item.id) === 0 ? (
                                                     <button
                                                         onClick={() => isActive && addToCart(item)}
                                                         disabled={item.available === false}
-                                                        className="bg-tashi-accent text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20"
+                                                        className="text-black px-6 py-2 rounded-xl text-xs font-black hover:opacity-90 transition-all hover:scale-105 shadow-xl active:scale-95"
+                                                        style={{ backgroundColor: menuAppearance.accentColor }}
                                                     >
                                                         ADD
                                                     </button>
                                                 ) : (
-                                                    <div className="flex items-center bg-neutral-800 rounded-lg border border-white/20 h-8">
-                                                        <button onClick={() => isActive && removeFromCart(item.id)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-l-lg font-bold text-lg">-</button>
-                                                        <span className="px-2 text-sm font-bold text-white min-w-[20px] text-center">{getQuantity(item.id)}</span>
-                                                        <button onClick={() => isActive && addToCart(item)} className="px-2.5 h-full text-white hover:bg-white/10 rounded-r-lg font-bold text-lg">+</button>
+                                                    <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 h-10 shadow-2xl">
+                                                        <button onClick={() => isActive && removeFromCart(item.id)} className="px-3 h-full text-white hover:bg-white/10 rounded-l-xl font-bold text-xl">-</button>
+                                                        <span className="px-2 text-base font-black text-white min-w-[30px] text-center">{getQuantity(item.id)}</span>
+                                                        <button onClick={() => isActive && addToCart(item)} className="px-3 h-full text-white hover:bg-white/10 rounded-r-xl font-bold text-xl">+</button>
                                                     </div>
                                                 )}
                                             </div>
@@ -1864,9 +2032,10 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`h-1.5 rounded-full transition-all ${index === currentIndex
-                                ? 'w-6 bg-tashi-accent'
+                                ? 'w-6'
                                 : 'w-1.5 bg-gray-600 hover:bg-gray-500'
                                 }`}
+                            style={index === currentIndex ? { backgroundColor: menuAppearance.accentColor } : {}}
                         />
                     ))}
                 </div>

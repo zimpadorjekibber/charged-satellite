@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
@@ -36,6 +37,8 @@ export default function AdminDashboard() {
     const logout = useStore((state) => state.logout);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const initialize = useStore((state) => state.initialize);
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
+    const updateMenuAppearance = useStore((state: any) => state.updateMenuAppearance);
 
     // Sound Logic
     const [soundEnabled, setSoundEnabled] = useState(false);
@@ -119,7 +122,26 @@ export default function AdminDashboard() {
         ? (window.location.hostname === 'localhost' ? 'http://192.168.1.109:3000' : window.location.origin)
         : '';
 
-    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media' | 'storage'>('live');
+    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media' | 'storage' | 'gear'>('live');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    // Sync tab with URL
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        const validTabs = ['live', 'history', 'analytics', 'reviews', 'settings', 'media', 'storage', 'gear'];
+        if (tab && validTabs.includes(tab)) {
+            setActiveTab(tab as any);
+        }
+    }, [searchParams]);
+
+    // Update URL when tab changes
+    const handleTabChange = (tab: string) => {
+        setActiveTab(tab as any);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', tab);
+        router.push(`/admin?${params.toString()}`, { scroll: false });
+    };
 
     // Auth Login State
     const [username, setUsername] = useState('');
@@ -333,12 +355,13 @@ export default function AdminDashboard() {
 
                     {/* Desktop Tab Navigation - Hidden on Mobile */}
                     <div className="hidden md:flex bg-gray-100 p-1 rounded-xl border border-gray-200 text-sm">
-                        <TabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={16} />} onClick={() => setActiveTab('live')} />
-                        <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => setActiveTab('history')} />
-                        <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => setActiveTab('analytics')} />
-                        <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => setActiveTab('reviews')} />
-                        <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => setActiveTab('settings')} />
-                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<ImageIcon size={16} />} onClick={() => setActiveTab('media')} />
+                        <TabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={16} />} onClick={() => handleTabChange('live')} />
+                        <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => handleTabChange('history')} />
+                        <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
+                        <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
+                        <TabButton active={activeTab === 'settings'} label="Admin Management" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
+                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
+                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -376,13 +399,14 @@ export default function AdminDashboard() {
 
             {/* Mobile Bottom Navigation Bar */}
             <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 md:hidden px-2 py-2 pb-safe shadow-lg">
-                <div className="grid grid-cols-6 gap-1">
-                    <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={20} />} onClick={() => setActiveTab('live')} />
-                    <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => setActiveTab('history')} />
-                    <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => setActiveTab('analytics')} />
-                    <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => setActiveTab('reviews')} />
-                    <MobileTabButton active={activeTab === 'settings'} label="Manage" icon={<Settings size={20} />} onClick={() => setActiveTab('settings')} />
-                    <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => setActiveTab('media')} />
+                <div className="grid grid-cols-7 gap-1">
+                    <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={20} />} onClick={() => handleTabChange('live')} />
+                    <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => handleTabChange('history')} />
+                    <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
+                    <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
+                    <MobileTabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
+                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
+                    <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
 
@@ -815,14 +839,69 @@ export default function AdminDashboard() {
                         <ReviewsView />
                     )}
 
-                    {/* SETTINGS (Tables/Menu) VIEW */}
+                    {/* GEAR MANAGEMENT VIEW (New) */}
+                    {activeTab === 'gear' && (
+                        <GearManagementView />
+                    )}
+
+                    {/* ADMIN MANAGEMENT VIEW */}
                     {activeTab === 'settings' && (
-                        // ... (existing settings content, but ensure it's wrapped)
                         <motion.div
                             key="settings"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                             className="space-y-12"
                         >
+                            {/* NEW: Admin Quick Overview Navigation */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('appearance-settings');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}
+                                    className="bg-purple-100 hover:bg-purple-200 p-4 rounded-2xl border border-purple-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-purple-600 text-white rounded-xl shadow-lg ring-4 ring-purple-100 group-hover:scale-110 transition-transform">
+                                        <Sparkles size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Appearance</span>
+                                </button>
+
+                                <button
+                                    onClick={() => handleTabChange('gear')}
+                                    className="bg-orange-100 hover:bg-orange-200 p-4 rounded-2xl border border-orange-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-orange-600 text-white rounded-xl shadow-lg ring-4 ring-orange-100 group-hover:scale-110 transition-transform">
+                                        <ShoppingBag size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Local Gear</span>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('table-management');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }}
+                                    className="bg-blue-100 hover:bg-blue-200 p-4 rounded-2xl border border-blue-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-blue-600 text-white rounded-xl shadow-lg ring-4 ring-blue-100 group-hover:scale-110 transition-transform">
+                                        <Grid size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Tables</span>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('menu-management');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }}
+                                    className="bg-green-100 hover:bg-green-200 p-4 rounded-2xl border border-green-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-green-600 text-white rounded-xl shadow-lg ring-4 ring-green-100 group-hover:scale-110 transition-transform">
+                                        <BookOpen size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Menu Items</span>
+                                </button>
+                            </div>
                             {/* App Sharing & QR */}
                             <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
                                 <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -905,14 +984,14 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Menu Appearance Settings (New) */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+                            <div id="appearance-settings" className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm scroll-mt-24">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                            <span className="p-2 bg-purple-100 rounded-lg text-purple-600"><Pencil size={20} /></span>
-                                            Menu Appearance
+                                            <span className="p-2 bg-purple-100 rounded-lg text-purple-600"><Sparkles size={20} /></span>
+                                            Menu Appearance Styling
                                         </h2>
-                                        <p className="text-gray-500 text-sm mt-1">Customize fonts and colors for your customer menu.</p>
+                                        <p className="text-gray-500 text-sm mt-1">Customize fonts and colors for your customer-facing menu. Changes are live instantly.</p>
                                     </div>
                                 </div>
 
@@ -922,17 +1001,26 @@ export default function AdminDashboard() {
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Category Headers</h3>
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Font Size</label>
-                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none">
-                                                <option>Normal (1rem)</option>
-                                                <option>Large (1.25rem)</option>
-                                                <option>Extra Large (1.5rem)</option>
+                                            <select
+                                                value={menuAppearance.categoryFontSize}
+                                                onChange={(e) => updateMenuAppearance({ categoryFontSize: e.target.value })}
+                                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
+                                            >
+                                                <option value="1rem">Normal (1rem)</option>
+                                                <option value="1.25rem">Large (1.25rem)</option>
+                                                <option value="1.5rem">Extra Large (1.5rem)</option>
                                             </select>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Text Color</label>
                                             <div className="flex gap-2 items-center">
-                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#ffffff" />
-                                                <span className="text-xs text-gray-500">#FFFFFF</span>
+                                                <input
+                                                    type="color"
+                                                    value={menuAppearance.categoryColor}
+                                                    onChange={(e) => updateMenuAppearance({ categoryColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
+                                                />
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.categoryColor}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -942,17 +1030,26 @@ export default function AdminDashboard() {
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Item Names</h3>
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Font Size</label>
-                                            <select className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none" defaultValue="Standard (1rem)">
-                                                <option>Compact (0.9rem)</option>
-                                                <option>Standard (1rem)</option>
-                                                <option>Large (1.1rem)</option>
+                                            <select
+                                                value={menuAppearance.itemNameFontSize}
+                                                onChange={(e) => updateMenuAppearance({ itemNameFontSize: e.target.value })}
+                                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
+                                            >
+                                                <option value="0.9rem">Compact (0.9rem)</option>
+                                                <option value="1rem">Standard (1rem)</option>
+                                                <option value="1.1rem">Large (1.1rem)</option>
                                             </select>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Text Color</label>
                                             <div className="flex gap-2 items-center">
-                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#e5e5e5" />
-                                                <span className="text-xs text-gray-500">#E5E5E5</span>
+                                                <input
+                                                    type="color"
+                                                    value={menuAppearance.itemNameColor}
+                                                    onChange={(e) => updateMenuAppearance({ itemNameColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
+                                                />
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.itemNameColor}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -963,21 +1060,70 @@ export default function AdminDashboard() {
                                         <div>
                                             <label className="text-xs text-gray-500 block mb-1">Accent Color</label>
                                             <div className="flex gap-2 items-center">
-                                                <input type="color" className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300" defaultValue="#DAA520" />
-                                                <span className="text-xs text-gray-500">#DAA520</span>
+                                                <input
+                                                    type="color"
+                                                    value={menuAppearance.accentColor}
+                                                    onChange={(e) => updateMenuAppearance({ accentColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
+                                                />
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.accentColor}</span>
                                             </div>
                                         </div>
                                         <div className="pt-2">
-                                            <button className="w-full bg-white hover:bg-gray-100 text-xs font-bold py-2 rounded text-gray-600 border border-gray-300 transition-colors">
+                                            <button
+                                                onClick={() => updateMenuAppearance({
+                                                    categoryFontSize: '1.25rem',
+                                                    categoryColor: '#FFFFFF',
+                                                    itemNameFontSize: '1rem',
+                                                    itemNameColor: '#E5E5E5',
+                                                    accentColor: '#DAA520'
+                                                })}
+                                                className="w-full bg-white hover:bg-gray-100 text-xs font-bold py-2 rounded text-gray-600 border border-gray-300 transition-colors"
+                                            >
                                                 Reset to Default
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mt-4 flex justify-end">
-                                    <button className="bg-tashi-primary text-white text-sm font-bold px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                                        Save Appearance
-                                    </button>
+
+                                {/* Live Preview Section */}
+                                <div className="bg-neutral-900 rounded-2xl p-6 border border-white/10 shadow-inner">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                        Live Style Preview (Customer View)
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <h2 style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }} className="font-serif border-b border-white/5 pb-2 transition-all">
+                                            Signature Starters
+                                        </h2>
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }} className="font-bold transition-all">
+                                                    Tibetan Butter Tea
+                                                </h3>
+                                                <p className="text-xs text-gray-500 max-w-[200px]">Hand-churned with local butter and Himalayan salt.</p>
+                                            </div>
+                                            <span style={{ color: menuAppearance.accentColor }} className="font-bold text-sm">
+                                                ₹120
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-6 pt-4 border-t border-white/5 flex gap-2 overflow-x-auto pb-2">
+                                        {['Breakfast', 'Lunch', 'Dinner'].map(cat => (
+                                            <div key={cat} className="px-3 py-1 rounded-full text-[10px] uppercase font-bold border" style={{ borderColor: `${menuAppearance.accentColor}40`, color: menuAppearance.accentColor }}>
+                                                {cat}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <p className="text-xs text-gray-500 italic">
+                                    <strong>💡 Tip:</strong> These styles apply to ALL devices instantly.
+                                </p>
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-100">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    Saved to Cloud
                                 </div>
                             </div>
 
@@ -1190,7 +1336,7 @@ export default function AdminDashboard() {
                             {/* Contact Settings */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
-                                <p className="text-sm text-gray-500 mb-6">Update your restaurant contact details that appear in the customer menu.</p>
+                                <p className="text-sm text-gray-500 mb-6">Update your homestay contact details that appear in the customer menu.</p>
                                 <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-600 mb-2">Phone Number</label>
@@ -1269,7 +1415,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Table Management */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
                                     <button
@@ -1339,7 +1485,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Menu Management */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            <div id="menu-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-bold text-gray-900">Menu Management</h2>
                                     <button
@@ -1734,183 +1880,385 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                 )}
+                            </div>
 
-                                {/* EDIT ITEM MODAL */}
-                                {editingItem && (
-                                    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
-                                            <button
-                                                onClick={() => setEditingItem(null)}
-                                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                                            >
-                                                <X size={24} />
-                                            </button>
+                            {/* EDIT ITEM MODAL */}
+                            {editingItem && (
+                                <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                                    <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                        <button
+                                            onClick={() => setEditingItem(null)}
+                                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                                        >
+                                            <X size={24} />
+                                        </button>
 
-                                            <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
+                                        <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
 
-                                            <form
-                                                onSubmit={async (e) => {
-                                                    e.preventDefault();
-                                                    const form = e.target as HTMLFormElement;
-                                                    const formData = new FormData(form);
+                                        <form
+                                            onSubmit={async (e) => {
+                                                e.preventDefault();
+                                                const form = e.target as HTMLFormElement;
+                                                const formData = new FormData(form);
 
-                                                    const updates: any = {
-                                                        name: formData.get('name'),
-                                                        price: Number(formData.get('price')),
-                                                        category: formData.get('category'),
-                                                        description: formData.get('description'),
-                                                        image: formData.get('image'),
-                                                        isVegetarian: formData.get('isVegetarian') === 'on',
-                                                        isSpicy: formData.get('isSpicy') === 'on',
-                                                        isChefSpecial: formData.get('isChefSpecial') === 'on',
-                                                    };
+                                                const updates: any = {
+                                                    name: formData.get('name'),
+                                                    price: Number(formData.get('price')),
+                                                    category: formData.get('category'),
+                                                    description: formData.get('description'),
+                                                    image: formData.get('image'),
+                                                    isVegetarian: formData.get('isVegetarian') === 'on',
+                                                    isSpicy: formData.get('isSpicy') === 'on',
+                                                    isChefSpecial: formData.get('isChefSpecial') === 'on',
+                                                };
 
-                                                    await useStore.getState().updateMenuItem(editingItem.id, updates);
-                                                    setEditingItem(null);
-                                                    alert('Item updated successfully!');
-                                                }}
-                                                className="space-y-4"
-                                            >
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
-                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
-                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                    </div>
-                                                </div>
-
+                                                await useStore.getState().updateMenuItem(editingItem.id, updates);
+                                                setEditingItem(null);
+                                                alert('Item updated successfully!');
+                                            }}
+                                            className="space-y-4"
+                                        >
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
-                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                    <datalist id="category-list-edit">
-                                                        {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                            <option key={c} value={c} />
-                                                        ))}
-                                                    </datalist>
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
+                                                    <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
                                                 </div>
-
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
-                                                    <div className="flex flex-col gap-3">
-                                                        <div className="flex gap-2">
-                                                            <div className="flex-1 relative">
-                                                                <input
-                                                                    name="image"
-                                                                    id="edit-item-image-url"
-                                                                    defaultValue={editingItem.image}
-                                                                    placeholder="Paste URL or Select..."
-                                                                    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
-                                                                    onChange={(e) => {
-                                                                        // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
-                                                                        // Since it's uncontrolled, we use a simple ref-like approach for preview.
-                                                                        const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                        if (img) img.src = e.target.value;
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setShowGalleryPicker(true)}
-                                                                className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
-                                                            >
-                                                                <ImageIcon size={16} /> Gallery
-                                                            </button>
-                                                            <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    className="hidden"
-                                                                    onChange={async (e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (file) {
-                                                                            if (confirm(`Upload ${file.name}?`)) {
-                                                                                try {
-                                                                                    const url = await useStore.getState().uploadImage(file, true);
-                                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                                    if (input) {
-                                                                                        input.value = url;
-                                                                                        // Dispatch input event for any listeners
-                                                                                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                                                                                    }
-                                                                                    if (img) img.src = url;
-                                                                                } catch (err) {
-                                                                                    alert('Upload failed');
-                                                                                    console.error(err);
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
+                                                    <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                                                <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                <datalist id="category-list-edit">
+                                                    {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                        <option key={c} value={c} />
+                                                    ))}
+                                                </datalist>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
+                                                <div className="flex flex-col gap-3">
+                                                    <div className="flex gap-2">
+                                                        <div className="flex-1 relative">
+                                                            <input
+                                                                name="image"
+                                                                id="edit-item-image-url"
+                                                                defaultValue={editingItem.image}
+                                                                placeholder="Paste URL or Select..."
+                                                                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
+                                                                onChange={(e) => {
+                                                                    // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
+                                                                    // Since it's uncontrolled, we use a simple ref-like approach for preview.
+                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                    if (img) img.src = e.target.value;
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowGalleryPicker(true)}
+                                                            className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
+                                                        >
+                                                            <ImageIcon size={16} /> Gallery
+                                                        </button>
+                                                        <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        if (confirm(`Upload ${file.name}?`)) {
+                                                                            try {
+                                                                                const url = await useStore.getState().uploadImage(file, true);
+                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                                if (input) {
+                                                                                    input.value = url;
+                                                                                    // Dispatch input event for any listeners
+                                                                                    input.dispatchEvent(new Event('input', { bubbles: true }));
                                                                                 }
+                                                                                if (img) img.src = url;
+                                                                            } catch (err) {
+                                                                                alert('Upload failed');
+                                                                                console.error(err);
                                                                             }
                                                                         }
-                                                                    }}
-                                                                />
-                                                                <Upload size={20} />
-                                                            </label>
-                                                        </div>
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Upload size={20} />
+                                                        </label>
+                                                    </div>
 
-                                                        {/* Image Preview */}
-                                                        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
-                                                            <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
-                                                                <img
-                                                                    id="edit-item-preview"
-                                                                    src={editingItem.image || '/images/placeholders/default.png'}
-                                                                    alt="Preview"
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(e) => {
-                                                                        (e.target as HTMLImageElement).style.display = 'none';
-                                                                        (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
-                                                                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <p className="text-xs text-gray-500">
-                                                                Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
-                                                            </p>
+                                                    {/* Image Preview */}
+                                                    <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
+                                                        <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
+                                                            <img
+                                                                id="edit-item-preview"
+                                                                src={editingItem.image || '/images/placeholders/default.png'}
+                                                                alt="Preview"
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).style.display = 'none';
+                                                                    (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
+                                                                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
+                                                                }}
+                                                            />
                                                         </div>
+                                                        <p className="text-xs text-gray-500">
+                                                            Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
+                                                        </p>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <div>
-                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
-                                                </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                                <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
+                                            </div>
 
-                                                <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                        <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
-                                                        <span>Vegetarian</span>
-                                                    </label>
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                        <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
-                                                        <span>Spicy</span>
-                                                    </label>
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                        <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
-                                                        <span>Chef's Special</span>
-                                                    </label>
-                                                </div>
+                                            <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
+                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                    <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
+                                                    <span>Vegetarian</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                    <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
+                                                    <span>Spicy</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                    <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
+                                                    <span>Chef's Special</span>
+                                                </label>
+                                            </div>
 
-                                                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
-                                                    <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
-                                                </div>
-                                            </form>
-                                        </div>
+                                            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                                                <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
+                                                <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
-        </div >
+        </div>
     );
 }
 
 // ----------------------------------------------------------------------
 // HELPER COMPONENTS
 // ----------------------------------------------------------------------
+
+function GearManagementView() {
+    const { gearItems, addGearItem, updateGearItem, removeGearItem, reorderGearItems } = useStore();
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingGear, setEditingGear] = useState<any>(null);
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+
+        const itemData = {
+            name: formData.get('name') as string,
+            price: parseFloat(formData.get('price') as string),
+            badge: formData.get('badge') as string,
+            available: formData.get('available') === 'on',
+            items: [
+                {
+                    url: formData.get('img0_url') as string || '/images/placeholders/gear-product.png',
+                    label: 'Product View',
+                    details: formData.get('img0_details') as string || 'Hand-knitted in Kibber'
+                },
+                {
+                    url: formData.get('img1_url') as string || '/images/placeholders/gear-lifestyle-1.png',
+                    label: formData.get('img1_label') as string || 'Lifestyle View',
+                    details: 'Worn by local artisan',
+                    worn: true
+                },
+                {
+                    url: formData.get('img2_url') as string || '/images/placeholders/gear-lifestyle-2.png',
+                    label: formData.get('img2_label') as string || 'Fashion Shot',
+                    details: 'Premium Spitian Wool',
+                    worn: true
+                }
+            ]
+        };
+
+        if (editingGear) {
+            await updateGearItem(editingGear.id, itemData);
+            setEditingGear(null);
+        } else {
+            await addGearItem(itemData);
+            setIsAdding(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="space-y-8"
+        >
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 font-serif">Local Gear Management</h2>
+                    <p className="text-gray-500 text-sm">Manage items in the 'Cold Weather Gear' carousel</p>
+                </div>
+                <button
+                    onClick={() => setIsAdding(true)}
+                    className="bg-tashi-primary hover:bg-red-700 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-red-500/20"
+                >
+                    <Plus size={20} /> Add Item
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {gearItems.map((item) => (
+                    <div key={item.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+                        <div className="aspect-[4/5] bg-gray-100 relative">
+                            <img src={item.items[0]?.url} className="w-full h-full object-cover" alt={item.name} />
+                            {!item.available && (
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
+                                    <span className="bg-red-500 text-white font-bold py-1 px-4 rounded-full text-sm">OUT OF STOCK</span>
+                                </div>
+                            )}
+                            <div className="absolute top-4 left-4">
+                                <span className="bg-tashi-accent text-tashi-dark text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider">
+                                    {item.badge}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-gray-100">
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-bold text-gray-900">{item.name}</h3>
+                                <span className="text-tashi-primary font-bold">₹{item.price}</span>
+                            </div>
+                            <div className="flex gap-2 mt-4">
+                                <button
+                                    onClick={() => setEditingGear(item)}
+                                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+                                >
+                                    <Pencil size={14} /> Edit
+                                </button>
+                                <button
+                                    onClick={() => { if (confirm('Delete this gear item?')) removeGearItem(item.id); }}
+                                    className="p-2 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                >
+                                    <Trash size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                {gearItems.length === 0 && !isAdding && (
+                    <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-300 rounded-2xl">
+                        <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
+                        <p className="text-gray-500">No gear items yet.</p>
+                        <button onClick={() => setIsAdding(true)} className="text-tashi-primary font-bold mt-2">Add your first item</button>
+                    </div>
+                )}
+            </div>
+
+            {/* ADD/EDIT MODAL */}
+            {(isAdding || editingGear) && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        onClick={() => { setIsAdding(false); setEditingGear(null); }}
+                    />
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                        className="relative bg-white border border-gray-200 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl overflow-y-auto max-h-[90vh]"
+                    >
+                        <form onSubmit={handleSave} className="p-8">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-2xl font-bold text-gray-900 font-serif">
+                                    {editingGear ? 'Edit Gear Item' : 'Add New Local Gear'}
+                                </h2>
+                                <button type="button" onClick={() => { setIsAdding(false); setEditingGear(null); }} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Item Name</label>
+                                        <input name="name" required defaultValue={editingGear?.name} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-tashi-accent outline-none" placeholder="e.g. Spitian Ear Warmer" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Price (₹)</label>
+                                        <input name="price" type="number" required defaultValue={editingGear?.price} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-tashi-accent outline-none" placeholder="e.g. 450" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Badge / Material</label>
+                                        <input name="badge" defaultValue={editingGear?.badge} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-tashi-accent outline-none" placeholder="e.g. 100% Pure Wool" />
+                                    </div>
+                                    <div className="flex items-center gap-2 pt-6">
+                                        <input name="available" type="checkbox" defaultChecked={editingGear ? editingGear.available : true} className="w-6 h-6 accent-green-500" />
+                                        <span className="font-bold text-gray-700">In Stock</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 border-t border-gray-100 pt-6">
+                                    <h3 className="font-bold text-gray-900">Carousel Frames (3 Recommended)</h3>
+
+                                    {/* Frame 1: Product */}
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-xs font-bold text-gray-400 uppercase">Frame 1 (Product Shot)</span>
+                                        </div>
+                                        <input name="img0_url" defaultValue={editingGear?.items[0]?.url} className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:border-tashi-accent outline-none" placeholder="Image URL (Clean background preferred)" />
+                                        <input name="img0_details" defaultValue={editingGear?.items[0]?.details} className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:border-tashi-accent outline-none" placeholder="Details (e.g. Hand-knitted in Kibber)" />
+                                    </div>
+
+                                    {/* Frame 2: Lifestyle 1 */}
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-xs font-bold text-gray-400 uppercase">Frame 2 (Lifestyle - Man)</span>
+                                            <input name="img1_label" defaultValue={editingGear?.items[1]?.label || 'Local Man Lifestyle'} className="bg-transparent text-right text-xs font-bold text-tashi-primary focus:outline-none" placeholder="Label" />
+                                        </div>
+                                        <input name="img1_url" defaultValue={editingGear?.items[1]?.url} className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:border-tashi-accent outline-none" placeholder="Image URL (Man facing left)" />
+                                    </div>
+
+                                    {/* Frame 3: Lifestyle 2 */}
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-xs font-bold text-gray-400 uppercase">Frame 3 (Lifestyle - Lady)</span>
+                                            <input name="img2_label" defaultValue={editingGear?.items[2]?.label || 'Local Lady Lifestyle'} className="bg-transparent text-right text-xs font-bold text-tashi-primary focus:outline-none" placeholder="Label" />
+                                        </div>
+                                        <input name="img2_url" defaultValue={editingGear?.items[2]?.url} className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:border-tashi-accent outline-none" placeholder="Image URL (Fashion shot)" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 mt-10 pt-6 border-t border-gray-100">
+                                <button type="button" onClick={() => { setIsAdding(false); setEditingGear(null); }} className="px-6 py-2 rounded-xl text-gray-500 font-bold hover:bg-gray-100 transition-colors">Cancel</button>
+                                <button type="submit" className="px-8 py-2 rounded-xl bg-tashi-primary text-white font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-500/20">
+                                    {editingGear ? 'Update Item' : 'Create Item'}
+                                </button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
+        </motion.div>
+    );
+}
 
 function ReviewsView() {
     const reviews = useStore((state) => state.reviews);
@@ -3039,11 +3387,31 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                                                         <span className="font-mono text-xs text-blue-600 font-bold">{ipInfo.ip || 'Unknown IP'}</span>
                                                         <span className="text-[10px] text-gray-500">
                                                             {ipInfo.city ? `${ipInfo.city}, ${ipInfo.region} ` : (scan.tableId ? 'Local Scan' : 'N/A')}
+                                                            {!scan.isGpsVerified && ipInfo.city === 'Shimla' && (
+                                                                <span className="text-amber-600 font-bold ml-1" title="Mobile networks in Spiti often route through Shimla hubs. Actual location is likely Spiti.">
+                                                                    (IP Hub Estimate)
+                                                                </span>
+                                                            )}
                                                         </span>
                                                         {scan.distanceKm !== undefined && scan.distanceKm !== null && (
-                                                            <span className="text-[9px] font-bold text-indigo-600">
-                                                                ~{scan.distanceKm} km away
-                                                            </span>
+                                                            <div className="flex items-center gap-1 mt-0.5">
+                                                                <span className={`text-[9px] font-bold ${scan.isGpsVerified ? 'text-green-600' : 'text-indigo-600'}`}>
+                                                                    {scan.distanceKm === 0 ? 'At Restaurant' : `~${scan.distanceKm} km away`}
+                                                                </span>
+                                                                <span className={`text-[7px] px-1 rounded font-bold uppercase tracking-tighter border ${scan.isGpsVerified ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
+                                                                    {scan.isGpsVerified ? `Precision GPS (±${Math.round(scan.geoAccuracy || 0)}m)` : 'Estimated IP'}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {scan.preciseCoords && (
+                                                            <a
+                                                                href={`https://www.google.com/maps?q=${scan.preciseCoords.lat},${scan.preciseCoords.lng}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-[8px] text-blue-500 hover:underline flex items-center gap-0.5 mt-0.5"
+                                                            >
+                                                                <MapPin size={8} /> View Precision Location
+                                                            </a>
                                                         )}
                                                         {ipInfo.country_name && <span className="text-[9px] text-gray-400 uppercase">{ipInfo.country_name}</span>}
                                                     </div>
@@ -3165,7 +3533,7 @@ function TabButton({ active, label, icon, onClick }: { active: boolean; label: s
     return (
         <button
             onClick={onClick}
-            className={`flex items - center gap - 2 px - 4 py - 2 rounded - lg transition - all ${active
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${active
                 ? 'bg-tashi-primary text-white font-bold shadow-lg shadow-tashi-primary/20'
                 : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200'
                 } `}
@@ -3180,12 +3548,12 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
     return (
         <button
             onClick={onClick}
-            className={`flex flex - col items - center justify - center py - 2 rounded - lg transition - all ${active
+            className={`flex flex-col items-center justify-center py-2 rounded-lg transition-all ${active
                 ? 'text-tashi-primary'
                 : 'text-gray-400 hover:text-gray-600'
                 } `}
         >
-            <div className={`p - 1 rounded - full ${active ? 'bg-tashi-primary/10' : ''} `}>
+            <div className={`p-1 rounded-full ${active ? 'bg-tashi-primary/10' : ''} `}>
                 {icon}
             </div>
             <span className="text-[10px] font-bold mt-1">{label}</span>

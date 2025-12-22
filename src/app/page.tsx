@@ -12,7 +12,26 @@ export default function Home() {
   useEffect(() => {
     // Clear previous table session for generic app entry
     useStore.getState().setTableId(null);
-    useStore.getState().recordScan('app_qr', { path: '/' });
+
+    // Attempt to get location for more accurate analytics
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          useStore.getState().recordScan('app_qr', { path: '/' }, {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          });
+        },
+        () => {
+          // Fallback to IP-based if permission denied or error
+          useStore.getState().recordScan('app_qr', { path: '/' });
+        },
+        { timeout: 5000, enableHighAccuracy: false } // Fast check, don't need high accuracy for general visit
+      );
+    } else {
+      useStore.getState().recordScan('app_qr', { path: '/' });
+    }
   }, []);
 
   // Toggle between Food view and Building view every 5 seconds

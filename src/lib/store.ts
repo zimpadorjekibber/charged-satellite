@@ -97,6 +97,31 @@ export interface ValleyUpdate {
     mediaType?: 'image' | 'video'; // New field for type
 }
 
+export interface GearImage {
+    url: string;
+    label: string;
+    details?: string;
+    worn?: boolean;
+}
+
+export interface GearItem {
+    id: string;
+    name: string;
+    price: number;
+    badge: string;
+    available: boolean;
+    items: GearImage[];
+    sortOrder?: number;
+}
+
+export interface MenuAppearance {
+    categoryFontSize: string;
+    categoryColor: string;
+    itemNameFontSize: string;
+    itemNameColor: string;
+    accentColor: string;
+}
+
 export interface ContactSettings {
     phone: string;
     secondaryPhone?: string;
@@ -127,6 +152,8 @@ interface AppState {
     callStaffRadius: number; // Geofence radius for Call Staff feature (in meters)
     contactInfo: ContactSettings;
     categoryOrder: string[]; // New: For custom category ordering
+    gearItems: GearItem[]; // New: For local gear e-commerce
+    menuAppearance: MenuAppearance; // New: For visual customization
 
 
     isListening: boolean;
@@ -167,6 +194,13 @@ interface AppState {
 
     saveValleyUpdates: (updates: any[]) => Promise<void>;
 
+    // New: Local Gear Management
+    addGearItem: (item: Omit<GearItem, 'id'>) => Promise<void>;
+    updateGearItem: (id: string, updates: Partial<GearItem>) => Promise<void>;
+    removeGearItem: (id: string) => Promise<void>;
+    reorderGearItems: (items: GearItem[]) => Promise<void>;
+    updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
+
     login: (username: string, password: string) => Promise<boolean>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
@@ -174,7 +208,7 @@ interface AppState {
     addMediaItem: (url: string, name: string) => Promise<void>;
     deleteMedia: (id: string) => Promise<void>;
 
-    recordScan: (type: 'table_qr' | 'app_qr' | 'manual', details?: any) => Promise<void>;
+    recordScan: (type: 'table_qr' | 'app_qr' | 'manual', details?: any, geo?: { lat: number, lng: number, accuracy?: number }) => Promise<void>;
     fetchScanStats: () => Promise<any[]>;
 
 
@@ -203,6 +237,14 @@ export const useStore = create<AppState>()(
             geoRadius: 5,
             callStaffRadius: 50, // Default: 50 meters
             categoryOrder: [], // Initial empty state
+            gearItems: [], // Initial empty state
+            menuAppearance: {
+                categoryFontSize: '1.25rem',
+                categoryColor: '#FFFFFF',
+                itemNameFontSize: '1rem',
+                itemNameColor: '#E5E5E5',
+                accentColor: '#DAA520'
+            },
             customerDetails: null,
             contactInfo: {
                 phone: '+919876543210',
@@ -229,6 +271,18 @@ export const useStore = create<AppState>()(
                 unsubscribers.push(onSnapshot(collection(db, 'menu'), (snap) => {
                     const menu = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MenuItem[];
                     set({ menu });
+                }));
+
+                unsubscribers.push(onSnapshot(collection(db, 'gear'), (snap) => {
+                    const gearItems = snap.docs.map(d => ({ id: d.id, ...d.data() })) as GearItem[];
+                    set({ gearItems: gearItems.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) });
+                }));
+
+                // Menu Appearance
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'menu-appearance'), (snap) => {
+                    if (snap.exists()) {
+                        set({ menuAppearance: { ...get().menuAppearance, ...snap.data() } });
+                    }
                 }));
 
                 // Tables
@@ -567,63 +621,64 @@ export const useStore = create<AppState>()(
             },
 
 
-            recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}) => {
+            recordScan: async (type: 'table_qr' | 'app_qr' | 'manual', details: any = {}, geo?: { lat: number, lng: number, accuracy?: number }) => {
                 try {
                     const state = get();
+
+                    // DE-DUPLICATION: Don't record same scan type for same session within 1 minute
+                    const now = Date.now();
+                    const lastScanKey = `last_scan_${type}_${details.tableId || 'direct'}`;
+                    const lastScanTime = (window as any)[lastScanKey] || 0;
+                    if (now - lastScanTime < 60000) return;
+                    (window as any)[lastScanKey] = now;
+
                     let ipData: any = {};
-                    let distanceKm = null;
+                    let distanceKm: number | null = null;
+                    let isGpsVerified = !!geo;
 
                     const fetchIp = async () => {
                         try {
                             const r1 = await fetch('https://ipapi.co/json/');
                             if (r1.ok) return await r1.json();
-                        } catch (e) {
-                            console.warn('ipapi failed', e);
-                        }
-
+                        } catch (e) { }
                         try {
-                            // Fallback to ipwho.is (free, no key, generous limits)
                             const r2 = await fetch('https://ipwho.is/');
                             if (r2.ok) return await r2.json();
-                        } catch (e) {
-                            console.warn('ipwhois failed', e);
-                        }
+                        } catch (e) { }
                         return {};
                     };
 
-
                     try {
                         ipData = await fetchIp();
+                        const targetLoc = state.contactInfo?.mapsLocation;
+                        if (targetLoc) {
+                            const [targetLat, targetLng] = targetLoc.split(',').map(s => parseFloat(s.trim()));
+                            const currentLat = geo?.lat ?? ipData.latitude;
+                            const currentLng = geo?.lng ?? ipData.longitude;
 
-                        // Calculate Distance if possible
-                        if (ipData.latitude && ipData.longitude && state.contactInfo?.mapsLocation) {
-                            try {
-                                const [targetLat, targetLng] = state.contactInfo.mapsLocation.split(',').map(s => parseFloat(s.trim()));
-                                if (!isNaN(targetLat) && !isNaN(targetLng)) {
-                                    const toRad = (v: number) => v * Math.PI / 180;
-                                    const R = 6371; // Earth Radius in km
-                                    const dLat = toRad(targetLat - ipData.latitude);
-                                    const dLon = toRad(targetLng - ipData.longitude);
-                                    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                                        Math.cos(toRad(ipData.latitude)) * Math.cos(toRad(targetLat)) *
-                                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                                    distanceKm = Math.round(R * c);
-                                }
-                            } catch (err) {
-                                console.warn('Failed to calc distance', err);
+                            if (currentLat && currentLng && !isNaN(targetLat) && !isNaN(targetLng)) {
+                                const toRad = (v: number) => v * Math.PI / 180;
+                                const R = 6371;
+                                const dLat = toRad(targetLat - currentLat);
+                                const dLon = toRad(targetLng - currentLng);
+                                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                    Math.cos(toRad(currentLat)) * Math.cos(toRad(targetLat)) *
+                                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                distanceKm = Math.round(R * c);
                             }
                         }
-                    } catch (err) {
-                        console.warn('Failed to fetch IP data', err);
-                    }
+                    } catch (err) { }
 
                     await addDoc(collection(db, 'analytics_scans'), {
                         type,
                         ...details,
-                        sessionId: state.sessionId, // Link to device session
-                        ipData, // Store full IP/Geo payload
-                        distanceKm, // Store calculated distance
+                        sessionId: state.sessionId,
+                        ipData,
+                        distanceKm,
+                        isGpsVerified,
+                        geoAccuracy: geo?.accuracy,
+                        preciseCoords: geo ? { lat: geo.lat, lng: geo.lng } : null,
                         timestamp: new Date().toISOString(),
                         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
                     });
@@ -670,8 +725,40 @@ export const useStore = create<AppState>()(
             },
 
             saveValleyUpdates: async (updates) => {
-                // We store this as a single doc for simplicity
-                await setDoc(doc(db, 'settings', 'updates'), { list: updates });
+                const settingsRef = doc(db, 'settings', 'valley_updates');
+                await setDoc(settingsRef, { updates: updates.map(u => ({ ...u, id: Math.random().toString(36).substring(7) })) });
+                set({ valleyUpdates: updates });
+            },
+
+            // LOCAL GEAR MANAGEMENT
+            addGearItem: async (item) => {
+                await addDoc(collection(db, 'gear'), {
+                    ...item,
+                    sortOrder: get().gearItems.length
+                });
+            },
+
+            updateGearItem: async (id, updates) => {
+                await updateDoc(doc(db, 'gear', id), updates);
+            },
+
+            removeGearItem: async (id) => {
+                await deleteDoc(doc(db, 'gear', id));
+            },
+
+            reorderGearItems: async (items) => {
+                const batch = items.map((item, idx) => ({
+                    id: item.id,
+                    sortOrder: idx
+                }));
+
+                for (const item of batch) {
+                    await updateDoc(doc(db, 'gear', item.id), { sortOrder: item.sortOrder });
+                }
+            },
+
+            updateMenuAppearance: async (updates) => {
+                await setDoc(doc(db, 'settings', 'menu-appearance'), updates, { merge: true });
             },
 
             updateSettings: async (settings) => {

@@ -1,5 +1,77 @@
 [
   {
+    "name": "ear_warmer_product",
+    "path": "/gallery/ear_warmer_product.png",
+    "size": "512KB",
+    "source": "local"
+  },
+  {
+    "name": "beanie_product",
+    "path": "/gallery/beanie_product.png",
+    "size": "512KB",
+    "source": "local"
+  },
+  {
+    "name": "local_ear_warmer.png",
+    "path": "/gallery/local_ear_warmer.png",
+    "size": 524288,
+    "source": "gallery"
+  },
+  {
+    "name": "local_beanie.png",
+    "path": "/gallery/local_beanie.png",
+    "size": 524288,
+    "source": "gallery"
+  },
+  {
+    "name": "thentuk_soup.png",
+    "path": "/gallery/thentuk_soup.png",
+    "size": 615376,
+    "source": "gallery"
+  },
+  {
+    "name": "masala_omelette.png",
+    "path": "/gallery/masala_omelette.png",
+    "size": 554423,
+    "source": "gallery"
+  },
+  {
+    "name": "veg_jalfrezi.png",
+    "path": "/gallery/veg_jalfrezi.png",
+    "size": 539753,
+    "source": "gallery"
+  },
+  {
+    "name": "fresh_fruit_bowl.png",
+    "path": "/gallery/fresh_fruit_bowl.png",
+    "size": 483755,
+    "source": "gallery"
+  },
+  {
+    "name": "dal_makhani.png",
+    "path": "/gallery/dal_makhani.png",
+    "size": 767199,
+    "source": "gallery"
+  },
+  {
+    "name": "veg_hakka_noodles.png",
+    "path": "/gallery/veg_hakka_noodles.png",
+    "size": 888785,
+    "source": "gallery"
+  },
+  {
+    "name": "cold_coffee.png",
+    "path": "/gallery/cold_coffee.png",
+    "size": 792863,
+    "source": "gallery"
+  },
+  {
+    "name": "cheese_garlic_bread.png",
+    "path": "/gallery/cheese_garlic_bread.png",
+    "size": 827823,
+    "source": "gallery"
+  },
+  {
     "name": "chicken_spring_roll_1765973891653.png",
     "path": "/gallery/chicken_spring_roll_1765973891653.png",
     "size": 880598,
