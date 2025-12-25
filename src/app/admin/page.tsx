@@ -1588,6 +1588,14 @@ function AdminDashboard() {
                                                 const rawCat = item.category?.trim();
                                                 let displayCat = CATEGORY_MAPPING[rawCat] || rawCat;
 
+                                                // Clean Description
+                                                if (item.description) {
+                                                    const desc = item.description.toLowerCase();
+                                                    if (desc.includes('delicious') && desc.includes('item')) {
+                                                        item.description = '';
+                                                    }
+                                                }
+
                                                 // Fallback fuzzy match if exact match not found
                                                 if (!groupedMenu[displayCat]) {
                                                     const fuzzy = PREFERRED_ORDER.find(p => p.includes(displayCat) || displayCat.includes(p));
