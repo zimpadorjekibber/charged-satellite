@@ -1607,9 +1607,13 @@ function AdminDashboard() {
                                                 groupedMenu[displayCat].push(item);
                                             });
 
-                                            // Sort items within categories
+                                            // Sort items within categories with strictly correct 0 handling
                                             Object.keys(groupedMenu).forEach(key => {
-                                                groupedMenu[key].sort((a, b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+                                                groupedMenu[key].sort((a, b) => {
+                                                    const orderA = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : 999;
+                                                    const orderB = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : 999;
+                                                    return orderA - orderB;
+                                                });
                                             });
 
                                             printWindow.document.write(`
@@ -1618,13 +1622,13 @@ function AdminDashboard() {
                                                     <title>TashiZom Menu</title>
                                                     <style>
                                                         @page { size: A4; margin: 15mm; }
-                                                        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; line-height: 1.5; }
-                                                        h1 { text-align: center; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-                                                        .subtitle { text-align: center; font-size: 10px; color: #444; margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
+                                                        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #000; font-size: 13px; line-height: 1.5; }
+                                                        h1 { text-align: center; font-size: 28px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+                                                        .subtitle { text-align: center; font-size: 12px; color: #444; margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
                                                         
                                                         .category-section { margin-bottom: 25px; break-inside: auto; }
                                                         .category-title { 
-                                                            font-size: 16px; font-weight: 800; border-bottom: 2px solid #000; 
+                                                            font-size: 18px; font-weight: 800; border-bottom: 2px solid #000; 
                                                             padding-bottom: 4px; margin-bottom: 12px; text-transform: uppercase; 
                                                             letter-spacing: 1px; page-break-after: avoid; 
                                                         }
@@ -1633,15 +1637,15 @@ function AdminDashboard() {
                                                         thead { display: table-header-group; }
                                                         tr { break-inside: avoid; page-break-inside: avoid; }
                                                         
-                                                        td { border-bottom: 1px solid #ddd; padding: 6px 4px; vertical-align: top; }
-                                                        th { text-align: left; border-bottom: 2px solid #666; padding: 6px 4px; font-size: 10px; text-transform: uppercase; background: #fff; font-weight: bold; }
+                                                        td { border-bottom: 1px solid #ddd; padding: 8px 4px; vertical-align: top; }
+                                                        th { text-align: left; border-bottom: 2px solid #666; padding: 6px 4px; font-size: 11px; text-transform: uppercase; background: #fff; font-weight: bold; }
                                                         
-                                                        .price { font-weight: bold; text-align: right; white-space: nowrap; font-size: 12px; }
-                                                        .desc { font-size: 10px; color: #555; font-style: italic; margin-top: 2px; }
-                                                        .item-name { font-weight: bold; font-size: 12px; }
+                                                        .price { font-weight: bold; text-align: right; white-space: nowrap; font-size: 14px; }
+                                                        .desc { font-size: 11px; color: #555; font-style: italic; margin-top: 2px; }
+                                                        .item-name { font-weight: bold; font-size: 14px; }
                                                         
-                                                        .veg { color: green; font-weight: bold; font-size: 9px; border: 1px solid green; padding: 1px 3px; border-radius: 3px; }
-                                                        .non-veg { color: red; font-weight: bold; font-size: 9px; border: 1px solid red; padding: 1px 3px; border-radius: 3px; }
+                                                        .veg { color: green; font-weight: bold; font-size: 10px; border: 1px solid green; padding: 1px 3px; border-radius: 3px; }
+                                                        .non-veg { color: red; font-weight: bold; font-size: 10px; border: 1px solid red; padding: 1px 3px; border-radius: 3px; }
                                                     </style>
                                                 </head>
                                                 <body>
