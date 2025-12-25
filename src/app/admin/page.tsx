@@ -1524,47 +1524,84 @@ function AdminDashboard() {
                                             const printWindow = window.open('', '_blank');
                                             if (!printWindow) return;
 
-                                            // Define Preferred Order
+                                            // 1. Define Category Mappings (DB -> Display)
+                                            const CATEGORY_MAPPING: Record<string, string> = {
+                                                'Hot Beverages': 'Tea & Coffee',
+                                                'Tea & Coffee': 'Tea & Coffee',
+                                                'Omelettes': 'Omelets & Egg Dishes',
+                                                'Omelets & Egg Dishes': 'Omelets & Egg Dishes',
+                                                'Indian Bread': 'Indian Tawa/Tandoori Roti',
+                                                'Indian Breads': 'Indian Tawa/Tandoori Roti',
+                                                'Indian Tawa/Tandoori Roti': 'Indian Tawa/Tandoori Roti',
+                                                'Snacks': 'Snacks & Starters',
+                                                'Snacks & Starters': 'Snacks & Starters',
+                                                'Chinese Course': 'Chinese',
+                                                'Chinese': 'Chinese',
+                                                'Italian Course': 'Pizza & Pasta',
+                                                'Pizza': 'Pizza & Pasta',
+                                                'Pizza & Pasta': 'Pizza & Pasta',
+                                                'Salads': 'Soups & Salads',
+                                                'Soups': 'Soups & Salads',
+                                                'Soups & Salads': 'Soups & Salads',
+                                                'Vegetable & Dishes': 'Main Course (Vegetarian)',
+                                                'Main Course (Vegetarian)': 'Main Course (Vegetarian)',
+                                                'Non-Veg': 'Main Course (Non-Vegetarian)',
+                                                'Main Course (Non-Vegetarian)': 'Main Course (Non-Vegetarian)',
+                                                'Rice, Pulao, Biryani': 'Rice & Biryani',
+                                                'Rice & Biryani': 'Rice & Biryani',
+                                                'Toasts': 'Toasts',
+                                                'Cereals': 'Cereals',
+                                                'Pancakes': 'Pancakes',
+                                                'Sandwiches': 'Sandwiches',
+                                                'Desserts': 'Desserts',
+                                                'Cold Beverages & Shakes': 'Cold Beverages & Shakes',
+                                                'Breakfast': 'Breakfast'
+                                            };
+
                                             const PREFERRED_ORDER = [
                                                 'Breakfast',
-                                                'Soups & Salads',
-                                                'Snacks & Starters',
+                                                'Tea & Coffee',
+                                                'Toasts',
+                                                'Cereals',
+                                                'Omelets & Egg Dishes',
                                                 'Main Course (Vegetarian)',
                                                 'Main Course (Non-Vegetarian)',
-                                                'Rice & Biryani',
-                                                'Indian Breads',
+                                                'Indian Tawa/Tandoori Roti',
+                                                'Snacks & Starters',
                                                 'Chinese',
+                                                'Pancakes',
                                                 'Pizza & Pasta',
+                                                'Rice & Biryani',
+                                                'Sandwiches',
                                                 'Desserts',
-                                                'Tea & Coffee',
+                                                'Soups & Salads',
                                                 'Cold Beverages & Shakes'
                                             ];
 
-                                            // Group Items by Category
+                                            // 2. Group Items by Category
                                             const groupedMenu: Record<string, any[]> = {};
 
-                                            // Sort categories: Custom -> Preferred -> Alphabetical
-                                            const sortedCategories = [...Array.from(new Set(menu.map(i => i.category)))].sort((a, b) => {
-                                                // 1. Custom Admin Order
-                                                const idxA = categoryOrder.indexOf(a);
-                                                const idxB = categoryOrder.indexOf(b);
-                                                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                                if (idxA !== -1) return -1;
-                                                if (idxB !== -1) return 1;
+                                            // Initialize preferred groups
+                                            PREFERRED_ORDER.forEach(c => groupedMenu[c] = []);
 
-                                                // 2. Preferred Order (Hardcoded fallback)
-                                                const pIdxA = PREFERRED_ORDER.findIndex(p => a.toLowerCase() === p.toLowerCase());
-                                                const pIdxB = PREFERRED_ORDER.findIndex(p => b.toLowerCase() === p.toLowerCase());
-                                                if (pIdxA !== -1 && pIdxB !== -1) return pIdxA - pIdxB;
-                                                if (pIdxA !== -1) return -1;
-                                                if (pIdxB !== -1) return 1;
+                                            menu.forEach(item => {
+                                                const rawCat = item.category?.trim();
+                                                let displayCat = CATEGORY_MAPPING[rawCat] || rawCat;
 
-                                                // 3. Alphabetical
-                                                return a.localeCompare(b);
+                                                // Fallback fuzzy match if exact match not found
+                                                if (!groupedMenu[displayCat]) {
+                                                    const fuzzy = PREFERRED_ORDER.find(p => p.includes(displayCat) || displayCat.includes(p));
+                                                    if (fuzzy) displayCat = fuzzy;
+                                                    else {
+                                                        if (!groupedMenu[displayCat]) groupedMenu[displayCat] = [];
+                                                    }
+                                                }
+                                                groupedMenu[displayCat].push(item);
                                             });
 
-                                            sortedCategories.forEach(cat => {
-                                                groupedMenu[cat] = menu.filter(i => i.category === cat).sort((a, b) => (a.sortOrder || 999) - (b.sortOrder || 999));
+                                            // Sort items within categories
+                                            Object.keys(groupedMenu).forEach(key => {
+                                                groupedMenu[key].sort((a, b) => (a.sortOrder || 999) - (b.sortOrder || 999));
                                             });
 
                                             printWindow.document.write(`
@@ -1573,40 +1610,82 @@ function AdminDashboard() {
                                                     <title>TashiZom Menu</title>
                                                     <style>
                                                         @page { size: A4; margin: 15mm; }
-                                                        body { font-family: sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; line-height: 1.4; }
-                                                        h1 { text-align: center; font-size: 20px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-                                                        .subtitle { text-align: center; font-size: 9px; color: #444; margin-bottom: 15px; letter-spacing: 3px; text-transform: uppercase; }
+                                                        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; line-height: 1.5; }
+                                                        h1 { text-align: center; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+                                                        .subtitle { text-align: center; font-size: 10px; color: #444; margin-bottom: 25px; letter-spacing: 3px; text-transform: uppercase; }
                                                         
-                                                        /* Allow categories to split across pages to save space */
-                                                        .category-section { margin-bottom: 20px; break-inside: auto; page-break-inside: auto; }
-                                                        
-                                                        /* Keep title with the table */
+                                                        .category-section { margin-bottom: 25px; break-inside: auto; }
                                                         .category-title { 
-                                                            font-size: 14px; 
-                                                            font-weight: bold; 
-                                                            border-bottom: 2px solid #000; 
-                                                            padding-bottom: 2px; 
-                                                            margin-bottom: 8px; 
-                                                            text-transform: uppercase;
-                                                            display: block; /* changed from inline-block to block */
-                                                            letter-spacing: 1px;
-                                                            page-break-after: avoid; /* Don't leave title orphan at bottom of page */
+                                                            font-size: 16px; font-weight: 800; border-bottom: 2px solid #000; 
+                                                            padding-bottom: 4px; margin-bottom: 12px; text-transform: uppercase; 
+                                                            letter-spacing: 1px; page-break-after: avoid; 
                                                         }
 
                                                         table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
-                                                        
-                                                        /* Repeat headers on new pages */
                                                         thead { display: table-header-group; }
-                                                        
-                                                        /* Don't split rows in half */
                                                         tr { break-inside: avoid; page-break-inside: avoid; }
                                                         
-                                                        th { text-align: left; border-bottom: 1px solid #000; padding: 4px; font-size: 10px; text-transform: uppercase; background: #fff; }
-                                                        td { border-bottom: 1px solid #eee; padding: 3px 4px; vertical-align: top; }
+                                                        td { border-bottom: 1px solid #ddd; padding: 6px 4px; vertical-align: top; }
+                                                        th { text-align: left; border-bottom: 2px solid #666; padding: 6px 4px; font-size: 10px; text-transform: uppercase; background: #fff; font-weight: bold; }
                                                         
-                                                        .price { font-weight: bold; text-align: right; white-space: nowrap; }
-                                                        .veg { color: green; font-weight: bold; font-size: 9px; }
-                                                        .non-veg { color: red; font-weight: bold; font-size: 9px; }
+                                                        .price { font-weight: bold; text-align: right; white-space: nowrap; font-size: 12px; }
+                                                        .desc { font-size: 10px; color: #555; font-style: italic; margin-top: 2px; }
+                                                        .item-name { font-weight: bold; font-size: 12px; }
+                                                        
+                                                        .veg { color: green; font-weight: bold; font-size: 9px; border: 1px solid green; padding: 1px 3px; border-radius: 3px; }
+                                                        .non-veg { color: red; font-weight: bold; font-size: 9px; border: 1px solid red; padding: 1px 3px; border-radius: 3px; }
+                                                    </style>
+                                                </head>
+                                                <body>
+                                                    <h1>TashiZom</h1>
+                                                    <p class="subtitle">KIBBER • SPITI VALLEY</p>
+                                                    
+                                                    ${PREFERRED_ORDER.map(cat => {
+                                                const items = groupedMenu[cat];
+                                                if (!items || items.length === 0) return '';
+                                                return `
+                                                        <div class="category-section">
+                                                            <div class="category-title">${cat}</div>
+                                                            <table>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 50%">Item</th>
+                                                                        <th style="width: 15%; text-align: center;">Type</th>
+                                                                        <th style="width: 15%; text-align: right;">Price</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    ${items.map(item => `
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="item-name">${item.name}</div>
+                                                                                <div class="desc">${item.description || ''}</div>
+                                                                            </td>
+                                                                            <td style="text-align: center;">
+                                                                                <span class="${item.isVegetarian ? 'veg' : 'non-veg'}">
+                                                                                    ${item.isVegetarian ? 'VEG' : 'NON-VEG'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td class="price">₹${item.price}</td>
+                                                                        </tr>
+                                                                    `).join('')}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>`;
+                                            }).join('')}
+
+                                                    ${Object.keys(groupedMenu).filter(k => !PREFERRED_ORDER.includes(k) && groupedMenu[k].length > 0).map(cat => `
+                                                        <div class="category-section">
+                                                            <div class="category-title">${cat}</div>
+                                                             <table>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 50%">Item</th>
+                                                                        <th style="width: 15%; text-align: center;">Type</th>
+                                                                        <th style="width: 15%; text-align: right;">Price</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
                                                         .desc { font-size: 10px; color: #555; font-style: italic; }
                                                         .item-name { font-weight: bold; }
                                                     </style>
@@ -1897,247 +1976,252 @@ function AdminDashboard() {
                                 />
 
                                 {/* GALLERY PICKER MODAL */}
-                                {showGalleryPicker && (
-                                    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                                        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
-                                            <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                                                <h3 className="font-bold text-gray-800">Select Image</h3>
-                                                <button onClick={() => setShowGalleryPicker(false)} className="p-2 hover:bg-gray-200 rounded-full">
-                                                    <X size={20} />
-                                                </button>
-                                            </div>
-                                            <div className="flex-1 overflow-auto p-6 space-y-8">
-                                                {/* Local Gallery */}
-                                                <section>
-                                                    <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
-                                                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                                                        {localGallery.map((file, idx) => (
-                                                            <button
-                                                                key={`local-${idx}`}
-                                                                onClick={() => {
-                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                    if (input) {
-                                                                        input.value = file.path;
-                                                                        // Trigger preview update if we were using state, but here we just update input.
-                                                                        // We can force a re-render or just let the user see the input change.
-                                                                        // To update preview, we might need a little state in the form, but let's stick to simple input update first.
-                                                                        // Actually, let's trigger an event to update the preview if we add one.
-                                                                        const event = new Event('input', { bubbles: true });
-                                                                        input.dispatchEvent(event);
-                                                                    }
-                                                                    setShowGalleryPicker(false);
-                                                                }}
-                                                                className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
-                                                            >
-                                                                <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
-                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                                                    Select
-                                                                </div>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </section>
+                                {
+                                    showGalleryPicker && (
+                                        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                                            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+                                                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                                    <h3 className="font-bold text-gray-800">Select Image</h3>
+                                                    <button onClick={() => setShowGalleryPicker(false)} className="p-2 hover:bg-gray-200 rounded-full">
+                                                        <X size={20} />
+                                                    </button>
+                                                </div>
+                                                <div className="flex-1 overflow-auto p-6 space-y-8">
+                                                    {/* Local Gallery */}
+                                                    <section>
+                                                        <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
+                                                        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                            {localGallery.map((file, idx) => (
+                                                                <button
+                                                                    key={`local-${idx}`}
+                                                                    onClick={() => {
+                                                                        const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                        if (input) {
+                                                                            input.value = file.path;
+                                                                            // Trigger preview update if we were using state, but here we just update input.
+                                                                            // We can force a re-render or just let the user see the input change.
+                                                                            // To update preview, we might need a little state in the form, but let's stick to simple input update first.
+                                                                            // Actually, let's trigger an event to update the preview if we add one.
+                                                                            const event = new Event('input', { bubbles: true });
+                                                                            input.dispatchEvent(event);
+                                                                        }
+                                                                        setShowGalleryPicker(false);
+                                                                    }}
+                                                                    className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                                >
+                                                                    <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                                        Select
+                                                                    </div>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </section>
 
-                                                {/* Firebase Gallery */}
-                                                <section>
-                                                    <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
-                                                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                                                        {media?.map((item) => (
-                                                            <button
-                                                                key={item.id}
-                                                                onClick={() => {
-                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                    if (input) {
-                                                                        input.value = item.url;
-                                                                        const event = new Event('input', { bubbles: true });
-                                                                        input.dispatchEvent(event);
-                                                                    }
-                                                                    setShowGalleryPicker(false);
-                                                                }}
-                                                                className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
-                                                            >
-                                                                <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                                                    Select
-                                                                </div>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </section>
+                                                    {/* Firebase Gallery */}
+                                                    <section>
+                                                        <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
+                                                        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                            {media?.map((item) => (
+                                                                <button
+                                                                    key={item.id}
+                                                                    onClick={() => {
+                                                                        const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                        if (input) {
+                                                                            input.value = item.url;
+                                                                            const event = new Event('input', { bubbles: true });
+                                                                            input.dispatchEvent(event);
+                                                                        }
+                                                                        setShowGalleryPicker(false);
+                                                                    }}
+                                                                    className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                                >
+                                                                    <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                                        Select
+                                                                    </div>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </section>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )
+                                }
+                            </div >
 
                             {/* EDIT ITEM MODAL */}
-                            {editingItem && (
-                                <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                                    <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
-                                        <button
-                                            onClick={() => setEditingItem(null)}
-                                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                                        >
-                                            <X size={24} />
-                                        </button>
+                            {
+                                editingItem && (
+                                    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                            <button
+                                                onClick={() => setEditingItem(null)}
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                                            >
+                                                <X size={24} />
+                                            </button>
 
-                                        <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
+                                            <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
 
-                                        <form
-                                            onSubmit={async (e) => {
-                                                e.preventDefault();
-                                                const form = e.target as HTMLFormElement;
-                                                const formData = new FormData(form);
+                                            <form
+                                                onSubmit={async (e) => {
+                                                    e.preventDefault();
+                                                    const form = e.target as HTMLFormElement;
+                                                    const formData = new FormData(form);
 
-                                                const updates: any = {
-                                                    name: formData.get('name'),
-                                                    price: Number(formData.get('price')),
-                                                    category: formData.get('category'),
-                                                    description: formData.get('description'),
-                                                    image: formData.get('image'),
-                                                    isVegetarian: formData.get('isVegetarian') === 'on',
-                                                    isSpicy: formData.get('isSpicy') === 'on',
-                                                    isChefSpecial: formData.get('isChefSpecial') === 'on',
-                                                };
+                                                    const updates: any = {
+                                                        name: formData.get('name'),
+                                                        price: Number(formData.get('price')),
+                                                        category: formData.get('category'),
+                                                        description: formData.get('description'),
+                                                        image: formData.get('image'),
+                                                        isVegetarian: formData.get('isVegetarian') === 'on',
+                                                        isSpicy: formData.get('isSpicy') === 'on',
+                                                        isChefSpecial: formData.get('isChefSpecial') === 'on',
+                                                    };
 
-                                                await useStore.getState().updateMenuItem(editingItem.id, updates);
-                                                setEditingItem(null);
-                                                alert('Item updated successfully!');
-                                            }}
-                                            className="space-y-4"
-                                        >
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
-                                                    <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    await useStore.getState().updateMenuItem(editingItem.id, updates);
+                                                    setEditingItem(null);
+                                                    alert('Item updated successfully!');
+                                                }}
+                                                className="space-y-4"
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
+                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
+                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    </div>
                                                 </div>
+
                                                 <div>
-                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
-                                                    <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    <datalist id="category-list-edit">
+                                                        {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                            <option key={c} value={c} />
+                                                        ))}
+                                                    </datalist>
                                                 </div>
-                                            </div>
 
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
-                                                <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                <datalist id="category-list-edit">
-                                                    {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                        <option key={c} value={c} />
-                                                    ))}
-                                                </datalist>
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
-                                                <div className="flex flex-col gap-3">
-                                                    <div className="flex gap-2">
-                                                        <div className="flex-1 relative">
-                                                            <input
-                                                                name="image"
-                                                                id="edit-item-image-url"
-                                                                defaultValue={editingItem.image}
-                                                                placeholder="Paste URL or Select..."
-                                                                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
-                                                                onChange={(e) => {
-                                                                    // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
-                                                                    // Since it's uncontrolled, we use a simple ref-like approach for preview.
-                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                    if (img) img.src = e.target.value;
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowGalleryPicker(true)}
-                                                            className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
-                                                        >
-                                                            <ImageIcon size={16} /> Gallery
-                                                        </button>
-                                                        <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                onChange={async (e) => {
-                                                                    const file = e.target.files?.[0];
-                                                                    if (file) {
-                                                                        if (confirm(`Upload ${file.name}?`)) {
-                                                                            try {
-                                                                                const url = await useStore.getState().uploadImage(file, true);
-                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                                if (input) {
-                                                                                    input.value = url;
-                                                                                    // Dispatch input event for any listeners
-                                                                                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex gap-2">
+                                                            <div className="flex-1 relative">
+                                                                <input
+                                                                    name="image"
+                                                                    id="edit-item-image-url"
+                                                                    defaultValue={editingItem.image}
+                                                                    placeholder="Paste URL or Select..."
+                                                                    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
+                                                                    onChange={(e) => {
+                                                                        // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
+                                                                        // Since it's uncontrolled, we use a simple ref-like approach for preview.
+                                                                        const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                        if (img) img.src = e.target.value;
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowGalleryPicker(true)}
+                                                                className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
+                                                            >
+                                                                <ImageIcon size={16} /> Gallery
+                                                            </button>
+                                                            <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="hidden"
+                                                                    onChange={async (e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) {
+                                                                            if (confirm(`Upload ${file.name}?`)) {
+                                                                                try {
+                                                                                    const url = await useStore.getState().uploadImage(file, true);
+                                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                                    if (input) {
+                                                                                        input.value = url;
+                                                                                        // Dispatch input event for any listeners
+                                                                                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                                                                                    }
+                                                                                    if (img) img.src = url;
+                                                                                } catch (err) {
+                                                                                    alert('Upload failed');
+                                                                                    console.error(err);
                                                                                 }
-                                                                                if (img) img.src = url;
-                                                                            } catch (err) {
-                                                                                alert('Upload failed');
-                                                                                console.error(err);
                                                                             }
                                                                         }
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <Upload size={20} />
-                                                        </label>
-                                                    </div>
-
-                                                    {/* Image Preview */}
-                                                    <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
-                                                        <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
-                                                            <img
-                                                                id="edit-item-preview"
-                                                                src={editingItem.image || '/images/placeholders/default.png'}
-                                                                alt="Preview"
-                                                                className="w-full h-full object-cover"
-                                                                onError={(e) => {
-                                                                    (e.target as HTMLImageElement).style.display = 'none';
-                                                                    (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
-                                                                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
-                                                                }}
-                                                            />
+                                                                    }}
+                                                                />
+                                                                <Upload size={20} />
+                                                            </label>
                                                         </div>
-                                                        <p className="text-xs text-gray-500">
-                                                            Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
-                                                        </p>
+
+                                                        {/* Image Preview */}
+                                                        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
+                                                            <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
+                                                                <img
+                                                                    id="edit-item-preview"
+                                                                    src={editingItem.image || '/images/placeholders/default.png'}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                                        (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
+                                                                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">
+                                                                Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                                                <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
-                                            </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
+                                                </div>
 
-                                            <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
-                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                    <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
-                                                    <span>Vegetarian</span>
-                                                </label>
-                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                    <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
-                                                    <span>Spicy</span>
-                                                </label>
-                                                <label className="flex items-center gap-2 text-white cursor-pointer select-none">
-                                                    <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
-                                                    <span>Chef's Special</span>
-                                                </label>
-                                            </div>
+                                                <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
+                                                        <span>Vegetarian</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
+                                                        <span>Spicy</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                        <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
+                                                        <span>Chef's Special</span>
+                                                    </label>
+                                                </div>
 
-                                            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                                <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
-                                                <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
-                                            </div>
-                                        </form>
+                                                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
+                                                    <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+                                )
+                            }
+                        </motion.div >
+                    )
+                    }
+                </AnimatePresence >
+            </div >
         </div >
     );
 }
