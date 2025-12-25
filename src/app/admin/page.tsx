@@ -1612,7 +1612,7 @@ function AdminDashboard() {
                                                     </style>
                                                 </head>
                                                 <body>
-                                                    <h1>TashiZom Homestay</h1>
+                                                    <h1>TashiZom</h1>
                                                     <p class="subtitle">KIBBER • SPITI VALLEY</p>
                                                     
                                                     ${Object.entries(groupedMenu).map(([category, items]) => `
