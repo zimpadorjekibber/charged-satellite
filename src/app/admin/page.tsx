@@ -1573,26 +1573,40 @@ function AdminDashboard() {
                                                     <title>TashiZom Menu</title>
                                                     <style>
                                                         @page { size: A4; margin: 15mm; }
-                                                        body { font-family: sans-serif; margin: 0; padding: 0; color: #000; font-size: 12px; }
-                                                        h1 { text-align: center; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-                                                        .subtitle { text-align: center; font-size: 10px; color: #444; margin-bottom: 20px; letter-spacing: 3px; text-transform: uppercase; }
-                                                        .category-section { margin-bottom: 20px; break-inside: avoid; page-break-inside: avoid; }
+                                                        body { font-family: sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; line-height: 1.4; }
+                                                        h1 { text-align: center; font-size: 20px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+                                                        .subtitle { text-align: center; font-size: 9px; color: #444; margin-bottom: 15px; letter-spacing: 3px; text-transform: uppercase; }
+                                                        
+                                                        /* Allow categories to split across pages to save space */
+                                                        .category-section { margin-bottom: 20px; break-inside: auto; page-break-inside: auto; }
+                                                        
+                                                        /* Keep title with the table */
                                                         .category-title { 
-                                                            font-size: 16px; 
+                                                            font-size: 14px; 
                                                             font-weight: bold; 
                                                             border-bottom: 2px solid #000; 
                                                             padding-bottom: 2px; 
-                                                            margin-bottom: 10px; 
+                                                            margin-bottom: 8px; 
                                                             text-transform: uppercase;
-                                                            display: inline-block;
+                                                            display: block; /* changed from inline-block to block */
                                                             letter-spacing: 1px;
+                                                            page-break-after: avoid; /* Don't leave title orphan at bottom of page */
                                                         }
-                                                        table { width: 100%; border-collapse: collapse; }
-                                                        th { text-align: left; border-bottom: 1px solid #000; padding: 4px; font-size: 10px; text-transform: uppercase; }
-                                                        td { border-bottom: 1px solid #eee; padding: 4px 4px; vertical-align: top; }
-                                                        .price { font-weight: bold; text-align: right; }
-                                                        .veg { color: green; font-weight: bold; font-size: 10px; }
-                                                        .non-veg { color: red; font-weight: bold; font-size: 10px; }
+
+                                                        table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+                                                        
+                                                        /* Repeat headers on new pages */
+                                                        thead { display: table-header-group; }
+                                                        
+                                                        /* Don't split rows in half */
+                                                        tr { break-inside: avoid; page-break-inside: avoid; }
+                                                        
+                                                        th { text-align: left; border-bottom: 1px solid #000; padding: 4px; font-size: 10px; text-transform: uppercase; background: #fff; }
+                                                        td { border-bottom: 1px solid #eee; padding: 3px 4px; vertical-align: top; }
+                                                        
+                                                        .price { font-weight: bold; text-align: right; white-space: nowrap; }
+                                                        .veg { color: green; font-weight: bold; font-size: 9px; }
+                                                        .non-veg { color: red; font-weight: bold; font-size: 9px; }
                                                         .desc { font-size: 10px; color: #555; font-style: italic; }
                                                         .item-name { font-weight: bold; }
                                                     </style>
