@@ -1686,37 +1686,18 @@ function AdminDashboard() {
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                        .desc { font-size: 10px; color: #555; font-style: italic; }
-                                                        .item-name { font-weight: bold; }
-                                                    </style>
-                                                </head>
-                                                <body>
-                                                    <h1>TashiZom</h1>
-                                                    <p class="subtitle">KIBBER • SPITI VALLEY</p>
-                                                    
-                                                    ${Object.entries(groupedMenu).map(([category, items]) => `
-                                                        <div class="category-section">
-                                                            <div class="category-title">${category}</div>
-                                                            <table>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th style="width: 35%">Item Name</th>
-                                                                        <th style="width: 10%; text-align: right;">Price</th>
-                                                                        <th style="width: 45%">Description</th>
-                                                                        <th style="width: 10%; text-align: center;">Type</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    ${items.map(item => `
+                                                                    ${groupedMenu[cat].map(item => `
                                                                         <tr>
-                                                                            <td class="item-name">${item.name}</td>
-                                                                            <td class="price">₹${item.price}</td>
-                                                                            <td class="desc">${item.description || ''}</td>
+                                                                            <td>
+                                                                                <div class="item-name">${item.name}</div>
+                                                                                <div class="desc">${item.description || ''}</div>
+                                                                            </td>
                                                                             <td style="text-align: center;">
                                                                                 <span class="${item.isVegetarian ? 'veg' : 'non-veg'}">
                                                                                     ${item.isVegetarian ? 'VEG' : 'NON-VEG'}
                                                                                 </span>
                                                                             </td>
+                                                                            <td class="price">₹${item.price}</td>
                                                                         </tr>
                                                                     `).join('')}
                                                                 </tbody>
