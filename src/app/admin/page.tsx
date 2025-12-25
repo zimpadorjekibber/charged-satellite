@@ -1315,7 +1315,7 @@ function AdminDashboard() {
                                             <input
                                                 id="call-staff-radius-input"
                                                 type="number"
-                                                defaultValue={useStore.getState().callStaffRadius || 50}
+                                                defaultValue={useStore.getState().callStaffRadius || 200}
                                                 className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
                                             />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
@@ -1422,6 +1422,29 @@ function AdminDashboard() {
                                 </div>
                             </div>
 
+
+
+                            {/* DANGER ZONE */}
+                            <div className="bg-red-50 border border-red-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-red-900 mb-6 flex items-center gap-2">
+                                    <div className="p-2 bg-red-200 rounded-full"><Trash size={20} /></div>
+                                    Danger Zone
+                                </h2>
+                                <p className="text-sm text-red-700 mb-6">
+                                    These actions are irreversible. Use with caution.
+                                </p>
+                                <button
+                                    onClick={() => useStore.getState().clearAllData_Dangerous()}
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 active:scale-95 transition-all flex items-center justify-center gap-3"
+                                >
+                                    <Trash size={24} />
+                                    DELETE ALL ORDERS & DATA
+                                </button>
+                                <p className="text-xs text-red-500 mt-2 text-center">
+                                    Clears: Orders, Reviews, Notifications, Scan History
+                                </p>
+                            </div>
+
                             {/* Table Management */}
                             <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-6">
@@ -1501,17 +1524,42 @@ function AdminDashboard() {
                                             const printWindow = window.open('', '_blank');
                                             if (!printWindow) return;
 
+                                            // Define Preferred Order
+                                            const PREFERRED_ORDER = [
+                                                'Breakfast',
+                                                'Soups & Salads',
+                                                'Snacks & Starters',
+                                                'Main Course (Vegetarian)',
+                                                'Main Course (Non-Vegetarian)',
+                                                'Rice & Biryani',
+                                                'Indian Breads',
+                                                'Chinese',
+                                                'Pizza & Pasta',
+                                                'Desserts',
+                                                'Tea & Coffee',
+                                                'Cold Beverages & Shakes'
+                                            ];
+
                                             // Group Items by Category
                                             const groupedMenu: Record<string, any[]> = {};
-                                            // Sort categories by custom order if available
+
+                                            // Sort categories: Custom -> Preferred -> Alphabetical
                                             const sortedCategories = [...Array.from(new Set(menu.map(i => i.category)))].sort((a, b) => {
+                                                // 1. Custom Admin Order
                                                 const idxA = categoryOrder.indexOf(a);
                                                 const idxB = categoryOrder.indexOf(b);
                                                 if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                                // If one is in order list and other isn't, prioritize the one in list?
-                                                // Or just put ordered ones first.
                                                 if (idxA !== -1) return -1;
                                                 if (idxB !== -1) return 1;
+
+                                                // 2. Preferred Order (Hardcoded fallback)
+                                                const pIdxA = PREFERRED_ORDER.findIndex(p => a.toLowerCase() === p.toLowerCase());
+                                                const pIdxB = PREFERRED_ORDER.findIndex(p => b.toLowerCase() === p.toLowerCase());
+                                                if (pIdxA !== -1 && pIdxB !== -1) return pIdxA - pIdxB;
+                                                if (pIdxA !== -1) return -1;
+                                                if (pIdxB !== -1) return 1;
+
+                                                // 3. Alphabetical
                                                 return a.localeCompare(b);
                                             });
 
@@ -1524,56 +1572,74 @@ function AdminDashboard() {
                                                 <head>
                                                     <title>TashiZom Menu</title>
                                                     <style>
-                                                        @page { size: A4; margin: 20mm; }
-                                                        body { font-family: 'Times New Roman', serif; margin: 0; padding: 0; color: #000; }
-                                                        h1 { text-align: center; font-size: 32px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-                                                        .subtitle { text-align: center; font-size: 12px; color: #444; margin-bottom: 30px; letter-spacing: 4px; text-transform: uppercase; }
-                                                        .category-section { margin-bottom: 25px; break-inside: avoid; page-break-inside: avoid; }
+                                                        @page { size: A4; margin: 15mm; }
+                                                        body { font-family: sans-serif; margin: 0; padding: 0; color: #000; font-size: 12px; }
+                                                        h1 { text-align: center; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+                                                        .subtitle { text-align: center; font-size: 10px; color: #444; margin-bottom: 20px; letter-spacing: 3px; text-transform: uppercase; }
+                                                        .category-section { margin-bottom: 20px; break-inside: avoid; page-break-inside: avoid; }
                                                         .category-title { 
-                                                            font-size: 18px; 
+                                                            font-size: 16px; 
                                                             font-weight: bold; 
-                                                            border-bottom: 1px solid #000; 
+                                                            border-bottom: 2px solid #000; 
                                                             padding-bottom: 2px; 
                                                             margin-bottom: 10px; 
                                                             text-transform: uppercase;
                                                             display: inline-block;
                                                             letter-spacing: 1px;
                                                         }
-                                                        .item-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: baseline; }
-                                                        .item-info { flex: 1; margin-right: 20px; }
-                                                        .item-name { font-weight: bold; font-size: 14px; margin-bottom: 1px; }
-                                                        .item-desc { font-size: 11px; color: #444; font-style: italic; }
-                                                        .item-price { font-weight: bold; font-size: 14px; white-space: nowrap; }
+                                                        table { width: 100%; border-collapse: collapse; }
+                                                        th { text-align: left; border-bottom: 1px solid #000; padding: 4px; font-size: 10px; text-transform: uppercase; }
+                                                        td { border-bottom: 1px solid #eee; padding: 4px 4px; vertical-align: top; }
+                                                        .price { font-weight: bold; text-align: right; }
+                                                        .veg { color: green; font-weight: bold; font-size: 10px; }
+                                                        .non-veg { color: red; font-weight: bold; font-size: 10px; }
+                                                        .desc { font-size: 10px; color: #555; font-style: italic; }
+                                                        .item-name { font-weight: bold; }
                                                     </style>
                                                 </head>
                                                 <body>
-                                                    <h1>TashiZom</h1>
+                                                    <h1>TashiZom Homestay</h1>
                                                     <p class="subtitle">KIBBER • SPITI VALLEY</p>
                                                     
                                                     ${Object.entries(groupedMenu).map(([category, items]) => `
                                                         <div class="category-section">
                                                             <div class="category-title">${category}</div>
-                                                            ${items.map(item => `
-                                                                <div class="item-row">
-                                                                    <div class="item-info">
-                                                                        <div class="item-name">${item.name} ${item.isVegetarian ? '🌱' : ''} ${item.isSpicy ? '🌶️' : ''}</div>
-                                                                        ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
-                                                                    </div>
-                                                                    <div class="item-price">₹${item.price}</div>
-                                                                </div>
-                                                            `).join('')}
+                                                            <table>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 35%">Item Name</th>
+                                                                        <th style="width: 10%; text-align: right;">Price</th>
+                                                                        <th style="width: 45%">Description</th>
+                                                                        <th style="width: 10%; text-align: center;">Type</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    ${items.map(item => `
+                                                                        <tr>
+                                                                            <td class="item-name">${item.name}</td>
+                                                                            <td class="price">₹${item.price}</td>
+                                                                            <td class="desc">${item.description || ''}</td>
+                                                                            <td style="text-align: center;">
+                                                                                <span class="${item.isVegetarian ? 'veg' : 'non-veg'}">
+                                                                                    ${item.isVegetarian ? 'VEG' : 'NON-VEG'}
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    `).join('')}
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     `).join('')}
 
                                                     <script>
-                                                        window.onload = function() { window.print(); }
+                                                        window.onload = function() { setTimeout(function(){ window.print(); }, 500); }
                                                     </script>
                                                 </body>
                                                 </html>
                                             `);
                                             printWindow.document.close();
                                         }}
-                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm"
+                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm border border-gray-300 shadow-sm"
                                     >
                                         <Printer size={16} /> Print Full Menu
                                     </button>
@@ -2058,7 +2124,7 @@ function AdminDashboard() {
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </div >
     );
 }
 
