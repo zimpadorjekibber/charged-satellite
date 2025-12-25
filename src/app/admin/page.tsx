@@ -1655,14 +1655,24 @@ function AdminDashboard() {
                                                     ${PREFERRED_ORDER.map(cat => {
                                                 const items = groupedMenu[cat];
                                                 if (!items || items.length === 0) return '';
+
+                                                const HIDE_TYPE_FOR = [
+                                                    'Tea & Coffee',
+                                                    'Cold Beverages & Shakes',
+                                                    'Indian Tawa/Tandoori Roti',
+                                                    'Cereals',
+                                                    'Toasts'
+                                                ];
+                                                const hideType = HIDE_TYPE_FOR.includes(cat);
+
                                                 return `
                                                         <div class="category-section">
                                                             <div class="category-title">${cat}</div>
                                                             <table>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th style="width: 50%">Item</th>
-                                                                        <th style="width: 15%; text-align: center;">Type</th>
+                                                                        <th style="width: ${hideType ? '85%' : '50%'}">Item</th>
+                                                                        ${!hideType ? '<th style="width: 15%; text-align: center;">Type</th>' : ''}
                                                                         <th style="width: 15%; text-align: right;">Price</th>
                                                                     </tr>
                                                                 </thead>
@@ -1673,11 +1683,12 @@ function AdminDashboard() {
                                                                                 <div class="item-name">${item.name}</div>
                                                                                 <div class="desc">${item.description || ''}</div>
                                                                             </td>
+                                                                            ${!hideType ? `
                                                                             <td style="text-align: center;">
                                                                                 <span class="${item.isVegetarian ? 'veg' : 'non-veg'}">
                                                                                     ${item.isVegetarian ? 'VEG' : 'NON-VEG'}
                                                                                 </span>
-                                                                            </td>
+                                                                            </td>` : ''}
                                                                             <td class="price">₹${item.price}</td>
                                                                         </tr>
                                                                     `).join('')}
@@ -1686,14 +1697,16 @@ function AdminDashboard() {
                                                         </div>`;
                                             }).join('')}
 
-                                                    ${Object.keys(groupedMenu).filter(k => !PREFERRED_ORDER.includes(k) && groupedMenu[k].length > 0).map(cat => `
+                                                    ${Object.keys(groupedMenu).filter(k => !PREFERRED_ORDER.includes(k) && groupedMenu[k].length > 0).map(cat => {
+                                                const hideType = ['Tea & Coffee', 'Cold Beverages & Shakes'].includes(cat);
+                                                return `
                                                         <div class="category-section">
                                                             <div class="category-title">${cat}</div>
                                                              <table>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th style="width: 50%">Item</th>
-                                                                        <th style="width: 15%; text-align: center;">Type</th>
+                                                                        <th style="width: ${hideType ? '85%' : '50%'}">Item</th>
+                                                                        ${!hideType ? '<th style="width: 15%; text-align: center;">Type</th>' : ''}
                                                                         <th style="width: 15%; text-align: right;">Price</th>
                                                                     </tr>
                                                                 </thead>
@@ -1704,18 +1717,19 @@ function AdminDashboard() {
                                                                                 <div class="item-name">${item.name}</div>
                                                                                 <div class="desc">${item.description || ''}</div>
                                                                             </td>
+                                                                            ${!hideType ? `
                                                                             <td style="text-align: center;">
                                                                                 <span class="${item.isVegetarian ? 'veg' : 'non-veg'}">
                                                                                     ${item.isVegetarian ? 'VEG' : 'NON-VEG'}
                                                                                 </span>
-                                                                            </td>
+                                                                            </td>` : ''}
                                                                             <td class="price">₹${item.price}</td>
                                                                         </tr>
                                                                     `).join('')}
                                                                 </tbody>
                                                             </table>
                                                         </div>
-                                                    `).join('')}
+                                                    `}).join('')}
 
                                                     <script>
                                                         window.onload = function() { setTimeout(function(){ window.print(); }, 500); }
