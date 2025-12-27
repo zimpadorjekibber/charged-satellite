@@ -462,6 +462,8 @@ export default function MenuPage() {
 
     // Local state for "Calling" visual/audio feedback
     const [isCalling, setIsCalling] = useState(false);
+    const [callSuccessToast, setCallSuccessToast] = useState(false);
+    const [callErrorToast, setCallErrorToast] = useState(false); // New Error Toast
     const callSoundRef = useRef<HTMLAudioElement | null>(null);
 
     // Initialize Audio
@@ -660,7 +662,8 @@ export default function MenuPage() {
             setTimeout(() => setCallSuccessToast(false), 3500); // Hide toast after 3.5 seconds
         } catch (e) {
             console.error("Failed to call staff:", e);
-            alert("Failed to send notification. Please try calling the number directly.");
+            setCallErrorToast(true); // Show error toast instead of alert
+            setTimeout(() => setCallErrorToast(false), 4000);
             setIsCalling(false);
             if (callSoundRef.current) {
                 callSoundRef.current.pause();
@@ -730,6 +733,28 @@ export default function MenuPage() {
                             <div>
                                 <p className="font-bold text-lg">Staff Notified! ✓</p>
                                 <p className="text-sm text-green-100">Someone will be with you shortly</p>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Error Toast for Call Staff */}
+            <AnimatePresence>
+                {callErrorToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -50 }}
+                        className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+                    >
+                        <div className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-red-500/50 border border-red-400/30 flex items-center gap-3 backdrop-blur-xl">
+                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                <span className="text-2xl font-bold">!</span>
+                            </div>
+                            <div>
+                                <p className="font-bold text-lg">Call Failed</p>
+                                <p className="text-sm text-red-100">Please call directly using the 'Contact' button.</p>
                             </div>
                         </div>
                     </motion.div>

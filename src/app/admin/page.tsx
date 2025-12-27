@@ -27,6 +27,8 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import { collection, getDocs, query, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function AdminPage() {
     return (
@@ -1999,28 +2001,40 @@ function AdminDashboard() {
                                                         <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
                                                         <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                                                             {localGallery.map((file, idx) => (
-                                                                <button
+                                                                <div
                                                                     key={`local-${idx}`}
-                                                                    onClick={() => {
-                                                                        const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                        if (input) {
-                                                                            input.value = file.path;
-                                                                            // Trigger preview update if we were using state, but here we just update input.
-                                                                            // We can force a re-render or just let the user see the input change.
-                                                                            // To update preview, we might need a little state in the form, but let's stick to simple input update first.
-                                                                            // Actually, let's trigger an event to update the preview if we add one.
-                                                                            const event = new Event('input', { bubbles: true });
-                                                                            input.dispatchEvent(event);
-                                                                        }
-                                                                        setShowGalleryPicker(false);
-                                                                    }}
                                                                     className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
                                                                 >
                                                                     <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
-                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+
+                                                                    {/* Select Overlay */}
+                                                                    <div
+                                                                        onClick={() => {
+                                                                            const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                            if (input) {
+                                                                                input.value = file.path;
+                                                                                const event = new Event('input', { bubbles: true });
+                                                                                input.dispatchEvent(event);
+                                                                            }
+                                                                            setShowGalleryPicker(false);
+                                                                        }}
+                                                                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold cursor-pointer"
+                                                                    >
                                                                         Select
                                                                     </div>
-                                                                </button>
+
+                                                                    {/* Delete Button */}
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteLocal(file.path);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
+                                                                        title="Delete File"
+                                                                    >
+                                                                        <Trash size={12} />
+                                                                    </button>
+                                                                </div>
                                                             ))}
                                                         </div>
                                                     </section>
@@ -3219,8 +3233,6 @@ const DbStatusIndicator = () => {
         const check = async () => {
             try {
                 // Try simple read operation (Checking Menu is public-safe)
-                const { collection, getDocs, query, limit } = await import('firebase/firestore');
-                const { db } = await import('@/lib/firebase');
                 const q = query(collection(db, 'menu'), limit(1));
                 await getDocs(q);
                 setStatus('connected');
@@ -3284,7 +3296,7 @@ function StatusBadge({ status }: { status: string }) {
         'Served': 'bg-green-500/20 text-green-500',
         'Paid': 'bg-gray-500/20 text-gray-500',
     } as any;
-    return <span className={`px - 2 py - 1 rounded text - xs font - bold ${colors[status] || 'bg-gray-500/20'} `}>{status}</span>;
+    return <span className={`px-2 py-1 rounded text-xs font-bold ${colors[status] || 'bg-gray-500/20'} `}>{status}</span>;
 }
 
 // Drag and Drop Components
@@ -3368,8 +3380,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items - center justify - between bg - white p - 3 rounded - lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'
-                } `}
+            className={`flex items-center justify-between bg-white p-3 rounded-lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'} `}
         >
             {/* Drag Handle */}
             <div
@@ -3394,7 +3405,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
                 <div>
                     <div className="flex items-center gap-2">
                         <p className="font-bold text-gray-900">{item.name}</p>
-                        <span className={`w - 2 h - 2 rounded - full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'} `} />
+                        <span className={`w-2 h-2 rounded-full ${item.available !== false ? 'bg-green-500' : 'bg-red-500'} `} />
                         {item.isVegetarian ? <Leaf size={12} className="text-green-500" /> : <Drumstick size={12} className="text-red-500" />}
                     </div>
                     <p className="text-xs text-gray-500">{item.category} • ₹{item.price}</p>
@@ -3405,20 +3416,20 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { available: !(item.available !== false) })}
-                    className={`px - 2 py - 1 rounded text - xs font - bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'} `}
+                    className={`px-2 py-1 rounded text-xs font-bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'} `}
                 >
                     {item.available !== false ? 'Active' : 'Sold Out'}
                 </button>
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
-                    className={`p - 1.5 rounded text - xs font - bold flex items - center justify - center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'} `}
+                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'} `}
                     title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
                 >
                     {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
                 </button>
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { isChefSpecial: !item.isChefSpecial })}
-                    className={`p - 1.5 rounded text - xs font - bold flex items - center justify - center border transition - colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'} `}
+                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center border transition-colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'} `}
                     title={item.isChefSpecial ? "Remove from Chef's Specials" : "Mark as Chef's Special"}
                 >
                     <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
