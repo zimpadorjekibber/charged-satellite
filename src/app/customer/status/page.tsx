@@ -73,14 +73,15 @@ export default function OrderStatusPage() {
         }
     }, [orders, sessionId]);
 
-    // Polling to keep orders updated
+    // Immediate initialization and polling
     const initialize = useStore((state) => state.initialize);
     useEffect(() => {
-        const interval = setInterval(() => {
-            initialize(); // fetch latest orders from backend
-        }, 5000); // Poll every 5 seconds
+        initialize();
+        const interval = setInterval(initialize, 5000);
         return () => clearInterval(interval);
     }, [initialize]);
+
+    const isDataReady = mounted && sessionId;
 
     // Auto-redirect to feedback page when an order is marked as Paid
     // Auto-redirect to feedback page when an order is marked as Paid
@@ -114,20 +115,23 @@ export default function OrderStatusPage() {
     }, [myPaidOrders, myOrders.length, router]);
 
 
-    if (!mounted) return null;
+    if (!isDataReady) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-10">
+                <div className="w-12 h-12 border-4 border-tashi-accent border-t-transparent rounded-full animate-spin mb-4" />
+                <p className="text-gray-400">Syncing with kitchen...</p>
+            </div>
+        );
+    }
 
     if (myOrders.length === 0) {
         if (myPaidOrders.length > 0) {
             const latestPaid = myPaidOrders[0];
             return (
                 <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center space-y-6">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30"
-                    >
+                    <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
                         <CheckCircle2 size={48} className="text-white" />
-                    </motion.div>
+                    </div>
 
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-2">Order Completed!</h2>
@@ -198,7 +202,11 @@ export default function OrderStatusPage() {
                             );
                         } catch (err) {
                             console.error("OrderTracker render error:", err);
-                            return null;
+                            return (
+                                <div key={order.id} className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs">
+                                    Error displaying order #{String(order.id).slice(0, 6)}
+                                </div>
+                            );
                         }
                     })}
                 </div>
@@ -511,10 +519,9 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
                 {phaseLabel}
             </p>
             <div className="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
-                <motion.div
-                    className={`h-full ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
-                    animate={{ width: `${progressPercent}%` }}
-                    transition={{ ease: "linear", duration: 1 }}
+                <div
+                    className={`h-full transition-all duration-1000 ease-linear ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
+                    style={{ width: `${progressPercent}%` }}
                 />
             </div>
         </div>
