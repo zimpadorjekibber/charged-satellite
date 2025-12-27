@@ -140,20 +140,19 @@ export default function OrderStatusPage() {
             </h2>
 
             <div className="space-y-6">
-                {(myOrders || []).sort((a: any, b: any) => {
+                {(myOrders || []).filter((o: any) => o && o.id).sort((a: any, b: any) => {
                     const dateA = new Date(a.createdAt || 0).getTime();
                     const dateB = new Date(b.createdAt || 0).getTime();
-                    return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
-                }).map((order: any) => {
-                    if (!order || !order.id) return null;
-                    return (
-                        <OrderTracker
-                            key={order.id}
-                            order={order}
-                            isRemote={order.tableId === 'REQUEST' || order.tableId === 'Remote'}
-                        />
-                    );
-                })}
+                    const valA = isNaN(dateA) ? 0 : dateA;
+                    const valB = isNaN(dateB) ? 0 : dateB;
+                    return valB - valA;
+                }).map((order: any) => (
+                    <OrderTracker
+                        key={String(order.id)}
+                        order={order}
+                        isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
+                    />
+                ))}
             </div>
 
             <div className="flex justify-center mt-8">
@@ -204,7 +203,7 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
     return (
         <div className="glass-card p-6 rounded-xl relative overflow-hidden">
             <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                <span className="text-gray-400 text-sm font-mono">#{order.id.slice(0, 6)}</span>
+                <span className="text-gray-400 text-sm font-mono">#{String(order?.id || '').slice(0, 6)}</span>
                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-500'}`}>
                     {order.status}
                 </span>
