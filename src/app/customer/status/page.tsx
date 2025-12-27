@@ -9,10 +9,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 export default function OrderStatusPage() {
+    const [mounted, setMounted] = useState(false);
     const orders = useStore((state: any) => state.orders || []);
     const currentTableId = useStore((state: any) => state.currentTableId);
     const sessionId = useStore((state: any) => state.sessionId);
     const router = useRouter();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Track which orders we've already seen as paid to avoid duplicate redirects
     const processedPaidOrders = useRef<Set<string>>(new Set());
@@ -73,6 +78,8 @@ export default function OrderStatusPage() {
         }
     }, [myPaidOrders, myOrders.length, router]);
 
+
+    if (!mounted) return null;
 
     if (myOrders.length === 0) {
         if (myPaidOrders.length > 0) {
@@ -143,12 +150,12 @@ export default function OrderStatusPage() {
                 {(myOrders || []).filter((o: any) => o && o.id).sort((a: any, b: any) => {
                     const dateA = new Date(a.createdAt || 0).getTime();
                     const dateB = new Date(b.createdAt || 0).getTime();
-                    const valA = isNaN(dateA) ? 0 : dateA;
-                    const valB = isNaN(dateB) ? 0 : dateB;
+                    const valA = isFinite(dateA) ? dateA : 0;
+                    const valB = isFinite(dateB) ? dateB : 0;
                     return valB - valA;
                 }).map((order: any) => (
                     <OrderTracker
-                        key={String(order.id)}
+                        key={`${String(order.id)}-${order.status}-${order.tableId}`}
                         order={order}
                         isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
                     />
@@ -211,7 +218,11 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
 
             {/* Countdown Timer */}
             {!isCompleted && (
-                <CountdownTimer order={order} isRemote={isRemote} />
+                <CountdownTimer
+                    key={`${String(order?.id)}-timer-${order?.status}-${order?.acceptedAt}`}
+                    order={order}
+                    isRemote={isRemote}
+                />
             )}
 
             {/* Progress Bar */}
@@ -306,11 +317,14 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
 
 
 function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
     // Countdown Timer logic update
-    const startTimeStr = order.acceptedAt; // Only use acceptedAt for the timer start
+    const startTimeStr = order?.acceptedAt;
     const [elapsedMs, setElapsedMs] = useState(0);
 
-    // If it's a remote order and hasn't been accepted (table assigned), show waiting state
+    if (!mounted || !order) return null;
     // If it's a remote order and hasn't been accepted (table assigned), show waiting state
     if (isRemote) {
         if (order.paymentStatus === 'Pending') {
@@ -352,11 +366,11 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     const effectiveStart = startTimeStr || order.createdAt;
 
     useEffect(() => {
+        if (!effectiveStart || !mounted) return;
         const update = () => {
-            if (!effectiveStart) return;
             try {
                 const created = new Date(effectiveStart).getTime();
-                if (isNaN(created)) return; // Safety check
+                if (!isFinite(created)) return; // Safety check
                 const now = new Date().getTime();
                 setElapsedMs(Math.max(0, now - created));
             } catch (err) {
@@ -366,7 +380,7 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
         update();
         const timer = setInterval(update, 1000);
         return () => clearInterval(timer);
-    }, [effectiveStart]);
+    }, [effectiveStart, mounted]);
 
     // ... (Keep existing Pending/Rejected checks if they are above this)
 
@@ -445,9 +459,9 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     // Calculate progress (starts full, goes to empty for current phase)
     // Avoid division by zero and NaN
     const durationMs = (totalPhaseDurationMin || 1) * 60 * 1000;
-    const progressPercent = (!isNaN(displayMs) && durationMs > 0) ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
+    const progressPercent = (isFinite(displayMs) && isFinite(durationMs) && durationMs > 0) ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
 
-    if (isNaN(displayMs)) return null; // Ultimate safety guard
+    if (!isFinite(displayMs)) return null; // Ultimate safety guard
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
