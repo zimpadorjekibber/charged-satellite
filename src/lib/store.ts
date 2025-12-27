@@ -375,8 +375,8 @@ export const useStore = create<AppState>()(
                     if (doc.exists()) {
                         const data = doc.data();
                         set({
-                            geoRadius: data.geoRadius || 5,
-                            callStaffRadius: data.callStaffRadius || 200, // Load Call Staff radius
+                            geoRadius: data.geoRadius ?? get().geoRadius ?? 5,
+                            callStaffRadius: data.callStaffRadius ?? get().callStaffRadius ?? 200, // Load Call Staff radius
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }
@@ -916,6 +916,9 @@ export const useStore = create<AppState>()(
                 cart: state.cart,
                 currentUser: state.currentUser,
                 sessionId: state.sessionId, // Persist Session ID across reloads
+                geoRadius: state.geoRadius,
+                callStaffRadius: state.callStaffRadius,
+                contactInfo: state.contactInfo,
             }),
         }
     )
