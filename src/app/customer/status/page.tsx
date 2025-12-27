@@ -1,24 +1,37 @@
 
 'use client';
 
-import { useStore, Order } from '../../../lib/store';
+import { useStore, Order, getValidDate } from '../../../lib/store';
 import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import * as React from 'react';
 
-// Safe Date Utility to handle strings, objects, and Firestore Timestamps
-const getValidDate = (dateInput: any): Date | null => {
-    if (!dateInput) return null;
-    try {
-        if (typeof dateInput.toDate === 'function') return dateInput.toDate();
-        const d = new Date(dateInput);
-        return isFinite(d.getTime()) ? d : null;
-    } catch (e) {
-        return null;
+// Local Error Boundary Component
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false };
     }
-};
+    static getDerivedStateFromError() { return { hasError: true }; }
+    componentDidCatch(error: any, errorInfo: any) { console.error("OrderStatus Error Boundary:", error, errorInfo); }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 bg-tashi-darker">
+                    <h2 className="text-xl font-bold text-white mb-4">Something went wrong while updating</h2>
+                    <p className="text-gray-400 text-sm mb-6">Please try refreshing your status page.</p>
+                    <button onClick={() => window.location.reload()} className="px-8 py-3 bg-tashi-accent text-tashi-dark rounded-xl font-bold font-serif shadow-lg">
+                        Refresh Status
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 export default function OrderStatusPage() {
     const [mounted, setMounted] = useState(false);
@@ -34,20 +47,30 @@ export default function OrderStatusPage() {
     // Track which orders we've already seen as paid to avoid duplicate redirects
     const processedPaidOrders = useRef<Set<string>>(new Set());
 
-    // Memoized filters to prevent unnecessary re-renders and potential race conditions
+    // Memoized filters with try-catch for extreme stability
     const myOrders = useMemo(() => {
-        return orders.filter((o: any) =>
-            (o.sessionId === sessionId) &&
-            o.status !== 'Rejected' &&
-            o.status !== 'Paid'
-        );
+        try {
+            return orders.filter((o: any) =>
+                o && o.sessionId === sessionId &&
+                o.status !== 'Rejected' &&
+                o.status !== 'Paid'
+            );
+        } catch (e) {
+            console.error("Filter myOrders error:", e);
+            return [];
+        }
     }, [orders, sessionId]);
 
     const myPaidOrders = useMemo(() => {
-        return orders.filter((o: any) =>
-            (o.sessionId === sessionId) &&
-            o.status === 'Paid'
-        );
+        try {
+            return orders.filter((o: any) =>
+                o && o.sessionId === sessionId &&
+                o.status === 'Paid'
+            );
+        } catch (e) {
+            console.error("Filter myPaidOrders error:", e);
+            return [];
+        }
     }, [orders, sessionId]);
 
     // Polling to keep orders updated
@@ -69,9 +92,9 @@ export default function OrderStatusPage() {
             const latestPaidOrder = [...myPaidOrders]
                 .filter((o: any) => o && o.id && !processedPaidOrders.current.has(o.id))
                 .sort((a: any, b: any) => {
-                    const dateA = new Date(a.createdAt || 0).getTime();
-                    const dateB = new Date(b.createdAt || 0).getTime();
-                    return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+                    const dateA = getValidDate(a.createdAt)?.getTime() || 0;
+                    const dateB = getValidDate(b.createdAt)?.getTime() || 0;
+                    return dateB - dateA;
                 })[0];
 
             if (latestPaidOrder) {
@@ -153,31 +176,40 @@ export default function OrderStatusPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto space-y-8 pb-24">
-            <h2 className="text-2xl font-bold text-white font-serif flex items-center gap-2">
-                <ChefHat className="text-tashi-accent" /> Track Order
-            </h2>
+        <ErrorBoundary>
+            <div className="max-w-md mx-auto space-y-8 pb-24">
+                <h2 className="text-2xl font-bold text-white font-serif flex items-center gap-2">
+                    <ChefHat className="text-tashi-accent" /> Track Order
+                </h2>
 
-            <div className="space-y-6">
-                {(myOrders || []).filter((o: any) => o && o.id).sort((a: any, b: any) => {
-                    const dateA = getValidDate(a.createdAt)?.getTime() || 0;
-                    const dateB = getValidDate(b.createdAt)?.getTime() || 0;
-                    return dateB - dateA;
-                }).map((order: any) => (
-                    <OrderTracker
-                        key={`${String(order.id)}-${order.status}-${order.tableId}`}
-                        order={order}
-                        isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
-                    />
-                ))}
-            </div>
+                <div className="space-y-6">
+                    {(myOrders || []).filter((o: any) => o && o.id).sort((a: any, b: any) => {
+                        const dateA = getValidDate(a.createdAt)?.getTime() || 0;
+                        const dateB = getValidDate(b.createdAt)?.getTime() || 0;
+                        return dateB - dateA;
+                    }).map((order: any) => {
+                        try {
+                            return (
+                                <OrderTracker
+                                    key={`${String(order.id)}-${order.status}-${order.tableId}`}
+                                    order={order}
+                                    isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
+                                />
+                            );
+                        } catch (err) {
+                            console.error("OrderTracker render error:", err);
+                            return null;
+                        }
+                    })}
+                </div>
 
-            <div className="flex justify-center mt-8">
-                <Link href="/customer/menu" className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-center py-4 rounded-xl text-white font-bold transition-all">
-                    Back To Menu
-                </Link>
+                <div className="flex justify-center mt-8">
+                    <Link href="/customer/menu" className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-center py-4 rounded-xl text-white font-bold transition-all">
+                        Back To Menu
+                    </Link>
+                </div>
             </div>
-        </div>
+        </ErrorBoundary>
     );
 }
 
@@ -260,10 +292,10 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
             </div>
 
             <div className="space-y-2 mb-6">
-                {(order.items || []).map((item: any, idx: number) => (
+                {(order.items || []).filter((i: any) => i).map((item: any, idx: number) => (
                     <div key={idx} className="flex justify-between text-sm text-gray-300">
-                        <span><b className="text-white">{(item.quantity || 0)}x</b> {item.name || 'Unknown Item'}</span>
-                        <span>₹{(item.price || 0) * (item.quantity || 0)}</span>
+                        <span><b className="text-white">{item?.quantity || 0}x</b> {item?.name || 'Item'}</span>
+                        <span>₹{(item?.price || 0) * (item?.quantity || 0)}</span>
                     </div>
                 ))}
                 <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-white text-lg">

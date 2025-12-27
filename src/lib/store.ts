@@ -17,6 +17,18 @@ import {
 import { auth } from './firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
+// Safe Date Utility forFirestore Timestamps, ISO strings, etc.
+export const getValidDate = (dateInput: any): Date | null => {
+    if (!dateInput) return null;
+    try {
+        if (typeof dateInput.toDate === 'function') return dateInput.toDate();
+        const d = new Date(dateInput);
+        return isFinite(d.getTime()) ? d : null;
+    } catch (e) {
+        return null;
+    }
+};
+
 export type Category = string;
 export type UserRole = 'admin' | 'staff';
 export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Paid' | 'Rejected' | 'Cancelled';

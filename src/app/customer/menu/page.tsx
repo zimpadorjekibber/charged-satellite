@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useStore, Category, MenuItem, Table, Order } from '../../../lib/store';
+import { useStore, Category, MenuItem, Table, Order, getValidDate } from '../../../lib/store';
 import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -445,12 +445,14 @@ export default function MenuPage() {
     const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
 
     // Check if there is already a pending call for this table
-    const hasPendingCall = notifications.some((n: any) =>
+    const pendingCallNotification = notifications.find((n: any) =>
         n.tableId === callTableId &&
         n.type === 'call_staff' &&
         n.status === 'pending' &&
         (callTableId !== 'REQUEST' && callTableId !== 'Remote' || n.sessionId === sessionId)
     );
+
+    const hasPendingCall = !!pendingCallNotification;
 
     // Check for active order (Expanded definition)
     const hasActiveOrder = orders.some((o: Order) =>
@@ -1823,9 +1825,9 @@ const MiniOrderTimer = memo(function MiniOrderTimer() {
             (o.status === 'Pending' || o.status === 'Preparing')
         )
         .sort((a: any, b: any) => {
-            const dateA = new Date(a.createdAt || 0).getTime();
-            const dateB = new Date(b.createdAt || 0).getTime();
-            return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+            const dateA = getValidDate(a.createdAt)?.getTime() || 0;
+            const dateB = getValidDate(b.createdAt)?.getTime() || 0;
+            return dateB - dateA;
         })[0];
 
     if (!activeOrder) return null;
@@ -1849,14 +1851,19 @@ const MiniOrderTimer = memo(function MiniOrderTimer() {
     );
 });
 
-function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
+function MiniTimerDisplay({ startTime }: { startTime: Date | string | any }) {
     const [timeLeft, setTimeLeft] = useState(0);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
+        if (!mounted) return;
         const interval = setInterval(() => {
             try {
-                const start = new Date(startTime).getTime();
-                if (isNaN(start)) return;
+                const date = getValidDate(startTime);
+                if (!date) return;
+                const start = date.getTime();
                 const now = new Date().getTime();
                 // Estimate 30 mins
                 const end = start + 30 * 60 * 1000;
@@ -1867,7 +1874,7 @@ function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
             }
         }, 1000);
         return () => clearInterval(interval);
-    }, [startTime]);
+    }, [startTime, mounted]);
 
     const mins = Math.floor((timeLeft / 1000 / 60) % 60);
     const secs = Math.floor((timeLeft / 1000) % 60);
