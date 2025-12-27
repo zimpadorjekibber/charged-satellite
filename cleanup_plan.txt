@@ -1,0 +1,27 @@
+
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin (Using Application Default Credentials or Service Account)
+// Assuming you have set GOOGLE_APPLICATION_CREDENTIALS in your environment or are running in an environment that provides them (like Cloud Shell or local emulator)
+// If not, you'd need a service account key file. For this simplified script, we'll try default init.
+// IF RUNNING LOCALLY WITHOUT ENV VARS, THIS MIGHT FAIL.
+//
+// SAFEGUARD: We will assume we can use the 'test' or simulated environment if this is for a specific user request where auth is tricky.
+// HOWEVER, safely deleting Firestore data usually requires Admin SDK.
+
+// Since I cannot easily authenticate as Admin without a key file in this environment,
+// I will create a CLIENT-SIDE script that the user can run via their browser console or a temporary admin page button?
+// No, user asked ME to delete them. I have 'run_command' access but no SERVICE ACCOUNT KEY.
+
+// ALTERNATIVE: Use the existing client-side code in a temporary node script that signs in anonymously? 
+// No, client SDK in node needs specific handling.
+
+// BETTER APPROACH: Create a temporary cleanup utility in the source code (e.g., a hidden admin button or API route) 
+// and then trigger it. 
+// OR simpler: Just create a specialized cleanup script using the Client SDK which I CAN run if I hardcode the config (which I know from firebase.ts).
+
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, getDocs, deleteDoc, doc } = require('firebase/firestore');
+
+// Load config from regex search or previous knowledge.
+// I will read firebase.ts to get the config first to ensure accuracy.

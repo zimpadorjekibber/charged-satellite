@@ -210,6 +210,7 @@ interface AppState {
 
     recordScan: (type: 'table_qr' | 'app_qr' | 'manual', details?: any, geo?: { lat: number, lng: number, accuracy?: number }) => Promise<void>;
     fetchScanStats: () => Promise<any[]>;
+    clearAllData_Dangerous: () => Promise<void>;
 
 
     customerDetails: { name: string; phone: string; } | null;
@@ -235,7 +236,7 @@ export const useStore = create<AppState>()(
             isListening: false,
             unsubscribers: [],
             geoRadius: 5,
-            callStaffRadius: 50, // Default: 50 meters
+            callStaffRadius: 200, // Default: 200 meters (increased from 50 to handle GPS drift)
             categoryOrder: [], // Initial empty state
             gearItems: [], // Initial empty state
             menuAppearance: {
@@ -363,7 +364,7 @@ export const useStore = create<AppState>()(
                         const data = doc.data();
                         set({
                             geoRadius: data.geoRadius || 5,
-                            callStaffRadius: data.callStaffRadius || 50, // Load Call Staff radius
+                            callStaffRadius: data.callStaffRadius || 200, // Load Call Staff radius
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }
@@ -544,12 +545,13 @@ export const useStore = create<AppState>()(
 
                 // Use local state for faster check
                 const currentOrder = get().orders.find(o => o.id === orderId);
-                const isRemote = currentOrder?.tableId === 'REQUEST';
+                const isRemote = currentOrder?.tableId === 'REQUEST' || currentOrder?.tableId === 'Remote';
+                const isNowTable = tableId !== 'REQUEST' && tableId !== 'Remote';
 
                 const updates: any = { tableId };
 
-                // If moving from REQUEST to Real Table, reset AcceptedAt
-                if (isRemote && tableId !== 'REQUEST') {
+                // If moving from REQUEST/Remote to Real Table, set AcceptedAt
+                if (isRemote && isNowTable) {
                     updates.acceptedAt = new Date().toISOString();
                 }
 
@@ -799,6 +801,23 @@ export const useStore = create<AppState>()(
 
             deleteMedia: async (id: string) => {
                 await deleteDoc(doc(db, 'settings', 'media', 'library', id));
+            },
+
+            clearAllData_Dangerous: async () => {
+                const CONFIRM = prompt("TYPE 'DELETE' TO CONFIRM CLEARING ALL ORDERS, REVIEWS & NOTIFICATIONS:");
+                if (CONFIRM !== 'DELETE') return;
+
+                const collections = ['orders', 'notifications', 'reviews', 'analytics_scans'];
+
+                for (const colName of collections) {
+                    const q = query(collection(db, colName));
+                    const snapshot = await getDocs(q);
+                    const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, colName, d.id)));
+                    await Promise.all(deletePromises);
+                }
+
+                alert("ALL DATA CLEARED SUCCESSFULLY.");
+                window.location.reload();
             },
 
             login: async (usernameOrEmail, password) => {

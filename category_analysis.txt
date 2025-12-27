@@ -1,0 +1,19 @@
+{
+  "Hot Beverages": 3,
+  "Breakfast": 10,
+  "Omelettes": 4,
+  "Cereals": 4,
+  "Pancakes": 6,
+  "Sandwiches": 4,
+  "Soups": 4,
+  "Salads": 3,
+  "Snacks": 11,
+  "Vegetable & Dishes": 14,
+  "Non-Veg": 8,
+  "Chinese Course": 19,
+  "Italian Course": 9,
+  "Pizza": 7,
+  "Rice, Pulao, Biryani": 5,
+  "Indian Bread": 6,
+  "Desserts": 4
+}

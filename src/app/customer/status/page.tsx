@@ -4,12 +4,12 @@
 import { useStore, Order } from '../../../lib/store';
 import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 export default function OrderStatusPage() {
-    const orders = useStore((state: any) => state.orders);
+    const orders = useStore((state: any) => state.orders || []);
     const currentTableId = useStore((state: any) => state.currentTableId);
     const sessionId = useStore((state: any) => state.sessionId);
     const router = useRouter();
@@ -17,18 +17,21 @@ export default function OrderStatusPage() {
     // Track which orders we've already seen as paid to avoid duplicate redirects
     const processedPaidOrders = useRef<Set<string>>(new Set());
 
-    // Filter orders: Match Session ID primarily
-    const myOrders = orders.filter((o: any) =>
-        (o.sessionId === sessionId) &&
-        o.status !== 'Rejected' &&
-        o.status !== 'Paid'
-    );
+    // Memoized filters to prevent unnecessary re-renders and potential race conditions
+    const myOrders = useMemo(() => {
+        return orders.filter((o: any) =>
+            (o.sessionId === sessionId) &&
+            o.status !== 'Rejected' &&
+            o.status !== 'Paid'
+        );
+    }, [orders, sessionId]);
 
-    // Find recently paid orders for this session
-    const myPaidOrders = orders.filter((o: any) =>
-        (o.sessionId === sessionId) &&
-        o.status === 'Paid'
-    );
+    const myPaidOrders = useMemo(() => {
+        return orders.filter((o: any) =>
+            (o.sessionId === sessionId) &&
+            o.status === 'Paid'
+        );
+    }, [orders, sessionId]);
 
     // Polling to keep orders updated
     const initialize = useStore((state) => state.initialize);
@@ -46,9 +49,13 @@ export default function OrderStatusPage() {
     useEffect(() => {
         if (myPaidOrders.length > 0 && myOrders.length === 0) {
             // Find the most recent paid order that we haven't processed yet
-            const latestPaidOrder = myPaidOrders
-                .filter((o: any) => !processedPaidOrders.current.has(o.id))
-                .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+            const latestPaidOrder = [...myPaidOrders]
+                .filter((o: any) => o && o.id && !processedPaidOrders.current.has(o.id))
+                .sort((a: any, b: any) => {
+                    const dateA = new Date(a.createdAt || 0).getTime();
+                    const dateB = new Date(b.createdAt || 0).getTime();
+                    return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+                })[0];
 
             if (latestPaidOrder) {
                 // Mark this order as processed
@@ -56,9 +63,9 @@ export default function OrderStatusPage() {
 
                 // Redirect to feedback page with order details
                 const params = new URLSearchParams({
-                    orderId: latestPaidOrder.id,
-                    customerName: latestPaidOrder.customerName || '',
-                    customerPhone: latestPaidOrder.customerPhone || ''
+                    orderId: String(latestPaidOrder.id),
+                    customerName: String(latestPaidOrder.customerName || ''),
+                    customerPhone: String(latestPaidOrder.customerPhone || '')
                 });
 
                 router.push(`/customer/feedback?${params.toString()}`);
@@ -133,9 +140,20 @@ export default function OrderStatusPage() {
             </h2>
 
             <div className="space-y-6">
-                {myOrders.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order: any) => (
-                    <OrderTracker key={order.id} order={order} isRemote={order.tableId === 'REQUEST'} />
-                ))}
+                {(myOrders || []).sort((a: any, b: any) => {
+                    const dateA = new Date(a.createdAt || 0).getTime();
+                    const dateB = new Date(b.createdAt || 0).getTime();
+                    return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+                }).map((order: any) => {
+                    if (!order || !order.id) return null;
+                    return (
+                        <OrderTracker
+                            key={order.id}
+                            order={order}
+                            isRemote={order.tableId === 'REQUEST' || order.tableId === 'Remote'}
+                        />
+                    );
+                })}
             </div>
 
             <div className="flex justify-center mt-8">
@@ -222,15 +240,15 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
             </div>
 
             <div className="space-y-2 mb-6">
-                {order.items.map((item, idx) => (
+                {(order.items || []).map((item: any, idx: number) => (
                     <div key={idx} className="flex justify-between text-sm text-gray-300">
-                        <span><b className="text-white">{item.quantity}x</b> {item.name}</span>
-                        <span>₹{item.price * item.quantity}</span>
+                        <span><b className="text-white">{(item.quantity || 0)}x</b> {item.name || 'Unknown Item'}</span>
+                        <span>₹{(item.price || 0) * (item.quantity || 0)}</span>
                     </div>
                 ))}
                 <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-white text-lg">
                     <span>Total</span>
-                    <span className="text-tashi-accent">₹{order.totalAmount}</span>
+                    <span className="text-tashi-accent">₹{order.totalAmount || 0}</span>
                 </div>
             </div>
 
@@ -337,10 +355,14 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     useEffect(() => {
         const update = () => {
             if (!effectiveStart) return;
-            const created = new Date(effectiveStart).getTime();
-            if (isNaN(created)) return; // Safety check
-            const now = new Date().getTime();
-            setElapsedMs(Math.max(0, now - created));
+            try {
+                const created = new Date(effectiveStart).getTime();
+                if (isNaN(created)) return; // Safety check
+                const now = new Date().getTime();
+                setElapsedMs(Math.max(0, now - created));
+            } catch (err) {
+                console.error("Timer update error:", err);
+            }
         };
         update();
         const timer = setInterval(update, 1000);
@@ -422,15 +444,17 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     const seconds = Math.floor((displayMs / 1000) % 60);
 
     // Calculate progress (starts full, goes to empty for current phase)
-    // Avoid division by zero
-    const durationMs = totalPhaseDurationMin * 60 * 1000;
-    const progressPercent = durationMs > 0 ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
+    // Avoid division by zero and NaN
+    const durationMs = (totalPhaseDurationMin || 1) * 60 * 1000;
+    const progressPercent = (!isNaN(displayMs) && durationMs > 0) ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
+
+    if (isNaN(displayMs)) return null; // Ultimate safety guard
 
     return (
         <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
             <div className={`flex items-end gap-1 font-mono leading-none ${isCritical ? 'animate-pulse text-red-500' : ''}`}>
                 <div className="text-3xl font-bold text-white">
-                    {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+                    {Math.max(0, minutes).toString().padStart(2, '0')}:{Math.max(0, seconds).toString().padStart(2, '0')}
                 </div>
             </div>
             <p className={`text-[10px] uppercase font-bold mt-2 tracking-widest ${isWarning ? 'text-red-400' : 'text-gray-500'} ${isCritical ? 'animate-pulse' : ''}`}>

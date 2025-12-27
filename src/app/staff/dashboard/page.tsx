@@ -40,7 +40,11 @@ export default function StaffDashboard() {
     const isFirstMount = useRef(true);
 
     // Derived data
-    const activeOrders = [...(orders || [])].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const activeOrders = [...(orders || [])].sort((a: any, b: any) => {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+    });
     const today = new Date().toDateString();
     const todaysOrders = (orders || []).filter((o: any) => new Date(o.createdAt).toDateString() === today);
 
@@ -1404,7 +1408,7 @@ function OrderCard({ order, onUpdateStatus, onDelete, isNew, isPreparing, isRead
                             )}
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 p-4 bg-gray-50 rounded-xl">
-                                {order.items.map((item: any, idx: number) => (
+                                {(order.items || []).map((item: any, idx: number) => (
                                     <div key={idx} className="flex items-center gap-2">
                                         <span className="flex items-center justify-center w-7 h-7 bg-orange-500 text-white rounded text-sm font-bold">
                                             {item.quantity}x

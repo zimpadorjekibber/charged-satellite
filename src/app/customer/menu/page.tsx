@@ -445,13 +445,12 @@ export default function MenuPage() {
     const callTableId = currentTableId || lastOrder?.tableId || 'REQUEST';
 
     // Check if there is already a pending call for this table
-    const pendingCallNotification = notifications.find((n: any) =>
+    const hasPendingCall = notifications.some((n: any) =>
         n.tableId === callTableId &&
         n.type === 'call_staff' &&
         n.status === 'pending' &&
-        (callTableId !== 'REQUEST' || n.sessionId === sessionId)
+        (callTableId !== 'REQUEST' && callTableId !== 'Remote' || n.sessionId === sessionId)
     );
-    const hasPendingCall = !!pendingCallNotification;
 
     // Check for active order (Expanded definition)
     const hasActiveOrder = orders.some((o: Order) =>
@@ -578,7 +577,9 @@ export default function MenuPage() {
         }
 
         // GEOFENCE CHECK: Only allow in-app "Call Staff" if within configured radius
-        const callStaffRadius = useStore.getState().callStaffRadius || 50; // Get from settings, default 50m
+        // Enforce minimum 200m to handle GPS drift in valley
+        const configuredRadius = useStore.getState().callStaffRadius || 200;
+        const callStaffRadius = Math.max(configuredRadius, 200);
 
         setIsLocating(true); // START LOADING
 
@@ -601,7 +602,7 @@ export default function MenuPage() {
                     if (distanceMeters > callStaffRadius) {
                         // Customer is too far - show phone number for direct call
                         const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
-                        if (confirm(`You are ${distanceMeters.toFixed(0)}m away from the restaurant.\n\nThe "Call Staff" feature is only available when you're at the restaurant (within ${callStaffRadius}m).\n\nWould you like to call us directly at ${phoneNumber}?`)) {
+                        if (confirm(`You appear to be ${distanceMeters.toFixed(0)}m away (Limit: ${callStaffRadius}m).\n\nGPS can sometimes be inaccurate in the valley.\n\nIf you are at the homestay, please try moving slightly or call us directly.`)) {
                             window.location.href = `tel:${phoneNumber}`;
                         }
                         setIsLocating(false);
@@ -1821,7 +1822,11 @@ const MiniOrderTimer = memo(function MiniOrderTimer() {
             o.sessionId === sessionId &&
             (o.status === 'Pending' || o.status === 'Preparing')
         )
-        .sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+        .sort((a: any, b: any) => {
+            const dateA = new Date(a.createdAt || 0).getTime();
+            const dateB = new Date(b.createdAt || 0).getTime();
+            return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+        })[0];
 
     if (!activeOrder) return null;
 
@@ -1849,12 +1854,17 @@ function MiniTimerDisplay({ startTime }: { startTime: Date | string }) {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            const start = new Date(startTime).getTime();
-            const now = new Date().getTime();
-            // Estimate 30 mins
-            const end = start + 30 * 60 * 1000;
-            const diff = Math.max(0, end - now);
-            setTimeLeft(diff);
+            try {
+                const start = new Date(startTime).getTime();
+                if (isNaN(start)) return;
+                const now = new Date().getTime();
+                // Estimate 30 mins
+                const end = start + 30 * 60 * 1000;
+                const diff = Math.max(0, end - now);
+                setTimeLeft(diff);
+            } catch (err) {
+                console.error("MiniTimer update error:", err);
+            }
         }, 1000);
         return () => clearInterval(interval);
     }, [startTime]);
