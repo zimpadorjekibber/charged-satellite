@@ -83,37 +83,30 @@ export default function OrderStatusPage() {
 
     const isDataReady = mounted && sessionId;
 
-    // Auto-redirect to feedback page when an order is marked as Paid
-    // Auto-redirect to feedback page when an order is marked as Paid
-    // FIX: Only redirect if there are NO active orders remaining. 
-    // This prevents interrupting the user if they have one completed order but another one still coming.
+    // NEW: Monitor active orders to sync Table ID if assigned by staff
+    // This ensures the header updates even if the user stays on the status page
     useEffect(() => {
-        if (myPaidOrders.length > 0 && myOrders.length === 0) {
-            // Find the most recent paid order that we haven't processed yet
-            const latestPaidOrder = [...myPaidOrders]
-                .filter((o: any) => o && o.id && !processedPaidOrders.current.has(o.id))
-                .sort((a: any, b: any) => {
-                    const dateA = getValidDate(a.createdAt)?.getTime() || 0;
-                    const dateB = getValidDate(b.createdAt)?.getTime() || 0;
-                    return dateB - dateA;
-                })[0];
+        if (!sessionId || !orders.length || !isDataReady) return;
 
-            if (latestPaidOrder) {
-                // Mark this order as processed
-                processedPaidOrders.current.add(latestPaidOrder.id);
+        try {
+            // Find the most recent active order for this session
+            const activeOrder = orders.find((o: any) =>
+                o && o.sessionId === sessionId &&
+                ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
+            );
 
-                // Redirect to feedback page with order details
-                const params = new URLSearchParams({
-                    orderId: String(latestPaidOrder.id),
-                    customerName: String(latestPaidOrder.customerName || ''),
-                    customerPhone: String(latestPaidOrder.customerPhone || '')
-                });
-
-                router.push(`/customer/feedback?${params.toString()}`);
+            if (activeOrder && activeOrder.tableId) {
+                const isRealTable = activeOrder.tableId !== 'REQUEST' && activeOrder.tableId !== 'Remote';
+                // If we have a real table assigned and it differs from our local state
+                if (isRealTable && activeOrder.tableId !== currentTableId) {
+                    const setTableId = useStore.getState().setTableId;
+                    if (setTableId) setTableId(activeOrder.tableId);
+                }
             }
+        } catch (e) {
+            console.error("Sync Table ID error:", e);
         }
-    }, [myPaidOrders, myOrders.length, router]);
-
+    }, [orders, sessionId, currentTableId, isDataReady]);
 
     if (!isDataReady) {
         return (
@@ -124,9 +117,10 @@ export default function OrderStatusPage() {
         );
     }
 
-    if (myOrders.length === 0) {
-        if (myPaidOrders.length > 0) {
+    if (!myOrders || myOrders.length === 0) {
+        if (myPaidOrders && myPaidOrders.length > 0) {
             const latestPaid = myPaidOrders[0];
+            if (!latestPaid) return null;
             return (
                 <div className="flex flex-col items-center justify-center min-h-[60vh] p-10 text-center space-y-6">
                     <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
@@ -143,9 +137,9 @@ export default function OrderStatusPage() {
                         <button
                             onClick={() => {
                                 const params = new URLSearchParams({
-                                    orderId: latestPaid.id,
-                                    customerName: latestPaid.customerName || '',
-                                    customerPhone: latestPaid.customerPhone || ''
+                                    orderId: String(latestPaid.id || ''),
+                                    customerName: String(latestPaid.customerName || 'Guest'),
+                                    customerPhone: String(latestPaid.customerPhone || '')
                                 });
                                 router.push(`/customer/feedback?${params.toString()}`);
                             }}
@@ -192,22 +186,13 @@ export default function OrderStatusPage() {
                         const dateB = getValidDate(b.createdAt)?.getTime() || 0;
                         return dateB - dateA;
                     }).map((order: any) => {
-                        try {
-                            return (
-                                <OrderTracker
-                                    key={`${String(order.id)}-${order.status}-${order.tableId}`}
-                                    order={order}
-                                    isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
-                                />
-                            );
-                        } catch (err) {
-                            console.error("OrderTracker render error:", err);
-                            return (
-                                <div key={order.id} className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs">
-                                    Error displaying order #{String(order.id).slice(0, 6)}
-                                </div>
-                            );
-                        }
+                        return (
+                            <OrderTracker
+                                key={`${String(order.id)}-${String(order.status || '')}-${String(order.tableId || '')}-${String(order.acceptedAt || '')}`}
+                                order={order}
+                                isRemote={String(order.tableId) === 'REQUEST' || String(order.tableId) === 'Remote'}
+                            />
+                        );
                     })}
                 </div>
 
@@ -229,6 +214,8 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
 
+    if (!order) return null;
+
     const steps = [
         { status: 'Pending', icon: Clock, label: 'Received' },
         { status: 'Preparing', icon: ChefHat, label: 'Cooking' },
@@ -237,7 +224,7 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
 
     const getCurrentStep = (status: string) => {
         if (status === 'Pending') return 0;
-        if (status === 'Preparing') return 1;
+        if (status === 'Preparing' || status === 'Ready') return 1;
         if (status === 'Served' || status === 'Paid') return 2;
         return 0;
     };
@@ -247,14 +234,18 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
 
     const handleReviewSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (rating === 0) return;
+        try {
+            if (rating === 0) return;
 
-        addReview({
-            customerName: order.customerName || 'Guest',
-            rating,
-            comment,
-        });
-        setReviewSubmitted(true);
+            addReview({
+                customerName: order.customerName || 'Guest',
+                rating,
+                comment,
+            });
+            setReviewSubmitted(true);
+        } catch (err) {
+            console.error("Review submit error:", err);
+        }
     };
 
     return (
@@ -262,14 +253,13 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
             <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
                 <span className="text-gray-400 text-sm font-mono">#{String(order?.id || '').slice(0, 6)}</span>
                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-500'}`}>
-                    {order.status}
+                    {order.status || 'Unknown'}
                 </span>
             </div>
 
             {/* Countdown Timer */}
             {!isCompleted && (
                 <CountdownTimer
-                    key={`${String(order?.id)}-timer-${order?.status}-${order?.acceptedAt}`}
                     order={order}
                     isRemote={isRemote}
                 />
@@ -300,10 +290,10 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
             </div>
 
             <div className="space-y-2 mb-6">
-                {(order.items || []).filter((i: any) => i).map((item: any, idx: number) => (
+                {(Array.isArray(order.items) ? order.items : []).filter((i: any) => i).map((item: any, idx: number) => (
                     <div key={idx} className="flex justify-between text-sm text-gray-300">
                         <span><b className="text-white">{item?.quantity || 0}x</b> {item?.name || 'Item'}</span>
-                        <span>₹{(item?.price || 0) * (item?.quantity || 0)}</span>
+                        <span>₹{Number(item?.price || 0) * Number(item?.quantity || 0)}</span>
                     </div>
                 ))}
                 <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-white text-lg">
@@ -364,17 +354,40 @@ function OrderTracker({ order, isRemote }: { order: Order; isRemote: boolean }) 
     );
 }
 
-
-
 function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }) {
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
 
     const [elapsedMs, setElapsedMs] = useState(0);
 
-    if (!mounted || !order) return null;
+    const startTime = useMemo(() => {
+        try {
+            return getValidDate(order?.acceptedAt) || getValidDate(order?.createdAt);
+        } catch (e) {
+            console.error("CountdownTimer startTime error:", e);
+            return null;
+        }
+    }, [order?.acceptedAt, order?.createdAt]);
 
-    const startTime = getValidDate(order.acceptedAt) || getValidDate(order.createdAt);
+    useEffect(() => {
+        if (!startTime || !mounted) return;
+        const update = () => {
+            try {
+                const now = Date.now();
+                const start = startTime.getTime();
+                if (isFinite(start)) {
+                    setElapsedMs(Math.max(0, now - start));
+                }
+            } catch (err) {
+                console.error("CountdownTimer update error:", err);
+            }
+        };
+        update();
+        const timer = setInterval(update, 1000);
+        return () => clearInterval(timer);
+    }, [startTime?.getTime(), mounted]);
+
+    if (!mounted || !order) return null;
 
     // If it's a remote order and hasn't been accepted (table assigned), show waiting state
     if (isRemote && !order.acceptedAt) {
@@ -412,22 +425,7 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
         }
     }
 
-    // Use startTime determined above (acceptedAt or createdAt)
     if (!startTime) return null;
-
-    useEffect(() => {
-        if (!startTime || !mounted) return;
-        const update = () => {
-            const now = new Date().getTime();
-            const start = startTime.getTime();
-            setElapsedMs(Math.max(0, now - start));
-        };
-        update();
-        const timer = setInterval(update, 1000);
-        return () => clearInterval(timer);
-    }, [startTime?.getTime(), mounted]);
-
-    // ... (Keep existing Pending/Rejected checks if they are above this)
 
     if (order.status === 'Pending') {
         return (
@@ -446,84 +444,72 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
         );
     }
 
-    // ... (rest of the timer phase logic remains the same)
+    try {
+        const elapsedMinutes = (Number(elapsedMs) || 0) / 1000 / 60;
 
+        let displayMs = 0;
+        let totalPhaseDurationMin = 30;
+        let phaseLabel = "Estimated Prep Time";
+        let isWarning = false;
+        let isCritical = false;
 
-    const elapsedMinutes = elapsedMs / 1000 / 60;
+        if (elapsedMinutes < 30) {
+            displayMs = (30 * 60 * 1000) - elapsedMs;
+            totalPhaseDurationMin = 30;
+            phaseLabel = "Estimated Prep Time";
+        } else if (elapsedMinutes < 50) {
+            displayMs = (50 * 60 * 1000) - elapsedMs;
+            totalPhaseDurationMin = 20;
+            phaseLabel = "Slight Delay... Processing";
+            isWarning = true;
+        } else if (elapsedMinutes < 60) {
+            displayMs = (60 * 60 * 1000) - elapsedMs;
+            totalPhaseDurationMin = 10;
+            phaseLabel = "Almost Ready...";
+            isWarning = true;
+        } else if (elapsedMinutes < 65) {
+            displayMs = (65 * 60 * 1000) - elapsedMs;
+            totalPhaseDurationMin = 5;
+            phaseLabel = "Final Touches...";
+            isWarning = true;
+            isCritical = true;
+        } else {
+            displayMs = 0;
+            totalPhaseDurationMin = 1;
+            phaseLabel = "Running Late - Please ask staff";
+            isWarning = true;
+            isCritical = true;
+        }
 
-    let displayMs = 0;
-    let totalPhaseDurationMin = 30;
-    let phaseLabel = "Estimated Prep Time";
-    let isWarning = false;
-    let isCritical = false;
-    let isFree = false;
+        const minutes = Math.floor((displayMs / 1000 / 60) % 60);
+        const seconds = Math.floor((displayMs / 1000) % 60);
 
-    // Logic: 0-30 (30m), 30-50 (20m), 50-60 (10m), 60-65 (5m), >65 (Free)
-    if (elapsedMinutes < 30) {
-        // Phase 1: 0-30
-        displayMs = (30 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 30;
-        phaseLabel = "Estimated Prep Time";
-    } else if (elapsedMinutes < 50) {
-        // Phase 2: 30-50 (Duration 20m)
-        // We want to count down from 20. 
-        // elapsedMs is e.g. 31 mins. 
-        // End target is 50 mins.
-        displayMs = (50 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 20;
-        phaseLabel = "Slight Delay... Processing";
-        isWarning = true;
-    } else if (elapsedMinutes < 60) {
-        // Phase 3: 50-60 (Duration 10m)
-        displayMs = (60 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 10;
-        phaseLabel = "Almost Ready...";
-        isWarning = true;
-    } else if (elapsedMinutes < 65) {
-        // Phase 4: 60-65 (Duration 5m)
-        displayMs = (65 * 60 * 1000) - elapsedMs;
-        totalPhaseDurationMin = 5;
-        phaseLabel = "Final Touches...";
-        isWarning = true;
-        isCritical = true; // Blink text
-    } else {
-        // Phase 5: > 65 (Previously Free Food)
-        // Now just show generic delay message
-        displayMs = 0;
-        totalPhaseDurationMin = 1;
-        phaseLabel = "Running Late - Please ask staff";
-        isWarning = true;
-        isCritical = true;
-    }
+        const durationMs = (Number(totalPhaseDurationMin) || 1) * 60 * 1000;
+        const progressPercent = (isFinite(displayMs) && isFinite(durationMs) && durationMs > 0) ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
 
-    /* REMOVED FREE FOOD BLOCK */
+        if (!isFinite(displayMs)) return null;
 
-    const minutes = Math.floor((displayMs / 1000 / 60) % 60);
-    const seconds = Math.floor((displayMs / 1000) % 60);
-
-    // Calculate progress (starts full, goes to empty for current phase)
-    // Avoid division by zero and NaN
-    const durationMs = (totalPhaseDurationMin || 1) * 60 * 1000;
-    const progressPercent = (isFinite(displayMs) && isFinite(durationMs) && durationMs > 0) ? Math.min(100, Math.max(0, (displayMs / durationMs) * 100)) : 0;
-
-    if (!isFinite(displayMs)) return null; // Ultimate safety guard
-
-    return (
-        <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
-            <div className={`flex items-end gap-1 font-mono leading-none ${isCritical ? 'animate-pulse text-red-500' : ''}`}>
-                <div className="text-3xl font-bold text-white">
-                    {Math.max(0, minutes).toString().padStart(2, '0')}:{Math.max(0, seconds).toString().padStart(2, '0')}
+        return (
+            <div className="flex flex-col items-center justify-center p-4 bg-black/20 rounded-lg border border-white/5 mb-4">
+                <div className={`flex items-end gap-1 font-mono leading-none ${isCritical ? 'animate-pulse text-red-500' : ''}`}>
+                    <div className="text-3xl font-bold text-white">
+                        {Math.max(0, minutes).toString().padStart(2, '0')}:{Math.max(0, seconds).toString().padStart(2, '0')}
+                    </div>
+                </div>
+                <p className={`text-[10px] uppercase font-bold mt-2 tracking-widest ${isWarning ? 'text-red-400' : 'text-gray-500'} ${isCritical ? 'animate-pulse' : ''}`}>
+                    {phaseLabel}
+                </p>
+                <div className="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
+                    <div
+                        className={`h-full transition-all duration-1000 ease-linear ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
+                        style={{ width: `${progressPercent}%` }}
+                    />
                 </div>
             </div>
-            <p className={`text-[10px] uppercase font-bold mt-2 tracking-widest ${isWarning ? 'text-red-400' : 'text-gray-500'} ${isCritical ? 'animate-pulse' : ''}`}>
-                {phaseLabel}
-            </p>
-            <div className="w-full h-1 bg-white/10 rounded-full mt-3 overflow-hidden">
-                <div
-                    className={`h-full transition-all duration-1000 ease-linear ${isWarning ? 'bg-red-500' : 'bg-blue-500'}`}
-                    style={{ width: `${progressPercent}%` }}
-                />
-            </div>
-        </div>
-    );
+        );
+    } catch (e) {
+        console.error("CountdownTimer render logic error:", e);
+        return null;
+    }
 }
+

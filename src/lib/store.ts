@@ -784,12 +784,50 @@ export const useStore = create<AppState>()(
             },
 
             uploadImage: async (file: File, saveToGallery = false) => {
-                // Dynamic import to avoid SSR issues with some firebase modules if any
+                // Client-side compression
+                const compressImage = async (file: File): Promise<Blob | File> => {
+                    if (!file.type.startsWith('image/')) return file;
+                    if (file.size < 200 * 1024) return file;
+
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = (event) => {
+                            const img = new Image();
+                            img.src = event.target?.result as string;
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+                                const MAX_DIM = 1200;
+                                if (width > height) {
+                                    if (width > MAX_DIM) {
+                                        height *= MAX_DIM / width;
+                                        width = MAX_DIM;
+                                    }
+                                } else {
+                                    if (height > MAX_DIM) {
+                                        width *= MAX_DIM / height;
+                                        height = MAX_DIM;
+                                    }
+                                }
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx?.drawImage(img, 0, 0, width, height);
+                                canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', 0.8);
+                            };
+                        };
+                        reader.onerror = () => resolve(file);
+                    });
+                };
+
+                const compressedFile = await compressImage(file);
                 const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
                 const { storage } = await import('./firebase');
 
-                const fileRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
-                await uploadBytes(fileRef, file);
+                const fileRef = ref(storage, `uploads/${Date.now()}_${file.name.replace(/\.[^/.]+$/, "")}.jpg`);
+                await uploadBytes(fileRef, compressedFile);
                 const url = await getDownloadURL(fileRef);
 
                 if (saveToGallery) {
@@ -799,7 +837,6 @@ export const useStore = create<AppState>()(
                         createdAt: new Date().toISOString()
                     });
                 }
-
                 return url;
             },
 
