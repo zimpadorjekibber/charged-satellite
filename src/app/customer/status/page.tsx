@@ -8,6 +8,18 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
+// Safe Date Utility to handle strings, objects, and Firestore Timestamps
+const getValidDate = (dateInput: any): Date | null => {
+    if (!dateInput) return null;
+    try {
+        if (typeof dateInput.toDate === 'function') return dateInput.toDate();
+        const d = new Date(dateInput);
+        return isFinite(d.getTime()) ? d : null;
+    } catch (e) {
+        return null;
+    }
+};
+
 export default function OrderStatusPage() {
     const [mounted, setMounted] = useState(false);
     const orders = useStore((state: any) => state.orders || []);
@@ -148,11 +160,9 @@ export default function OrderStatusPage() {
 
             <div className="space-y-6">
                 {(myOrders || []).filter((o: any) => o && o.id).sort((a: any, b: any) => {
-                    const dateA = new Date(a.createdAt || 0).getTime();
-                    const dateB = new Date(b.createdAt || 0).getTime();
-                    const valA = isFinite(dateA) ? dateA : 0;
-                    const valB = isFinite(dateB) ? dateB : 0;
-                    return valB - valA;
+                    const dateA = getValidDate(a.createdAt)?.getTime() || 0;
+                    const dateB = getValidDate(b.createdAt)?.getTime() || 0;
+                    return dateB - dateA;
                 }).map((order: any) => (
                     <OrderTracker
                         key={`${String(order.id)}-${order.status}-${order.tableId}`}
@@ -320,13 +330,14 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
 
-    // Countdown Timer logic update
-    const startTimeStr = order?.acceptedAt;
     const [elapsedMs, setElapsedMs] = useState(0);
 
     if (!mounted || !order) return null;
+
+    const startTime = getValidDate(order.acceptedAt) || getValidDate(order.createdAt);
+
     // If it's a remote order and hasn't been accepted (table assigned), show waiting state
-    if (isRemote) {
+    if (isRemote && !order.acceptedAt) {
         if (order.paymentStatus === 'Pending') {
             return (
                 <div className="flex flex-col items-center justify-center p-6 bg-yellow-500/10 rounded-lg border border-yellow-500/20 mb-4 animate-pulse">
@@ -361,26 +372,20 @@ function CountdownTimer({ order, isRemote }: { order: Order; isRemote: boolean }
         }
     }
 
-    // Fallback for immediate orders (if somehow acceptedAt is missing but it's not remote, or legacy)
-    // We can default to createdAt as a failsafe, but for the new logic we prefer explicit acceptance.
-    const effectiveStart = startTimeStr || order.createdAt;
+    // Use startTime determined above (acceptedAt or createdAt)
+    if (!startTime) return null;
 
     useEffect(() => {
-        if (!effectiveStart || !mounted) return;
+        if (!startTime || !mounted) return;
         const update = () => {
-            try {
-                const created = new Date(effectiveStart).getTime();
-                if (!isFinite(created)) return; // Safety check
-                const now = new Date().getTime();
-                setElapsedMs(Math.max(0, now - created));
-            } catch (err) {
-                console.error("Timer update error:", err);
-            }
+            const now = new Date().getTime();
+            const start = startTime.getTime();
+            setElapsedMs(Math.max(0, now - start));
         };
         update();
         const timer = setInterval(update, 1000);
         return () => clearInterval(timer);
-    }, [effectiveStart, mounted]);
+    }, [startTime?.getTime(), mounted]);
 
     // ... (Keep existing Pending/Rejected checks if they are above this)
 
