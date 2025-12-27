@@ -83,7 +83,7 @@ export default function CartPage() {
                             }
                         }
 
-                        if (distance > geoRadius) {
+                        if (!isPrePaid && distance > geoRadius) {
                             alert(`You are out of our service area. \n\nYour distance: ${distance.toFixed(2)}km\nLimit: ${geoRadius}km\n\nYou can still browse our menu, but we cannot accept orders from your current location.`);
                             setIsOrdering(false);
                             return; // BLOCK ORDER
