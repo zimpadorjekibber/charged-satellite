@@ -1404,14 +1404,14 @@ export default function MenuPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+                        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-4"
                         onClick={() => setShowMap(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.9, y: 30 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 30 }}
-                            className="bg-white border border-tashi-accent/20 rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col h-[95vh] md:h-auto md:max-h-[90vh]"
+                            className="bg-white border-0 md:border md:border-tashi-accent/20 rounded-none md:rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col h-[100dvh] md:h-auto md:max-h-[90vh]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
@@ -1424,11 +1424,11 @@ export default function MenuPage() {
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-auto p-0 md:p-4 flex items-center justify-center bg-black/40">
+                            <div className="flex-1 overflow-hidden bg-black/5 p-0 relative flex flex-col">
                                 <LocalMapGuide />
                             </div>
 
-                            <div className="p-4 bg-black/20 text-center border-t border-white/5">
+                            <div className="p-4 bg-black/20 text-center border-t border-white/5 hidden md:block">
                                 <p className="text-gray-400 text-xs">
                                     The road connects Chicham Bridge & TashiZom directly. No need to go back!
                                 </p>

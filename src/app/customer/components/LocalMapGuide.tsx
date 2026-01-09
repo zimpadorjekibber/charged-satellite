@@ -48,7 +48,7 @@ export default function LocalMapGuide() {
     }, []);
 
     return (
-        <div className="bg-white border border-tashi-accent/20 rounded-3xl overflow-hidden relative w-full flex flex-col max-w-3xl mx-auto shadow-[0_0_50px_rgba(0,0,0,0.1)]">
+        <div className="bg-white border-0 md:border md:border-tashi-accent/20 rounded-none md:rounded-3xl overflow-hidden relative w-full flex flex-col h-full md:h-auto max-w-3xl mx-auto shadow-none md:shadow-[0_0_50px_rgba(0,0,0,0.1)]">
             {/* Topography Pattern */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/pinstripe.png')]" />
 
@@ -88,7 +88,7 @@ export default function LocalMapGuide() {
             </div>
 
             {/* Interactive SVG Map */}
-            <div className="flex-1 w-full h-[75vh] md:h-[600px] relative bg-white overflow-hidden">
+            <div className="flex-1 w-full h-full min-h-0 md:h-[600px] relative bg-white overflow-hidden">
                 <svg viewBox="160 0 480 600" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
