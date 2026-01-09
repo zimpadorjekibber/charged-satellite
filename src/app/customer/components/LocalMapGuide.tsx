@@ -137,11 +137,11 @@ export default function LocalMapGuide() {
                         />
 
                         {/* Segment 2: TashiZom -> Chicham (The Direct Link) */}
-                        {/* This curve visualizes the high-altitude connecting road */}
+                        {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (280, 180) */}
                         <motion.path
                             d={isReverse
-                                ? "M 280 80 C 280 200, 450 280, 570 360"
-                                : "M 570 360 C 450 280, 280 200, 280 80"}
+                                ? "M 280 180 C 280 250, 450 300, 570 360"
+                                : "M 570 360 C 450 300, 280 250, 280 180"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                             transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
@@ -152,12 +152,11 @@ export default function LocalMapGuide() {
                     {!isReverse && (
                         <g fill="#555" fontSize="10" fontStyle="italic" fontWeight="bold">
                             <text x="450" y="480">~15m</text>
-                            <text x="400" y="200">~15m</text>
+                            <text x="400" y="270">~15m</text>
                         </g>
                     )}
 
                     {/* Nodes */}
-                    {/* OLD Link Road Removed - Superseded by the Orange Dot below */}
 
                     {/* Chicham-Kibber Link Road (Formerly Kee Marker position) - Moved to bifurcation point */}
                     <g transform="translate(400, 550)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
@@ -187,10 +186,10 @@ export default function LocalMapGuide() {
                         <text x="-15" y="5" textAnchor="end" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
                     </g>
 
-                    {/* Chicham Bridge (Top Left) */}
-                    <g transform="translate(280, 80)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
+                    {/* Chicham Bridge (Top Left) - Moved DOWN to 180 to shrink space */}
+                    <g transform="translate(280, 180)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
                         <circle r="14" fill="#ef4444" />
-                        <text y="35" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
+                        <text x="-15" y="5" textAnchor="end" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
                     </g>
 
                     {/* TashiZom - THE TARGET (Near Kibber) */}
@@ -210,8 +209,8 @@ export default function LocalMapGuide() {
                     </g>
                     {/* Directional Route Markers */}
 
-                    {/* To Manali (North from Chicham) - Moved down slightly for visibility */}
-                    <g transform="translate(260, 60)">
+                    {/* To Manali (North from Chicham) - Moved down with Chicham */}
+                    <g transform="translate(260, 160)">
                         <motion.path
                             d="M 0 0 L -20 -30"
                             fill="none"
@@ -224,31 +223,31 @@ export default function LocalMapGuide() {
                         <text x="0" y="-35" textAnchor="start" fill="#22c55e" fontSize="14" fontWeight="bold">To Manali</text>
                     </g>
 
-                    {/* To Kaza (South from Link Road area) */}
+                    {/* To Kaza (South from Link Road area) - Changed to Green */}
                     <g transform="translate(400, 580)">
                         <motion.path
                             d="M 0 10 L 0 50"
                             fill="none"
-                            stroke="#3b82f6"
+                            stroke="#22c55e"
                             strokeWidth="3"
                             strokeDasharray="5,5"
                             animate={{ strokeDashoffset: [0, 10] }}
                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                         />
-                        <text x="10" y="30" fill="#3b82f6" fontSize="14" fontWeight="bold">To Kaza</text>
+                        <text x="10" y="30" fill="#22c55e" fontSize="14" fontWeight="bold">To Kaza</text>
                     </g>
 
                 </svg>
 
-                {/* Legend / Overlay */}
+                {/* Legend / Overlay - Positioned near the river bend as requested */}
                 <motion.div
                     drag
                     dragMomentum={false}
-                    className="absolute top-4 left-4 flex flex-col gap-2 cursor-move"
+                    className="absolute top-[40%] left-6 flex flex-col gap-2 cursor-move"
                 >
-                    <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 shadow-lg">
+                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
-                        <span className="text-[10px] text-black font-medium">Click markers for details</span>
+                        <span className="text-[10px] text-black font-bold">Click markers for details</span>
                     </div>
                 </motion.div>
             </div>
