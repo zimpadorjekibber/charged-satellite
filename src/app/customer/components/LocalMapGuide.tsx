@@ -241,7 +241,7 @@ export default function LocalMapGuide() {
                 </svg>
 
                 {/* Legend / Overlay */}
-                <div className="absolute bottom-4 left-4 flex flex-col gap-2">
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
                     <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
                         <span className="text-[10px] text-black font-medium">Click markers for details</span>
