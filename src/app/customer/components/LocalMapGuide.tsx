@@ -88,8 +88,8 @@ export default function LocalMapGuide() {
             </div>
 
             {/* Interactive SVG Map */}
-            <div className="flex-1 w-full h-full relative bg-white overflow-hidden">
-                <svg viewBox="0 0 800 600" className="w-full h-full p-0 md:p-4" preserveAspectRatio="xMidYMid meet">
+            <div className="flex-1 w-full h-[75vh] md:h-[600px] relative bg-white overflow-hidden">
+                <svg viewBox="160 0 480 600" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
@@ -163,7 +163,7 @@ export default function LocalMapGuide() {
                     <g transform="translate(450, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
                         {/* Using Link Road data but orange marker style as requested */}
                         <motion.circle r="12" fill="#d97706" animate={selectedLoc === 'linkroad' ? { r: 16 } : {}} />
-                        <text x="18" y="5" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
+                        <text x="0" y="28" textAnchor="middle" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
                     </g>
 
                     {/* To Kee Monastery (Directional Arrow at Bottom Left) */}
@@ -184,7 +184,7 @@ export default function LocalMapGuide() {
                     {/* Kibber Village (Center Right) */}
                     <g transform="translate(550, 350)" className="group cursor-pointer" onClick={() => setSelectedLoc('kibber')}>
                         <circle r="12" fill="#22c55e" />
-                        <text x="20" y="0" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
+                        <text x="-15" y="5" textAnchor="end" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
                     </g>
 
                     {/* Chicham Bridge (Top Left) */}
@@ -203,7 +203,7 @@ export default function LocalMapGuide() {
                         <circle r="22" fill="none" stroke="#DAA520" strokeWidth="1" strokeDasharray="4,4">
                             <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="10s" repeatCount="indefinite" />
                         </circle>
-                        <text x="30" y="10" fill="#DAA520" fontSize="24" fontWeight="bold" fontFamily="serif" filter="url(#glow)">TashiZom</text>
+                        <text x="-25" y="10" textAnchor="end" fill="#DAA520" fontSize="24" fontWeight="bold" fontFamily="serif" filter="url(#glow)">TashiZom</text>
                         <motion.g animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
                             <path d="M -8 -30 L 0 -45 L 8 -30 Z" fill="#DAA520" />
                         </motion.g>
@@ -221,7 +221,7 @@ export default function LocalMapGuide() {
                             animate={{ strokeDashoffset: [0, -10] }}
                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                         />
-                        <text x="-10" y="-35" fill="#22c55e" fontSize="14" fontWeight="bold">To Manali</text>
+                        <text x="0" y="-35" textAnchor="start" fill="#22c55e" fontSize="14" fontWeight="bold">To Manali</text>
                     </g>
 
                     {/* To Kaza (South from Link Road area) */}

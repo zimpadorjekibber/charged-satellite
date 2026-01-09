@@ -1424,7 +1424,7 @@ export default function MenuPage() {
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-black/40">
+                            <div className="flex-1 overflow-auto p-0 md:p-4 flex items-center justify-center bg-black/40">
                                 <LocalMapGuide />
                             </div>
 
