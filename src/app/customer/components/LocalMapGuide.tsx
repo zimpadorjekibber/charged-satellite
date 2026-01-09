@@ -89,7 +89,7 @@ export default function LocalMapGuide() {
 
             {/* Interactive SVG Map */}
             <div className="flex-1 w-full h-full min-h-0 md:h-[600px] relative bg-white overflow-hidden">
-                <svg viewBox="120 0 560 600" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
+                <svg viewBox="120 100 560 580" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
@@ -137,11 +137,11 @@ export default function LocalMapGuide() {
                         />
 
                         {/* Segment 2: TashiZom -> Chicham (The Direct Link) */}
-                        {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (320, 180) */}
+                        {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (320, 200) */}
                         <motion.path
                             d={isReverse
-                                ? "M 320 180 C 400 160, 550 220, 570 360"
-                                : "M 570 360 C 550 220, 400 160, 320 180"}
+                                ? "M 320 200 C 400 160, 550 220, 570 360"
+                                : "M 570 360 C 550 220, 400 160, 320 200"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                             transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
@@ -187,7 +187,7 @@ export default function LocalMapGuide() {
                     </g>
 
                     {/* Chicham Bridge (Top Left) - Moved IN to 320 to avoid crop */}
-                    <g transform="translate(320, 180)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
+                    <g transform="translate(320, 200)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
                         <circle r="14" fill="#ef4444" />
                         <text x="0" y="28" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
                     </g>
@@ -210,7 +210,7 @@ export default function LocalMapGuide() {
                     {/* Directional Route Markers */}
 
                     {/* To Manali (North from Chicham) - Moved In with Chicham */}
-                    <g transform="translate(300, 160)">
+                    <g transform="translate(300, 180)">
                         <motion.path
                             d="M 0 0 L -20 -30"
                             fill="none"
@@ -243,7 +243,7 @@ export default function LocalMapGuide() {
                 <motion.div
                     drag
                     dragMomentum={false}
-                    className="absolute top-[40%] left-[10%] flex flex-col gap-2 cursor-move"
+                    className="absolute top-[25%] left-[10%] flex flex-col gap-2 cursor-move"
                 >
                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
