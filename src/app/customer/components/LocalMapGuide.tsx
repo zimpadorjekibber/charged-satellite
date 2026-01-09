@@ -138,6 +138,17 @@ export default function LocalMapGuide() {
                             transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
                         />
+
+                        {/* Segment 3: Chicham -> Link Road (Direct Bypass) */}
+                        <motion.path
+                            d={isReverse
+                                ? "M 360 500 C 280 400, 160 300, 180 100"
+                                : "M 180 100 C 160 300, 280 400, 360 500"}
+                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                            transition={{ duration: 3, delay: 3, repeat: Infinity, ease: "easeInOut" }}
+                            strokeDasharray="10,10"
+                            markerEnd="url(#arrowhead)"
+                        />
                     </g>
 
                     {/* Drive Times */}
