@@ -225,11 +225,11 @@ export default function LocalMapGuide() {
 
                 </svg>
 
-                {/* Legend / Overlay - Reset Position */}
+                {/* Legend / Overlay - Positioned at Top Right to avoid overlaps */}
                 <motion.div
                     drag
                     dragMomentum={false}
-                    className="absolute top-4 left-4 flex flex-col gap-2 cursor-move"
+                    className="absolute top-4 right-4 flex flex-col gap-2 cursor-move"
                 >
                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
