@@ -159,8 +159,8 @@ export default function LocalMapGuide() {
                     {/* Nodes */}
                     {/* OLD Link Road Removed - Superseded by the Orange Dot below */}
 
-                    {/* Chicham-Kibber Link Road (Formerly Kee Marker position) */}
-                    <g transform="translate(450, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
+                    {/* Chicham-Kibber Link Road (Formerly Kee Marker position) - Moved to bifurcation point */}
+                    <g transform="translate(400, 550)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
                         {/* Using Link Road data but orange marker style as requested */}
                         <motion.circle r="12" fill="#d97706" animate={selectedLoc === 'linkroad' ? { r: 16 } : {}} />
                         <text x="0" y="28" textAnchor="middle" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
@@ -241,12 +241,16 @@ export default function LocalMapGuide() {
                 </svg>
 
                 {/* Legend / Overlay */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                <motion.div
+                    drag
+                    dragMomentum={false}
+                    className="absolute top-4 left-4 flex flex-col gap-2 cursor-move"
+                >
                     <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
                         <span className="text-[10px] text-black font-medium">Click markers for details</span>
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             {/* Location Detail Panel */}
