@@ -253,9 +253,9 @@ export const useStore = create<AppState>()(
             gearItems: [], // Initial empty state
             menuAppearance: {
                 categoryFontSize: '1.25rem',
-                categoryColor: '#FFFFFF',
+                categoryColor: '#000000',
                 itemNameFontSize: '1rem',
-                itemNameColor: '#E5E5E5',
+                itemNameColor: '#1A1A1A',
                 accentColor: '#DAA520'
             },
             customerDetails: null,

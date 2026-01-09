@@ -30,7 +30,7 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
     const [currentIdx, setCurrentIdx] = useState(0);
 
     return (
-        <div className="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl flex flex-col h-full">
+        <div className="bg-white border border-black/5 rounded-2xl overflow-hidden shadow-xl flex flex-col h-full">
             <div className="h-48 relative overflow-hidden group" onClick={() => setCurrentIdx((currentIdx + 1) % items.length)}>
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -58,8 +58,8 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
 
                         {/* Overlay Details for Product Shot */}
                         {!items[currentIdx].worn && items[currentIdx].details && (
-                            <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-2">
-                                <span className="text-[9px] font-bold text-white bg-tashi-accent/80 px-1.5 py-0.5 rounded w-fit mb-1 backdrop-blur-sm">
+                            <div className="absolute inset-0 bg-white/40 flex flex-col justify-end p-2">
+                                <span className="text-[9px] font-bold text-black bg-tashi-accent/80 px-1.5 py-0.5 rounded w-fit mb-1 backdrop-blur-sm">
                                     {items[currentIdx].details}
                                 </span>
                             </div>
@@ -69,12 +69,12 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
 
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1">
-                    <div className="bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/10 w-fit">
+                    <div className="bg-white/60 backdrop-blur-md text-black text-[9px] font-bold px-2 py-0.5 rounded-full border border-black/10 w-fit">
                         {badge}
                     </div>
                 </div>
 
-                <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-white/10 uppercase tracking-tighter">
+                <div className="absolute top-2 right-2 bg-white/40 backdrop-blur-md text-black text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-black/10 uppercase tracking-tighter">
                     {items[currentIdx].label}
                 </div>
 
@@ -83,7 +83,7 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
                     {items.map((_, i) => (
                         <div
                             key={i}
-                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-tashi-accent w-4' : 'bg-white/30'}`}
+                            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-tashi-accent w-4' : 'bg-black/30'}`}
                         />
                     ))}
                 </div>
@@ -91,10 +91,10 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
 
             <div className="p-3 flex-1 flex flex-col justify-between">
                 <div>
-                    <h3 className="text-gray-100 font-bold text-[13px] mb-1 line-clamp-1">{name}</h3>
+                    <h3 className="text-black font-bold text-[13px] mb-1 line-clamp-1">{name}</h3>
                     <div className="flex justify-between items-center">
                         <span className="text-tashi-accent font-bold font-serif">&#8377;{price}</span>
-                        <button className="text-[10px] bg-white/5 hover:bg-white/10 text-gray-400 px-2.5 py-1 rounded-full border border-white/10 transition-colors">
+                        <button className="text-[10px] bg-black/5 hover:bg-black/10 text-gray-600 px-2.5 py-1 rounded-full border border-black/10 transition-colors">
                             Enquire
                         </button>
                     </div>
@@ -462,7 +462,6 @@ export default function MenuPage() {
 
     // Local state for "Calling" visual/audio feedback
     const [isCalling, setIsCalling] = useState(false);
-    const [callSuccessToast, setCallSuccessToast] = useState(false);
     const [callErrorToast, setCallErrorToast] = useState(false); // New Error Toast
     const callSoundRef = useRef<HTMLAudioElement | null>(null);
 
@@ -687,7 +686,7 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-neutral-900 border border-red-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
+                            className="bg-white border border-red-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
                         >
                             <div className="flex flex-col items-center text-center gap-4">
                                 <div className="p-4 bg-red-500/10 rounded-full animate-pulse">
@@ -762,7 +761,7 @@ export default function MenuPage() {
             </AnimatePresence>
 
             {/* Bottom Action Bar - Horizontal */}
-            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-black via-black/95 to-transparent backdrop-blur-md border-t border-white/10 pointer-events-auto">
+            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-md border-t border-black/10 pointer-events-auto">
                 <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
                     {hasActiveOrder && (
                         <Link href="/customer/status">
@@ -793,8 +792,8 @@ export default function MenuPage() {
                             : isCancelling
                                 ? 'bg-gray-700 text-gray-300 cursor-wait'
                                 : isLocating
-                                    ? 'bg-neutral-800 text-gray-400 cursor-wait'
-                                    : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10'
+                                    ? 'bg-gray-100 text-gray-500 cursor-wait'
+                                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
                             }`}
                     >
                         {isLocating ? (
@@ -825,7 +824,7 @@ export default function MenuPage() {
                     {/* Navigate/Location Button */}
                     <button
                         onClick={() => setShowNavigationModal(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 border border-white/10 active:scale-95 transition-transform"
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-black hover:bg-gray-200 border border-black/10 active:scale-95 transition-transform"
                     >
                         <Navigation size={24} />
                         <span className="text-[10px] uppercase tracking-wider font-bold">
@@ -844,17 +843,17 @@ export default function MenuPage() {
                 {/* Review Shortcut */}
                 <button
                     onClick={() => setShowReviewModal(true)}
-                    className="ml-1 bg-neutral-900 border border-white/10 rounded-lg p-2 hover:bg-white/10 transition-colors shadow-lg shadow-black/20"
+                    className="ml-1 bg-white border border-black/10 rounded-lg p-2 hover:bg-black/5 transition-colors shadow-lg shadow-black/5"
                     style={{ color: menuAppearance.accentColor }}
                     aria-label="Write a Review"
                 >
                     <Star size={18} fill={menuAppearance.accentColor} />
                 </button>
 
-                <div className="bg-neutral-900 border border-white/10 rounded-lg p-1 flex gap-1">
+                <div className="bg-white border border-black/10 rounded-lg p-1 flex gap-1">
                     <button
                         onClick={() => setFilterType('all')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${filterType === 'all' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${filterType === 'all' ? 'bg-black/10 text-black' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         All
                     </button>
@@ -874,7 +873,7 @@ export default function MenuPage() {
             </div>
 
             {/* Category Tabs */}
-            <div className="sticky top-[60px] z-40 bg-tashi-darker/95 backdrop-blur-md -mx-4 px-4 border-b border-white/5 pt-2 pb-4">
+            <div className="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md -mx-4 px-4 border-b border-black/5 pt-2 pb-4">
                 <div ref={categoryScrollContainerRef} className="flex overflow-x-auto gap-3 hide-scrollbar snap-x">
                     {CATEGORIES.map((cat) => (
                         <button
@@ -882,8 +881,8 @@ export default function MenuPage() {
                             id={`tab-${cat}`}
                             onClick={() => scrollToCategory(cat)}
                             className={`relative whitespace-nowrap px-8 py-3 rounded-full text-base font-bold transition-all duration-300 snap-center ${activeCategory === cat
-                                ? 'text-tashi-dark scale-105'
-                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                ? 'text-black scale-105'
+                                : 'bg-black/5 text-gray-500 hover:bg-black/10'
                                 }`}
                         >
                             {activeCategory === cat && (
@@ -955,12 +954,12 @@ export default function MenuPage() {
                     return (
                         <section key={cat} id={cat} className="scroll-mt-32">
                             {/* Typewriter Header */}
-                            <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-black via-black/90 to-transparent backdrop-blur-sm -mx-2 px-2">
-                                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/20" />
+                            <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-white via-white/95 to-transparent backdrop-blur-sm -mx-2 px-2">
+                                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-black/10" />
                                 <h2 className="font-bold font-serif uppercase tracking-widest text-shadow-glow" style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }}>
                                     {cat}
                                 </h2>
-                                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/20" />
+                                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-black/10" />
                             </div>
 
                             {/* Items WITH images - Display as cards */}
@@ -1021,14 +1020,14 @@ export default function MenuPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+                            className="fixed inset-0 z-[200] bg-white/90 backdrop-blur-md flex items-center justify-center p-4"
                             onClick={() => setSelectedItem(null)}
                         >
                             <motion.div
                                 initial={{ scale: 0.9, y: 20 }}
                                 animate={{ scale: 1, y: 0 }}
                                 exit={{ scale: 0.9, y: 20 }}
-                                className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl"
+                                className="bg-white border border-black/10 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl"
                                 onClick={(e) => e.stopPropagation()}
                                 drag="x"
                                 dragConstraints={{ left: 0, right: 0 }}
@@ -1070,7 +1069,7 @@ export default function MenuPage() {
                                     {selectedItem.image ? (
                                         <img key={selectedItem.image} src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
+                                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                                             <span className="text-gray-600 font-bold text-xl uppercase tracking-widest">No Image</span>
                                         </div>
                                     )}
@@ -1096,11 +1095,11 @@ export default function MenuPage() {
 
                                 <div className="p-6 space-y-4">
                                     <div>
-                                        <h2 className="text-2xl font-bold text-white mb-2 font-serif">{selectedItem.name}</h2>
-                                        <p className="text-gray-400 leading-relaxed">{selectedItem.description}</p>
+                                        <h2 className="text-2xl font-bold text-black mb-2 font-serif">{selectedItem.name}</h2>
+                                        <p className="text-gray-600 leading-relaxed">{selectedItem.description}</p>
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                                    <div className="flex items-center justify-between pt-4 border-t border-black/10">
                                         <span className="text-3xl font-serif text-tashi-accent">&#8377;{selectedItem.price}</span>
 
                                         <div className="flex items-center gap-4">
@@ -1114,7 +1113,7 @@ export default function MenuPage() {
                                                     addToCart(selectedItem);
                                                 }}
                                                 disabled={selectedItem.available === false}
-                                                className="bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                             >
                                                 <Plus size={18} /> Add to Order
                                             </button>
@@ -1134,7 +1133,7 @@ export default function MenuPage() {
                         <motion.div
                             initial={false}
                             animate={{ height: showAllUpdates ? 'auto' : '60px' }}
-                            className={`bg-neutral-900/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-neutral-900'
+                            className={`bg-white/90 backdrop-blur-md rounded-2xl border border-black/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-white'
                                 }`}
                             onClick={() => setShowAllUpdates(!showAllUpdates)}
                         >
@@ -1155,7 +1154,7 @@ export default function MenuPage() {
                             {/* Expandable Content */}
                             <div className="pt-[70px] px-6 pb-6">
                                 {/* Consolidated card with all updates as bullets */}
-                                <div className="bg-black/40 p-5 rounded-xl border-l-2 border-tashi-accent/50">
+                                <div className="bg-black/5 p-5 rounded-xl border-l-2 border-tashi-accent/50">
                                     <motion.ul
                                         className="space-y-3"
                                         variants={containerVariants}
@@ -1181,7 +1180,7 @@ export default function MenuPage() {
                                                 <div className="flex-1">
                                                     <div className="flex items-start justify-between gap-2">
                                                         <p className="text-sm text-gray-300 leading-relaxed">
-                                                            <span className="font-semibold text-white">{update.title}</span>
+                                                            <span className="font-semibold text-black">{update.title}</span>
                                                             {update.description && (
                                                                 <span className="text-gray-400"> - {update.description}</span>
                                                             )}
@@ -1263,7 +1262,7 @@ export default function MenuPage() {
                     <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
                         <ShoppingBag size={20} />
                     </div>
-                    <h2 className="text-xl font-bold font-serif text-white tracking-tight">
+                    <h2 className="text-xl font-bold font-serif text-black tracking-tight">
                         Cold Weather Gears <span className="text-orange-400 text-sm font-sans font-normal ml-1">By Locals</span>
                     </h2>
                 </div>
@@ -1298,12 +1297,12 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+                            className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="text-center mb-4">
-                                <h3 className="text-xl font-bold text-white font-serif">Select Your Table</h3>
-                                <p className="text-gray-400 text-sm">Tap your table number to switch</p>
+                                <h3 className="text-xl font-bold text-black font-serif">Select Your Table</h3>
+                                <p className="text-gray-500 text-sm">Tap your table number to switch</p>
                             </div>
 
                             <div className="grid grid-cols-3 gap-3 overflow-y-auto p-1 custom-scrollbar">
@@ -1318,7 +1317,7 @@ export default function MenuPage() {
                                         }}
                                         className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
                                             ? 'text-black'
-                                            : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+                                            : 'bg-black/5 text-gray-500 border-black/10 hover:bg-black/10'
                                             }`}
                                         style={currentTableId === table.id ? { backgroundColor: menuAppearance.accentColor, borderColor: menuAppearance.accentColor } : {}}
                                     >
@@ -1329,7 +1328,7 @@ export default function MenuPage() {
 
                             <button
                                 onClick={() => setShowTableSelector(false)}
-                                className="mt-4 w-full py-3 rounded-xl bg-neutral-800 text-gray-400 font-bold hover:bg-neutral-700 hover:text-white transition-colors text-sm uppercase tracking-wide"
+                                className="mt-4 w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
                             >
                                 Cancel
                             </button>
@@ -1346,11 +1345,11 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-neutral-900 border border-white/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-6"
+                            className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-6"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="text-center">
-                                <h3 className="text-xl font-bold text-white font-serif mb-2">Direction</h3>
+                                <h3 className="text-xl font-bold text-black font-serif mb-2">Direction</h3>
                                 <p className="text-gray-400 text-sm">Choose your wayfinding method</p>
                             </div>
 
@@ -1360,13 +1359,13 @@ export default function MenuPage() {
                                     href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group"
+                                    className="flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group"
                                 >
                                     <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                                         <MapPin size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Reach Us</p>
+                                        <p className="font-bold text-gray-800">Reach Us</p>
                                         <p className="text-xs text-gray-500">Live GPS Directions</p>
                                     </div>
                                 </a>
@@ -1377,13 +1376,13 @@ export default function MenuPage() {
                                         setShowNavigationModal(false);
                                         setTimeout(() => setShowMap(true), 200); // Small delay for smooth transition
                                     }}
-                                    className="w-full flex items-center gap-4 bg-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group text-left"
+                                    className="w-full flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group text-left"
                                 >
                                     <div className="p-3 rounded-full transition-colors" style={{ backgroundColor: `${menuAppearance.accentColor}33`, color: menuAppearance.accentColor }}>
                                         <Navigation size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Tourist Loop Map</p>
+                                        <p className="font-bold text-gray-800">Tourist Loop Map</p>
                                         <p className="text-xs text-gray-500">Local Schematic Guide (No U-Turn)</p>
                                     </div>
                                 </button>
@@ -1391,7 +1390,7 @@ export default function MenuPage() {
 
                             <button
                                 onClick={() => setShowNavigationModal(false)}
-                                className="w-full py-3 rounded-xl bg-neutral-800 text-gray-400 font-bold hover:bg-neutral-700 hover:text-white transition-colors text-sm uppercase tracking-wide"
+                                className="w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
                             >
                                 Cancel
                             </button>
@@ -1412,14 +1411,13 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 30 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 30 }}
-                            className="bg-neutral-900 border border-tashi-accent/20 rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]"
+                            className="bg-white border border-tashi-accent/20 rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
                                 <h3 className="text-xl font-bold text-tashi-accent font-serif pl-2">Local Guide Map</h3>
                                 <button
-                                    onClick={() => setShowMap(false)}
-                                    className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-colors"
+                                    className="w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-black transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
@@ -1443,44 +1441,44 @@ export default function MenuPage() {
             {
                 showContactInfo && (
                     <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
-                        <div className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
+                        <div className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-xl font-bold text-white font-serif">Contact Us</h3>
-                                    <p className="text-sm text-gray-400">We are here to help!</p>
+                                    <h3 className="text-xl font-bold text-black font-serif">Contact Us</h3>
+                                    <p className="text-sm text-gray-500">We are here to help!</p>
                                 </div>
-                                <button onClick={() => setShowContactInfo(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                                <button onClick={() => setShowContactInfo(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
                             </div>
 
                             <div className="space-y-3 pt-2">
-                                <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
                                     <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
                                         <Phone size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">Call Staffs</p>
+                                        <p className="font-bold text-gray-800">Call Staffs</p>
                                         <p className="text-xs text-gray-500">{contactInfo.phone}</p>
                                     </div>
                                 </a>
 
                                 {contactInfo.secondaryPhone && (
-                                    <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                    <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
                                         <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
                                             <Phone size={24} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-200">Call Owner</p>
+                                            <p className="font-bold text-gray-800">Call Owner</p>
                                             <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
                                         </div>
                                     </a>
                                 )}
 
-                                <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
                                     <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                                         <MessageCircle size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-200">WhatsApp</p>
+                                        <p className="font-bold text-gray-800">WhatsApp</p>
                                         <p className="text-xs text-gray-500">Chat with us</p>
                                     </div>
                                 </a>
@@ -1510,15 +1508,15 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-neutral-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+                            className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-xl font-bold text-white font-serif">Rate Us</h3>
-                                    <p className="text-sm text-gray-400">Tell us about your experience</p>
+                                    <h3 className="text-xl font-bold text-black font-serif">Rate Us</h3>
+                                    <p className="text-sm text-gray-500">Tell us about your experience</p>
                                 </div>
-                                <button onClick={() => setShowReviewModal(false)} className="bg-white/10 p-1 rounded-full text-white hover:bg-white/20"><X size={20} /></button>
+                                <button onClick={() => setShowReviewModal(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
                             </div>
 
                             <div className="space-y-4 pt-2">
@@ -1541,14 +1539,14 @@ export default function MenuPage() {
                                     placeholder="Your Name (Optional)"
                                     value={reviewName}
                                     onChange={(e) => setReviewName(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50"
+                                    className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50"
                                 />
 
                                 <textarea
                                     placeholder="Share your feedback..."
                                     value={reviewComment}
                                     onChange={(e) => setReviewComment(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
+                                    className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
                                 />
 
                                 <button
@@ -1668,7 +1666,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
             )}
 
             {/* Image Placeholder with Gradient */}
-            <div className="w-32 h-32 bg-neutral-800 rounded-xl flex-shrink-0 relative overflow-hidden border border-white/5 cursor-pointer">
+            <div className="w-32 h-32 bg-gray-200 rounded-xl flex-shrink-0 relative overflow-hidden border border-black/5 cursor-pointer">
                 {item.image ? (
                     <img
                         src={item.image}
@@ -1732,7 +1730,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                             style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
                                 ? 'bg-white/5 cursor-pointer'
-                                : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                                : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
                                 }`}
                         >
                             <Plus size={20} />
@@ -1808,7 +1806,7 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
                         style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
                             ? 'bg-white/5 cursor-pointer'
-                            : 'bg-neutral-800 text-gray-600 border-gray-700 cursor-not-allowed'
+                            : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
                             }`}
                     >
                         <Plus size={18} />
@@ -1963,7 +1961,7 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                                 <div className="absolute -inset-[2px] rounded-2xl opacity-75 blur-sm animate-pulse" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}, #FFFFFF, ${menuAppearance.accentColor})` }} />
 
                                 <div
-                                    className="relative bg-neutral-900 rounded-2xl overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.5)] group"
+                                    className="relative bg-white rounded-2xl overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.1)] group"
                                     style={{ borderColor: `${menuAppearance.accentColor}4d`, borderWidth: '1px' }}
                                     onClick={() => isActive && setSelectedItem(item)}
                                 >
@@ -1980,7 +1978,7 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
                                             </>
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-neutral-800 text-gray-700 font-bold text-xs uppercase">No Image</div>
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold text-xs uppercase">No Image</div>
                                         )}
                                     </div>
 
