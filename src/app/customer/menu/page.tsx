@@ -1417,6 +1417,7 @@ export default function MenuPage() {
                             <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
                                 <h3 className="text-xl font-bold text-tashi-accent font-serif pl-2">Local Guide Map</h3>
                                 <button
+                                    onClick={() => setShowMap(false)}
                                     className="w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-black transition-colors"
                                 >
                                     <X size={20} />

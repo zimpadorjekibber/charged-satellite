@@ -58,7 +58,7 @@ export default function LocalMapGuide() {
                     <div>
                         <h3 className="text-black font-serif font-bold text-xl flex items-center gap-2">
                             <Navigation size={20} className={`transition-transform duration-700 text-tashi-accent ${isReverse ? 'rotate-180' : ''}`} />
-                            Interactive Tourist Loop
+                            Interactive Tourist Loop & Terrain
                         </h3>
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5 font-bold">Spiti Valley Expedition Guide</p>
                     </div>
@@ -95,22 +95,50 @@ export default function LocalMapGuide() {
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
                         </marker>
                         <linearGradient id="roadGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#e5e5e5" />
-                            <stop offset="50%" stopColor="#d4d4d4" />
-                            <stop offset="100%" stopColor="#e5e5e5" />
+                            <stop offset="0%" stopColor="#d4d4d4" />
+                            <stop offset="20%" stopColor="#e5e5e5" />
+                            <stop offset="80%" stopColor="#e5e5e5" />
+                            <stop offset="100%" stopColor="#d4d4d4" />
                         </linearGradient>
+                        <linearGradient id="riverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#a5f3fc" />
+                            <stop offset="100%" stopColor="#67e8f9" />
+                        </linearGradient>
+                        <pattern id="terrainPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="#000000" opacity="0.05" />
+                        </pattern>
                         <filter id="glow">
                             <feGaussianBlur stdDeviation="3" result="blur" />
                             <feComposite in="SourceGraphic" in2="blur" operator="over" />
                         </filter>
                     </defs>
 
-                    {/* MOUNTAIN SILHOUETTES Background - Light Grey for White Theme */}
-                    <path d="M 0 400 L 150 250 L 300 380 L 500 150 L 650 320 L 800 180 V 600 H 0 Z" fill="#f5f5f5" opacity="0.5" />
-                    <path d="M 0 450 L 200 320 L 400 450 L 600 280 L 800 400 V 600 H 0 Z" fill="#eeeeee" opacity="0.8" />
+                    {/* TERRAIN TEXTURE Background */}
+                    <rect width="800" height="600" fill="url(#terrainPattern)" />
 
-                    {/* ROADS - Base */}
-                    <g stroke="url(#roadGrad)" strokeWidth="18" fill="none" strokeLinecap="round" opacity="0.8">
+                    {/* MOUNTAIN RANGES - Styled as detailed topographic contours */}
+                    {/* Background Range */}
+                    <path d="M 0 400 C 50 380, 150 250, 200 270 S 300 380, 400 350 S 500 150, 600 200 S 750 320, 800 180 V 600 H 0 Z" fill="#f3f4f6" stroke="#e5e7eb" strokeWidth="2" />
+
+                    {/* Mid Range */}
+                    <path d="M 0 450 C 50 440, 200 320, 250 340 S 400 450, 500 420 S 600 280, 650 300 S 750 400, 800 400 V 600 H 0 Z" fill="#f9fafb" stroke="#e5e7eb" strokeWidth="2" />
+
+                    {/* SPITI RIVER FLOW - Behind roads */}
+                    <path d="M 800 550 C 700 560, 600 540, 500 500 S 300 400, 200 450 S 50 500, 0 480" fill="none" stroke="url(#riverGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.6" />
+
+
+                    {/* ROADS - Realistic styling with borders */}
+                    {/* Road Borders */}
+                    <g stroke="#a3a3a3" strokeWidth="22" fill="none" strokeLinecap="round" opacity="0.3">
+                        <path d="M 120 530 Q 230 520 350 480" />
+                        <path d="M 350 480 Q 515 480 680 380" />
+                        <path d="M 680 380 Q 700 315 680 250" />
+                        <path d="M 680 250 Q 550 150 350 100" />
+                        <path d="M 350 100 Q 200 250 350 480" />
+                    </g>
+
+                    {/* Road Pavement */}
+                    <g stroke="url(#roadGrad)" strokeWidth="16" fill="none" strokeLinecap="round" opacity="1">
                         <path d="M 120 530 Q 230 520 350 480" />
                         <path d="M 350 480 Q 515 480 680 380" />
                         <path d="M 680 380 Q 700 315 680 250" />
