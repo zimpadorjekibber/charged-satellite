@@ -140,8 +140,8 @@ export default function LocalMapGuide() {
                         {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (280, 180) */}
                         <motion.path
                             d={isReverse
-                                ? "M 280 180 C 280 250, 450 300, 570 360"
-                                : "M 570 360 C 450 300, 280 250, 280 180"}
+                                ? "M 280 180 C 380 160, 550 220, 570 360"
+                                : "M 570 360 C 550 220, 380 160, 280 180"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                             transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
