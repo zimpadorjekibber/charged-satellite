@@ -118,53 +118,36 @@ export default function LocalMapGuide() {
 
                     {/* ANIMATED FLOW OVERLAY - Tracing the real map road */}
                     <g fill="none" stroke="#DAA520" strokeWidth="6" strokeLinecap="round" opacity="0.8" filter="url(#glow)">
-                        <motion.path
-                            key={isReverse ? 's1r' : 's1f'}
-                            d={isReverse
-                                ? "M 320 200 C 350 250, 480 300, 520 450" // Chicham -> Kibber (Reverse)
-                                : "M 400 580 C 400 500, 380 400, 350 350 S 480 300, 520 450"} // Link -> Kibber (Forward) - Rough approx
-                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            markerEnd="url(#arrowhead)"
-                        />
                         {/* 
-                            Path Logic based on Real Map:
-                            - Link Road (Bottom Center approx): 400, 580
-                            - Chicham (Top Left): 280, 80
-                            - Kibber (Center Right): 550, 350
-                            - TashiZom (Near Kibber, slightly lower): 570, 380
+                            Path Logic - Emphasizing the LOOP:
+                            1. Enter from Link Road (Bottom)
+                            2. Go UP to TashiZom/Kibber (Right)
+                            3. Connect DIRECTLY across to Chicham (Left)
+                            4. Exit to Manali (Top)
                          */}
-                        <motion.path
-                            key="real-path-fwd"
-                            d="M 400 580 C 420 500, 400 450, 450 400 S 550 380, 570 380" // Link -> TashiZom
-                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            // markerEnd="url(#arrowhead)"
-                            opacity="0" // Hiding this test path, using segments below
-                        />
 
-                        {/* Segment 1: Link Road -> TashiZom/Kibber Area */}
+                        {/* Segment 1: Link Road -> TashiZom (Arrival) */}
                         <motion.path
                             d={isReverse
-                                ? "M 570 380 C 550 380, 450 400, 400 580"
-                                : "M 400 580 C 420 500, 400 450, 450 400 S 550 380, 570 380"}
+                                ? "M 570 360 C 500 400, 420 500, 400 580"
+                                : "M 400 580 C 420 500, 500 400, 570 360"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
                         />
 
-                        {/* Segment 2: TashiZom -> Chicham */}
+                        {/* Segment 2: TashiZom -> Chicham (The Direct Link) */}
+                        {/* This curve visualizes the high-altitude connecting road */}
                         <motion.path
                             d={isReverse
-                                ? "M 280 80 C 300 150, 500 250, 570 380"
-                                : "M 570 380 C 500 250, 300 150, 280 80"}
+                                ? "M 280 80 C 280 200, 450 280, 570 360"
+                                : "M 570 360 C 450 280, 280 200, 280 80"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
                         />
                     </g>
 
-                    {/* Drive Times */}
                     {/* Drive Times */}
                     {!isReverse && (
                         <g fill="#555" fontSize="10" fontStyle="italic" fontWeight="bold">
@@ -200,7 +183,7 @@ export default function LocalMapGuide() {
                     </g>
 
                     {/* TashiZom - THE TARGET (Near Kibber) */}
-                    <g transform="translate(570, 380)" className="cursor-pointer" onClick={() => setSelectedLoc('tashizom')}>
+                    <g transform="translate(570, 360)" className="cursor-pointer" onClick={() => setSelectedLoc('tashizom')}>
                         <circle r="45" fill="#DAA520" opacity="0.15">
                             <animate attributeName="r" from="25" to="55" dur="2s" repeatCount="indefinite" />
                             <animate attributeName="opacity" from="0.3" to="0" dur="2s" repeatCount="indefinite" />
