@@ -116,82 +116,91 @@ export default function LocalMapGuide() {
                     {/* REAL MAP BACKGROUND */}
                     <image href="/spiti-real-map.png" x="0" y="0" width="800" height="600" preserveAspectRatio="xMidYMid slice" opacity="0.8" />
 
-                    {/* ANIMATED FLOW OVERLAY - Adjusted to loosely follow the loop */}
-                    <g fill="none" stroke="#DAA520" strokeWidth="6" strokeLinecap="round" opacity="0.9" filter="url(#glow)">
+                    {/* ANIMATED FLOW OVERLAY - Tracing the real map road */}
+                    <g fill="none" stroke="#DAA520" strokeWidth="6" strokeLinecap="round" opacity="0.8" filter="url(#glow)">
                         <motion.path
                             key={isReverse ? 's1r' : 's1f'}
-                            d={isReverse ? "M 350 480 Q 230 520 120 530" : "M 120 530 Q 230 520 350 480"}
+                            d={isReverse
+                                ? "M 320 200 C 350 250, 480 300, 520 450" // Chicham -> Kibber (Reverse)
+                                : "M 400 580 C 400 500, 380 400, 350 350 S 480 300, 520 450"} // Link -> Kibber (Forward) - Rough approx
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                             markerEnd="url(#arrowhead)"
                         />
+                        {/* 
+                            Path Logic based on Real Map:
+                            - Link Road (Bottom Center approx): 400, 580
+                            - Chicham (Top Left): 280, 80
+                            - Kibber (Center Right): 550, 350
+                            - TashiZom (Near Kibber, slightly lower): 570, 380
+                         */}
                         <motion.path
-                            key={isReverse ? 's2r' : 's2f'}
-                            d={isReverse ? "M 680 380 Q 515 480 350 480" : "M 350 480 Q 515 480 680 380"}
+                            key="real-path-fwd"
+                            d="M 400 580 C 420 500, 400 450, 450 400 S 550 380, 570 380" // Link -> TashiZom
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 2, delay: 1, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            // markerEnd="url(#arrowhead)"
+                            opacity="0" // Hiding this test path, using segments below
+                        />
+
+                        {/* Segment 1: Link Road -> TashiZom/Kibber Area */}
+                        <motion.path
+                            d={isReverse
+                                ? "M 570 380 C 550 380, 450 400, 400 580"
+                                : "M 400 580 C 420 500, 400 450, 450 400 S 550 380, 570 380"}
+                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                             markerEnd="url(#arrowhead)"
                         />
+
+                        {/* Segment 2: TashiZom -> Chicham */}
                         <motion.path
-                            key={isReverse ? 's3r' : 's3f'}
-                            d={isReverse ? "M 680 250 Q 700 315 680 380" : "M 680 380 Q 700 315 680 250"}
+                            d={isReverse
+                                ? "M 280 80 C 300 150, 500 250, 570 380"
+                                : "M 570 380 C 500 250, 300 150, 280 80"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 1.5, delay: 2, repeat: Infinity, ease: "linear" }}
-                            markerEnd="url(#arrowhead)"
-                        />
-                        <motion.path
-                            key={isReverse ? 's4r' : 's4f'}
-                            d={isReverse ? "M 350 100 Q 550 150 680 250" : "M 680 250 Q 550 150 350 100"}
-                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 2.5, delay: 3, repeat: Infinity, ease: "linear" }}
-                            markerEnd="url(#arrowhead)"
-                        />
-                        <motion.path
-                            key={isReverse ? 's5r' : 's5f'}
-                            d={isReverse ? "M 350 480 Q 200 250 350 100" : "M 350 100 Q 200 250 350 480"}
-                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-                            transition={{ duration: 3, delay: 4.5, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "linear" }}
                             markerEnd="url(#arrowhead)"
                         />
                     </g>
 
                     {/* Drive Times */}
+                    {/* Drive Times */}
                     {!isReverse && (
                         <g fill="#555" fontSize="10" fontStyle="italic" fontWeight="bold">
-                            <text x="210" y="515">~12m</text>
-                            <text x="500" y="470">~15m</text>
-                            <text x="695" y="325">~2m</text>
-                            <text x="500" y="160">~15m</text>
+                            <text x="450" y="480">~15m</text>
+                            <text x="400" y="200">~15m</text>
                         </g>
                     )}
 
                     {/* Nodes */}
-                    {/* Link Road */}
-                    <g transform="translate(350, 480)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
+                    {/* Link Road (Bottom Center) */}
+                    <g transform="translate(400, 580)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
                         <circle r="12" fill={selectedLoc === 'linkroad' ? '#3b82f6' : '#e5e5e5'} stroke="#3b82f6" strokeWidth="2" />
                         <text y="35" textAnchor="middle" fill="black" fontSize="12" fontWeight="bold">Link Road</text>
                     </g>
 
-                    {/* Kee Monastery */}
-                    <g transform="translate(120, 530)" className="group cursor-pointer" onClick={() => setSelectedLoc('kee')}>
-                        <motion.circle r="14" fill="#d97706" animate={selectedLoc === 'kee' ? { r: 18 } : {}} />
-                        <text y="-25" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Kee Monastery</text>
+                    {/* Kee Monastery (Bottom Right/Center - actually removed from main loop view usually, but lets place it towards bottom right if needed, or closer to Kaza direction) */}
+                    {/* Hiding/Moving Kee to reflect visual reality if it's not prominently on this specific loop crop, or placing it near Kaza exit */}
+                    <g transform="translate(450, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('kee')}>
+                        <motion.circle r="10" fill="#d97706" animate={selectedLoc === 'kee' ? { r: 14 } : {}} />
+                        <text x="15" y="5" fill="black" fontSize="12" fontWeight="bold">Kee</text>
                     </g>
 
-                    {/* Kibber Village */}
-                    <g transform="translate(680, 250)" className="group cursor-pointer" onClick={() => setSelectedLoc('kibber')}>
+                    {/* Kibber Village (Center Right) */}
+                    <g transform="translate(550, 350)" className="group cursor-pointer" onClick={() => setSelectedLoc('kibber')}>
                         <circle r="12" fill="#22c55e" />
                         <text x="20" y="0" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
                     </g>
 
-                    {/* Chicham Bridge */}
-                    <g transform="translate(350, 100)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
+                    {/* Chicham Bridge (Top Left) */}
+                    <g transform="translate(280, 80)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
                         <circle r="14" fill="#ef4444" />
-                        <text y="-25" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
+                        <text y="35" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
                     </g>
 
-                    {/* TashiZom - THE TARGET */}
-                    <g transform="translate(680, 380)" className="cursor-pointer" onClick={() => setSelectedLoc('tashizom')}>
+                    {/* TashiZom - THE TARGET (Near Kibber) */}
+                    <g transform="translate(570, 380)" className="cursor-pointer" onClick={() => setSelectedLoc('tashizom')}>
                         <circle r="45" fill="#DAA520" opacity="0.15">
                             <animate attributeName="r" from="25" to="55" dur="2s" repeatCount="indefinite" />
                             <animate attributeName="opacity" from="0.3" to="0" dur="2s" repeatCount="indefinite" />
@@ -208,9 +217,9 @@ export default function LocalMapGuide() {
                     {/* Directional Route Markers */}
 
                     {/* To Manali (North from Chicham) */}
-                    <g transform="translate(350, 80)">
+                    <g transform="translate(260, 40)">
                         <motion.path
-                            d="M 0 -10 L 0 -50"
+                            d="M 0 0 L -20 -30"
                             fill="none"
                             stroke="#22c55e"
                             strokeWidth="3"
@@ -218,13 +227,11 @@ export default function LocalMapGuide() {
                             animate={{ strokeDashoffset: [0, -10] }}
                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                         />
-                        <path d="M -5 -45 L 0 -55 L 5 -45" fill="#22c55e" />
-                        <text x="10" y="-45" fill="#22c55e" fontSize="20" fontWeight="bold">Manali</text>
-                        <text x="12" y="-28" fill="#4ade80" fontSize="10" fontWeight="medium">168 km from TashiZom</text>
+                        <text x="-10" y="-35" fill="#22c55e" fontSize="14" fontWeight="bold">To Manali</text>
                     </g>
 
                     {/* To Kaza (South from Link Road area) */}
-                    <g transform="translate(350, 500)">
+                    <g transform="translate(400, 580)">
                         <motion.path
                             d="M 0 10 L 0 50"
                             fill="none"
@@ -234,9 +241,7 @@ export default function LocalMapGuide() {
                             animate={{ strokeDashoffset: [0, 10] }}
                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                         />
-                        <path d="M -5 45 L 0 55 L 5 45" fill="#3b82f6" />
-                        <text x="10" y="48" fill="#3b82f6" fontSize="18" fontWeight="bold">To Kaza</text>
-                        <text x="12" y="62" fill="#60a5fa" fontSize="11" fontWeight="medium">20 km from TashiZom</text>
+                        <text x="10" y="30" fill="#3b82f6" fontSize="14" fontWeight="bold">To Kaza</text>
                     </g>
 
                 </svg>
