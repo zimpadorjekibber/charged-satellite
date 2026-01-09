@@ -58,9 +58,9 @@ export default function LocalMapGuide() {
                     <div>
                         <h3 className="text-black font-serif font-bold text-xl flex items-center gap-2">
                             <Navigation size={20} className={`transition-transform duration-700 text-tashi-accent ${isReverse ? 'rotate-180' : ''}`} />
-                            Interactive Tourist Loop & Terrain
+                            Interactive Real Map
                         </h3>
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5 font-bold">Spiti Valley Expedition Guide</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5 font-bold">Terrain View with Route Flow</p>
                     </div>
                     <button
                         onClick={() => setIsReverse(!isReverse)}
@@ -113,41 +113,11 @@ export default function LocalMapGuide() {
                         </filter>
                     </defs>
 
-                    {/* TERRAIN TEXTURE Background */}
-                    <rect width="800" height="600" fill="url(#terrainPattern)" />
+                    {/* REAL MAP BACKGROUND */}
+                    <image href="/spiti-real-map.png" x="0" y="0" width="800" height="600" preserveAspectRatio="xMidYMid slice" opacity="0.8" />
 
-                    {/* MOUNTAIN RANGES - Styled as detailed topographic contours */}
-                    {/* Background Range */}
-                    <path d="M 0 400 C 50 380, 150 250, 200 270 S 300 380, 400 350 S 500 150, 600 200 S 750 320, 800 180 V 600 H 0 Z" fill="#f3f4f6" stroke="#e5e7eb" strokeWidth="2" />
-
-                    {/* Mid Range */}
-                    <path d="M 0 450 C 50 440, 200 320, 250 340 S 400 450, 500 420 S 600 280, 650 300 S 750 400, 800 400 V 600 H 0 Z" fill="#f9fafb" stroke="#e5e7eb" strokeWidth="2" />
-
-                    {/* SPITI RIVER FLOW - Behind roads */}
-                    <path d="M 800 550 C 700 560, 600 540, 500 500 S 300 400, 200 450 S 50 500, 0 480" fill="none" stroke="url(#riverGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.6" />
-
-
-                    {/* ROADS - Realistic styling with borders */}
-                    {/* Road Borders */}
-                    <g stroke="#a3a3a3" strokeWidth="22" fill="none" strokeLinecap="round" opacity="0.3">
-                        <path d="M 120 530 Q 230 520 350 480" />
-                        <path d="M 350 480 Q 515 480 680 380" />
-                        <path d="M 680 380 Q 700 315 680 250" />
-                        <path d="M 680 250 Q 550 150 350 100" />
-                        <path d="M 350 100 Q 200 250 350 480" />
-                    </g>
-
-                    {/* Road Pavement */}
-                    <g stroke="url(#roadGrad)" strokeWidth="16" fill="none" strokeLinecap="round" opacity="1">
-                        <path d="M 120 530 Q 230 520 350 480" />
-                        <path d="M 350 480 Q 515 480 680 380" />
-                        <path d="M 680 380 Q 700 315 680 250" />
-                        <path d="M 680 250 Q 550 150 350 100" />
-                        <path d="M 350 100 Q 200 250 350 480" />
-                    </g>
-
-                    {/* ANIMATED FLOW */}
-                    <g fill="none" stroke="#DAA520" strokeWidth="4" strokeLinecap="round" opacity="0.8">
+                    {/* ANIMATED FLOW OVERLAY - Adjusted to loosely follow the loop */}
+                    <g fill="none" stroke="#DAA520" strokeWidth="6" strokeLinecap="round" opacity="0.9" filter="url(#glow)">
                         <motion.path
                             key={isReverse ? 's1r' : 's1f'}
                             d={isReverse ? "M 350 480 Q 230 520 120 530" : "M 120 530 Q 230 520 350 480"}
