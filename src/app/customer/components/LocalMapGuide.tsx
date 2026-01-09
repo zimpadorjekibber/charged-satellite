@@ -89,7 +89,7 @@ export default function LocalMapGuide() {
 
             {/* Interactive SVG Map */}
             <div className="flex-1 w-full h-full min-h-0 md:h-[600px] relative bg-white overflow-hidden">
-                <svg viewBox="160 0 480 600" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
+                <svg viewBox="120 0 560 600" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
@@ -137,11 +137,11 @@ export default function LocalMapGuide() {
                         />
 
                         {/* Segment 2: TashiZom -> Chicham (The Direct Link) */}
-                        {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (280, 180) */}
+                        {/* This curve visualizes the high-altitude connecting road - Adjusted end point to (320, 180) */}
                         <motion.path
                             d={isReverse
-                                ? "M 280 180 C 380 160, 550 220, 570 360"
-                                : "M 570 360 C 550 220, 380 160, 280 180"}
+                                ? "M 320 180 C 400 160, 550 220, 570 360"
+                                : "M 570 360 C 550 220, 400 160, 320 180"}
                             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
                             transition={{ duration: 3, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}
                             markerEnd="url(#arrowhead)"
@@ -165,8 +165,8 @@ export default function LocalMapGuide() {
                         <text x="0" y="28" textAnchor="middle" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
                     </g>
 
-                    {/* To Kee Monastery (Directional Arrow at Bottom Left) */}
-                    <g transform="translate(250, 550)">
+                    {/* To Kee Monastery (Directional Arrow at Bottom Left) - Moved UP/IN for visibility */}
+                    <g transform="translate(280, 530)">
                         <motion.path
                             d="M 0 -10 L 0 30"
                             fill="none"
@@ -186,10 +186,10 @@ export default function LocalMapGuide() {
                         <text x="-15" y="5" textAnchor="end" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
                     </g>
 
-                    {/* Chicham Bridge (Top Left) - Moved DOWN to 180 to shrink space */}
-                    <g transform="translate(280, 180)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
+                    {/* Chicham Bridge (Top Left) - Moved IN to 320 to avoid crop */}
+                    <g transform="translate(320, 180)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
                         <circle r="14" fill="#ef4444" />
-                        <text x="-15" y="5" textAnchor="end" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
+                        <text x="0" y="28" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
                     </g>
 
                     {/* TashiZom - THE TARGET (Near Kibber) */}
@@ -209,8 +209,8 @@ export default function LocalMapGuide() {
                     </g>
                     {/* Directional Route Markers */}
 
-                    {/* To Manali (North from Chicham) - Moved down with Chicham */}
-                    <g transform="translate(260, 160)">
+                    {/* To Manali (North from Chicham) - Moved In with Chicham */}
+                    <g transform="translate(300, 160)">
                         <motion.path
                             d="M 0 0 L -20 -30"
                             fill="none"
@@ -223,8 +223,8 @@ export default function LocalMapGuide() {
                         <text x="0" y="-35" textAnchor="start" fill="#22c55e" fontSize="14" fontWeight="bold">To Manali</text>
                     </g>
 
-                    {/* To Kaza (South from Link Road area) - Changed to Green */}
-                    <g transform="translate(400, 580)">
+                    {/* To Kaza (South from Link Road area) - Moved UP for visibility */}
+                    <g transform="translate(400, 560)">
                         <motion.path
                             d="M 0 10 L 0 50"
                             fill="none"
@@ -243,7 +243,7 @@ export default function LocalMapGuide() {
                 <motion.div
                     drag
                     dragMomentum={false}
-                    className="absolute top-[40%] left-6 flex flex-col gap-2 cursor-move"
+                    className="absolute top-[40%] left-[10%] flex flex-col gap-2 cursor-move"
                 >
                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
