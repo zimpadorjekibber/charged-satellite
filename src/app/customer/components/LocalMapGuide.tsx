@@ -166,8 +166,8 @@ export default function LocalMapGuide() {
                         <text x="18" y="5" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
                     </g>
 
-                    {/* To Kee Monastery (Directional Arrow at Bottom/Side) */}
-                    <g transform="translate(650, 550)">
+                    {/* To Kee Monastery (Directional Arrow at Bottom Left) */}
+                    <g transform="translate(250, 550)">
                         <motion.path
                             d="M 0 -10 L 0 30"
                             fill="none"
