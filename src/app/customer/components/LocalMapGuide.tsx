@@ -88,8 +88,8 @@ export default function LocalMapGuide() {
             </div>
 
             {/* Interactive SVG Map */}
-            <div className="flex-1 w-full aspect-[4/3] relative bg-white">
-                <svg viewBox="0 0 800 600" className="w-full h-full p-4">
+            <div className="flex-1 w-full h-full relative bg-white overflow-hidden">
+                <svg viewBox="0 0 800 600" className="w-full h-full p-0 md:p-4" preserveAspectRatio="xMidYMid meet">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
@@ -157,17 +157,28 @@ export default function LocalMapGuide() {
                     )}
 
                     {/* Nodes */}
-                    {/* Link Road (Bottom Center) */}
-                    <g transform="translate(400, 580)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
-                        <circle r="12" fill={selectedLoc === 'linkroad' ? '#3b82f6' : '#e5e5e5'} stroke="#3b82f6" strokeWidth="2" />
-                        <text y="35" textAnchor="middle" fill="black" fontSize="12" fontWeight="bold">Link Road</text>
+                    {/* OLD Link Road Removed - Superseded by the Orange Dot below */}
+
+                    {/* Chicham-Kibber Link Road (Formerly Kee Marker position) */}
+                    <g transform="translate(450, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
+                        {/* Using Link Road data but orange marker style as requested */}
+                        <motion.circle r="12" fill="#d97706" animate={selectedLoc === 'linkroad' ? { r: 16 } : {}} />
+                        <text x="18" y="5" fill="black" fontSize="13" fontWeight="bold">Chicham-Kibber Link Rd</text>
                     </g>
 
-                    {/* Kee Monastery (Bottom Right/Center - actually removed from main loop view usually, but lets place it towards bottom right if needed, or closer to Kaza direction) */}
-                    {/* Hiding/Moving Kee to reflect visual reality if it's not prominently on this specific loop crop, or placing it near Kaza exit */}
-                    <g transform="translate(450, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('kee')}>
-                        <motion.circle r="10" fill="#d97706" animate={selectedLoc === 'kee' ? { r: 14 } : {}} />
-                        <text x="15" y="5" fill="black" fontSize="12" fontWeight="bold">Kee</text>
+                    {/* To Kee Monastery (Directional Arrow at Bottom/Side) */}
+                    <g transform="translate(650, 550)">
+                        <motion.path
+                            d="M 0 -10 L 0 30"
+                            fill="none"
+                            stroke="#d97706"
+                            strokeWidth="3"
+                            strokeDasharray="5,5"
+                            animate={{ strokeDashoffset: [0, 10] }}
+                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                        />
+                        <path d="M -5 25 L 0 35 L 5 25" fill="#d97706" />
+                        <text x="0" y="-15" textAnchor="middle" fill="#d97706" fontSize="14" fontWeight="bold">To Kee Monastery</text>
                     </g>
 
                     {/* Kibber Village (Center Right) */}
@@ -199,8 +210,8 @@ export default function LocalMapGuide() {
                     </g>
                     {/* Directional Route Markers */}
 
-                    {/* To Manali (North from Chicham) */}
-                    <g transform="translate(260, 40)">
+                    {/* To Manali (North from Chicham) - Moved down slightly for visibility */}
+                    <g transform="translate(260, 60)">
                         <motion.path
                             d="M 0 0 L -20 -30"
                             fill="none"

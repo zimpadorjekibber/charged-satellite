@@ -1411,7 +1411,7 @@ export default function MenuPage() {
                             initial={{ scale: 0.9, y: 30 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 30 }}
-                            className="bg-white border border-tashi-accent/20 rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]"
+                            className="bg-white border border-tashi-accent/20 rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col h-[95vh] md:h-auto md:max-h-[90vh]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
