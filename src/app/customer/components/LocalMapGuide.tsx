@@ -48,23 +48,23 @@ export default function LocalMapGuide() {
     }, []);
 
     return (
-        <div className="bg-neutral-900 border border-tashi-accent/20 rounded-3xl overflow-hidden relative w-full flex flex-col max-w-3xl mx-auto shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        <div className="bg-white border border-tashi-accent/20 rounded-3xl overflow-hidden relative w-full flex flex-col max-w-3xl mx-auto shadow-[0_0_50px_rgba(0,0,0,0.1)]">
             {/* Topography Pattern */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/pinstripe.png')]" />
 
             {/* Header / Instructions */}
-            <div className="bg-black/60 backdrop-blur-xl p-5 w-full z-20 border-b border-white/10 relative">
+            <div className="bg-white/60 backdrop-blur-xl p-5 w-full z-20 border-b border-black/10 relative">
                 <div className="flex justify-between items-start mb-2">
                     <div>
-                        <h3 className="text-tashi-accent font-serif font-bold text-xl flex items-center gap-2">
-                            <Navigation size={20} className={`transition-transform duration-700 ${isReverse ? 'rotate-180' : ''}`} />
+                        <h3 className="text-black font-serif font-bold text-xl flex items-center gap-2">
+                            <Navigation size={20} className={`transition-transform duration-700 text-tashi-accent ${isReverse ? 'rotate-180' : ''}`} />
                             Interactive Tourist Loop
                         </h3>
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5 font-bold">Spiti Valley Expedition Guide</p>
                     </div>
                     <button
                         onClick={() => setIsReverse(!isReverse)}
-                        className="bg-white/5 hover:bg-tashi-accent/20 border border-white/10 p-2 rounded-xl transition-all active:scale-90 group"
+                        className="bg-black/5 hover:bg-tashi-accent/20 border border-black/10 p-2 rounded-xl transition-all active:scale-90 group"
                         title="Switch Direction"
                     >
                         <ArrowLeftRight size={18} className="text-tashi-accent group-hover:rotate-180 transition-transform duration-500" />
@@ -76,11 +76,11 @@ export default function LocalMapGuide() {
                     <p className="text-gray-300 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                         {isReverse ? (
                             <>
-                                <b className="text-white">Chicham</b> ➔ <b className="text-white">Kibber</b> ➔ <b className="text-white">TashiZom</b> ➔ <b className="text-white">Kee</b>
+                                <b className="text-black">Chicham</b> ➔ <b className="text-black">Kibber</b> ➔ <b className="text-black">TashiZom</b> ➔ <b className="text-black">Kee</b>
                             </>
                         ) : (
                             <>
-                                <b className="text-white">Kee</b> ➔ <b className="text-white">Kibber</b> ➔ <b className="text-white">TashiZom</b> ➔ <b className="text-white">Chicham</b>
+                                <b className="text-black">Kee</b> ➔ <b className="text-black">Kibber</b> ➔ <b className="text-black">TashiZom</b> ➔ <b className="text-black">Chicham</b>
                             </>
                         )}
                     </p>
@@ -88,16 +88,16 @@ export default function LocalMapGuide() {
             </div>
 
             {/* Interactive SVG Map */}
-            <div className="flex-1 w-full aspect-[4/3] relative bg-[#0a0a0a]">
+            <div className="flex-1 w-full aspect-[4/3] relative bg-white">
                 <svg viewBox="0 0 800 600" className="w-full h-full p-4">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
                         </marker>
                         <linearGradient id="roadGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#1a1a1a" />
-                            <stop offset="50%" stopColor="#222" />
-                            <stop offset="100%" stopColor="#1a1a1a" />
+                            <stop offset="0%" stopColor="#e5e5e5" />
+                            <stop offset="50%" stopColor="#d4d4d4" />
+                            <stop offset="100%" stopColor="#e5e5e5" />
                         </linearGradient>
                         <filter id="glow">
                             <feGaussianBlur stdDeviation="3" result="blur" />
@@ -105,9 +105,9 @@ export default function LocalMapGuide() {
                         </filter>
                     </defs>
 
-                    {/* MOUNTAIN SILHOUETTES Background */}
-                    <path d="M 0 400 L 150 250 L 300 380 L 500 150 L 650 320 L 800 180 V 600 H 0 Z" fill="#0f0f0f" opacity="0.5" />
-                    <path d="M 0 450 L 200 320 L 400 450 L 600 280 L 800 400 V 600 H 0 Z" fill="#141414" opacity="0.8" />
+                    {/* MOUNTAIN SILHOUETTES Background - Light Grey for White Theme */}
+                    <path d="M 0 400 L 150 250 L 300 380 L 500 150 L 650 320 L 800 180 V 600 H 0 Z" fill="#f5f5f5" opacity="0.5" />
+                    <path d="M 0 450 L 200 320 L 400 450 L 600 280 L 800 400 V 600 H 0 Z" fill="#eeeeee" opacity="0.8" />
 
                     {/* ROADS - Base */}
                     <g stroke="url(#roadGrad)" strokeWidth="18" fill="none" strokeLinecap="round" opacity="0.8">
@@ -170,26 +170,26 @@ export default function LocalMapGuide() {
                     {/* Nodes */}
                     {/* Link Road */}
                     <g transform="translate(350, 480)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
-                        <circle r="12" fill={selectedLoc === 'linkroad' ? '#3b82f6' : '#222'} stroke="#3b82f6" strokeWidth="2" />
-                        <text y="35" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">Link Road</text>
+                        <circle r="12" fill={selectedLoc === 'linkroad' ? '#3b82f6' : '#e5e5e5'} stroke="#3b82f6" strokeWidth="2" />
+                        <text y="35" textAnchor="middle" fill="black" fontSize="12" fontWeight="bold">Link Road</text>
                     </g>
 
                     {/* Kee Monastery */}
                     <g transform="translate(120, 530)" className="group cursor-pointer" onClick={() => setSelectedLoc('kee')}>
                         <motion.circle r="14" fill="#d97706" animate={selectedLoc === 'kee' ? { r: 18 } : {}} />
-                        <text y="-25" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">Kee Monastery</text>
+                        <text y="-25" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Kee Monastery</text>
                     </g>
 
                     {/* Kibber Village */}
                     <g transform="translate(680, 250)" className="group cursor-pointer" onClick={() => setSelectedLoc('kibber')}>
                         <circle r="12" fill="#22c55e" />
-                        <text x="20" y="0" fill="white" fontSize="14" fontWeight="bold">Kibber Village</text>
+                        <text x="20" y="0" fill="black" fontSize="14" fontWeight="bold">Kibber Village</text>
                     </g>
 
                     {/* Chicham Bridge */}
                     <g transform="translate(350, 100)" className="group cursor-pointer" onClick={() => setSelectedLoc('chicham')}>
                         <circle r="14" fill="#ef4444" />
-                        <text y="-25" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">Chicham Bridge</text>
+                        <text y="-25" textAnchor="middle" fill="black" fontSize="14" fontWeight="bold">Chicham Bridge</text>
                     </g>
 
                     {/* TashiZom - THE TARGET */}
@@ -245,9 +245,9 @@ export default function LocalMapGuide() {
 
                 {/* Legend / Overlay */}
                 <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-                    <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
+                    <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 shadow-lg">
                         <div className="w-2 h-2 rounded-full bg-tashi-accent animate-pulse" />
-                        <span className="text-[10px] text-white font-medium">Click markers for details</span>
+                        <span className="text-[10px] text-black font-medium">Click markers for details</span>
                     </div>
                 </div>
             </div>
@@ -259,12 +259,12 @@ export default function LocalMapGuide() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="bg-black/80 backdrop-blur-2xl border-t border-tashi-accent/30 overflow-hidden"
+                        className="bg-white/80 backdrop-blur-2xl border-t border-tashi-accent/30 overflow-hidden"
                     >
                         <div className="p-6 relative">
                             <button
                                 onClick={() => setSelectedLoc(null)}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                                className="absolute top-4 right-4 text-gray-400 hover:text-black"
                             >
                                 <Info size={20} />
                             </button>
@@ -275,12 +275,12 @@ export default function LocalMapGuide() {
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex justify-between items-center mb-1">
-                                        <h4 className="text-xl font-bold text-white font-serif">{LOCATIONS[selectedLoc].name}</h4>
+                                        <h4 className="text-xl font-bold text-black font-serif">{LOCATIONS[selectedLoc].name}</h4>
                                         <span className="bg-tashi-accent/20 text-tashi-accent px-2 py-0.5 rounded text-[10px] font-bold border border-tashi-accent/30">
                                             {LOCATIONS[selectedLoc].elevation}
                                         </span>
                                     </div>
-                                    <p className="text-gray-400 text-xs leading-relaxed mb-3">
+                                    <p className="text-gray-600 text-xs leading-relaxed mb-3">
                                         {LOCATIONS[selectedLoc].desc}
                                     </p>
                                     <div className="flex items-center gap-4">
@@ -297,14 +297,16 @@ export default function LocalMapGuide() {
             </AnimatePresence>
 
             {/* Footer Prompt */}
-            {!selectedLoc && (
-                <div className="bg-black/40 p-3 text-center border-t border-white/5">
-                    <p className="text-[10px] text-gray-500 font-medium">
-                        Exploring Spiti? Grab a hot beverage at TashiZom before your next landmark!
-                    </p>
-                </div>
-            )}
-        </div>
+            {
+                !selectedLoc && (
+                    <div className="bg-white/40 p-3 text-center border-t border-black/5">
+                        <p className="text-[10px] text-gray-500 font-medium">
+                            Exploring Spiti? Grab a hot beverage at TashiZom before your next landmark!
+                        </p>
+                    </div>
+                )
+            }
+        </div >
     );
 }
 
