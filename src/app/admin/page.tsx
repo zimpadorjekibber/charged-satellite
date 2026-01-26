@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
@@ -62,6 +62,7 @@ function AdminDashboard() {
 
     const prevOrdersLength = useRef(0);
     const prevNotifLength = useRef(0);
+    const [showVisualAlert, setShowVisualAlert] = useState(false);
 
     // Scan Stats Logic
     const [showScanStats, setShowScanStats] = useState(false);
@@ -80,26 +81,47 @@ function AdminDashboard() {
     }, []);
 
     useEffect(() => {
-        const pendingNotifs = notifications.filter(n => n.status === 'pending').length;
+        const currentPendingOrders = orders.filter(o => o.status === 'Pending').length;
+        const currentPendingNotifs = notifications.filter(n => n.status === 'pending').length;
 
-        // Continuous Ringer for Pending Calls
-        if (soundEnabled && pendingNotifs > 0) {
+        // Trigger Alert for NEW items
+        if (currentPendingOrders > prevOrdersLength.current || currentPendingNotifs > prevNotifLength.current) {
+            setShowVisualAlert(true);
+
+            // If sound is enabled and not already ringing, play a chime or start ring
+            if (soundEnabled && audioRef.current) {
+                audioRef.current.loop = true;
+                if (audioRef.current.paused) {
+                    audioRef.current.play().catch(e => console.error("Sound play failed", e));
+                }
+            }
+        }
+
+        // Keep ringing if ANY action is needed (Order Pending or Service Request Pending)
+        const hasActionsNeeded = currentPendingOrders > 0 || currentPendingNotifs > 0;
+
+        if (soundEnabled && hasActionsNeeded) {
             if (audioRef.current) {
-                // Ensure loop is enabled (handle race condition where audio is already playing)
                 audioRef.current.loop = true;
                 if (audioRef.current.paused) {
                     audioRef.current.play().catch(e => console.error("Ring loop failed", e));
                 }
             }
         } else {
-            // Silence if no pending calls
+            // Silence if everything is clear
             if (audioRef.current) {
-                audioRef.current.loop = false; // Disable loop for previews
+                audioRef.current.loop = false;
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
             }
+            if (!hasActionsNeeded) {
+                setShowVisualAlert(false);
+            }
         }
-    }, [notifications, soundEnabled]);
+
+        prevOrdersLength.current = currentPendingOrders;
+        prevNotifLength.current = currentPendingNotifs;
+    }, [notifications, orders, soundEnabled]);
 
     const toggleSound = () => {
         if (!soundEnabled) {
@@ -161,6 +183,7 @@ function AdminDashboard() {
     const [error, setError] = useState('');
     const [editingItem, setEditingItem] = useState<any>(null); // State for editing item
     const [menuSearchQuery, setMenuSearchQuery] = useState(''); // Search filter for menu
+    const [historySearch, setHistorySearch] = useState(''); // Search filter for history
     const [menuCategoryFilter, setMenuCategoryFilter] = useState<string>('All'); // Category filter
     const [showGalleryPicker, setShowGalleryPicker] = useState(false); // State for gallery picker modal
 
@@ -346,14 +369,62 @@ function AdminDashboard() {
     }
 
     // Computed Stats
+    const today = new Date().toDateString();
+    const todaysOrders = (orders || []).filter(o => new Date(orderCreatedAt(o)).toDateString() === today);
+    const todaysRevenue = todaysOrders.reduce((sum, o) => sum + o.totalAmount, 0);
     const totalRevenue = (orders || []).reduce((sum, order) => sum + order.totalAmount, 0);
     const activeOrders = (orders || []).filter(o => o.status !== 'Paid' && o.status !== 'Rejected' && o.status !== 'Cancelled');
     const pastOrders = (orders || []).filter(o => o.status === 'Paid' || o.status === 'Rejected' || o.status === 'Cancelled');
+
+    function orderCreatedAt(o: any) {
+        if (!o.createdAt) return new Date();
+        try {
+            return new Date(o.createdAt);
+        } catch {
+            return new Date();
+        }
+    }
 
     return (
         <div className="min-h-screen pb-24 bg-gray-50 text-gray-900 selection:bg-orange-100 selection:text-orange-900">
             {/* Hidden Audio Element for Reliable Playback */}
             <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" />
+
+            {/* Visual Alert Banner */}
+            <AnimatePresence>
+                {showVisualAlert && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-red-600 text-white overflow-hidden shadow-2xl relative z-[60]"
+                    >
+                        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white/20 rounded-full animate-pulse">
+                                    <Bell size={18} className="fill-white" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-sm">Action Required: New Activity Detected!</p>
+                                    <p className="text-[10px] opacity-90 uppercase tracking-widest font-bold">Check orders or service requests</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setShowVisualAlert(false);
+                                    if (audioRef.current) {
+                                        audioRef.current.pause();
+                                        audioRef.current.currentTime = 0;
+                                    }
+                                }}
+                                className="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2"
+                            >
+                                <Check size={14} /> Dismiss Alert
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Top Navigation Bar - Desktop Only / Minimal Mobile Header */}
             <div className="border-b border-gray-200 p-4 sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
@@ -399,8 +470,12 @@ function AdminDashboard() {
                             Kitchen View
                         </Link>
                         <button
-                            onClick={logout}
-                            className="p-2 bg-red-900/20 text-red-400 border border-red-900/50 rounded-lg hover:bg-red-900/40 transition-colors"
+                            onClick={() => {
+                                if (confirm('Are you sure you want to logout?')) {
+                                    logout();
+                                }
+                            }}
+                            className="p-2 bg-red-900/20 text-red-500 border border-red-900/50 rounded-lg hover:bg-red-900/40 transition-colors"
                         >
                             <LogOut size={16} />
                         </button>
@@ -438,106 +513,233 @@ function AdminDashboard() {
                 <AnimatePresence mode="wait">
                     {/* LIVE DASHBOARD VIEW */}
                     {activeTab === 'live' && (
-                        // ... (existing live view content)
                         <motion.div
                             key="live"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                             className="space-y-8"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Dashboard Header Stats */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+                                <StatCard
+                                    title="Today's Revenue"
+                                    value={`₹${todaysRevenue.toLocaleString()}`}
+                                    icon={<DollarSign className="text-green-500" size={24} />}
+                                    subtext={`${todaysOrders.length} orders today`}
+                                />
                                 <StatCard
                                     title="Active Orders"
                                     value={activeOrders.length.toString()}
-                                    icon={<TrendingUp className="text-blue-400" size={24} />}
+                                    icon={<ShoppingBag className="text-blue-500" size={24} />}
                                     subtext="Pending fulfillment"
                                 />
                                 <StatCard
-                                    title="Active Tables"
-                                    value={tables.length.toString()}
-                                    icon={<Users className="text-tashi-accent" size={24} />}
-                                    subtext="Registered tables"
+                                    title="Service Requests"
+                                    value={notifications.filter(n => n.status === 'pending').length.toString()}
+                                    icon={<Bell className="text-orange-500" size={24} />}
+                                    subtext="Pending calls/bills"
                                 />
                                 <StatCard
-                                    title="Total Revenue (All Time)"
-                                    value={`₹${totalRevenue.toLocaleString()}`}
-                                    icon={<DollarSign className="text-green-400" size={24} />}
-                                    subtext={`From ${orders.length} orders`}
+                                    title="Total Tables"
+                                    value={tables.length.toString()}
+                                    icon={<Users className="text-purple-500" size={24} />}
+                                    subtext="Registered units"
                                 />
                             </div>
 
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    Live Orders
-                                </h2>
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    {activeOrders.length === 0 ? (
-                                        <div className="col-span-1 lg:col-span-2 text-center py-20 bg-black/20 rounded-xl border border-dashed border-white/10">
-                                            <p className="text-gray-500">No active orders right now.</p>
+                            {/* Main Live Content */}
+                            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                                {/* Left Side: Live Orders (2/3 width on desktop) */}
+                                <div className="xl:col-span-2 space-y-6">
+                                    <div className="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h2 className="text-xl font-bold text-gray-900 font-serif flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                Live Orders
+                                            </h2>
+                                            <div className="flex gap-2">
+                                                {/* Filter buttons could go here */}
+                                            </div>
                                         </div>
-                                    ) : (
-                                        activeOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(order => (
-                                            <AdminOrderCard key={order.id} order={order} />
-                                        ))
-                                    )}
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            {activeOrders.length === 0 ? (
+                                                <div className="col-span-full py-20 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                                    <div className="mb-4 text-gray-300 flex justify-center"><ShoppingBag size={48} /></div>
+                                                    <p className="text-gray-500 font-medium">No active orders right now.</p>
+                                                    <p className="text-xs text-gray-400 mt-1">New orders will appear here automatically.</p>
+                                                </div>
+                                            ) : (
+                                                activeOrders.sort((a, b) => new Date(orderCreatedAt(b)).getTime() - new Date(orderCreatedAt(a)).getTime()).map(order => (
+                                                    <AdminOrderCard key={order.id} order={order} />
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Side: Active Service Requests (1/3 width) */}
+                                <div className="space-y-6">
+                                    <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm h-full">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h2 className="text-lg font-bold text-gray-900 font-serif flex items-center gap-2">
+                                                <Bell size={20} className="text-orange-500" />
+                                                Service Alerts
+                                            </h2>
+                                            {notifications.filter(n => n.status === 'pending').length > 0 && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Resolve all pending service requests?')) {
+                                                            notifications.filter(n => n.status === 'pending').forEach(n => useStore.getState().resolveNotification(n.id));
+                                                        }
+                                                    }}
+                                                    className="text-xs text-tashi-primary hover:underline font-bold"
+                                                >
+                                                    Clear All
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            {notifications.filter(n => n.status === 'pending').length === 0 ? (
+                                                <div className="py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                                    <p className="text-gray-400 text-xs font-medium">No service alerts</p>
+                                                </div>
+                                            ) : (
+                                                notifications
+                                                    .filter(n => n.status === 'pending')
+                                                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                                                    .map(notif => (
+                                                        <motion.div
+                                                            key={notif.id}
+                                                            layout
+                                                            initial={{ x: 20, opacity: 0 }}
+                                                            animate={{ x: 0, opacity: 1 }}
+                                                            className="bg-orange-50 border border-orange-100 p-4 rounded-2xl flex items-center justify-between"
+                                                        >
+                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-bold text-gray-900">{tables.find(t => t.id === notif.tableId)?.name || notif.tableId}</span>
+                                                                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${notif.type === 'call_staff' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                                                                        {notif.type === 'call_staff' ? 'Service' : 'Bill'}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-[10px] text-gray-500 mt-1 font-mono">{new Date(notif.createdAt).toLocaleTimeString()}</p>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => useStore.getState().resolveNotification(notif.id)}
+                                                                className="p-2 bg-white text-orange-600 rounded-xl hover:bg-orange-600 hover:text-white transition-all shadow-sm border border-orange-200"
+                                                            >
+                                                                <Check size={18} />
+                                                            </button>
+                                                        </motion.div>
+                                                    ))
+                                            )}
+                                        </div>
+
+                                        <div className="mt-8">
+                                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Quick Actions</h3>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                <button onClick={handlePrintAllQRs} className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-sm font-medium text-gray-700 border border-gray-100">
+                                                    <div className="flex items-center gap-3">
+                                                        <Printer size={18} className="text-gray-400" />
+                                                        Print All Table QRs
+                                                    </div>
+                                                    <ArrowRight size={14} className="text-gray-300" />
+                                                </button>
+                                                <button onClick={() => updateMenuAppearance(menuAppearance === 'grid' ? 'list' : 'grid')} className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-sm font-medium text-gray-700 border border-gray-100">
+                                                    <div className="flex items-center gap-3">
+                                                        <Grid size={18} className="text-gray-400" />
+                                                        Switch Menu Layout
+                                                    </div>
+                                                    <ArrowRight size={14} className="text-gray-300" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
                     )}
 
-                    {/* ORDER HISTORY VIEW */}
                     {activeTab === 'history' && (
-                        // ... (existing history view content)
                         <motion.div
                             key="history"
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                         >
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Order History</h2>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900 font-serif">Order History</h2>
+                                <div className="relative w-full md:w-96">
+                                    <input
+                                        type="text"
+                                        placeholder="Search by ID, table, or items..."
+                                        value={historySearch}
+                                        onChange={(e) => setHistorySearch(e.target.value)}
+                                        className="w-full bg-white border border-gray-200 rounded-xl py-2 px-4 pl-10 text-sm focus:outline-none focus:border-tashi-primary transition-colors shadow-sm"
+                                    />
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                                    {historySearch && (
+                                        <button onClick={() => setHistorySearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
                             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                                <table className="w-full text-left text-sm text-gray-500">
-                                    <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-700 border-b border-gray-200">
-                                        <tr>
-                                            <th className="p-4">Order ID</th>
-                                            <th className="p-4">Date & Time</th>
-                                            <th className="p-4">Table</th>
-                                            <th className="p-4">Items</th>
-                                            <th className="p-4 text-right">Total</th>
-                                            <th className="p-4 text-center">Status</th>
-                                            <th className="p-4 text-center">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {pastOrders.length === 0 ? (
-                                            <tr><td colSpan={7} className="p-8 text-center text-gray-400">No past orders found.</td></tr>
-                                        ) : (
-                                            pastOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(order => (
-                                                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="p-4 font-mono text-gray-900">#{order.id.slice(0, 6)}</td>
-                                                    <td className="p-4">{new Date(order.createdAt).toLocaleString()}</td>
-                                                    <td className="p-4">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</td>
-                                                    <td className="p-4">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
-                                                    <td className="p-4 text-right font-bold text-tashi-accent">₹{order.totalAmount}</td>
-                                                    <td className="p-4 text-center">
-                                                        <StatusBadge status={order.status} />
-                                                    </td>
-                                                    <td className="p-4 text-center">
-                                                        <button
-                                                            onClick={async () => {
-                                                                if (confirm('Permanently delete this order record?')) {
-                                                                    await useStore.getState().deleteOrder(order.id);
-                                                                }
-                                                            }}
-                                                            className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
-                                                            title="Delete Order Record"
-                                                        >
-                                                            <Trash size={16} />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm text-gray-500">
+                                        <thead className="bg-gray-50 text-[10px] uppercase font-bold text-gray-700 border-b border-gray-200 tracking-wider">
+                                            <tr>
+                                                <th className="p-4">Order ID</th>
+                                                <th className="p-4">Date & Time</th>
+                                                <th className="p-4">Table</th>
+                                                <th className="p-4">Items</th>
+                                                <th className="p-4 text-right">Total</th>
+                                                <th className="p-4 text-center">Status</th>
+                                                <th className="p-4 text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 italic">
+                                            {pastOrders.filter(order => {
+                                                const searchStr = `${order.id} ${order.tableId} ${order.items.map(i => i.name).join(' ')}`.toLowerCase();
+                                                return searchStr.includes(historySearch.toLowerCase());
+                                            }).length === 0 ? (
+                                                <tr><td colSpan={7} className="p-12 text-center text-gray-400 font-medium">No orders matching your search.</td></tr>
+                                            ) : (
+                                                pastOrders
+                                                    .filter(order => {
+                                                        const searchStr = `${order.id} ${order.tableId} ${order.items.map(i => i.name).join(' ')}`.toLowerCase();
+                                                        return searchStr.includes(historySearch.toLowerCase());
+                                                    })
+                                                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                                                    .map(order => (
+                                                        <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                                                            <td className="p-4 font-mono text-gray-900">#{order.id.slice(0, 6)}</td>
+                                                            <td className="p-4">{new Date(order.createdAt).toLocaleString()}</td>
+                                                            <td className="p-4">{tables.find(t => t.id === order.tableId)?.name || order.tableId}</td>
+                                                            <td className="p-4">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
+                                                            <td className="p-4 text-right font-bold text-tashi-accent">₹{order.totalAmount}</td>
+                                                            <td className="p-4 text-center">
+                                                                <StatusBadge status={order.status} />
+                                                            </td>
+                                                            <td className="p-4 text-center">
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (confirm('Permanently delete this order record?')) {
+                                                                            await useStore.getState().deleteOrder(order.id);
+                                                                        }
+                                                                    }}
+                                                                    className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
+                                                                    title="Delete Order Record"
+                                                                >
+                                                                    <Trash size={16} />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </motion.div>
                     )}

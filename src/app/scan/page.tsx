@@ -3,7 +3,7 @@
 
 import { useStore } from '@/lib/store';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { Loader2, MapPinOff } from 'lucide-react';
 
 // Coordinates for TashiZom, Kibber (Approximate for demo)
@@ -40,6 +40,15 @@ function ScanPageContent() {
 
     const [status, setStatus] = useState<string>('Verifying location...');
     const [error, setError] = useState<string | null>(null);
+
+    const proceed = useCallback(async () => {
+        if (tableId) {
+            setTableId(tableId);
+            // Allow state persistence to trigger
+            await new Promise(resolve => setTimeout(resolve, 100));
+            router.replace('/customer/menu');
+        }
+    }, [tableId, router, setTableId]);
 
     useEffect(() => {
         if (!tableId) {
@@ -91,15 +100,12 @@ function ScanPageContent() {
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
 
-        async function proceed() {
-            if (tableId) {
-                setTableId(tableId);
-                // Allow state persistence to trigger
-                await new Promise(resolve => setTimeout(resolve, 100));
-                router.replace('/customer/menu');
-            }
+        // ... location logic inside useEffect ...
+        if (tableId && !error) {
+            // Check completed by the callbacks
         }
-    }, [tableId, router, setTableId, geoRadius]);
+
+    }, [tableId, router, setTableId, geoRadius, proceed, error]);
 
     if (error) {
         return (
@@ -107,16 +113,23 @@ function ScanPageContent() {
                 <div className="w-16 h-16 bg-red-900/20 text-red-500 rounded-full flex items-center justify-center mb-6">
                     <MapPinOff size={32} />
                 </div>
-                <h1 className="text-xl font-bold text-white mb-2">Turn On Location please...</h1>
-                <p className="text-gray-400 mb-6">{error}</p>
+                <h1 className="text-xl font-bold text-white mb-2">Location Required</h1>
+                <p className="text-gray-400 mb-6 text-sm">{error}</p>
+
                 <div className="flex flex-col gap-3 w-full">
                     <button
                         onClick={() => window.location.reload()}
-                        className="w-full px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 font-bold"
+                        className="w-full px-6 py-4 bg-tashi-accent text-tashi-dark rounded-xl font-bold shadow-lg active:scale-95 transition-all"
                     >
-                        Retry Location
+                        Try Again
                     </button>
 
+                    <button
+                        onClick={() => proceed()}
+                        className="w-full px-6 py-4 bg-white/5 text-gray-400 rounded-xl font-bold hover:bg-white/10 transition-all text-xs"
+                    >
+                        I am at the Homestay (Skip Check)
+                    </button>
                 </div>
             </div>
         );

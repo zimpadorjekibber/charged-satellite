@@ -2,7 +2,7 @@
 'use client';
 
 import { useStore, Order, getValidDate } from '../../../lib/store';
-import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, ChefHat, Utensils, Star, Send, Timer, Bell, PhoneCall, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +38,8 @@ export default function OrderStatusPage() {
     const orders = useStore((state: any) => state.orders || []);
     const currentTableId = useStore((state: any) => state.currentTableId);
     const sessionId = useStore((state: any) => state.sessionId);
+    const callStaff = useStore((state: any) => state.callStaff);
+    const [isCalling, setIsCalling] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -85,28 +87,20 @@ export default function OrderStatusPage() {
 
     // NEW: Monitor active orders to sync Table ID if assigned by staff
     // This ensures the header updates even if the user stays on the status page
+    // Monitor for status changes to notify user
+    const lastStatuses = useRef<Record<string, string>>({});
     useEffect(() => {
-        if (!sessionId || !orders.length || !isDataReady) return;
-
-        try {
-            // Find the most recent active order for this session
-            const activeOrder = orders.find((o: any) =>
-                o && o.sessionId === sessionId &&
-                ['Pending', 'Preparing', 'Ready', 'Served'].includes(o.status)
-            );
-
-            if (activeOrder && activeOrder.tableId) {
-                const isRealTable = activeOrder.tableId !== 'REQUEST' && activeOrder.tableId !== 'Remote';
-                // If we have a real table assigned and it differs from our local state
-                if (isRealTable && activeOrder.tableId !== currentTableId) {
-                    const setTableId = useStore.getState().setTableId;
-                    if (setTableId) setTableId(activeOrder.tableId);
+        myOrders.forEach((order: any) => {
+            const prevStatus = lastStatuses.current[order.id];
+            if (prevStatus && prevStatus !== order.status) {
+                // Status changed! Notify user
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
                 }
             }
-        } catch (e) {
-            console.error("Sync Table ID error:", e);
-        }
-    }, [orders, sessionId, currentTableId, isDataReady]);
+            lastStatuses.current[order.id] = order.status;
+        });
+    }, [myOrders]);
 
     if (!isDataReady) {
         return (
@@ -196,11 +190,49 @@ export default function OrderStatusPage() {
                     })}
                 </div>
 
-                <div className="flex justify-center mt-8">
+                <div className="flex flex-col gap-3 mt-8">
                     <Link href="/customer/menu" className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-center py-4 rounded-xl text-white font-bold transition-all">
-                        Back To Menu
+                        Order More Items
                     </Link>
+
+                    <button
+                        onClick={async () => {
+                            if (isCalling) return;
+                            setIsCalling(true);
+                            try {
+                                await callStaff();
+                                alert("Success! Staff notified. We'll be with you shortly.");
+                            } catch (e) {
+                                alert("Failed to call staff. Please try again.");
+                            } finally {
+                                setTimeout(() => setIsCalling(false), 2000);
+                            }
+                        }}
+                        disabled={isCalling}
+                        className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all shadow-lg ${isCalling ? 'bg-orange-500/20 text-orange-400' : 'bg-orange-500 text-white shadow-orange-500/20'}`}
+                    >
+                        {isCalling ? <Loader2 className="animate-spin" size={20} /> : <PhoneCall size={20} />}
+                        {isCalling ? 'Notifying Staff...' : 'Call for Assistance'}
+                    </button>
                 </div>
+            </div>
+
+            {/* Floating Service Button (Only visible if scrolled down?) - Always visible here for ease */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={async () => {
+                        if (isCalling) return;
+                        setIsCalling(true);
+                        await callStaff();
+                        alert("Staff notified!");
+                        setIsCalling(false);
+                    }}
+                    className="w-14 h-14 bg-tashi-accent text-tashi-dark rounded-full flex items-center justify-center shadow-2xl border-4 border-tashi-dark"
+                >
+                    <Bell size={24} className={isCalling ? 'animate-bounce' : ''} />
+                </motion.button>
             </div>
         </ErrorBoundary>
     );

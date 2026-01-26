@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useStore, Category, MenuItem, Table, Order, getValidDate } from '../../../lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag, PlayCircle } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag, PlayCircle, Share2, ArrowLeft } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -293,7 +293,6 @@ export default function MenuPage() {
         setSelectedItem(selectedItemContext[prevIndex]);
     };
 
-    const [showAllUpdates, setShowAllUpdates] = useState(false); // Controls Valley Updates expansion
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [showNavigationModal, setShowNavigationModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
@@ -485,7 +484,7 @@ export default function MenuPage() {
 
     // Continuous Vibration when Calling
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: any;
         if (isCalling) {
             // Initial vibration
             if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -673,985 +672,1209 @@ export default function MenuPage() {
     };
 
     return (
-        <div className="pb-32 pointer-events-auto min-h-[100dvh] relative">
-            {/* Winter Water Conservation Alert - MODAL */}
-            <AnimatePresence>
-                {showWinterNote && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-                        onClick={(e) => e.stopPropagation()}
+        <div className="pb-32 pointer-events-auto min-h-[100dvh] relative bg-white">
+            {/* Minimal Sticky Header */}
+            <div className="sticky top-0 z-[150] bg-white/80 backdrop-blur-xl border-b border-black/5 px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Link href="/" className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-500">
+                        <ArrowLeft size={20} />
+                    </Link>
+                    <div>
+                        <h1 className="font-bold font-serif text-lg text-black leading-none">TashiZom</h1>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Kibber, Spiti</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowMoreInfoModal(true)}
+                        className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-500"
                     >
+                        <Info size={20} />
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: 'TashiZom Menu',
+                                    text: 'Check out the delicious menu at TashiZom, Kibber!',
+                                    url: window.location.href
+                                });
+                            } else {
+                                alert("Link copied to clipboard!");
+                                navigator.clipboard.writeText(window.location.href);
+                            }
+                        }}
+                        className="p-2 hover:bg-black/5 rounded-full transition-colors text-tashi-accent"
+                    >
+                        <Share2 size={20} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="px-4">
+                {/* Winter Water Conservation Alert - MODAL */}
+                <AnimatePresence>
+                    {showWinterNote && (
                         <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white border border-red-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex flex-col items-center text-center gap-4">
-                                <div className="p-4 bg-red-500/10 rounded-full animate-pulse">
-                                    <Sparkles className="text-red-400" size={32} />
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                className="bg-white border border-red-500/30 rounded-2xl p-6 w-full max-w-sm shadow-2xl relative"
+                            >
+                                <div className="flex flex-col items-center text-center gap-4">
+                                    <div className="p-4 bg-red-500/10 rounded-full animate-pulse">
+                                        <Sparkles className="text-red-400" size={32} />
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-xl font-bold text-red-200 mb-2">Winter Notice</h3>
+                                        <p className="text-sm text-gray-300 leading-relaxed">
+                                            Freezing temperatures make fetching water extremely difficult. <br /><br />
+                                            <span className="text-red-300 font-bold border-b border-red-500/30 pb-0.5">Please use bucket water sparingly.</span>
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={dismissWinterNote}
+                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-900/50 active:scale-95 mt-2"
+                                    >
+                                        I Understand
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Hidden Audio Element for Call Feedback */}
+                <audio ref={callSoundRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
+
+                {/* Success Toast for Call Staff */}
+                <AnimatePresence>
+                    {callSuccessToast && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -50 }}
+                            className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+                        >
+                            <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-green-500/50 border border-green-400/30 flex items-center gap-3 backdrop-blur-xl">
+                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                    <Phone className="animate-pulse" size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-lg">Staff Notified! ✓</p>
+                                    <p className="text-sm text-green-100">Someone will be with you shortly</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Error Toast for Call Staff */}
+                <AnimatePresence>
+                    {callErrorToast && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -50 }}
+                            className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+                        >
+                            <div className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-red-500/50 border border-red-400/30 flex items-center gap-3 backdrop-blur-xl">
+                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                    <span className="text-2xl font-bold">!</span>
+                                </div>
+                                <div>
+                                    <p className="font-bold text-lg">Call Failed</p>
+                                    <p className="text-sm text-red-100">Please call directly using the 'Contact' button.</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Bottom Action Bar - Horizontal */}
+                <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-md border-t border-black/10 pointer-events-auto">
+                    <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
+                        {hasActiveOrder && (
+                            <Link href="/customer/status">
+                                <button
+                                    className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 shadow-[0_0_15px_rgba(255,165,0,0.3)] active:scale-95 transition-transform"
+                                >
+                                    <UtensilsCrossed size={24} />
+                                    <span className="text-[10px] uppercase tracking-wider font-bold">
+                                        Status
+                                    </span>
+                                </button>
+                            </Link>
+                        )}
+                        {/* Call Staff Button */}
+                        <motion.button
+                            onClick={handleCallStaff}
+                            disabled={isLocating || isCancelling}
+                            animate={isCalling ? {
+                                x: [-4, 4, -4, 4, 0],
+                                transition: {
+                                    repeat: Infinity,
+                                    duration: 0.4,
+                                    repeatDelay: 1
+                                }
+                            } : {}}
+                            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
+                                ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
+                                : isCancelling
+                                    ? 'bg-gray-700 text-gray-300 cursor-wait'
+                                    : isLocating
+                                        ? 'bg-gray-100 text-gray-500 cursor-wait'
+                                        : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
+                                }`}
+                        >
+                            {isLocating ? (
+                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : isCancelling ? (
+                                <Loader2 size={24} className="animate-spin" />
+                            ) : isCalling ? (
+                                <X size={24} />
+                            ) : (
+                                <Phone size={24} />
+                            )}
+                            <span className="text-[10px] uppercase tracking-wider font-bold">
+                                {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : 'Call Staff'}
+                            </span>
+                        </motion.button>
+
+                        {/* Contact Button */}
+                        <button
+                            onClick={() => setShowContactInfo(true)}
+                            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 border border-blue-400/30 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
+                        >
+                            <Info size={24} />
+                            <span className="text-[10px] uppercase tracking-wider font-bold">
+                                Contact
+                            </span>
+                        </button>
+
+                        {/* Navigate/Location Button */}
+                        <button
+                            onClick={() => setShowNavigationModal(true)}
+                            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-black hover:bg-gray-200 border border-black/10 active:scale-95 transition-transform"
+                        >
+                            <Navigation size={24} />
+                            <span className="text-[10px] uppercase tracking-wider font-bold">
+                                Direction
+                            </span>
+                        </button>
+
+
+                    </div>
+                </div>
+
+                {/* Mini Timer for Active Orders - Commented out as component is missing */}
+                {/* <MiniOrderTimer /> */}
+
+                {/* Top Toolbar: Map Icon & Filters */}
+                <div className="px-1 mt-6 mb-2 flex justify-between items-center">
+                    {/* Local Map Shortcut */}
+                    {/* Review Shortcut */}
+                    <button
+                        onClick={() => setShowReviewModal(true)}
+                        className="ml-1 bg-white border border-black/10 rounded-lg p-2 hover:bg-black/5 transition-colors shadow-lg shadow-black/5"
+                        style={{ color: menuAppearance.accentColor }}
+                        aria-label="Write a Review"
+                    >
+                        <Star size={18} fill={menuAppearance.accentColor} />
+                    </button>
+
+                    <div className="bg-white border border-black/10 rounded-lg p-1 flex gap-1">
+                        <button
+                            onClick={() => setFilterType('all')}
+                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${filterType === 'all' ? 'bg-black/10 text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setFilterType('veg')}
+                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'veg' ? 'bg-green-600 text-white shadow-lg shadow-green-900' : 'text-green-500 hover:bg-green-500/10'}`}
+                        >
+                            <Leaf size={10} className={filterType === 'veg' ? 'fill-white' : 'fill-green-500/30'} /> Veg
+                        </button>
+                        <button
+                            onClick={() => setFilterType('non-veg')}
+                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'non-veg' ? 'bg-red-600 text-white shadow-lg shadow-red-900' : 'text-red-500 hover:bg-red-500/10'}`}
+                        >
+                            <Drumstick size={10} className={filterType === 'non-veg' ? 'fill-white' : 'fill-red-500/30'} /> Non-Veg
+                        </button>
+                    </div>
+                </div>
+
+                {/* Category Tabs */}
+                <div className="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md -mx-4 px-4 border-b border-black/5 pt-2 pb-4">
+                    <div ref={categoryScrollContainerRef} className="flex overflow-x-auto gap-3 hide-scrollbar snap-x">
+                        {CATEGORIES.map((cat) => (
+                            <button
+                                key={cat}
+                                id={`tab-${cat}`}
+                                onClick={() => scrollToCategory(cat)}
+                                className={`relative whitespace-nowrap px-8 py-3 rounded-full text-base font-bold transition-all duration-300 snap-center ${activeCategory === cat
+                                    ? 'text-black scale-105'
+                                    : 'bg-black/5 text-gray-500 hover:bg-black/10'
+                                    }`}
+                            >
+                                {activeCategory === cat && (
+                                    <div
+                                        className="absolute inset-0 rounded-full shadow-lg"
+                                        style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 0 15px ${menuAppearance.accentColor}66` }}
+                                    />
+                                )}
+                                <span className="relative z-10" style={{ fontSize: menuAppearance.categoryFontSize, color: activeCategory === cat ? (parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff') : menuAppearance.categoryColor }}>{cat}</span>
+                            </button>
+                        ))}
+                        {CATEGORIES.length === 0 && (
+                            <div className="px-4 py-2 text-gray-500 text-sm italic">Loading categories...</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Current Table Indicator - Only show if Table ID is set but not 'REQUEST' */}
+                {currentTableId && currentTableId !== 'REQUEST' && currentTableId !== 'Remote' && (
+                    <div className="mx-4 mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-blue-500/20 p-2 rounded-lg">
+                                <Utensils size={18} className="text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-blue-300 font-bold uppercase tracking-wider">Ordering for</p>
+                                <p className="text-white font-bold text-lg">Table {tables.find((t: any) => t.id === currentTableId)?.name || currentTableId}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowTableSelector(true)}
+                            className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-gray-400 transition-colors"
+                        >
+                            Change
+                        </button>
+                    </div>
+                )}
+
+                {/* Chef's Special Section */}
+                {(() => {
+                    const chefSpecialItems = menu.filter((item: MenuItem) => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)));
+                    if (chefSpecialItems.length === 0) return null;
+                    return (
+                        <ChefsSpecialSection
+                            items={chefSpecialItems}
+                            addToCart={addToCart}
+                            removeFromCart={removeFromCart}
+                            getQuantity={getQuantity}
+                            setSelectedItem={(item) => handleSelectItem(item, chefSpecialItems)}
+                        />
+                    );
+                })()}
+
+                {/* Menu Grid - CONTINUOUS SCROLL */}
+                <div className="mt-6 space-y-12">
+                    {CATEGORIES.map((cat) => {
+                        // Filter items for this category based on filterType
+                        const categoryItems = menu
+                            .filter((item: MenuItem) => {
+                                if (item.category !== cat) return false;
+                                if (filterType === 'veg') return item.isVegetarian;
+                                if (filterType === 'non-veg') return !item.isVegetarian;
+                                return true;
+                            })
+                            .sort((a: MenuItem, b: MenuItem) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)); // Sort by admin-defined order
+
+                        if (categoryItems.length === 0) return null;
+
+                        return (
+                            <section key={cat} id={cat} className="scroll-mt-32">
+                                {/* Typewriter Header */}
+                                <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-white via-white/95 to-transparent backdrop-blur-sm -mx-2 px-2">
+                                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-black/10" />
+                                    <h2 className="font-bold font-serif uppercase tracking-widest text-shadow-glow" style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }}>
+                                        {cat}
+                                    </h2>
+                                    <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-black/10" />
                                 </div>
 
-                                <div>
-                                    <h3 className="text-xl font-bold text-red-200 mb-2">Winter Notice</h3>
-                                    <p className="text-sm text-gray-300 leading-relaxed">
-                                        Freezing temperatures make fetching water extremely difficult. <br /><br />
-                                        <span className="text-red-300 font-bold border-b border-red-500/30 pb-0.5">Please use bucket water sparingly.</span>
-                                    </p>
+                                {/* Items WITH images - Display as cards */}
+                                {categoryItems.filter((item: MenuItem) => item.image).length > 0 && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                        {categoryItems.filter((item: MenuItem) => item.image).map((item: MenuItem) => (
+                                            <MenuItemCard
+                                                key={item.id}
+                                                item={item}
+                                                quantity={getQuantity(item.id)}
+                                                onAdd={() => addToCart(item)}
+                                                onRemove={() => removeFromCart(item.id)}
+                                                onSelect={() => handleSelectItem(item, categoryItems)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Items WITHOUT images - Display as compact list */}
+                                {categoryItems.filter((item: MenuItem) => !item.image).length > 0 && (
+                                    <div className="space-y-2">
+                                        {categoryItems.filter((item: MenuItem) => !item.image).map((item: MenuItem) => (
+                                            <MenuItemListRow
+                                                key={item.id}
+                                                item={item}
+                                                quantity={getQuantity(item.id)}
+                                                onAdd={() => addToCart(item)}
+                                                onRemove={() => removeFromCart(item.id)}
+                                                onSelect={() => handleSelectItem(item, categoryItems)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </section>
+                        );
+                    })}
+
+                    {/* Empty State if EVERYTHING is filtered out */}
+                    {menu.length > 0 && CATEGORIES.every(cat =>
+                        menu.filter((i: MenuItem) => i.category === cat &&
+                            (filterType === 'veg' ? i.isVegetarian : filterType === 'non-veg' ? !i.isVegetarian : true)
+                        ).length === 0) && (
+                            <div className="text-center py-20 text-gray-500 italic">
+                                No items match your filter.
+                            </div>
+                        )}
+
+                    {/* End of Menu Indicator */}
+                    <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
+                        <div className="w-16 h-[1px] bg-white/20" />
+                        <p className="text-xs font-mono uppercase">End of Menu</p>
+                    </div>
+
+                    {/* Item Details Modal */}
+                    <AnimatePresence>
+                        {selectedItem && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-[200] bg-white/90 backdrop-blur-md flex items-center justify-center p-4"
+                                onClick={() => setSelectedItem(null)}
+                            >
+                                <motion.div
+                                    initial={{ scale: 0.9, y: 20 }}
+                                    animate={{ scale: 1, y: 0 }}
+                                    exit={{ scale: 0.9, y: 20 }}
+                                    className="bg-white border border-black/10 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl"
+                                    onClick={(e) => e.stopPropagation()}
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={0.2}
+                                    onDragEnd={(e, { offset, velocity }) => {
+                                        const swipeThreshold = 50;
+                                        if (offset.x > swipeThreshold) {
+                                            handlePrevItem();
+                                        } else if (offset.x < -swipeThreshold) {
+                                            handleNextItem();
+                                        }
+                                    }}
+                                >
+                                    <button
+                                        onClick={() => setSelectedItem(null)}
+                                        className="absolute top-4 right-4 z-[20] w-10 h-10 bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-white"
+                                    >
+                                        <X size={20} />
+                                    </button>
+
+                                    {selectedItemContext.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handlePrevItem(); }}
+                                                className="absolute top-1/2 left-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
+                                            >
+                                                <ChevronLeft size={24} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleNextItem(); }}
+                                                className="absolute top-1/2 right-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
+                                            >
+                                                <ChevronRight size={24} />
+                                            </button>
+                                        </>
+                                    )}
+
+                                    <div className="h-64 w-full relative">
+                                        {selectedItem.image ? (
+                                            <img key={selectedItem.image} src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                                <span className="text-gray-600 font-bold text-xl uppercase tracking-widest">No Image</span>
+                                            </div>
+                                        )}
+                                        <div className="absolute top-4 left-4 z-[10]">
+                                            <div className={`px-3 py-1.5 rounded-full shadow-lg border backdrop-blur-md flex items-center gap-2 ${selectedItem.isVegetarian
+                                                ? 'bg-green-600/90 border-green-400'
+                                                : 'bg-red-600/90 border-red-400'
+                                                }`}>
+                                                {selectedItem.isVegetarian ? (
+                                                    <>
+                                                        <Leaf size={16} className="text-white fill-white" />
+                                                        <span className="text-xs text-white font-bold uppercase">Veg</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Drumstick size={16} className="text-white fill-white" />
+                                                        <span className="text-xs text-white font-bold uppercase">Non-Veg</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 space-y-4">
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-black mb-2 font-serif">{selectedItem.name}</h2>
+                                            <p className="text-gray-600 leading-relaxed">{selectedItem.description}</p>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                                            <span className="text-3xl font-serif text-tashi-accent">&#8377;{selectedItem.price}</span>
+
+                                            <div className="flex items-center gap-4">
+                                                {getQuantity(selectedItem.id) > 0 && (
+                                                    <span className="font-bold text-white bg-tashi-primary px-3 py-1 rounded-full">
+                                                        in cart: {getQuantity(selectedItem.id)}
+                                                    </span>
+                                                )}
+                                                <button
+                                                    onClick={() => {
+                                                        addToCart(selectedItem);
+                                                    }}
+                                                    disabled={selectedItem.available === false}
+                                                    className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                >
+                                                    <Plus size={18} /> Add to Order
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* NEW: More Info Modal containing Updates & Gears */}
+                <AnimatePresence>
+                    {showMoreInfoModal && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-0"
+                            onClick={() => setShowMoreInfoModal(false)}
+                        >
+                            <motion.div
+                                initial={{ y: '100%' }}
+                                animate={{ y: 0 }}
+                                exit={{ y: '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                className="bg-white rounded-t-3xl w-full h-[90vh] absolute bottom-0 flex flex-col overflow-hidden shadow-2xl"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                {/* Modal Header */}
+                                <div className="p-5 border-b border-black/5 flex items-center justify-between bg-white z-10 sticky top-0">
+                                    <div>
+                                        <h3 className="text-xl font-bold font-serif text-black">Valley Essentials</h3>
+                                        <p className="text-xs text-gray-400">Updates & Local Gear</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowMoreInfoModal(false)}
+                                        className="w-8 h-8 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-colors"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+
+                                {/* Scrollable Content */}
+                                <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-8">
+
+                                    {/* 1. Valley Updates Section (Moved here) */}
+                                    {valleyUpdates.length > 0 && (
+                                        <section>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <div className="p-1.5 bg-tashi-accent/20 rounded-lg text-tashi-accent">
+                                                    <Newspaper size={20} />
+                                                </div>
+                                                <h2 className="text-lg font-bold font-serif text-black tracking-tight" style={{ color: menuAppearance.accentColor }}>
+                                                    Valley Updates
+                                                </h2>
+                                            </div>
+
+                                            <div className="bg-black/5 p-4 rounded-xl border-l-2 border-tashi-accent/50">
+                                                <ul className="space-y-3">
+                                                    {valleyUpdates.map((update: any, idx: number) => (
+                                                        <li key={idx} className="flex gap-3 group">
+                                                            <div className="flex-shrink-0 mt-1.5">
+                                                                <div className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : update.statusColor === 'red' ? 'bg-red-500' : 'bg-tashi-accent'}`} />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span className="font-semibold text-sm text-black">{update.title}</span>
+                                                                    {update.description && (
+                                                                        <span className="text-xs text-gray-500 leading-relaxed">{update.description}</span>
+                                                                    )}
+
+                                                                    {update.mediaUrl && (
+                                                                        <div
+                                                                            className="mt-2 rounded-lg overflow-hidden border border-black/10 bg-black cursor-pointer group/media relative h-32 w-full"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setFullScreenMedia({
+                                                                                    url: update.mediaUrl!,
+                                                                                    type: update.mediaType === 'video' ? 'video' : 'image',
+                                                                                    title: update.title
+                                                                                });
+                                                                            }}
+                                                                        >
+                                                                            {update.mediaType === 'video' ? (
+                                                                                <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                                    <PlayCircle className="text-white opacity-50" />
+                                                                                    <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                                                                                </div>
+                                                                            ) : (
+                                                                                <img src={update.mediaUrl} alt={update.title} className="w-full h-full object-cover" />
+                                                                            )}
+                                                                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover/media:opacity-100 transition-opacity">
+                                                                                <div className="bg-white/20 backdrop-blur-md p-2 rounded-full text-white">
+                                                                                    {update.mediaType === 'video' ? <PlayCircle size={20} /> : <Info size={20} />}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <p className="text-[10px] text-gray-400 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()}</p>
+                                            </div>
+                                        </section>
+                                    )}
+
+                                    {/* 2. Cold Weather Gears Section (Moved here) */}
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
+                                                <ShoppingBag size={20} />
+                                            </div>
+                                            <h2 className="text-lg font-bold font-serif text-black tracking-tight">
+                                                Cold Weather Gears <span className="text-orange-400 text-xs font-sans font-normal ml-1">By Locals</span>
+                                            </h2>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {gearItems?.map((item: any) => (
+                                                <GearItemCard
+                                                    key={item.id}
+                                                    name={item.name}
+                                                    price={item.price}
+                                                    items={item.items}
+                                                    badge={item.badge}
+                                                    available={item.available}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-4 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">
+                                            <p className="text-[10px] text-gray-400 leading-relaxed italic">
+                                                Hand-knitted by local Spiti women. Ask staff for purchase.
+                                            </p>
+                                        </div>
+                                    </section>
+
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Table Selection Modal */}
+                <AnimatePresence>
+                    {showTableSelector && (
+                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowTableSelector(false)}>
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div className="text-center mb-4">
+                                    <h3 className="text-xl font-bold text-black font-serif">Select Your Table</h3>
+                                    <p className="text-gray-500 text-sm">Tap your table number to switch</p>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-3 overflow-y-auto p-1 custom-scrollbar">
+                                    {tables.map((table: any) => (
+                                        <button
+                                            key={table.id}
+                                            onClick={() => {
+                                                setTableId(table.id);
+                                                setShowTableSelector(false);
+                                                // Reload page to ensure clean state for the new table session
+                                                setTimeout(() => window.location.reload(), 100);
+                                            }}
+                                            className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
+                                                ? 'text-black'
+                                                : 'bg-black/5 text-gray-500 border-black/10 hover:bg-black/10'
+                                                }`}
+                                            style={currentTableId === table.id ? { backgroundColor: menuAppearance.accentColor, borderColor: menuAppearance.accentColor } : {}}
+                                        >
+                                            {table.name}
+                                        </button>
+                                    ))}
                                 </div>
 
                                 <button
-                                    onClick={dismissWinterNote}
-                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-900/50 active:scale-95 mt-2"
+                                    onClick={() => setShowTableSelector(false)}
+                                    className="mt-4 w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
                                 >
-                                    I Understand
+                                    Cancel
+                                </button>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Navigation Selection Modal */}
+                <AnimatePresence>
+                    {showNavigationModal && (
+                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowNavigationModal(false)}>
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-6"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div className="text-center">
+                                    <h3 className="text-xl font-bold text-black font-serif mb-2">Direction</h3>
+                                    <p className="text-gray-400 text-sm">Choose your wayfinding method</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {/* Option 1: Google Maps */}
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group"
+                                    >
+                                        <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                            <MapPin size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800">Reach Us</p>
+                                            <p className="text-xs text-gray-500">Live GPS Directions</p>
+                                        </div>
+                                    </a>
+
+                                    {/* Option 2: Local Map Loop (Interactive) */}
+                                    <button
+                                        onClick={() => {
+                                            setMapAutoPlay(false);
+                                            setShowNavigationModal(false);
+                                            setTimeout(() => setShowMap(true), 200);
+                                        }}
+                                        className="w-full flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group text-left"
+                                    >
+                                        <div className="p-3 rounded-full transition-colors bg-gray-200 text-gray-600 group-hover:bg-gray-300">
+                                            <Navigation size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800">Tourist Loop Map</p>
+                                            <p className="text-xs text-gray-500">Interactive Schematic Guide</p>
+                                        </div>
+                                    </button>
+
+
+                                </div>
+
+                                <button
+                                    onClick={() => setShowNavigationModal(false)}
+                                    className="w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
+                                >
+                                    Cancel
+                                </button>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+                <AnimatePresence>
+                    {showMap && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-4"
+                            onClick={() => setShowMap(false)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, y: 30 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 30 }}
+                                className="bg-white border-0 md:border md:border-tashi-accent/20 rounded-none md:rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col h-[100dvh] md:h-auto md:max-h-[90vh]"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
+                                    <h3 className="text-xl font-bold text-tashi-accent font-serif pl-2">Local Guide Map</h3>
+                                    <button
+                                        onClick={() => setShowMap(false)}
+                                        className="w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-black transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                <div className="flex-1 overflow-hidden bg-black/5 p-0 relative flex flex-col">
+                                    <LocalMapGuide autoPlay={mapAutoPlay} />
+                                </div>
+
+                                <div className="p-4 bg-black/20 text-center border-t border-white/5 hidden md:block">
+                                    <p className="text-gray-400 text-xs">
+                                        The road connects Chicham Bridge & TashiZom directly. No need to go back!
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+
+
+                {/* More Info Modal */}
+                <AnimatePresence>
+                    {showMoreInfoModal && (
+                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowMoreInfoModal(false)}>
+                            <div className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-black font-serif">More Info</h3>
+                                        <p className="text-sm text-gray-500">About TashiZom</p>
+                                    </div>
+                                    <button onClick={() => setShowMoreInfoModal(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
+                                </div>
+
+                                <div className="space-y-4 pt-2">
+                                    <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                                        <p className="text-sm text-gray-700"><strong>Opening Hours:</strong> 8:00 AM - 10:00 PM</p>
+                                        <p className="text-sm text-gray-700"><strong>Location:</strong> Near Chicham Bridge, Kibber</p>
+                                        <p className="text-sm text-gray-700"><strong>Cuisine:</strong> Multi-Cuisine (Indian, Chinese, Tibetan, Pizza)</p>
+                                    </div>
+                                    <div className="text-xs text-gray-500 text-center pt-2">
+                                        Designed & Powered by <span className="font-bold text-tashi-accent">Antigravity</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Contact Info Modal */}
+                {
+                    showContactInfo && (
+                        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
+                            <div className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-black font-serif">Contact Us</h3>
+                                        <p className="text-sm text-gray-500">We are here to help!</p>
+                                    </div>
+                                    <button onClick={() => setShowContactInfo(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
+                                </div>
+
+                                <div className="space-y-3 pt-2">
+                                    <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
+                                        <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                                            <Phone size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800">Call Staffs</p>
+                                            <p className="text-xs text-gray-500">{contactInfo.phone}</p>
+                                        </div>
+                                    </a>
+
+                                    {contactInfo.secondaryPhone && (
+                                        <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
+                                            <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                                                <Phone size={24} />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-800">Call Owner</p>
+                                                <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
+                                            </div>
+                                        </a>
+                                    )}
+
+                                    <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
+                                        <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                            <MessageCircle size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800">WhatsApp</p>
+                                            <p className="text-xs text-gray-500">Chat with us</p>
+                                        </div>
+                                    </a>
+
+
+
+                                    {/* Removed Duplicate WhatsApp Button */}
+
+
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Review Modal */}
+                <AnimatePresence>
+                    {showReviewModal && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                            onClick={() => setShowReviewModal(false)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.9, y: 20 }}
+                                className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-black font-serif">Rate Us</h3>
+                                        <p className="text-sm text-gray-500">Tell us about your experience</p>
+                                    </div>
+                                    <button onClick={() => setShowReviewModal(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
+                                </div>
+
+                                <div className="space-y-4 pt-2">
+                                    {/* Stars */}
+                                    <div className="flex justify-center gap-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                onClick={() => setReviewRating(star)}
+                                                className={`p-1 transition-all ${reviewRating >= star ? 'text-tashi-accent scale-110' : 'text-gray-600'}`}
+                                            >
+                                                <Star size={32} fill={reviewRating >= star ? "currentColor" : "none"} />
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Inputs */}
+                                    <input
+                                        type="text"
+                                        placeholder="Your Name (Optional)"
+                                        value={reviewName}
+                                        onChange={(e) => setReviewName(e.target.value)}
+                                        className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50"
+                                    />
+
+                                    <textarea
+                                        placeholder="Share your feedback..."
+                                        value={reviewComment}
+                                        onChange={(e) => setReviewComment(e.target.value)}
+                                        className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
+                                    />
+
+                                    <button
+                                        onClick={() => {
+                                            addReview({
+                                                customerName: reviewName || 'Guest',
+                                                rating: reviewRating,
+                                                comment: reviewComment
+                                            });
+                                            setShowReviewModal(false);
+                                            setReviewComment('');
+                                            setReviewRating(5);
+                                            setReviewName('');
+                                        }}
+                                        disabled={!reviewComment.trim()}
+                                        className="w-full bg-tashi-accent text-tashi-dark font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        <Send size={18} />
+                                        Submit Review
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Full Screen Media Overlay (Plays inside app) */}
+                <AnimatePresence>
+                    {fullScreenMedia && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center touch-none"
+                        >
+                            {/* Header with Title and Close */}
+                            <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+                                <div className="flex-1">
+                                    <h4 className="text-white font-serif font-bold text-lg">{fullScreenMedia.title || 'Valley Update'}</h4>
+                                    <p className="text-gray-400 text-[10px] uppercase tracking-widest">TashiZom Newsroom</p>
+                                </div>
+                                <button
+                                    onClick={() => setFullScreenMedia(null)}
+                                    className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white transition-all transform hover:rotate-90"
+                                >
+                                    <X size={24} />
                                 </button>
                             </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
-            {/* Hidden Audio Element for Call Feedback */}
-            <audio ref={callSoundRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
-
-            {/* Success Toast for Call Staff */}
-            <AnimatePresence>
-                {callSuccessToast && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
-                    >
-                        <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-green-500/50 border border-green-400/30 flex items-center gap-3 backdrop-blur-xl">
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <Phone className="animate-pulse" size={20} />
-                            </div>
-                            <div>
-                                <p className="font-bold text-lg">Staff Notified! ✓</p>
-                                <p className="text-sm text-green-100">Someone will be with you shortly</p>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Error Toast for Call Staff */}
-            <AnimatePresence>
-                {callErrorToast && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
-                    >
-                        <div className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-red-500/50 border border-red-400/30 flex items-center gap-3 backdrop-blur-xl">
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <span className="text-2xl font-bold">!</span>
-                            </div>
-                            <div>
-                                <p className="font-bold text-lg">Call Failed</p>
-                                <p className="text-sm text-red-100">Please call directly using the 'Contact' button.</p>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Bottom Action Bar - Horizontal */}
-            <div className="fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-md border-t border-black/10 pointer-events-auto">
-                <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-around gap-2">
-                    {hasActiveOrder && (
-                        <Link href="/customer/status">
-                            <button
-                                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/50 hover:bg-orange-600/30 shadow-[0_0_15px_rgba(255,165,0,0.3)] active:scale-95 transition-transform"
+                            {/* Content Container */}
+                            <motion.div
+                                initial={{ scale: 0.95, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                className="w-full h-full flex items-center justify-center p-2"
                             >
-                                <UtensilsCrossed size={24} />
-                                <span className="text-[10px] uppercase tracking-wider font-bold">
-                                    Status
-                                </span>
-                            </button>
-                        </Link>
-                    )}
-                    {/* Call Staff Button */}
-                    <motion.button
-                        onClick={handleCallStaff}
-                        disabled={isLocating || isCancelling}
-                        animate={isCalling ? {
-                            x: [-4, 4, -4, 4, 0],
-                            transition: {
-                                repeat: Infinity,
-                                duration: 0.4,
-                                repeatDelay: 1
-                            }
-                        } : {}}
-                        className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
-                            ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
-                            : isCancelling
-                                ? 'bg-gray-700 text-gray-300 cursor-wait'
-                                : isLocating
-                                    ? 'bg-gray-100 text-gray-500 cursor-wait'
-                                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
-                            }`}
-                    >
-                        {isLocating ? (
-                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : isCancelling ? (
-                            <Loader2 size={24} className="animate-spin" />
-                        ) : isCalling ? (
-                            <X size={24} />
-                        ) : (
-                            <Phone size={24} />
-                        )}
-                        <span className="text-[10px] uppercase tracking-wider font-bold">
-                            {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : 'Call Staff'}
-                        </span>
-                    </motion.button>
+                                {fullScreenMedia.type === 'video' ? (
+                                    (() => {
+                                        const youtubeId = getYouTubeId(fullScreenMedia.url);
+                                        if (youtubeId) {
+                                            return (
+                                                <iframe
+                                                    src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                                                    className="w-full aspect-video max-w-4xl shadow-2xl rounded-xl border border-white/5"
+                                                    title="YouTube video player"
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                    allowFullScreen
+                                                />
+                                            );
+                                        }
+                                        return (
+                                            <video
+                                                src={fullScreenMedia.url}
+                                                controls
+                                                autoPlay
+                                                playsInline
+                                                className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
+                                            />
+                                        );
+                                    })()
+                                ) : (
+                                    <img
+                                        src={fullScreenMedia.url}
+                                        alt="Full screen view"
+                                        className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
+                                    />
+                                )}
+                            </motion.div>
 
-                    {/* Contact Button */}
-                    <button
-                        onClick={() => setShowContactInfo(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 border border-blue-400/30 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
-                    >
-                        <Info size={24} />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">
-                            Contact
-                        </span>
-                    </button>
-
-                    {/* Navigate/Location Button */}
-                    <button
-                        onClick={() => setShowNavigationModal(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-black hover:bg-gray-200 border border-black/10 active:scale-95 transition-transform"
-                    >
-                        <Navigation size={24} />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">
-                            Direction
-                        </span>
-                    </button>
-
-                    {/* NEW: More Info Button */}
-                    <button
-                        onClick={() => setShowMoreInfoModal(true)}
-                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-black hover:bg-gray-200 border border-black/10 active:scale-95 transition-transform"
-                    >
-                        <ShoppingBag size={24} />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">
-                            More Info
-                        </span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Mini Timer for Active Orders */}
-            <MiniOrderTimer />
-
-            {/* Top Toolbar: Map Icon & Filters */}
-            <div className="px-1 mt-6 mb-2 flex justify-between items-center">
-                {/* Local Map Shortcut */}
-                {/* Review Shortcut */}
-                <button
-                    onClick={() => setShowReviewModal(true)}
-                    className="ml-1 bg-white border border-black/10 rounded-lg p-2 hover:bg-black/5 transition-colors shadow-lg shadow-black/5"
-                    style={{ color: menuAppearance.accentColor }}
-                    aria-label="Write a Review"
-                >
-                    <Star size={18} fill={menuAppearance.accentColor} />
-                </button>
-
-                <div className="bg-white border border-black/10 rounded-lg p-1 flex gap-1">
-                    <button
-                        onClick={() => setFilterType('all')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${filterType === 'all' ? 'bg-black/10 text-black' : 'text-gray-500 hover:text-gray-700'}`}
-                    >
-                        All
-                    </button>
-                    <button
-                        onClick={() => setFilterType('veg')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'veg' ? 'bg-green-600 text-white shadow-lg shadow-green-900' : 'text-green-500 hover:bg-green-500/10'}`}
-                    >
-                        <Leaf size={10} className={filterType === 'veg' ? 'fill-white' : 'fill-green-500/30'} /> Veg
-                    </button>
-                    <button
-                        onClick={() => setFilterType('non-veg')}
-                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${filterType === 'non-veg' ? 'bg-red-600 text-white shadow-lg shadow-red-900' : 'text-red-500 hover:bg-red-500/10'}`}
-                    >
-                        <Drumstick size={10} className={filterType === 'non-veg' ? 'fill-white' : 'fill-red-500/30'} /> Non-Veg
-                    </button>
-                </div>
-            </div>
-
-            {/* Category Tabs */}
-            <div className="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md -mx-4 px-4 border-b border-black/5 pt-2 pb-4">
-                <div ref={categoryScrollContainerRef} className="flex overflow-x-auto gap-3 hide-scrollbar snap-x">
-                    {CATEGORIES.map((cat) => (
-                        <button
-                            key={cat}
-                            id={`tab-${cat}`}
-                            onClick={() => scrollToCategory(cat)}
-                            className={`relative whitespace-nowrap px-8 py-3 rounded-full text-base font-bold transition-all duration-300 snap-center ${activeCategory === cat
-                                ? 'text-black scale-105'
-                                : 'bg-black/5 text-gray-500 hover:bg-black/10'
-                                }`}
-                        >
-                            {activeCategory === cat && (
-                                <div
-                                    className="absolute inset-0 rounded-full shadow-lg"
-                                    style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 0 15px ${menuAppearance.accentColor}66` }}
-                                />
-                            )}
-                            <span className="relative z-10" style={{ fontSize: menuAppearance.categoryFontSize, color: activeCategory === cat ? (parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff') : menuAppearance.categoryColor }}>{cat}</span>
-                        </button>
-                    ))}
-                    {CATEGORIES.length === 0 && (
-                        <div className="px-4 py-2 text-gray-500 text-sm italic">Loading categories...</div>
-                    )}
-                </div>
-            </div>
-
-            {/* Current Table Indicator - Only show if Table ID is set but not 'REQUEST' */}
-            {currentTableId && currentTableId !== 'REQUEST' && currentTableId !== 'Remote' && (
-                <div className="mx-4 mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-blue-500/20 p-2 rounded-lg">
-                            <Utensils size={18} className="text-blue-400" />
-                        </div>
-                        <div>
-                            <p className="text-xs text-blue-300 font-bold uppercase tracking-wider">Ordering for</p>
-                            <p className="text-white font-bold text-lg">Table {tables.find((t: any) => t.id === currentTableId)?.name || currentTableId}</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setShowTableSelector(true)}
-                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-gray-400 transition-colors"
-                    >
-                        Change
-                    </button>
-                </div>
-            )}
-
-            {/* Chef's Special Section */}
-            {(() => {
-                const chefSpecialItems = menu.filter((item: MenuItem) => item.isChefSpecial && (filterType === 'all' || (filterType === 'veg' ? item.isVegetarian : !item.isVegetarian)));
-                if (chefSpecialItems.length === 0) return null;
-                return (
-                    <ChefsSpecialSection
-                        items={chefSpecialItems}
-                        addToCart={addToCart}
-                        removeFromCart={removeFromCart}
-                        getQuantity={getQuantity}
-                        setSelectedItem={(item) => handleSelectItem(item, chefSpecialItems)}
-                    />
-                );
-            })()}
-
-            {/* Menu Grid - CONTINUOUS SCROLL */}
-            <div className="mt-6 space-y-12">
-                {CATEGORIES.map((cat) => {
-                    // Filter items for this category based on filterType
-                    const categoryItems = menu
-                        .filter((item: MenuItem) => {
-                            if (item.category !== cat) return false;
-                            if (filterType === 'veg') return item.isVegetarian;
-                            if (filterType === 'non-veg') return !item.isVegetarian;
-                            return true;
-                        })
-                        .sort((a: MenuItem, b: MenuItem) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999)); // Sort by admin-defined order
-
-                    if (categoryItems.length === 0) return null;
-
-                    return (
-                        <section key={cat} id={cat} className="scroll-mt-32">
-                            {/* Typewriter Header */}
-                            <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-white via-white/95 to-transparent backdrop-blur-sm -mx-2 px-2">
-                                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-black/10" />
-                                <h2 className="font-bold font-serif uppercase tracking-widest text-shadow-glow" style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }}>
-                                    {cat}
-                                </h2>
-                                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-black/10" />
+                            {/* Backdrop Blur Helper */}
+                            <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
+                                <p className="text-gray-500 text-[10px] uppercase">Scroll to exit or use the back button</p>
                             </div>
-
-                            {/* Items WITH images - Display as cards */}
-                            {categoryItems.filter((item: MenuItem) => item.image).length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                                    {categoryItems.filter((item: MenuItem) => item.image).map((item: MenuItem) => (
-                                        <MenuItemCard
-                                            key={item.id}
-                                            item={item}
-                                            quantity={getQuantity(item.id)}
-                                            onAdd={() => addToCart(item)}
-                                            onRemove={() => removeFromCart(item.id)}
-                                            onSelect={() => handleSelectItem(item, categoryItems)}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Items WITHOUT images - Display as compact list */}
-                            {categoryItems.filter((item: MenuItem) => !item.image).length > 0 && (
-                                <div className="space-y-2">
-                                    {categoryItems.filter((item: MenuItem) => !item.image).map((item: MenuItem) => (
-                                        <MenuItemListRow
-                                            key={item.id}
-                                            item={item}
-                                            quantity={getQuantity(item.id)}
-                                            onAdd={() => addToCart(item)}
-                                            onRemove={() => removeFromCart(item.id)}
-                                            onSelect={() => handleSelectItem(item, categoryItems)}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </section>
-                    );
-                })}
-
-                {/* Empty State if EVERYTHING is filtered out */}
-                {menu.length > 0 && CATEGORIES.every(cat =>
-                    menu.filter((i: MenuItem) => i.category === cat &&
-                        (filterType === 'veg' ? i.isVegetarian : filterType === 'non-veg' ? !i.isVegetarian : true)
-                    ).length === 0) && (
-                        <div className="text-center py-20 text-gray-500 italic">
-                            No items match your filter.
-                        </div>
+                        </motion.div>
                     )}
+                </AnimatePresence>
 
-                {/* End of Menu Indicator */}
-                <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
-                    <div className="w-16 h-[1px] bg-white/20" />
-                    <p className="text-xs font-mono uppercase">End of Menu</p>
-                </div>
-
-                {/* Item Details Modal */}
+                {/* PREMIUM ITEM DETAIL MODAL */}
                 <AnimatePresence>
                     {selectedItem && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[200] bg-white/90 backdrop-blur-md flex items-center justify-center p-4"
+                            className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-end md:items-center justify-center pointer-events-auto"
                             onClick={() => setSelectedItem(null)}
                         >
                             <motion.div
-                                initial={{ scale: 0.9, y: 20 }}
-                                animate={{ scale: 1, y: 0 }}
-                                exit={{ scale: 0.9, y: 20 }}
-                                className="bg-white border border-black/10 rounded-3xl w-full max-w-md overflow-hidden relative shadow-2xl"
+                                initial={{ y: '100%' }}
+                                animate={{ y: 0 }}
+                                exit={{ y: '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                className="w-full md:max-w-xl h-[85vh] md:h-auto md:max-h-[90vh] bg-white rounded-t-3xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl relative"
                                 onClick={(e) => e.stopPropagation()}
-                                drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.2}
-                                onDragEnd={(e, { offset, velocity }) => {
-                                    const swipeThreshold = 50;
-                                    if (offset.x > swipeThreshold) {
-                                        handlePrevItem();
-                                    } else if (offset.x < -swipeThreshold) {
-                                        handleNextItem();
-                                    }
-                                }}
                             >
+                                {/* Close Button */}
                                 <button
                                     onClick={() => setSelectedItem(null)}
-                                    className="absolute top-4 right-4 z-[20] w-10 h-10 bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-white"
+                                    className="absolute top-4 right-4 z-20 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition-all"
                                 >
-                                    <X size={20} />
+                                    <X size={24} />
                                 </button>
 
-                                {selectedItemContext.length > 1 && (
-                                    <>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handlePrevItem(); }}
-                                            className="absolute top-1/2 left-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
-                                        >
-                                            <ChevronLeft size={24} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleNextItem(); }}
-                                            className="absolute top-1/2 right-2 z-[20] w-10 h-10 bg-black/30 hover:bg-black/60 backdrop-blur rounded-full flex items-center justify-center text-white transition-colors -translate-y-1/2"
-                                        >
-                                            <ChevronRight size={24} />
-                                        </button>
-                                    </>
-                                )}
-
-                                <div className="h-64 w-full relative">
+                                {/* Image Hero Section */}
+                                <div className="h-64 md:h-72 bg-gray-100 relative shrink-0">
                                     {selectedItem.image ? (
-                                        <img key={selectedItem.image} src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
+                                        <img
+                                            src={selectedItem.image}
+                                            alt={selectedItem.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                     ) : (
-                                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                            <span className="text-gray-600 font-bold text-xl uppercase tracking-widest">No Image</span>
+                                        <div className="w-full h-full bg-gradient-to-br from-gray-800 to-black flex flex-col items-center justify-center text-white/20">
+                                            <span className="text-4xl font-serif font-bold opacity-30">TashiZom</span>
                                         </div>
                                     )}
-                                    <div className="absolute top-4 left-4 z-[10]">
-                                        <div className={`px-3 py-1.5 rounded-full shadow-lg border backdrop-blur-md flex items-center gap-2 ${selectedItem.isVegetarian
-                                            ? 'bg-green-600/90 border-green-400'
-                                            : 'bg-red-600/90 border-red-400'
-                                            }`}>
-                                            {selectedItem.isVegetarian ? (
-                                                <>
-                                                    <Leaf size={16} className="text-white fill-white" />
-                                                    <span className="text-xs text-white font-bold uppercase">Veg</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Drumstick size={16} className="text-white fill-white" />
-                                                    <span className="text-xs text-white font-bold uppercase">Non-Veg</span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent" />
+
+                                    {/* Navigation Arrows (if context exists) */}
+                                    {selectedItemContext.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handlePrevItem(); }}
+                                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition-all active:scale-95"
+                                            >
+                                                <ChevronLeft size={24} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleNextItem(); }}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full backdrop-blur-md transition-all active:scale-95"
+                                            >
+                                                <ChevronRight size={24} />
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
 
-                                <div className="p-6 space-y-4">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-black mb-2 font-serif">{selectedItem.name}</h2>
-                                        <p className="text-gray-600 leading-relaxed">{selectedItem.description}</p>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-black/10">
-                                        <span className="text-3xl font-serif text-tashi-accent">&#8377;{selectedItem.price}</span>
-
-                                        <div className="flex items-center gap-4">
-                                            {getQuantity(selectedItem.id) > 0 && (
-                                                <span className="font-bold text-white bg-tashi-primary px-3 py-1 rounded-full">
-                                                    in cart: {getQuantity(selectedItem.id)}
-                                                </span>
-                                            )}
-                                            <button
-                                                onClick={() => {
-                                                    addToCart(selectedItem);
-                                                }}
-                                                disabled={selectedItem.available === false}
-                                                className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                            >
-                                                <Plus size={18} /> Add to Order
-                                            </button>
+                                {/* Content Scrollable Area */}
+                                <div className="flex-1 overflow-y-auto px-6 pt-2 pb-24">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h2 className="text-2xl font-black font-serif text-gray-900 leading-tight">
+                                            {selectedItem.name}
+                                        </h2>
+                                        <div className={`p-1.5 rounded-full border ${selectedItem.isVegetarian ? 'border-green-500' : 'border-red-500'}`}>
+                                            <div className={`w-2 h-2 rounded-full ${selectedItem.isVegetarian ? 'bg-green-500' : 'bg-red-500'}`} />
                                         </div>
                                     </div>
+
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="text-2xl font-bold" style={{ color: menuAppearance.accentColor }}>
+                                            ₹{selectedItem.price}
+                                        </span>
+                                        {selectedItem.available === false && (
+                                            <span className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold uppercase rounded-full border border-red-200">
+                                                Out of Stock
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <p className="text-gray-600 leading-relaxed mb-6">
+                                        {selectedItem.description || "A delicious preparation made with fresh ingredients and authentic spices from the valley."}
+                                    </p>
+
+                                    {/* Additional Info / Tags Placeholder */}
+                                    <div className="flex flex-wrap gap-2 mb-6">
+                                        {selectedItem.isChefSpecial && (
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200 flex items-center gap-1">
+                                                <Star size={12} className="fill-amber-800" /> Chef's Special
+                                            </span>
+                                        )}
+                                        {selectedItem.isSpicy && (
+                                            <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">
+                                                🌶️ Spicy
+                                            </span>
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                {/* Sticky Bottom Action Bar */}
+                                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 flex items-center gap-4 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+                                    {getQuantity(selectedItem.id) > 0 ? (
+                                        <div className="flex items-center justify-between w-full gap-4">
+                                            <div className="flex items-center bg-gray-100 rounded-xl h-14 px-2 ring-1 ring-black/5 flex-1 max-w-[140px] justify-between">
+                                                <button
+                                                    onClick={() => removeFromCart(selectedItem.id)}
+                                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-white rounded-lg transition-all"
+                                                >
+                                                    <Minus size={20} />
+                                                </button>
+                                                <span className="font-bold text-xl text-gray-900">{getQuantity(selectedItem.id)}</span>
+                                                <button
+                                                    onClick={() => addToCart(selectedItem)}
+                                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-white rounded-lg transition-all"
+                                                >
+                                                    <Plus size={20} />
+                                                </button>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedItem(null)}
+                                                className="flex-1 bg-black text-white h-14 rounded-xl font-bold shadow-xl active:scale-95 transition-all text-sm uppercase tracking-wider"
+                                            >
+                                                Done
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                if (selectedItem.available !== false) {
+                                                    addToCart(selectedItem);
+                                                }
+                                            }}
+                                            disabled={selectedItem.available === false}
+                                            className={`w-full h-14 rounded-xl font-bold shadow-xl active:scale-95 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2 ${selectedItem.available === false
+                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                : 'text-white'
+                                                }`}
+                                            style={selectedItem.available !== false ? { backgroundColor: menuAppearance.accentColor } : {}}
+                                        >
+                                            {selectedItem.available === false ? 'Currently Unavailable' : 'Add to Order'}
+                                        </button>
+                                    )}
                                 </div>
                             </motion.div>
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {/* Floating "View Cart" Button - Only visible if Cart has items */}
+                <AnimatePresence>
+                    {cart.length > 0 && !selectedItem && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="fixed bottom-24 left-4 right-4 z-[140] pointer-events-auto"
+                        >
+                            <Link href="/customer/cart">
+                                <button className="w-full bg-black text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between border border-white/10 active:scale-95 transition-transform" style={{ boxShadow: `0 10px 30px -10px ${menuAppearance.accentColor}66` }}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">
+                                            {cart.reduce((acc: number, item: any) => acc + item.quantity, 0)}
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="font-bold text-sm">View Your Order</p>
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-wider">{cart.length} items added</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 pr-2">
+                                        <span className="font-bold text-lg" style={{ color: menuAppearance.accentColor }}>
+                                            ₹{cart.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0)}
+                                        </span>
+                                        <ChevronRight size={18} className="text-gray-500" />
+                                    </div>
+                                </button>
+                            </Link>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
-
-            {/* Valley Updates - Collapsible Bottom Sheet */}
-            {
-                valleyUpdates.length > 0 && (
-                    <div className="mt-8 mx-1 mb-6">
-                        <motion.div
-                            initial={false}
-                            animate={{ height: showAllUpdates ? 'auto' : '60px' }}
-                            className={`bg-white/90 backdrop-blur-md rounded-2xl border border-black/10 overflow-hidden relative transition-all duration-300 ${showAllUpdates ? 'shadow-2xl ring-1 ring-tashi-accent/30' : 'hover:bg-white'
-                                }`}
-                            onClick={() => setShowAllUpdates(!showAllUpdates)}
-                        >
-                            {/* Header (Always Visible) */}
-                            <div className="absolute top-0 left-0 right-0 h-[60px] flex items-center justify-between px-6 cursor-pointer z-10">
-                                <h3 className="text-tashi-accent font-serif text-lg font-bold flex items-center gap-2">
-                                    <Newspaper size={18} className={showAllUpdates ? '' : 'animate-pulse'} />
-                                    Valley Updates
-                                </h3>
-                                <div className="flex items-center gap-3">
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${showAllUpdates ? 'bg-white/10 border-white/20 text-white' : 'bg-red-500/10 border-red-500/30 text-red-400 animate-pulse'}`}>
-                                        {showAllUpdates ? 'Close' : `${valleyUpdates.length} NEW`}
-            {/* NEW: More Info Modal containing Updates & Gears */}
-            <AnimatePresence>
-                {showMoreInfoModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-0"
-                        onClick={() => setShowMoreInfoModal(false)}
-                    >
-                        <motion.div
-                            initial={{ y: '100%' }}
-                            animate={{ y: 0 }}
-                            exit={{ y: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="bg-white rounded-t-3xl w-full h-[90vh] absolute bottom-0 flex flex-col overflow-hidden shadow-2xl"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            {/* Modal Header */}
-                            <div className="p-5 border-b border-black/5 flex items-center justify-between bg-white z-10 sticky top-0">
-                                <div>
-                                    <h3 className="text-xl font-bold font-serif text-black">Valley Essentials</h3>
-                                    <p className="text-xs text-gray-400">Updates & Local Gear</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowMoreInfoModal(false)}
-                                    className="w-8 h-8 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-colors"
-                                >
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            {/* Scrollable Content */}
-                            <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-8">
-                                
-                                {/* 1. Valley Updates Section (Moved here) */}
-                                {valleyUpdates.length > 0 && (
-                                    <section>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <div className="p-1.5 bg-tashi-accent/20 rounded-lg text-tashi-accent">
-                                                <Newspaper size={20} />
-                                            </div>
-                                            <h2 className="text-lg font-bold font-serif text-black tracking-tight" style={{ color: menuAppearance.accentColor }}>
-                                                Valley Updates
-                                            </h2>
-                                        </div>
-
-                                        <div className="bg-black/5 p-4 rounded-xl border-l-2 border-tashi-accent/50">
-                                            <ul className="space-y-3">
-                                                {valleyUpdates.map((update: any, idx: number) => (
-                                                    <li key={idx} className="flex gap-3 group">
-                                                         <div className="flex-shrink-0 mt-1.5">
-                                                            <div className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : update.statusColor === 'red' ? 'bg-red-500' : 'bg-tashi-accent'}`} />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <div className="flex flex-col gap-1">
-                                                                <span className="font-semibold text-sm text-black">{update.title}</span>
-                                                                {update.description && (
-                                                                    <span className="text-xs text-gray-500 leading-relaxed">{update.description}</span>
-                                                                )}
-                                                                
-                                                                {update.mediaUrl && (
-                                                                    <div
-                                                                        className="mt-2 rounded-lg overflow-hidden border border-black/10 bg-black cursor-pointer group/media relative h-32 w-full"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setFullScreenMedia({
-                                                                                url: update.mediaUrl!,
-                                                                                type: update.mediaType === 'video' ? 'video' : 'image',
-                                                                                title: update.title
-                                                                            });
-                                                                        }}
-                                                                    >
-                                                                        {update.mediaType === 'video' ? (
-                                                                            <div className="w-full h-full bg-black flex items-center justify-center">
-                                                                                <PlayCircle className="text-white opacity-50" />
-                                                                                <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                                                                            </div>
-                                                                        ) : (
-                                                                            <img src={update.mediaUrl} alt={update.title} className="w-full h-full object-cover" />
-                                                                        )}
-                                                                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover/media:opacity-100 transition-opacity">
-                                                                             <div className="bg-white/20 backdrop-blur-md p-2 rounded-full text-white">
-                                                                                 {update.mediaType === 'video' ? <PlayCircle size={20} /> : <Info size={20} />}
-                                                                             </div>
-                                                                         </div>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <p className="text-[10px] text-gray-400 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()}</p>
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* 2. Cold Weather Gears Section (Moved here) */}
-                                <section>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
-                                            <ShoppingBag size={20} />
-                                        </div>
-                                        <h2 className="text-lg font-bold font-serif text-black tracking-tight">
-                                            Cold Weather Gears <span className="text-orange-400 text-xs font-sans font-normal ml-1">By Locals</span>
-                                        </h2>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {gearItems?.map((item: any) => (
-                                            <GearItemCard
-                                                key={item.id}
-                                                name={item.name}
-                                                price={item.price}
-                                                items={item.items}
-                                                badge={item.badge}
-                                                available={item.available}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-4 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">
-                                        <p className="text-[10px] text-gray-400 leading-relaxed italic">
-                                            Hand-knitted by local Spiti women. Ask staff for purchase.
-                                        </p>
-                                    </div>
-                                </section>
-
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Table Selection Modal */}
-            <AnimatePresence>
-                {showTableSelector && (
-                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowTableSelector(false)}>
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="text-center mb-4">
-                                <h3 className="text-xl font-bold text-black font-serif">Select Your Table</h3>
-                                <p className="text-gray-500 text-sm">Tap your table number to switch</p>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-3 overflow-y-auto p-1 custom-scrollbar">
-                                {tables.map((table: any) => (
-                                    <button
-                                        key={table.id}
-                                        onClick={() => {
-                                            setTableId(table.id);
-                                            setShowTableSelector(false);
-                                            // Reload page to ensure clean state for the new table session
-                                            setTimeout(() => window.location.reload(), 100);
-                                        }}
-                                        className={`p-3 rounded-xl border font-bold text-lg transition-all ${currentTableId === table.id
-                                            ? 'text-black'
-                                            : 'bg-black/5 text-gray-500 border-black/10 hover:bg-black/10'
-                                            }`}
-                                        style={currentTableId === table.id ? { backgroundColor: menuAppearance.accentColor, borderColor: menuAppearance.accentColor } : {}}
-                                    >
-                                        {table.name}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <button
-                                onClick={() => setShowTableSelector(false)}
-                                className="mt-4 w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
-                            >
-                                Cancel
-                            </button>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Navigation Selection Modal */}
-            <AnimatePresence>
-                {showNavigationModal && (
-                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-6" onClick={() => setShowNavigationModal(false)}>
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white border border-black/10 rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-6"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="text-center">
-                                <h3 className="text-xl font-bold text-black font-serif mb-2">Direction</h3>
-                                <p className="text-gray-400 text-sm">Choose your wayfinding method</p>
-                            </div>
-
-                            <div className="space-y-4">
-                                {/* Option 1: Google Maps */}
-                                <a
-                                    href={`https://www.google.com/maps/dir/?api=1&destination=${contactInfo.mapsLocation}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group"
-                                >
-                                    <div className="bg-blue-500/20 p-3 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                        <MapPin size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-800">Reach Us</p>
-                                        <p className="text-xs text-gray-500">Live GPS Directions</p>
-                                    </div>
-                                </a>
-
-                                {/* Option 2: Local Map Loop (Interactive) */}
-                                <button
-                                    onClick={() => {
-                                        setMapAutoPlay(false);
-                                        setShowNavigationModal(false);
-                                        setTimeout(() => setShowMap(true), 200);
-                                    }}
-                                    className="w-full flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group text-left"
-                                >
-                                    <div className="p-3 rounded-full transition-colors bg-gray-200 text-gray-600 group-hover:bg-gray-300">
-                                        <Navigation size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-800">Tourist Loop Map</p>
-                                        <p className="text-xs text-gray-500">Interactive Schematic Guide</p>
-                                    </div>
-                                </button>
-
-
-                            </div>
-
-                            <button
-                                onClick={() => setShowNavigationModal(false)}
-                                className="w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 hover:text-black transition-colors text-sm uppercase tracking-wide"
-                            >
-                                Cancel
-                            </button>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-            <AnimatePresence>
-                {showMap && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-4"
-                        onClick={() => setShowMap(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 30 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 30 }}
-                            className="bg-white border-0 md:border md:border-tashi-accent/20 rounded-none md:rounded-3xl w-full max-w-4xl overflow-hidden relative shadow-2xl flex flex-col h-[100dvh] md:h-auto md:max-h-[90vh]"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex items-center justify-between p-4 border-b border-white/5 bg-black/20">
-                                <h3 className="text-xl font-bold text-tashi-accent font-serif pl-2">Local Guide Map</h3>
-                                <button
-                                    onClick={() => setShowMap(false)}
-                                    className="w-10 h-10 bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center text-black transition-colors"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <div className="flex-1 overflow-hidden bg-black/5 p-0 relative flex flex-col">
-                                <LocalMapGuide autoPlay={mapAutoPlay} />
-                            </div>
-
-                            <div className="p-4 bg-black/20 text-center border-t border-white/5 hidden md:block">
-                                <p className="text-gray-400 text-xs">
-                                    The road connects Chicham Bridge & TashiZom directly. No need to go back!
-                                </p>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Contact Info Modal */}
-            {
-                showContactInfo && (
-                    <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setShowContactInfo(false)}>
-                        <div className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onClick={e => e.stopPropagation()}>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="text-xl font-bold text-black font-serif">Contact Us</h3>
-                                    <p className="text-sm text-gray-500">We are here to help!</p>
-                                </div>
-                                <button onClick={() => setShowContactInfo(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
-                            </div>
-
-                            <div className="space-y-3 pt-2">
-                                <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
-                                    <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
-                                        <Phone size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-800">Call Staffs</p>
-                                        <p className="text-xs text-gray-500">{contactInfo.phone}</p>
-                                    </div>
-                                </a>
-
-                                {contactInfo.secondaryPhone && (
-                                    <a href={`tel:${contactInfo.secondaryPhone}`} className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
-                                        <div className="bg-green-500/20 p-3 rounded-full text-green-400 group-hover:bg-green-500 group-hover:text-white transition-colors">
-                                            <Phone size={24} />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-gray-800">Call Owner</p>
-                                            <p className="text-xs text-gray-500">{contactInfo.secondaryPhone}</p>
-                                        </div>
-                                    </a>
-                                )}
-
-                                <a href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" className="flex items-center gap-4 bg-black/5 p-4 rounded-xl hover:bg-black/10 transition-colors border border-black/5 group">
-                                    <div className="bg-emerald-500/20 p-3 rounded-full text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                                        <MessageCircle size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-800">WhatsApp</p>
-                                        <p className="text-xs text-gray-500">Chat with us</p>
-                                    </div>
-                                </a>
-
-
-
-                                {/* Removed Duplicate WhatsApp Button */}
-
-
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-
-            {/* Review Modal */}
-            <AnimatePresence>
-                {showReviewModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
-                        onClick={() => setShowReviewModal(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-white border border-black/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="text-xl font-bold text-black font-serif">Rate Us</h3>
-                                    <p className="text-sm text-gray-500">Tell us about your experience</p>
-                                </div>
-                                <button onClick={() => setShowReviewModal(false)} className="bg-black/10 p-1 rounded-full text-black hover:bg-black/20"><X size={20} /></button>
-                            </div>
-
-                            <div className="space-y-4 pt-2">
-                                {/* Stars */}
-                                <div className="flex justify-center gap-2">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            onClick={() => setReviewRating(star)}
-                                            className={`p-1 transition-all ${reviewRating >= star ? 'text-tashi-accent scale-110' : 'text-gray-600'}`}
-                                        >
-                                            <Star size={32} fill={reviewRating >= star ? "currentColor" : "none"} />
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Inputs */}
-                                <input
-                                    type="text"
-                                    placeholder="Your Name (Optional)"
-                                    value={reviewName}
-                                    onChange={(e) => setReviewName(e.target.value)}
-                                    className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50"
-                                />
-
-                                <textarea
-                                    placeholder="Share your feedback..."
-                                    value={reviewComment}
-                                    onChange={(e) => setReviewComment(e.target.value)}
-                                    className="w-full bg-black/5 border border-black/10 rounded-xl px-4 py-3 text-black placeholder:text-gray-500 focus:outline-none focus:border-tashi-accent/50 min-h-[100px] resize-none"
-                                />
-
-                                <button
-                                    onClick={() => {
-                                        addReview({
-                                            customerName: reviewName || 'Guest',
-                                            rating: reviewRating,
-                                            comment: reviewComment
-                                        });
-                                        setShowReviewModal(false);
-                                        setReviewComment('');
-                                        setReviewRating(5);
-                                        setReviewName('');
-                                    }}
-                                    disabled={!reviewComment.trim()}
-                                    className="w-full bg-tashi-accent text-tashi-dark font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    <Send size={18} />
-                                    Submit Review
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Full Screen Media Overlay (Plays inside app) */}
-            <AnimatePresence>
-                {fullScreenMedia && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center touch-none"
-                    >
-                        {/* Header with Title and Close */}
-                        <div className="absolute top-0 left-0 right-0 p-6 z-10 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
-                            <div className="flex-1">
-                                <h4 className="text-white font-serif font-bold text-lg">{fullScreenMedia.title || 'Valley Update'}</h4>
-                                <p className="text-gray-400 text-[10px] uppercase tracking-widest">TashiZom Newsroom</p>
-                            </div>
-                            <button
-                                onClick={() => setFullScreenMedia(null)}
-                                className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center text-white transition-all transform hover:rotate-90"
-                            >
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        {/* Content Container */}
-                        <motion.div
-                            initial={{ scale: 0.95, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            className="w-full h-full flex items-center justify-center p-2"
-                        >
-                            {fullScreenMedia.type === 'video' ? (
-                                (() => {
-                                    const youtubeId = getYouTubeId(fullScreenMedia.url);
-                                    if (youtubeId) {
-                                        return (
-                                            <iframe
-                                                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
-                                                className="w-full aspect-video max-w-4xl shadow-2xl rounded-xl border border-white/5"
-                                                title="YouTube video player"
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                allowFullScreen
-                                            />
-                                        );
-                                    }
-                                    return (
-                                        <video
-                                            src={fullScreenMedia.url}
-                                            controls
-                                            autoPlay
-                                            playsInline
-                                            className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
-                                        />
-                                    );
-                                })()
-                            ) : (
-                                <img
-                                    src={fullScreenMedia.url}
-                                    alt="Full screen view"
-                                    className="w-full max-h-[85vh] object-contain shadow-2xl rounded-xl"
-                                />
-                            )}
-                        </motion.div>
-
-                        {/* Backdrop Blur Helper */}
-                        <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                            <p className="text-gray-500 text-[10px] uppercase">Scroll to exit or use the back button</p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div >
     );
 }

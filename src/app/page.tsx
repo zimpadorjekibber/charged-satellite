@@ -105,8 +105,10 @@ export default function Home() {
             transition={{ duration: 1 }}
             className="pointer-events-auto text-center"
           >
-            <h1 className="text-6xl md:text-8xl font-bold text-tashi-accent drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] tracking-tighter font-serif">
-              TashiZom
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter font-serif">
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+                TashiZom
+              </span>
             </h1>
           </motion.div>
         </div>
@@ -117,11 +119,14 @@ export default function Home() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="pointer-events-auto text-center mt-2"
+            className="pointer-events-auto text-center mt-2 group"
           >
-            <p className="text-xl md:text-3xl text-amber-900 font-serif italic font-bold tracking-widest drop-shadow-sm px-4">
-              Multi-Cuisine Restaurant
-            </p>
+            <div className="relative inline-block">
+              <p className="text-xl md:text-4xl text-amber-200 font-serif italic font-bold tracking-[0.2em] drop-shadow-xl px-4">
+                Multi-Cuisine Restaurant
+              </p>
+              <div className="h-[2px] w-0 group-hover:w-full bg-tashi-accent transition-all duration-700 mt-1 mx-auto" />
+            </div>
           </motion.div>
 
           <motion.div
@@ -130,17 +135,23 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.3 }}
             className="flex flex-col items-center mb-2"
           >
-            <div className="text-white font-serif tracking-[0.4em] uppercase text-sm md:text-base font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-4 text-white/40 mb-2">
+              <div className="w-12 h-[1px] bg-gradient-to-r from-transparent to-white/20" />
+              <span className="text-[10px] uppercase tracking-[0.6em] font-bold">The Spiti Valley</span>
+              <div className="w-12 h-[1px] bg-gradient-to-l from-transparent to-white/20" />
+            </div>
+            <div className="text-white font-serif tracking-[0.6em] uppercase text-lg md:text-2xl font-bold drop-shadow-glow">
               Kibber
             </div>
-            <div className="text-white/90 font-serif text-xs md:text-sm tracking-[0.1em] mt-1 italic font-medium drop-shadow-md">
-              (All Season Open)
+            <div className="text-amber-500/80 font-serif text-xs md:text-sm tracking-[0.2em] mt-2 italic font-medium drop-shadow-md flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              All Season Open
             </div>
           </motion.div>
         </div>
 
         {/* Bottom Section Content (Night) */}
-        <div className="flex-1 flex flex-col items-center justify-start pt-4">
+        <div className="flex-1 flex flex-col items-center justify-start pt-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -149,10 +160,11 @@ export default function Home() {
           >
             <Link
               href="/customer/menu"
-              className="inline-flex items-center gap-2 bg-tashi-accent text-tashi-dark px-6 py-2.5 rounded-lg font-bold hover:bg-white hover:scale-105 transition-all duration-300 shadow-xl text-base md:text-lg border border-amber-400/30"
+              className="group relative inline-flex items-center gap-3 bg-gradient-to-b from-amber-400 to-amber-600 text-tashi-dark px-10 py-4 rounded-xl font-black shadow-[0_0_30px_rgba(218,165,32,0.3)] hover:shadow-[0_0_50px_rgba(218,165,32,0.5)] transition-all duration-500 active:scale-95"
             >
-              Preview Menu
-              <ArrowRight size={20} />
+              <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative z-10 text-lg md:text-xl font-serif uppercase tracking-widest">Discover Flavors</span>
+              <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform duration-300" />
             </Link>
           </motion.div>
         </div>
@@ -184,3 +196,4 @@ export default function Home() {
     </main>
   );
 }
+.........

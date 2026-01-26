@@ -134,23 +134,32 @@ export default function StaffDashboard() {
             return;
         }
 
-        if (newOrders.length > prevPendingCount) {
+        // Trigger Alert for NEW items
+        if (newOrders.length > prevPendingCount || activeNotifications.length > prevNotificationCount) {
             playNotificationSound();
             setShowVisualAlert(true);
-            setTimeout(() => setShowVisualAlert(false), 3000);
         }
 
-        if (activeNotifications.length > prevNotificationCount) {
-            playNotificationSound();
-        }
+        // Keep ringing if ANY action is needed
+        const hasActionsNeeded = newOrders.length > 0 || activeNotifications.length > 0;
 
-        if (activeNotifications.length < prevNotificationCount) {
-            stopNotificationSound();
+        if (isSoundEnabled && hasActionsNeeded) {
+            if (!isRinging) {
+                playNotificationSound();
+            }
+        } else {
+            // Silence if everything is clear
+            if (isRinging) {
+                stopNotificationSound();
+            }
+            if (!hasActionsNeeded) {
+                setShowVisualAlert(false);
+            }
         }
 
         setPrevPendingCount(newOrders.length);
         setPrevNotificationCount(activeNotifications.length);
-    }, [newOrders.length, activeNotifications.length]);
+    }, [newOrders.length, activeNotifications.length, isSoundEnabled]);
 
     // Toggle order expansion
     const toggleOrderExpansion = (orderId: string) => {
