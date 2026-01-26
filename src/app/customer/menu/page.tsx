@@ -1284,8 +1284,8 @@ export default function MenuPage() {
                     </div>
                 </div>
 
-                {/* Mini Timer for Active Orders - Commented out as component is missing */}
-                {/* <MiniOrderTimer /> */}
+                {/* Mini Timer for Active Orders */}
+                <MiniOrderTimer />
 
                 {/* Top Toolbar: Map Icon & Filters */}
                 <div className="px-1 mt-6 mb-2 flex justify-between items-center">
