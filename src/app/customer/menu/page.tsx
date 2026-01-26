@@ -1094,7 +1094,8 @@ export default function MenuPage() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setShowMoreInfoModal(true)}
-                        className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-500"
+                        className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-black shadow-sm"
+                        aria-label="More Info"
                     >
                         <Info size={20} />
                     </button>
