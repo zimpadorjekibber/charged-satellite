@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useStore, Category, MenuItem, Table, Order, getValidDate } from '../../../lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag, PlayCircle } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -297,6 +297,8 @@ export default function MenuPage() {
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [showNavigationModal, setShowNavigationModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
+    const [showMoreInfoModal, setShowMoreInfoModal] = useState(false); // NEW: Toggle for 'More Info' modal
+    const [mapAutoPlay, setMapAutoPlay] = useState(false); // New State for Map Mode
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLocating, setIsLocating] = useState(false); // New loading state for Call Staff
     const [showTableSelector, setShowTableSelector] = useState(false);
@@ -831,6 +833,17 @@ export default function MenuPage() {
                             Direction
                         </span>
                     </button>
+
+                    {/* NEW: More Info Button */}
+                    <button
+                        onClick={() => setShowMoreInfoModal(true)}
+                        className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-black hover:bg-gray-200 border border-black/10 active:scale-95 transition-transform"
+                    >
+                        <ShoppingBag size={24} />
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            More Info
+                        </span>
+                    </button>
                 </div>
             </div>
 
@@ -1146,149 +1159,141 @@ export default function MenuPage() {
                                 <div className="flex items-center gap-3">
                                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${showAllUpdates ? 'bg-white/10 border-white/20 text-white' : 'bg-red-500/10 border-red-500/30 text-red-400 animate-pulse'}`}>
                                         {showAllUpdates ? 'Close' : `${valleyUpdates.length} NEW`}
-                                    </span>
-                                    {showAllUpdates ? <Minus size={16} className="text-gray-400" /> : <Plus size={16} className="text-gray-400" />}
+            {/* NEW: More Info Modal containing Updates & Gears */}
+            <AnimatePresence>
+                {showMoreInfoModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-0"
+                        onClick={() => setShowMoreInfoModal(false)}
+                    >
+                        <motion.div
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="bg-white rounded-t-3xl w-full h-[90vh] absolute bottom-0 flex flex-col overflow-hidden shadow-2xl"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* Modal Header */}
+                            <div className="p-5 border-b border-black/5 flex items-center justify-between bg-white z-10 sticky top-0">
+                                <div>
+                                    <h3 className="text-xl font-bold font-serif text-black">Valley Essentials</h3>
+                                    <p className="text-xs text-gray-400">Updates & Local Gear</p>
                                 </div>
+                                <button
+                                    onClick={() => setShowMoreInfoModal(false)}
+                                    className="w-8 h-8 bg-black/5 rounded-full flex items-center justify-center hover:bg-black/10 transition-colors"
+                                >
+                                    <X size={18} />
+                                </button>
                             </div>
 
-                            {/* Expandable Content */}
-                            <div className="pt-[70px] px-6 pb-6">
-                                {/* Consolidated card with all updates as bullets */}
-                                <div className="bg-black/5 p-5 rounded-xl border-l-2 border-tashi-accent/50">
-                                    <motion.ul
-                                        className="space-y-3"
-                                        variants={containerVariants}
-                                        initial="hidden"
-                                        animate={showAllUpdates ? "show" : "hidden"}
-                                    >
-                                        {valleyUpdates.map((update: any, idx: number) => (
-                                            <motion.li
-                                                key={idx}
-                                                variants={itemVariants}
-                                                className="flex gap-3 group"
-                                            >
-                                                {/* Colored bullet indicator based on status */}
-                                                <div className="flex-shrink-0 mt-1.5">
-                                                    <div
-                                                        className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]' :
-                                                            update.statusColor === 'blue' ? 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.6)]' :
-                                                                update.statusColor === 'red' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]' :
-                                                                    'bg-tashi-accent shadow-[0_0_6px_rgba(218,165,32,0.6)]'
-                                                            }`}
-                                                    />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <p className="text-sm text-gray-300 leading-relaxed">
-                                                            <span className="font-semibold text-black">{update.title}</span>
-                                                            {update.description && (
-                                                                <span className="text-gray-400"> - {update.description}</span>
-                                                            )}
-                                                        </p>
-                                                        {update.status && update.status.toLowerCase() !== 'create' && (
-                                                            <span className={`flex-shrink-0 inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${update.statusColor === 'green' ? 'bg-green-500/20 text-green-400' :
-                                                                update.statusColor === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-                                                                    update.statusColor === 'red' ? 'bg-red-500/20 text-red-400' :
-                                                                        'bg-gray-500/20 text-gray-400'
-                                                                }`}>
-                                                                {update.status}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    {/* Show media if available */}
-                                                    {update.mediaUrl && (
-                                                        <div
-                                                            className="mt-2 rounded-lg overflow-hidden border border-white/5 bg-black cursor-pointer group/media relative"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setFullScreenMedia({
-                                                                    url: update.mediaUrl!,
-                                                                    type: update.mediaType === 'video' ? 'video' : 'image',
-                                                                    title: update.title
-                                                                });
-                                                            }}
-                                                        >
-                                                            {/* Play Overlay */}
-                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/media:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                                                <div className="w-12 h-12 bg-tashi-accent rounded-full flex items-center justify-center text-tashi-dark shadow-xl scale-90 group-hover/media:scale-100 transition-transform">
-                                                                    {update.mediaType === 'video' ? <Plus size={24} className="rotate-45" /> : <Info size={24} />}
-                                                                </div>
-                                                            </div>
-                                                            {update.mediaType === 'video' ? (
-                                                                (() => {
-                                                                    // Helper to detect and format YouTube URLs
-                                                                    const getYouTubeId = (url: string) => {
-                                                                        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-                                                                        const match = url.match(regExp);
-                                                                        return (match && match[2].length === 11) ? match[2] : null;
-                                                                    };
-                                                                    const youtubeId = getYouTubeId(update.mediaUrl || '');
+                            {/* Scrollable Content */}
+                            <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-8">
+                                
+                                {/* 1. Valley Updates Section (Moved here) */}
+                                {valleyUpdates.length > 0 && (
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="p-1.5 bg-tashi-accent/20 rounded-lg text-tashi-accent">
+                                                <Newspaper size={20} />
+                                            </div>
+                                            <h2 className="text-lg font-bold font-serif text-black tracking-tight" style={{ color: menuAppearance.accentColor }}>
+                                                Valley Updates
+                                            </h2>
+                                        </div>
 
-                                                                    if (youtubeId) {
-                                                                        return (
-                                                                            <iframe
-                                                                                src={`https://www.youtube.com/embed/${youtubeId}`}
-                                                                                className="w-full aspect-video"
-                                                                                title="YouTube video player"
-                                                                                frameBorder="0"
-                                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                                                allowFullScreen
-                                                                            />
-                                                                        );
-                                                                    }
-                                                                    // Fallback for direct MP4 files
-                                                                    return <video src={update.mediaUrl} controls className="w-full max-h-48 object-cover" />;
-                                                                })()
-                                                            ) : (
-                                                                <img src={update.mediaUrl} alt={update.title} className="w-full max-h-48 object-cover" />
-                                                            )}
+                                        <div className="bg-black/5 p-4 rounded-xl border-l-2 border-tashi-accent/50">
+                                            <ul className="space-y-3">
+                                                {valleyUpdates.map((update: any, idx: number) => (
+                                                    <li key={idx} className="flex gap-3 group">
+                                                         <div className="flex-shrink-0 mt-1.5">
+                                                            <div className={`w-2 h-2 rounded-full ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : update.statusColor === 'red' ? 'bg-red-500' : 'bg-tashi-accent'}`} />
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </motion.li>
+                                                        <div className="flex-1">
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className="font-semibold text-sm text-black">{update.title}</span>
+                                                                {update.description && (
+                                                                    <span className="text-xs text-gray-500 leading-relaxed">{update.description}</span>
+                                                                )}
+                                                                
+                                                                {update.mediaUrl && (
+                                                                    <div
+                                                                        className="mt-2 rounded-lg overflow-hidden border border-black/10 bg-black cursor-pointer group/media relative h-32 w-full"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setFullScreenMedia({
+                                                                                url: update.mediaUrl!,
+                                                                                type: update.mediaType === 'video' ? 'video' : 'image',
+                                                                                title: update.title
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        {update.mediaType === 'video' ? (
+                                                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                                <PlayCircle className="text-white opacity-50" />
+                                                                                <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <img src={update.mediaUrl} alt={update.title} className="w-full h-full object-cover" />
+                                                                        )}
+                                                                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover/media:opacity-100 transition-opacity">
+                                                                             <div className="bg-white/20 backdrop-blur-md p-2 rounded-full text-white">
+                                                                                 {update.mediaType === 'video' ? <PlayCircle size={20} /> : <Info size={20} />}
+                                                                             </div>
+                                                                         </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <p className="text-[10px] text-gray-400 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()}</p>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* 2. Cold Weather Gears Section (Moved here) */}
+                                <section>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
+                                            <ShoppingBag size={20} />
+                                        </div>
+                                        <h2 className="text-lg font-bold font-serif text-black tracking-tight">
+                                            Cold Weather Gears <span className="text-orange-400 text-xs font-sans font-normal ml-1">By Locals</span>
+                                        </h2>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {gearItems?.map((item: any) => (
+                                            <GearItemCard
+                                                key={item.id}
+                                                name={item.name}
+                                                price={item.price}
+                                                items={item.items}
+                                                badge={item.badge}
+                                                available={item.available}
+                                            />
                                         ))}
-                                    </motion.ul>
-                                </div>
-                                <p className="text-[10px] text-gray-600 text-center mt-3 italic">Updated: {new Date().toLocaleDateString()} • Ask staff for details</p>
+                                    </div>
+
+                                    <div className="mt-4 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">
+                                        <p className="text-[10px] text-gray-400 leading-relaxed italic">
+                                            Hand-knitted by local Spiti women. Ask staff for purchase.
+                                        </p>
+                                    </div>
+                                </section>
+
                             </div>
                         </motion.div>
-                    </div>
-                )
-            }
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Cold Weather Gears - Local Support Section */}
-            <section className="mt-8 mx-4 mb-32">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-orange-500/20 rounded-lg text-orange-400">
-                        <ShoppingBag size={20} />
-                    </div>
-                    <h2 className="text-xl font-bold font-serif text-black tracking-tight">
-                        Cold Weather Gears <span className="text-orange-400 text-sm font-sans font-normal ml-1">By Locals</span>
-                    </h2>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    {/* Render dynamic items from store */}
-                    {gearItems?.map((item: any) => (
-                        <GearItemCard
-                            key={item.id}
-                            name={item.name}
-                            price={item.price}
-                            items={item.items}
-                            badge={item.badge}
-                            available={item.available}
-                        />
-                    ))}
-
-
-                </div>
-
-                <div className="mt-4 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10 text-center">
-                    <p className="text-[11px] text-gray-400 leading-relaxed italic">
-                        All items are hand-knitted by local Spiti women. Supporting these crafts helps sustain our mountain communities. Ask staff for available colors.
-                    </p>
-                </div>
-            </section>
             {/* Table Selection Modal */}
             <AnimatePresence>
                 {showTableSelector && (
@@ -1370,22 +1375,25 @@ export default function MenuPage() {
                                     </div>
                                 </a>
 
-                                {/* Option 2: Local Map Loop */}
+                                {/* Option 2: Local Map Loop (Interactive) */}
                                 <button
                                     onClick={() => {
+                                        setMapAutoPlay(false);
                                         setShowNavigationModal(false);
-                                        setTimeout(() => setShowMap(true), 200); // Small delay for smooth transition
+                                        setTimeout(() => setShowMap(true), 200);
                                     }}
                                     className="w-full flex items-center gap-4 bg-black/5 p-4 rounded-2xl hover:bg-black/10 transition-colors border border-black/5 group text-left"
                                 >
-                                    <div className="p-3 rounded-full transition-colors" style={{ backgroundColor: `${menuAppearance.accentColor}33`, color: menuAppearance.accentColor }}>
+                                    <div className="p-3 rounded-full transition-colors bg-gray-200 text-gray-600 group-hover:bg-gray-300">
                                         <Navigation size={24} />
                                     </div>
                                     <div>
                                         <p className="font-bold text-gray-800">Tourist Loop Map</p>
-                                        <p className="text-xs text-gray-500">Local Schematic Guide (No U-Turn)</p>
+                                        <p className="text-xs text-gray-500">Interactive Schematic Guide</p>
                                     </div>
                                 </button>
+
+
                             </div>
 
                             <button
@@ -1425,7 +1433,7 @@ export default function MenuPage() {
                             </div>
 
                             <div className="flex-1 overflow-hidden bg-black/5 p-0 relative flex flex-col">
-                                <LocalMapGuide />
+                                <LocalMapGuide autoPlay={mapAutoPlay} />
                             </div>
 
                             <div className="p-4 bg-black/20 text-center border-t border-white/5 hidden md:block">

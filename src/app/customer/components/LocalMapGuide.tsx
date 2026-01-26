@@ -1,5 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Navigation, Info, Clock, Mountain, ArrowLeftRight } from 'lucide-react';
+'use client';
+
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Navigation, Info, Clock, Mountain, ArrowLeftRight, PlayCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const LOCATIONS = {
@@ -18,7 +20,7 @@ const LOCATIONS = {
     tashizom: {
         name: 'TashiZom',
         elevation: '4,250m',
-        desc: 'Your premium comfort hub in the heart of the Kibber wildlife sanctuary.',
+        desc: 'Located just to the right of the main road. Your premium comfort hub in the heart of the Kibber wildlife sanctuary.',
         time: '2 mins from Kibber'
     },
     chicham: {
@@ -28,24 +30,110 @@ const LOCATIONS = {
         time: '15 mins from TashiZom'
     },
     linkroad: {
-        name: 'Link Road Exit',
+        name: 'Chicham-Kibber Link Road',
         elevation: '3,800m',
-        desc: 'The vital gateway connecting the Kibber loop to the main highway. Head south from here for Kaza.',
-        time: 'Direct access to Kaza'
+        desc: 'CRUCIAL POINT: Turn RIGHT here. Chicham Bridge is connected VIA Kibber. Do not go straight (leads to Kaza).',
+        time: 'Turn RIGHT for Kibber'
     }
 };
 
-export default function LocalMapGuide() {
+export default function LocalMapGuide({ autoPlay = false }: { autoPlay?: boolean }) {
     const [isReverse, setIsReverse] = useState(false);
     const [selectedLoc, setSelectedLoc] = useState<keyof typeof LOCATIONS | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [hasStartedAutoPlay, setHasStartedAutoPlay] = useState(false);
+
+    // Camera/ViewBox Motion Values
+    const cameraX = useMotionValue(0);
+    const cameraY = useMotionValue(0);
+    const cameraW = useMotionValue(600);
+    const cameraH = useMotionValue(750);
+    const viewBoxString = useTransform(
+        [cameraX, cameraY, cameraW, cameraH],
+        ([x, y, w, h]) => `${x} ${y} ${w} ${h}`
+    );
 
     // Toggle direction every 15 seconds for a dynamic guide
     useEffect(() => {
+        if (isPlaying) return; // Pause auto-toggle during tour
         const interval = setInterval(() => {
             setIsReverse(prev => !prev);
         }, 15000);
         return () => clearInterval(interval);
-    }, []);
+    }, [isPlaying]);
+
+    // Handle AutoPlay on Mount
+    useEffect(() => {
+        if (autoPlay && !hasStartedAutoPlay) {
+            setHasStartedAutoPlay(true);
+            setTimeout(() => {
+                playTour();
+            }, 500); // Small delay to allow SVG to render
+        }
+    }, [autoPlay, hasStartedAutoPlay]);
+
+    // Tour Sequence
+    const playTour = async () => {
+        if (isPlaying) return;
+        setIsPlaying(true);
+        setSelectedLoc(null);
+        setIsReverse(false); // Force forward direction
+
+        const ease = "easeInOut";
+
+        // 1. Zoom to Kee (Bottom)
+        animate(cameraX, 280, { duration: 2, ease });
+        animate(cameraY, 550, { duration: 2, ease });
+        animate(cameraW, 200, { duration: 2, ease });
+        await animate(cameraH, 200, { duration: 2, ease }).finished;
+
+        setSelectedLoc('kee');
+        await new Promise(r => setTimeout(r, 4000));
+        setSelectedLoc(null);
+
+        // 1.5. Pan to Link Road (Crucial Turn)
+        animate(cameraX, 260, { duration: 2, ease });
+        animate(cameraY, 400, { duration: 2, ease }); // Centered on 360,500
+        await animate(cameraW, 200, { duration: 2, ease }).finished;
+
+        setSelectedLoc('linkroad');
+        await new Promise(r => setTimeout(r, 5000)); // Longer pause for crucial info
+        setSelectedLoc(null);
+
+        // 2. Pan to Kibber/TashiZom (Right)
+        animate(cameraX, 380, { duration: 3, ease: "linear" }); // Follow road
+        animate(cameraY, 200, { duration: 3, ease: "linear" });
+        await new Promise(r => setTimeout(r, 1000)); // slight pause mid-pan?
+
+        animate(cameraX, 380, { duration: 1.5, ease });
+        animate(cameraY, 200, { duration: 1.5, ease });
+
+        // Final position for step 2
+        animate(cameraX, 350, { duration: 2, ease });
+        animate(cameraY, 190, { duration: 2, ease });
+        await animate(cameraW, 220, { duration: 2, ease }).finished;
+
+        setSelectedLoc('tashizom');
+        await new Promise(r => setTimeout(r, 4000));
+        setSelectedLoc(null);
+
+        // 3. Pan to Chicham (Top Left)
+        animate(cameraX, 80, { duration: 2.5, ease });
+        animate(cameraY, 20, { duration: 2.5, ease });
+        await animate(cameraW, 200, { duration: 2.5, ease }).finished;
+
+        setSelectedLoc('chicham');
+        await new Promise(r => setTimeout(r, 3000));
+        setSelectedLoc(null);
+
+        // 4. Reset to Full View
+        animate(cameraX, 0, { duration: 2, ease });
+        animate(cameraY, 0, { duration: 2, ease });
+        animate(cameraW, 600, { duration: 2, ease });
+        await animate(cameraH, 750, { duration: 2, ease }).finished;
+
+        setIsPlaying(false);
+    };
 
     return (
         <div className="bg-white border-0 md:border md:border-tashi-accent/20 rounded-none md:rounded-3xl overflow-hidden relative w-full flex flex-col h-full md:h-auto max-w-3xl mx-auto shadow-none md:shadow-[0_0_50px_rgba(0,0,0,0.1)]">
@@ -60,7 +148,13 @@ export default function LocalMapGuide() {
                             <Navigation size={20} className={`transition-transform duration-700 text-tashi-accent ${isReverse ? 'rotate-180' : ''}`} />
                             Interactive Real Map
                         </h3>
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5 font-bold">Terrain View with Route Flow</p>
+                        <div className='flex items-center gap-2 mt-1'>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Terrain View</p>
+                            <div className='h-3 w-[1px] bg-black/20'></div>
+                            <button onClick={playTour} disabled={isPlaying} className={`text-[10px] font-bold flex items-center gap-1 ${isPlaying ? 'text-tashi-accent' : 'text-blue-600 animate-pulse hover:text-blue-800'}`}>
+                                <PlayCircle size={12} /> {isPlaying ? 'Playing Guide...' : 'Play Guide Map'}
+                            </button>
+                        </div>
                     </div>
                     <button
                         onClick={() => setIsReverse(!isReverse)}
@@ -89,7 +183,7 @@ export default function LocalMapGuide() {
 
             {/* Interactive SVG Map */}
             <div className="flex-1 w-full h-full min-h-0 md:h-[600px] relative bg-white overflow-hidden">
-                <svg viewBox="0 0 600 750" className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
+                <motion.svg viewBox={viewBoxString as any} className="w-full h-full p-0" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
                             <polygon points="0 0, 8 3, 0 6" fill="#DAA520" />
@@ -113,7 +207,7 @@ export default function LocalMapGuide() {
                         </filter>
                     </defs>
 
-                    {/* REAL MAP BACKGROUND - New Image */}
+                    {/* REAL MAP BACKGROUND - Illustrated Map */}
                     <image href="/spiti-real-map.png" x="0" y="0" width="600" height="750" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
 
                     {/* ANIMATED FLOW OVERLAY */}
@@ -163,9 +257,26 @@ export default function LocalMapGuide() {
 
                     {/* Nodes */}
 
-                    {/* Link Road / Bifurcation Point */}
-                    <g transform="translate(360, 500)">
-                        <circle r="6" fill="#d97706" />
+                    {/* Link Road / Bifurcation Point - UPDATED */}
+                    <g transform="translate(360, 500)" className="group cursor-pointer" onClick={() => setSelectedLoc('linkroad')}>
+                        <motion.circle r="8" fill="#d97706" animate={selectedLoc === 'linkroad' ? { scale: 1.5, fill: "#ef4444" } : {}} />
+                        <circle r="12" fill="none" stroke="#d97706" strokeWidth="1" strokeDasharray="2,2" />
+
+                        {/* Turn Right Indicator - Only visible during tour/selection */}
+                        <AnimatePresence>
+                            {selectedLoc === 'linkroad' && (
+                                <motion.g
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    {/* Curved Arrow indicating Right Turn */}
+                                    <path d="M -10 20 Q 10 20 20 -10 L 15 -5 M 20 -10 L 25 -5" fill="none" stroke="#ef4444" strokeWidth="4" markerEnd="url(#arrowhead)" />
+                                    <text x="30" y="-10" fill="#ef4444" fontSize="14" fontWeight="bold">TURN RIGHT</text>
+                                    <text x="30" y="5" fill="#333" fontSize="10" fontWeight="bold">to Kibber/Chicham</text>
+                                </motion.g>
+                            )}
+                        </AnimatePresence>
                     </g>
 
                     {/* Kee Monastery (Bottom Center) - NEW */}
@@ -223,7 +334,7 @@ export default function LocalMapGuide() {
                         <text x="0" y="0" textAnchor="middle" fill="#22c55e" fontSize="16" fontWeight="bold">To Kaza ↓</text>
                     </g>
 
-                </svg>
+                </motion.svg>
 
                 {/* Legend / Overlay - Positioned at Top Right to avoid overlaps */}
                 <motion.div
