@@ -104,6 +104,413 @@ const GearItemCard = ({ name, price, items, badge, available }: { name: string, 
     );
 };
 
+// --- HELPER COMPONENTS (Hoisted) ---
+
+const MiniOrderTimer = memo(function MiniOrderTimer() {
+    const orders = useStore((state: any) => state.orders);
+    const currentTableId = useStore((state: any) => state.currentTableId);
+    const sessionId = useStore((state: any) => state.sessionId);
+
+    // Find the latest active order for THIS session
+    const activeOrder = orders
+        .filter((o: Order) =>
+            o.sessionId === sessionId &&
+            (o.status === 'Pending' || o.status === 'Preparing')
+        )
+        .sort((a: any, b: any) => {
+            const dateA = getValidDate(a.createdAt)?.getTime() || 0;
+            const dateB = getValidDate(b.createdAt)?.getTime() || 0;
+            return dateB - dateA;
+        })[0];
+
+    if (!activeOrder) return null;
+
+    return (
+        <Link href="/customer/status">
+            <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
+            >
+                <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
+                <div className="flex flex-col leading-none">
+                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                        {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
+                    </span>
+                    <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
+                </div>
+            </motion.div>
+        </Link>
+    );
+});
+
+function MiniTimerDisplay({ startTime }: { startTime: Date | string | any }) {
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
+        const interval = setInterval(() => {
+            try {
+                const date = getValidDate(startTime);
+                if (!date) return;
+                const start = date.getTime();
+                const now = new Date().getTime();
+                // Estimate 30 mins
+                const end = start + 30 * 60 * 1000;
+                const diff = Math.max(0, end - now);
+                setTimeLeft(diff);
+            } catch (err) {
+                console.error("MiniTimer update error:", err);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [startTime, mounted]);
+
+    const mins = Math.floor((timeLeft / 1000 / 60) % 60);
+    const secs = Math.floor((timeLeft / 1000) % 60);
+
+    return (
+        <span className="font-mono font-bold text-sm">
+            {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
+        </span>
+    );
+}
+
+const ChefsSpecialSection = memo(function ChefsSpecialSection({
+    items,
+    addToCart,
+    removeFromCart,
+    getQuantity,
+    setSelectedItem
+}: {
+    items: MenuItem[],
+    addToCart: (item: MenuItem) => void,
+    removeFromCart: (id: string) => void,
+    getQuantity: (id: string) => number,
+    setSelectedItem: (item: MenuItem) => void
+}) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (items.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % items.length);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [items.length]);
+
+    if (items.length === 0) return null;
+
+    return (
+        <section className="mb-8 mt-4">
+            <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
+                <Sparkles style={{ color: menuAppearance.accentColor }} className="animate-pulse" size={24} />
+                <h2 className="text-xl font-bold font-serif uppercase tracking-widest animate-pulse" style={{ color: menuAppearance.accentColor, filter: `drop-shadow(0 0 8px ${menuAppearance.accentColor}80)` }}>
+                    Chef's Specials
+                </h2>
+                <div className="h-[1px] flex-1" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}80, transparent)` }} />
+            </div>
+
+            {/* Fixed Height Container for Zero Layout Shift */}
+            <div className="relative h-[150px] mx-4 mb-2">
+                {items.map((item, index) => {
+                    const isActive = index === currentIndex;
+                    return (
+                        <div
+                            key={item.id}
+                            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+                        >
+                            <div className="relative group h-full">
+                                {/* Flashing Border Effect */}
+                                <div className="absolute -inset-[2px] rounded-2xl opacity-75 blur-sm animate-pulse" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}, #FFFFFF, ${menuAppearance.accentColor})` }} />
+
+                                <div
+                                    className="relative bg-white rounded-2xl overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.1)] group"
+                                    style={{ borderColor: `${menuAppearance.accentColor}4d`, borderWidth: '1px' }}
+                                    onClick={() => isActive && setSelectedItem(item)}
+                                >
+                                    {/* Full Background Image */}
+                                    <div className="absolute inset-0 z-0">
+                                        {item.image ? (
+                                            <>
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                />
+                                                {/* Gradient Overlay for Legibility */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                                            </>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold text-xs uppercase">No Image</div>
+                                        )}
+                                    </div>
+
+                                    {/* Floating Badges */}
+                                    <div className="absolute top-3 left-3 z-20 flex gap-2">
+                                        <div className="text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg" style={{ backgroundColor: menuAppearance.accentColor }}>
+                                            CHEF'S SPECIAL
+                                        </div>
+                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full backdrop-blur-md border ${item.isVegetarian ? 'border-green-500/50 text-green-400 bg-green-500/20' : 'border-red-500/50 text-red-400 bg-red-500/20'}`}>
+                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
+                                        </span>
+                                    </div>
+
+                                    {/* Content Overlay */}
+                                    <div className="absolute inset-0 z-20 p-4 flex flex-col justify-end">
+                                        <div className="flex justify-between items-end gap-2">
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-white text-xl leading-tight mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                                    {item.name}
+                                                </h3>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl font-serif font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ color: menuAppearance.accentColor }}>
+                                                        &#8377;{item.price}
+                                                    </span>
+                                                    {item.isSpicy && (
+                                                        <span className="text-[10px] font-bold text-red-400 drop-shadow-md flex items-center gap-0.5">
+                                                            🌶️ Spicy
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div onClick={(e) => e.stopPropagation()} className="mb-0.5">
+                                                {getQuantity(item.id) === 0 ? (
+                                                    <button
+                                                        onClick={() => isActive && addToCart(item)}
+                                                        disabled={item.available === false}
+                                                        className="text-black px-6 py-2 rounded-xl text-xs font-black hover:opacity-90 transition-all hover:scale-105 shadow-xl active:scale-95"
+                                                        style={{ backgroundColor: menuAppearance.accentColor }}
+                                                    >
+                                                        ADD
+                                                    </button>
+                                                ) : (
+                                                    <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 h-10 shadow-2xl">
+                                                        <button onClick={() => isActive && removeFromCart(item.id)} className="px-3 h-full text-white hover:bg-white/10 rounded-l-xl font-bold text-xl">-</button>
+                                                        <span className="px-2 text-base font-black text-white min-w-[30px] text-center">{getQuantity(item.id)}</span>
+                                                        <button onClick={() => isActive && addToCart(item)} className="px-3 h-full text-white hover:bg-white/10 rounded-r-xl font-bold text-xl">+</button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Indicator dots - Static Layout */}
+            {items.length > 1 && (
+                <div className="flex justify-center gap-1.5 pb-2">
+                    {items.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentIndex(index)}
+                            className={`h-1.5 rounded-full transition-all ${index === currentIndex
+                                ? 'w-6'
+                                : 'w-1.5 bg-gray-600 hover:bg-gray-500'
+                                }`}
+                            style={index === currentIndex ? { backgroundColor: menuAppearance.accentColor } : {}}
+                        />
+                    ))}
+                </div>
+            )}
+        </section>
+    );
+});
+
+function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
+    const isAvailable = item.available !== false;
+
+    return (
+        <motion.div
+            variants={itemVariants}
+            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            className={`glass-card rounded-2xl p-3 flex gap-4 overflow-hidden relative group ${!isAvailable ? 'opacity-60 grayscale' : ''}`}
+            onClick={onSelect}
+        >
+            {/* Dynamic Background Glow for selected items */}
+            {quantity > 0 && isAvailable && (
+                <div className="absolute inset-0 bg-tashi-primary/10 pointer-events-none" />
+            )}
+
+            {/* Image Placeholder with Gradient */}
+            <div className="w-32 h-32 bg-gray-200 rounded-xl flex-shrink-0 relative overflow-hidden border border-black/5 cursor-pointer">
+                {item.image ? (
+                    <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            ((e.target as HTMLImageElement).nextSibling as HTMLElement).style.display = 'flex';
+                        }}
+                    />
+                ) : null}
+
+                {/* Fallback "Image" - Hidden if image loads successfully */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-600 p-2 bg-gradient-to-br from-gray-800 to-black ${item.image ? 'hidden' : 'flex'}`}>
+                    <span className="text-[10px] text-center uppercase tracking-widest font-bold opacity-50">TashiZom</span>
+                </div>
+
+                {/* Veg/Non-Veg Indicator (Icons) */}
+                {/* Veg/Non-Veg Indicator (Icons) */}
+                <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
+                    ? 'bg-green-600 border-green-400'
+                    : 'bg-red-600 border-red-400'
+                    }`}>
+                    {item.isVegetarian ? (
+                        <Leaf size={14} className="text-white fill-white" />
+                    ) : (
+                        <Drumstick size={14} className="text-white fill-white" />
+                    )}
+                </div>
+
+                {/* Availability Badge */}
+                {!isAvailable && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
+                        <span className="text-red-500 font-bold text-xs uppercase border-2 border-red-500 px-2 py-1 -rotate-12 bg-black/50 backdrop-blur-sm rounded">Sold Out</span>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex-1 flex flex-col justify-between py-1">
+                <div onClick={(e) => { e.stopPropagation(); onSelect(); }} className="cursor-pointer">
+                    <h3 className="font-bold leading-tight mb-1" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
+                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
+                    {/* Status Text */}
+                    <div className="flex items-center gap-2 mt-2">
+                        <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`} />
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>
+                            {isAvailable ? 'Available' : 'Unavailable'}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
+                    <span className="font-serif text-xl" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
+
+                    {quantity === 0 ? (
+                        <motion.button
+                            whileHover={isAvailable ? { scale: 1.1 } : {}}
+                            whileTap={isAvailable ? { scale: 0.9 } : {}}
+                            onClick={isAvailable ? onAdd : undefined}
+                            disabled={!isAvailable}
+                            style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
+                                ? 'bg-white/5 cursor-pointer'
+                                : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
+                                }`}
+                        >
+                            <Plus size={20} />
+                        </motion.button>
+                    ) : (
+                        <div className="flex items-center rounded-full px-1 py-1 shadow-lg" style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 4px 12px ${menuAppearance.accentColor}4D` }}>
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onRemove}
+                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                            >
+                                <Minus size={16} />
+                            </motion.button>
+                            <span className="px-3 text-sm font-bold" style={{ color: parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff' }}>x{quantity}</span>
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onAdd}
+                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                            >
+                                <Plus size={16} />
+                            </motion.button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
+function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+    const menuAppearance = useStore((state: any) => state.menuAppearance);
+    const isAvailable = item.available !== false;
+
+    return (
+        <motion.div
+            variants={itemVariants}
+            whileTap={isAvailable ? { scale: 0.98 } : {}}
+            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-pointer ${!isAvailable ? 'opacity-60' : ''}`}
+            onClick={onSelect}
+        >
+            {/* Veg/Non-Veg small indicator */}
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${item.isVegetarian
+                ? 'bg-green-600 border-green-400'
+                : 'bg-red-600 border-red-400'
+                }`}>
+                {item.isVegetarian ? (
+                    <Leaf size={14} className="text-white fill-white" />
+                ) : (
+                    <Drumstick size={14} className="text-white fill-white" />
+                )}
+            </div>
+
+            {/* Name and Price */}
+            <div className="flex-1">
+                <h3 className="font-bold leading-tight" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className="font-serif text-lg" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
+                    {!isAvailable && (
+                        <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Add button */}
+            <div onClick={(e) => e.stopPropagation()}>
+                {quantity === 0 ? (
+                    <motion.button
+                        whileHover={isAvailable ? { scale: 1.1 } : {}}
+                        whileTap={isAvailable ? { scale: 0.9 } : {}}
+                        onClick={isAvailable ? onAdd : undefined}
+                        disabled={!isAvailable}
+                        style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
+                            ? 'bg-white/5 cursor-pointer'
+                            : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
+                            }`}
+                    >
+                        <Plus size={18} />
+                    </motion.button>
+                ) : (
+                    <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onRemove}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                        >
+                            <Minus size={16} />
+                        </motion.button>
+                        <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={onAdd}
+                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
+                        >
+                            <Plus size={16} />
+                        </motion.button>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
 export default function MenuPage() {
     const menu = useStore((state: any) => state.menu);
     const gearItems = useStore((state: any) => state.gearItems);
@@ -1878,414 +2285,3 @@ export default function MenuPage() {
         </div >
     );
 }
-
-
-
-function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
-    const menuAppearance = useStore((state: any) => state.menuAppearance);
-    const isAvailable = item.available !== false;
-
-    return (
-        <motion.div
-            variants={itemVariants}
-            whileTap={isAvailable ? { scale: 0.98 } : {}}
-            className={`glass-card rounded-2xl p-3 flex gap-4 overflow-hidden relative group ${!isAvailable ? 'opacity-60 grayscale' : ''}`}
-            onClick={onSelect}
-        >
-            {/* Dynamic Background Glow for selected items */}
-            {quantity > 0 && isAvailable && (
-                <div className="absolute inset-0 bg-tashi-primary/10 pointer-events-none" />
-            )}
-
-            {/* Image Placeholder with Gradient */}
-            <div className="w-32 h-32 bg-gray-200 rounded-xl flex-shrink-0 relative overflow-hidden border border-black/5 cursor-pointer">
-                {item.image ? (
-                    <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            ((e.target as HTMLImageElement).nextSibling as HTMLElement).style.display = 'flex';
-                        }}
-                    />
-                ) : null}
-
-                {/* Fallback "Image" - Hidden if image loads successfully */}
-                <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-600 p-2 bg-gradient-to-br from-gray-800 to-black ${item.image ? 'hidden' : 'flex'}`}>
-                    <span className="text-[10px] text-center uppercase tracking-widest font-bold opacity-50">TashiZom</span>
-                </div>
-
-                {/* Veg/Non-Veg Indicator (Icons) */}
-                {/* Veg/Non-Veg Indicator (Icons) */}
-                <div className={`absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-lg border backdrop-blur-md ${item.isVegetarian
-                    ? 'bg-green-600 border-green-400'
-                    : 'bg-red-600 border-red-400'
-                    }`}>
-                    {item.isVegetarian ? (
-                        <Leaf size={14} className="text-white fill-white" />
-                    ) : (
-                        <Drumstick size={14} className="text-white fill-white" />
-                    )}
-                </div>
-
-                {/* Availability Badge */}
-                {!isAvailable && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-                        <span className="text-red-500 font-bold text-xs uppercase border-2 border-red-500 px-2 py-1 -rotate-12 bg-black/50 backdrop-blur-sm rounded">Sold Out</span>
-                    </div>
-                )}
-            </div>
-
-            <div className="flex-1 flex flex-col justify-between py-1">
-                <div onClick={(e) => { e.stopPropagation(); onSelect(); }} className="cursor-pointer">
-                    <h3 className="font-bold leading-tight mb-1" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
-                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
-                    {/* Status Text */}
-                    <div className="flex items-center gap-2 mt-2">
-                        <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}`} />
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>
-                            {isAvailable ? 'Available' : 'Unavailable'}
-                        </span>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between mt-3" onClick={(e) => e.stopPropagation()}>
-                    <span className="font-serif text-xl" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
-
-                    {quantity === 0 ? (
-                        <motion.button
-                            whileHover={isAvailable ? { scale: 1.1 } : {}}
-                            whileTap={isAvailable ? { scale: 0.9 } : {}}
-                            onClick={isAvailable ? onAdd : undefined}
-                            disabled={!isAvailable}
-                            style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
-                                ? 'bg-white/5 cursor-pointer'
-                                : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
-                                }`}
-                        >
-                            <Plus size={20} />
-                        </motion.button>
-                    ) : (
-                        <div className="flex items-center rounded-full px-1 py-1 shadow-lg" style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 4px 12px ${menuAppearance.accentColor}4D` }}>
-                            <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={onRemove}
-                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                            >
-                                <Minus size={16} />
-                            </motion.button>
-                            <span className="px-3 text-sm font-bold" style={{ color: parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff' }}>x{quantity}</span>
-                            <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={onAdd}
-                                className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                            >
-                                <Plus size={16} />
-                            </motion.button>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </motion.div>
-    );
-}
-
-function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
-    const menuAppearance = useStore((state: any) => state.menuAppearance);
-    const isAvailable = item.available !== false;
-
-    return (
-        <motion.div
-            variants={itemVariants}
-            whileTap={isAvailable ? { scale: 0.98 } : {}}
-            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-pointer ${!isAvailable ? 'opacity-60' : ''}`}
-            onClick={onSelect}
-        >
-            {/* Veg/Non-Veg small indicator */}
-            {/* Veg/Non-Veg small indicator */}
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${item.isVegetarian
-                ? 'bg-green-600 border-green-400'
-                : 'bg-red-600 border-red-400'
-                }`}>
-                {item.isVegetarian ? (
-                    <Leaf size={14} className="text-white fill-white" />
-                ) : (
-                    <Drumstick size={14} className="text-white fill-white" />
-                )}
-            </div>
-
-            {/* Name and Price */}
-            <div className="flex-1">
-                <h3 className="font-bold leading-tight" style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }}>{item.name}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                    <span className="font-serif text-lg" style={{ color: menuAppearance.accentColor }}>&#8377;{item.price}</span>
-                    {!isAvailable && (
-                        <span className="text-red-400 text-xs font-bold uppercase">Unavailable</span>
-                    )}
-                </div>
-            </div>
-
-            {/* Add button */}
-            <div onClick={(e) => e.stopPropagation()}>
-                {quantity === 0 ? (
-                    <motion.button
-                        whileHover={isAvailable ? { scale: 1.1 } : {}}
-                        whileTap={isAvailable ? { scale: 0.9 } : {}}
-                        onClick={isAvailable ? onAdd : undefined}
-                        disabled={!isAvailable}
-                        style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
-                            ? 'bg-white/5 cursor-pointer'
-                            : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
-                            }`}
-                    >
-                        <Plus size={18} />
-                    </motion.button>
-                ) : (
-                    <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={onRemove}
-                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                        >
-                            <Minus size={16} />
-                        </motion.button>
-                        <span className="px-3 text-sm font-bold text-white">x{quantity}</span>
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={onAdd}
-                            className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center text-white hover:bg-black/40"
-                        >
-                            <Plus size={16} />
-                        </motion.button>
-                    </div>
-                )}
-            </div>
-        </motion.div>
-    );
-}
-
-const MiniOrderTimer = memo(function MiniOrderTimer() {
-    const orders = useStore((state: any) => state.orders);
-    const currentTableId = useStore((state: any) => state.currentTableId);
-    const sessionId = useStore((state: any) => state.sessionId);
-
-    // Find the latest active order for THIS session
-    // FIX: Rely on sessionId primarily so logic persists even if tableId changes by staff
-    const activeOrder = orders
-        .filter((o: Order) =>
-            o.sessionId === sessionId &&
-            (o.status === 'Pending' || o.status === 'Preparing')
-        )
-        .sort((a: any, b: any) => {
-            const dateA = getValidDate(a.createdAt)?.getTime() || 0;
-            const dateB = getValidDate(b.createdAt)?.getTime() || 0;
-            return dateB - dateA;
-        })[0];
-
-    if (!activeOrder) return null;
-
-    return (
-        <Link href="/customer/status">
-            <motion.div
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="fixed bottom-24 right-6 z-[100] bg-black/80 backdrop-blur-md text-white px-4 py-3 rounded-full border border-white/10 shadow-lg flex items-center gap-3"
-            >
-                <div className={`w-2 h-2 rounded-full ${activeOrder.status === 'Pending' ? 'bg-yellow-500 animate-pulse' : 'bg-blue-500 animate-pulse'}`} />
-                <div className="flex flex-col leading-none">
-                    <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                        {activeOrder.status === 'Pending' ? 'Waiting...' : 'Cooking'}
-                    </span>
-                    <MiniTimerDisplay startTime={activeOrder.acceptedAt || activeOrder.createdAt} />
-                </div>
-            </motion.div>
-        </Link>
-    );
-});
-
-function MiniTimerDisplay({ startTime }: { startTime: Date | string | any }) {
-    const [timeLeft, setTimeLeft] = useState(0);
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => { setMounted(true); }, []);
-
-    useEffect(() => {
-        if (!mounted) return;
-        const interval = setInterval(() => {
-            try {
-                const date = getValidDate(startTime);
-                if (!date) return;
-                const start = date.getTime();
-                const now = new Date().getTime();
-                // Estimate 30 mins
-                const end = start + 30 * 60 * 1000;
-                const diff = Math.max(0, end - now);
-                setTimeLeft(diff);
-            } catch (err) {
-                console.error("MiniTimer update error:", err);
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [startTime, mounted]);
-
-    const mins = Math.floor((timeLeft / 1000 / 60) % 60);
-    const secs = Math.floor((timeLeft / 1000) % 60);
-
-    return (
-        <span className="font-mono font-bold text-sm">
-            {mins.toString().padStart(2, '0')}:{secs.toString().padStart(2, '0')}
-        </span>
-    );
-}
-
-
-
-const ChefsSpecialSection = memo(function ChefsSpecialSection({
-    items,
-    addToCart,
-    removeFromCart,
-    getQuantity,
-    setSelectedItem
-}: {
-    items: MenuItem[],
-    addToCart: (item: MenuItem) => void,
-    removeFromCart: (id: string) => void,
-    getQuantity: (id: string) => number,
-    setSelectedItem: (item: MenuItem) => void
-}) {
-    const menuAppearance = useStore((state: any) => state.menuAppearance);
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    useEffect(() => {
-        if (items.length <= 1) return;
-        const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % items.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [items.length]);
-
-    if (items.length === 0) return null;
-
-    return (
-        <section className="mb-8 mt-4">
-            <div className="flex items-center gap-2 mb-4 px-4 sticky top-[60px] z-30">
-                <Sparkles style={{ color: menuAppearance.accentColor }} className="animate-pulse" size={24} />
-                <h2 className="text-xl font-bold font-serif uppercase tracking-widest animate-pulse" style={{ color: menuAppearance.accentColor, filter: `drop-shadow(0 0 8px ${menuAppearance.accentColor}80)` }}>
-                    Chef's Specials
-                </h2>
-                <div className="h-[1px] flex-1" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}80, transparent)` }} />
-            </div>
-
-            {/* Fixed Height Container for Zero Layout Shift */}
-            <div className="relative h-[150px] mx-4 mb-2">
-                {items.map((item, index) => {
-                    const isActive = index === currentIndex;
-                    return (
-                        <div
-                            key={item.id}
-                            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
-                        >
-                            <div className="relative group h-full">
-                                {/* Flashing Border Effect */}
-                                <div className="absolute -inset-[2px] rounded-2xl opacity-75 blur-sm animate-pulse" style={{ background: `linear-gradient(to right, ${menuAppearance.accentColor}, #FFFFFF, ${menuAppearance.accentColor})` }} />
-
-                                <div
-                                    className="relative bg-white rounded-2xl overflow-hidden h-full shadow-[0_8px_32px_rgba(0,0,0,0.1)] group"
-                                    style={{ borderColor: `${menuAppearance.accentColor}4d`, borderWidth: '1px' }}
-                                    onClick={() => isActive && setSelectedItem(item)}
-                                >
-                                    {/* Full Background Image */}
-                                    <div className="absolute inset-0 z-0">
-                                        {item.image ? (
-                                            <>
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                />
-                                                {/* Gradient Overlay for Legibility */}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
-                                            </>
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold text-xs uppercase">No Image</div>
-                                        )}
-                                    </div>
-
-                                    {/* Floating Badges */}
-                                    <div className="absolute top-3 left-3 z-20 flex gap-2">
-                                        <div className="text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg" style={{ backgroundColor: menuAppearance.accentColor }}>
-                                            CHEF'S SPECIAL
-                                        </div>
-                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full backdrop-blur-md border ${item.isVegetarian ? 'border-green-500/50 text-green-400 bg-green-500/20' : 'border-red-500/50 text-red-400 bg-red-500/20'}`}>
-                                            {item.isVegetarian ? 'Veg' : 'Non-Veg'}
-                                        </span>
-                                    </div>
-
-                                    {/* Content Overlay */}
-                                    <div className="absolute inset-0 z-20 p-4 flex flex-col justify-end">
-                                        <div className="flex justify-between items-end gap-2">
-                                            <div className="flex-1">
-                                                <h3 className="font-bold text-white text-xl leading-tight mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                                    {item.name}
-                                                </h3>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-2xl font-serif font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ color: menuAppearance.accentColor }}>
-                                                        &#8377;{item.price}
-                                                    </span>
-                                                    {item.isSpicy && (
-                                                        <span className="text-[10px] font-bold text-red-400 drop-shadow-md flex items-center gap-0.5">
-                                                            🌶️ Spicy
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div onClick={(e) => e.stopPropagation()} className="mb-0.5">
-                                                {getQuantity(item.id) === 0 ? (
-                                                    <button
-                                                        onClick={() => isActive && addToCart(item)}
-                                                        disabled={item.available === false}
-                                                        className="text-black px-6 py-2 rounded-xl text-xs font-black hover:opacity-90 transition-all hover:scale-105 shadow-xl active:scale-95"
-                                                        style={{ backgroundColor: menuAppearance.accentColor }}
-                                                    >
-                                                        ADD
-                                                    </button>
-                                                ) : (
-                                                    <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 h-10 shadow-2xl">
-                                                        <button onClick={() => isActive && removeFromCart(item.id)} className="px-3 h-full text-white hover:bg-white/10 rounded-l-xl font-bold text-xl">-</button>
-                                                        <span className="px-2 text-base font-black text-white min-w-[30px] text-center">{getQuantity(item.id)}</span>
-                                                        <button onClick={() => isActive && addToCart(item)} className="px-3 h-full text-white hover:bg-white/10 rounded-r-xl font-bold text-xl">+</button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Indicator dots - Static Layout */}
-            {items.length > 1 && (
-                <div className="flex justify-center gap-1.5 pb-2">
-                    {items.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setCurrentIndex(index)}
-                            className={`h-1.5 rounded-full transition-all ${index === currentIndex
-                                ? 'w-6'
-                                : 'w-1.5 bg-gray-600 hover:bg-gray-500'
-                                }`}
-                            style={index === currentIndex ? { backgroundColor: menuAppearance.accentColor } : {}}
-                        />
-                    ))}
-                </div>
-            )}
-        </section>
-    );
-});
