@@ -491,9 +491,15 @@ export default function Home() {
                         onClick={() => setFullScreenMedia({ url: update.mediaUrl!, type: update.mediaType === 'video' ? 'video' : 'image', title: update.title })}
                       >
                         {update.mediaType === 'video' ? (
-                          <div className="w-full h-full bg-black flex items-center justify-center">
-                            <PlayCircle className="text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
-                            <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                          <div className="w-full h-full bg-black flex items-center justify-center relative">
+                            <PlayCircle className="relative z-10 text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
+                            <video
+                              src={update.mediaUrl}
+                              className="absolute inset-0 w-full h-full object-cover opacity-60"
+                              muted
+                              loop
+                              playsInline
+                            />
                           </div>
                         ) : (
                           <img src={update.mediaUrl} alt="" className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" />
