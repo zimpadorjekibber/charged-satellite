@@ -492,41 +492,53 @@ export default function Home() {
                         onClick={() => setFullScreenMedia({ url: update.mediaUrl!, type: update.mediaType === 'video' ? 'video' : 'image', title: update.title })}
                       >
                         {update.mediaType === 'video' ? (
-                          <>
+                          <div className="w-full h-full bg-black flex items-center justify-center relative">
                             {/* Smart Video Preview */}
                             {(() => {
                               const isYoutube = update.mediaUrl.includes('youtube.com') || update.mediaUrl.includes('youtu.be');
+                              const isFacebook = update.mediaUrl.includes('facebook.com') || update.mediaUrl.includes('fb.watch');
 
                               if (isYoutube) {
                                 const videoId = update.mediaUrl.includes('v=') ? update.mediaUrl.split('v=')[1]?.split('&')[0] : update.mediaUrl.split('/').pop();
                                 return (
                                   <>
-                                    <PlayCircle className="relative z-10 text-white/90 group-hover/media:scale-110 transition-transform drop-shadow-md" size={48} />
                                     <img
                                       src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                                      className="absolute inset-0 w-full h-full object-cover opacity-80"
+                                      alt="YouTube Preview"
+                                      className="absolute inset-0 w-full h-full object-cover"
                                     />
+                                    <div className="absolute inset-0 bg-black/30" />
+                                    <PlayCircle className="relative z-10 text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl" size={64} />
                                   </>
                                 );
                               }
 
-                              // Fallback for others (Facebook/Direct) - Just show play icon on black
+                              if (isFacebook) {
+                                return (
+                                  <>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700" />
+                                    <div className="relative z-10 text-center">
+                                      <PlayCircle className="mx-auto text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl mb-2" size={64} />
+                                      <p className="text-white text-xs font-bold">Facebook Video</p>
+                                    </div>
+                                  </>
+                                );
+                              }
+
+                              // Direct video URLs
                               return (
-                                <div className="w-full h-full bg-black flex items-center justify-center relative bg-[url('/video-placeholder.jpg')] bg-cover">
-                                  <div className="absolute inset-0 bg-black/50" />
-                                  <PlayCircle className="relative z-10 text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
-                                  {/* Direct video preview attempts to load if possible */}
-                                  {!update.mediaUrl.includes('facebook') && (
-                                    <video
-                                      src={update.mediaUrl}
-                                      className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
-                                      muted loop playsInline
-                                    />
-                                  )}
-                                </div>
+                                <>
+                                  <video
+                                    src={update.mediaUrl}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                    muted loop playsInline
+                                  />
+                                  <div className="absolute inset-0 bg-black/40" />
+                                  <PlayCircle className="relative z-10 text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl" size={64} />
+                                </>
                               );
                             })()}
-                          </>
+                          </div>
                         ) : (
                           <img src={update.mediaUrl} alt="" className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" />
                         )}

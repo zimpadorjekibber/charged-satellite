@@ -1594,12 +1594,12 @@ function AdminDashboard() {
                                     {/* Section: Custom Gateway Map */}
                                     <div className="pt-12 border-t border-gray-100">
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <MapPin size={16} className="text-amber-500" /> Gateway Map
+                                            <MapPin size={16} className="text-amber-500" /> Gateway Map (Portrait)
                                         </h3>
                                         <div className="flex flex-col md:flex-row gap-8 items-start">
                                             {landingPhotos?.customMap ? (
-                                                <div className="relative group w-full md:w-80 aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                    <img src={landingPhotos.customMap} alt="" className="w-full h-full object-cover" />
+                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                    <img src={landingPhotos.customMap} alt="" className="w-full h-full object-contain" />
                                                     <button
                                                         type="button"
                                                         onClick={() => updateLandingPhotos('customMap', '')}
@@ -1609,9 +1609,15 @@ function AdminDashboard() {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <label className="w-full md:w-80 aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-3 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400">
-                                                    <Plus size={32} />
-                                                    <span className="text-xs font-black uppercase tracking-widest">Upload Map</span>
+                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-amber-400 flex flex-col items-center justify-center gap-3 hover:border-amber-600 hover:bg-amber-50 cursor-pointer transition-all text-gray-500 p-6 group">
+                                                    <div className="p-4 bg-amber-100 rounded-full group-hover:bg-amber-200 transition-colors">
+                                                        <MapPin size={32} className="text-amber-600" />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-sm font-black text-gray-700 mb-1">नक्शा अपलोड करें</p>
+                                                        <p className="text-xs font-bold text-gray-500">Upload Valley Map</p>
+                                                        <p className="text-[10px] text-gray-400 mt-2">(Portrait Mode - 3:4)</p>
+                                                    </div>
                                                     <input
                                                         type="file"
                                                         className="hidden"
@@ -1621,15 +1627,21 @@ function AdminDashboard() {
                                                             if (file) {
                                                                 try {
                                                                     const url = await uploadImage(file);
-                                                                    updateLandingPhotos('customMap', url);
-                                                                } catch (err) { alert("Upload failed"); }
+                                                                    await updateLandingPhotos('customMap', url);
+                                                                    alert('✅ Map uploaded successfully!');
+                                                                } catch (err: any) {
+                                                                    console.error('Map upload error:', err);
+                                                                    alert(`❌ Upload failed: ${err.message || 'Unknown error'}`);
+                                                                }
                                                             }
                                                         }}
                                                     />
                                                 </label>
                                             )}
-                                            <div className="flex-1 text-sm text-gray-500 italic">
-                                                Upload your hand-drawn map to create a personal connection with travelers.
+                                            <div className="flex-1 text-sm text-gray-500 space-y-2">
+                                                <p className="font-semibold text-gray-700">📍 Valley Map Upload</p>
+                                                <p className="italic">Hand-drawn या custom map upload करें जो travelers को Spiti Valley का route दिखाए।</p>
+                                                <p className="text-xs text-amber-600">💡 Portrait orientation (vertical) best रहेगा mobile के लिए</p>
                                             </div>
                                         </div>
                                     </div>
@@ -1637,11 +1649,11 @@ function AdminDashboard() {
                                     {/* Section: Registration Document */}
                                     <div className="pt-12 border-t border-gray-100">
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <Clock size={16} className="text-amber-600" /> Historical Legacy
+                                            <Clock size={16} className="text-amber-600" /> Hotel Registration Document (1995)
                                         </h3>
                                         <div className="flex flex-col md:flex-row gap-8 items-start">
                                             {landingPhotos?.registrationDoc ? (
-                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm" style={{ height: '320px' }}>
+                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm" style={{ height: '400px' }}>
                                                     <img src={landingPhotos.registrationDoc} alt="" className="w-full h-full object-contain" />
                                                     <button
                                                         type="button"
@@ -1652,9 +1664,15 @@ function AdminDashboard() {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-3 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400" style={{ height: '320px' }}>
-                                                    <Plus size={32} />
-                                                    <span className="text-xs font-black uppercase tracking-widest px-8 text-center">Upload Heritage Photo</span>
+                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-blue-400 flex flex-col items-center justify-center gap-3 hover:border-blue-600 hover:bg-blue-50 cursor-pointer transition-all text-gray-500 p-6 group" style={{ height: '400px' }}>
+                                                    <div className="p-4 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                                                        <Clock size={32} className="text-blue-600" />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-sm font-black text-gray-700 mb-1">पंजीकरण दस्तावेज़</p>
+                                                        <p className="text-xs font-bold text-gray-500">Upload Registration</p>
+                                                        <p className="text-[10px] text-gray-400 mt-2">(Original 1995 Document)</p>
+                                                    </div>
                                                     <input
                                                         type="file"
                                                         className="hidden"
@@ -1664,15 +1682,21 @@ function AdminDashboard() {
                                                             if (file) {
                                                                 try {
                                                                     const url = await uploadImage(file);
-                                                                    updateLandingPhotos('registrationDoc', url);
-                                                                } catch (err) { alert("Upload failed"); }
+                                                                    await updateLandingPhotos('registrationDoc', url);
+                                                                    alert('✅ Registration document uploaded!');
+                                                                } catch (err: any) {
+                                                                    console.error('Registration doc upload error:', err);
+                                                                    alert(`❌ Upload failed: ${err.message || 'Unknown error'}`);
+                                                                }
                                                             }
                                                         }}
                                                     />
                                                 </label>
                                             )}
-                                            <div className="flex-1 text-sm text-gray-500 italic">
-                                                Upload your 1998 hotel registration photo to build trust and authenticity.
+                                            <div className="flex-1 text-sm text-gray-500 space-y-2">
+                                                <p className="font-semibold text-gray-700">📜 Historical Registration</p>
+                                                <p className="italic">आपका original 1995 hotel registration document upload करें। यह authenticity और trust build करता है।</p>
+                                                <p className="text-xs text-blue-600">💡 Photo clear होनी चाहिए ताकि text readable हो</p>
                                             </div>
                                         </div>
                                     </div>
