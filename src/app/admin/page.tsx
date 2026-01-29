@@ -1535,8 +1535,13 @@ function AdminDashboard() {
                                                         if (file) {
                                                             try {
                                                                 const url = await uploadImage(file);
-                                                                updateLandingPhotos('location', [...(landingPhotos.location || []), url]);
-                                                            } catch (err) { alert("Upload failed"); }
+                                                                const currentUrls = landingPhotos.location || [];
+                                                                await updateLandingPhotos('location', [...currentUrls, url]);
+                                                                alert('Image uploaded successfully!');
+                                                            } catch (err: any) {
+                                                                console.error("Upload error details:", err);
+                                                                alert(`Upload failed: ${err.message || "Unknown error"}`);
+                                                            }
                                                         }
                                                     }}
                                                 />
