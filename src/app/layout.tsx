@@ -18,12 +18,13 @@ import { StateInitializer } from '@/components/StateInitializer';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://tashizomcafe.in'),
-  title: "TashiZom | Digital Dining",
-  description: "Experience the taste of high altitude.",
+  title: "TashiZom Kibber | Best Restaurant in Spiti Valley, Himachal Pradesh",
+  description: "Experience authentic multi-cuisine dining at TashiZom, the highest year-round restaurant in Kibber, Spiti Valley. Famous for local Spitian flavors and breathtaking views.",
+  keywords: ["TashiZom", "Kibber", "Spiti Valley", "Best Restaurant in Spiti", "Cafe in Kibber", "Spiti Food", "Himachal Tourism", "Kaze Restaurant"],
   manifest: '/manifest.json',
   icons: {
     icon: '/tashizom-logo.png',
-    apple: '/tashizom-logo.png', // Uses the same logo for Apple home screen
+    apple: '/tashizom-logo.png',
   },
   appleWebApp: {
     capable: true,
@@ -31,8 +32,8 @@ export const metadata: Metadata = {
     title: 'TashiZom',
   },
   openGraph: {
-    title: 'TashiZom | Digital Dining',
-    description: 'Experience the taste of high altitude in Spiti Valley.',
+    title: 'TashiZom Kibber | Best Restaurant in Spiti Valley',
+    description: 'Experience authentic flavors at the highest year-round restaurant in Kibber, Spiti Valley.',
     url: 'https://tashizomcafe.in',
     siteName: 'TashiZom',
     images: [
@@ -43,9 +44,48 @@ export const metadata: Metadata = {
         alt: 'TashiZom Logo',
       },
     ],
-    locale: 'en_In',
+    locale: 'en_IN',
     type: 'website',
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "TashiZom",
+  "image": "https://tashizomcafe.in/tashizom-logo.png",
+  "@id": "https://tashizomcafe.in",
+  "url": "https://tashizomcafe.in",
+  "telephone": "+919418612295",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Kibber Village",
+    "addressLocality": "Spiti Valley",
+    "addressRegion": "HP",
+    "postalCode": "172114",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 32.3331,
+    "longitude": 78.0094
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "opens": "08:00",
+    "closes": "22:00"
+  },
+  "servesCuisine": ["Indian", "Tibetan", "Chinese", "Continental"],
+  "priceRange": "$$"
 };
 
 export const viewport = {
@@ -59,6 +99,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
