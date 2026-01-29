@@ -49,7 +49,14 @@ function AdminDashboard() {
     const logout = useStore((state) => state.logout);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
     const initialize = useStore((state) => state.initialize);
-    const menuAppearance = useStore((state: any) => state.menuAppearance);
+    const menuAppearanceRaw = useStore((state: any) => state.menuAppearance);
+    const menuAppearance = menuAppearanceRaw || {
+        categoryFontSize: '1.25rem',
+        categoryColor: '#000000',
+        itemNameFontSize: '1rem',
+        itemNameColor: '#1A1A1A',
+        accentColor: '#DAA520'
+    };
     const updateMenuAppearance = useStore((state: any) => state.updateMenuAppearance);
     const landingPhotos = useStore((state) => state.landingPhotos);
     const updateLandingPhotos = useStore((state) => state.updateLandingPhotos);
