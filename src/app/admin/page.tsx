@@ -7,6 +7,7 @@ import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PhotoUploadSection } from '../../components/PhotoUpload';
 import {
     DndContext,
     closestCenter,
@@ -48,6 +49,8 @@ function AdminDashboard() {
     const login = useStore((state) => state.login);
     const logout = useStore((state) => state.logout);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
+    const landingPhotos = useStore((state: any) => state.landingPhotos);
+    const updateLandingPhotos = useStore((state: any) => state.updateLandingPhotos);
     const initialize = useStore((state) => state.initialize);
     const menuAppearanceRaw = useStore((state: any) => state.menuAppearance);
     const menuAppearance = menuAppearanceRaw || {
@@ -1138,6 +1141,19 @@ function AdminDashboard() {
                                         <Newspaper size={24} />
                                     </div>
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Updates</span>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('landing-photos');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}
+                                    className="bg-amber-100 hover:bg-amber-200 p-4 rounded-2xl border border-amber-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-amber-600 text-white rounded-xl shadow-lg ring-4 ring-amber-100 group-hover:scale-110 transition-transform">
+                                        <ImageIcon size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Photos</span>
                                 </button>
                             </div>
                             {/* App Sharing & QR */}
