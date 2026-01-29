@@ -1607,113 +1607,34 @@ function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    {/* Section: Custom Gateway Map */}
-                                    <div className="pt-12 border-t border-gray-100">
-                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <MapPin size={16} className="text-amber-500" /> Gateway Map (Portrait)
-                                        </h3>
-                                        <div className="flex flex-col md:flex-row gap-8 items-start">
-                                            {landingPhotos?.customMap ? (
-                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                    <img src={landingPhotos.customMap} alt="" className="w-full h-full object-contain" />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => updateLandingPhotos('customMap', '')}
-                                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
-                                                    >
-                                                        <X size={18} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-amber-400 flex flex-col items-center justify-center gap-3 hover:border-amber-600 hover:bg-amber-50 cursor-pointer transition-all text-gray-500 p-6 group">
-                                                    <div className="p-4 bg-amber-100 rounded-full group-hover:bg-amber-200 transition-colors">
-                                                        <MapPin size={32} className="text-amber-600" />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className="text-sm font-black text-gray-700 mb-1">नक्शा अपलोड करें</p>
-                                                        <p className="text-xs font-bold text-gray-500">Upload Valley Map</p>
-                                                        <p className="text-[10px] text-gray-400 mt-2">(Portrait Mode - 3:4)</p>
-                                                    </div>
-                                                    <input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={async (e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                try {
-                                                                    const url = await uploadImage(file);
-                                                                    await updateLandingPhotos('customMap', url);
-                                                                    alert('✅ Map uploaded successfully!');
-                                                                } catch (err: any) {
-                                                                    console.error('Map upload error:', err);
-                                                                    alert(`❌ Upload failed: ${err.message || 'Unknown error'}`);
-                                                                }
-                                                            }
-                                                        }}
-                                                    />
-                                                </label>
-                                            )}
-                                            <div className="flex-1 text-sm text-gray-500 space-y-2">
-                                                <p className="font-semibold text-gray-700">📍 Valley Map Upload</p>
-                                                <p className="italic">Hand-drawn या custom map upload करें जो travelers को Spiti Valley का route दिखाए।</p>
-                                                <p className="text-xs text-amber-600">💡 Portrait orientation (vertical) best रहेगा mobile के लिए</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {/* Section: Landing Page Photos (Using New Component) */}
+                                    <div id="landing-photos" className="pt-12 border-t border-gray-100">
+                                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                            <ImageIcon className="text-amber-500" /> Landing Page Photos
+                                        </h2>
 
-                                    {/* Section: Registration Document */}
-                                    <div className="pt-12 border-t border-gray-100">
-                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <Clock size={16} className="text-amber-600" /> Hotel Registration Document (1995)
-                                        </h3>
-                                        <div className="flex flex-col md:flex-row gap-8 items-start">
-                                            {landingPhotos?.registrationDoc ? (
-                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm" style={{ height: '400px' }}>
-                                                    <img src={landingPhotos.registrationDoc} alt="" className="w-full h-full object-contain" />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => updateLandingPhotos('registrationDoc', '')}
-                                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
-                                                    >
-                                                        <X size={18} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-blue-400 flex flex-col items-center justify-center gap-3 hover:border-blue-600 hover:bg-blue-50 cursor-pointer transition-all text-gray-500 p-6 group" style={{ height: '400px' }}>
-                                                    <div className="p-4 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
-                                                        <Clock size={32} className="text-blue-600" />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className="text-sm font-black text-gray-700 mb-1">पंजीकरण दस्तावेज़</p>
-                                                        <p className="text-xs font-bold text-gray-500">Upload Registration</p>
-                                                        <p className="text-[10px] text-gray-400 mt-2">(Original 1995 Document)</p>
-                                                    </div>
-                                                    <input
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept="image/*"
-                                                        onChange={async (e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                try {
-                                                                    const url = await uploadImage(file);
-                                                                    await updateLandingPhotos('registrationDoc', url);
-                                                                    alert('✅ Registration document uploaded!');
-                                                                } catch (err: any) {
-                                                                    console.error('Registration doc upload error:', err);
-                                                                    alert(`❌ Upload failed: ${err.message || 'Unknown error'}`);
-                                                                }
-                                                            }
-                                                        }}
-                                                    />
-                                                </label>
-                                            )}
-                                            <div className="flex-1 text-sm text-gray-500 space-y-2">
-                                                <p className="font-semibold text-gray-700">📜 Historical Registration</p>
-                                                <p className="italic">आपका original 1995 hotel registration document upload करें। यह authenticity और trust build करता है।</p>
-                                                <p className="text-xs text-blue-600">💡 Photo clear होनी चाहिए ताकि text readable हो</p>
-                                            </div>
+                                        <div className="bg-gray-50 rounded-3xl p-6 md:p-8 border border-gray-200 space-y-8">
+                                            {/* Gateway Map Upload */}
+                                            <PhotoUploadSection
+                                                title="Gateway Map (Portrait)"
+                                                description="Upload a portrait-oriented map (3:4 aspect ratio) for mobile viewing"
+                                                icon={<MapPin size={20} className="text-amber-500" />}
+                                                aspectRatio="3/4"
+                                                currentImageUrl={landingPhotos?.customMap}
+                                                onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
+                                                placeholder="नक्शा अपलोड करें / Upload Valley Map"
+                                            />
+
+                                            {/* Hotel Registration Document Upload */}
+                                            <PhotoUploadSection
+                                                title="Hotel Registration Document"
+                                                description="Original 1995 Registration Certificate"
+                                                icon={<Clock size={20} className="text-blue-500" />}
+                                                aspectRatio="3/4"
+                                                currentImageUrl={landingPhotos?.registrationDoc}
+                                                onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
+                                                placeholder="पंजीकरण दस्तावेज़ / Upload Registration"
+                                            />
                                         </div>
                                     </div>
                                 </div>
