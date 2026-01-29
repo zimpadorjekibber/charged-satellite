@@ -445,8 +445,8 @@ function AdminDashboard() {
                         <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => handleTabChange('history')} />
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
-                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
                         <TabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
+                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
                         <TabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
                     </div>
 
@@ -494,8 +494,8 @@ function AdminDashboard() {
                     <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => handleTabChange('history')} />
                     <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
                     <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
-                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
                     <MobileTabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
+                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
                     <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
