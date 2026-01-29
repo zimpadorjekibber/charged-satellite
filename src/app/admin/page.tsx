@@ -1118,6 +1118,19 @@ function AdminDashboard() {
                                     </div>
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Menu Items</span>
                                 </button>
+
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('valley-updates-management');
+                                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}
+                                    className="bg-sky-100 hover:bg-sky-200 p-4 rounded-2xl border border-sky-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-sky-600 text-white rounded-xl shadow-lg ring-4 ring-sky-100 group-hover:scale-110 transition-transform">
+                                        <Newspaper size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Updates</span>
+                                </button>
                             </div>
                             {/* App Sharing & QR */}
                             <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
@@ -1345,8 +1358,8 @@ function AdminDashboard() {
                             </div>
 
                             {/* Valley Updates Management */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">Valley Updates</h2>
+                            <div id="valley-updates-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Valley Updates</h2>
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {(valleyUpdates || []).map((update, idx) => (
