@@ -1080,11 +1080,14 @@ export default function MenuPage() {
 
     return (
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative bg-white">
-            {/* Minimal Sticky Header */}
             <div className="sticky top-0 z-[150] bg-white/80 backdrop-blur-xl border-b border-black/5 px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Link href="/" className="p-2 hover:bg-black/5 rounded-full transition-colors text-gray-500">
-                        <ArrowLeft size={20} />
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 font-bold text-sm"
+                    >
+                        <ArrowLeft size={18} />
+                        <span>Home</span>
                     </Link>
                     <div>
                         <h1 className="font-bold font-serif text-lg text-black leading-none">TashiZom</h1>
