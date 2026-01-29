@@ -294,6 +294,27 @@ export default function Home() {
               पहाड़ों की ताज़गी। हम केवल खाना ही नहीं, बल्कि स्पीति की संस्कृति और परंपराओं का संगम हैं।
               चाहे आप की मॉनेस्ट्री घूम रहे हों या चिचम ब्रिज, हमारे यहाँ का ठहराव आपकी यात्रा को यादगार बना देगा।
             </p>
+
+            {/* QR Code Pre-ordering Feature */}
+            <div className="bg-white/5 border border-amber-500/30 rounded-2xl p-6 mb-6 backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="p-2 bg-amber-500/20 rounded-lg">
+                  <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-amber-300">पहले से ऑर्डर करें, गर्म खाना खाएं!</h4>
+              </div>
+              <p className="text-gray-300 leading-relaxed text-sm md:text-base">
+                <span className="text-amber-400 font-semibold">चिचम ब्रिज</span> या <span className="text-amber-400 font-semibold">की मॉनेस्ट्री</span> घूम रहे हैं?
+                घबराइए मत! हमारा <span className="text-white font-bold">QR Code</span> स्कैन करें और पहले से ऑर्डर कर दें।
+                जब आप टशीज़ोम पहुँचेंगे, तब तक आपका <span className="text-amber-300 font-bold">गर्म और ताज़ा खाना तैयार</span> होगा!
+              </p>
+              <p className="text-amber-500/80 text-xs md:text-sm mt-3 font-medium">
+                🎯 स्पीति घाटी में जगह-जगह हमारे QR Codes लगे हुए हैं - देखते ही स्कैन करें!
+              </p>
+            </div>
+
             <div className="flex flex-wrap justify-center gap-4 text-xs font-bold text-amber-500/60 uppercase tracking-widest">
               <span>#BestRestaurantInSpiti</span>
               <span>#KibberFood</span>
