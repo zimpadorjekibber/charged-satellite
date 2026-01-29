@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
@@ -326,6 +326,7 @@ function AdminDashboard() {
     };
 
     if (!currentUser || currentUser.role !== 'admin') {
+        // if (false) {
         return (
             <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
                 <Link href="/" className="absolute top-8 left-8 text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-2">
