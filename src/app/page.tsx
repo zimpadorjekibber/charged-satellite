@@ -272,7 +272,7 @@ export default function Home() {
               </div>
 
               <div
-                className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in max-w-4xl mx-auto"
+                className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in w-full md:max-w-4xl mx-auto"
                 onClick={() => setFullScreenMedia({ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' })}
               >
                 <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
@@ -409,7 +409,7 @@ export default function Home() {
               className="mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center gap-16"
             >
               <div
-                className="flex-1 w-full max-w-md cursor-zoom-in order-2 md:order-1"
+                className="flex-1 w-full max-w-2xl cursor-zoom-in order-2 md:order-1"
                 onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
               >
                 <div className="relative group">
@@ -427,6 +427,7 @@ export default function Home() {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
                   Our Roots
                 </div>
+                {/* ... text content remains same ... */}
                 <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
                   A Legacy of <span className="text-amber-500 italic">Hospitality</span>
                 </h2>
