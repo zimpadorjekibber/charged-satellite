@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef } from 'react';
@@ -51,6 +51,9 @@ function AdminDashboard() {
     const initialize = useStore((state) => state.initialize);
     const menuAppearance = useStore((state: any) => state.menuAppearance);
     const updateMenuAppearance = useStore((state: any) => state.updateMenuAppearance);
+    const landingPhotos = useStore((state) => state.landingPhotos);
+    const updateLandingPhotos = useStore((state) => state.updateLandingPhotos);
+    const uploadImage = useStore((state) => state.uploadImage);
 
     // Sound Logic
     const [soundEnabled, setSoundEnabled] = useState(false);
@@ -442,8 +445,9 @@ function AdminDashboard() {
                         <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => handleTabChange('history')} />
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
-                        <TabButton active={activeTab === 'settings'} label="Management" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
-                        <TabButton active={activeTab === 'media'} label="Gallery" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
+                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
+                        <TabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
+                        <TabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -490,6 +494,7 @@ function AdminDashboard() {
                     <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => handleTabChange('history')} />
                     <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
                     <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
+                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
                     <MobileTabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
                     <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
@@ -1465,6 +1470,102 @@ function AdminDashboard() {
                             </div>
 
 
+                            {/* Landing Page Contextual Photos */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><ImageIcon size={24} /></div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900">Landing Page Story Photos</h2>
+                                        <p className="text-sm text-gray-500">Manage photos for the 'Prime Location' and 'Hard Winter Conditions' sections on the home page.</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-12">
+                                    {/* Section: Prime Location */}
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <MapPin size={16} className="text-amber-500" /> Prime Location Photo Gallery (Real Place)
+                                        </h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {(landingPhotos?.location || []).map((url: string, idx: number) => (
+                                                <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                    <img src={url} alt="" className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
+                                                            updateLandingPhotos('location', newUrls);
+                                                        }}
+                                                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400 hover:text-amber-600">
+                                                <Plus size={24} />
+                                                <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            try {
+                                                                const url = await uploadImage(file);
+                                                                updateLandingPhotos('location', [...(landingPhotos.location || []), url]);
+                                                            } catch (err) { alert("Upload failed"); }
+                                                        }
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Hard Winter Conditions */}
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <CloudSnow size={16} className="text-blue-500" /> Winter Hardships & Survival Stories
+                                        </h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {(landingPhotos?.climate || []).map((url: string, idx: number) => (
+                                                <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                    <img src={url} alt="" className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
+                                                            updateLandingPhotos('climate', newUrls);
+                                                        }}
+                                                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400 hover:text-blue-600">
+                                                <Plus size={24} />
+                                                <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            try {
+                                                                const url = await uploadImage(file);
+                                                                updateLandingPhotos('climate', [...(landingPhotos.climate || []), url]);
+                                                            } catch (err) { alert("Upload failed"); }
+                                                        }
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Geo Settings */}
                             {/* Geo Settings */}

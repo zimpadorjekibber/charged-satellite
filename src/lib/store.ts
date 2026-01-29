@@ -166,6 +166,10 @@ interface AppState {
     categoryOrder: string[]; // New: For custom category ordering
     gearItems: GearItem[]; // New: For local gear e-commerce
     menuAppearance: MenuAppearance; // New: For visual customization
+    landingPhotos: {
+        location: string[];
+        climate: string[];
+    };
 
 
     isListening: boolean;
@@ -214,6 +218,7 @@ interface AppState {
     updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
 
     login: (username: string, password: string) => Promise<boolean>;
+    updateLandingPhotos: (section: 'location' | 'climate', urls: string[]) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
@@ -258,6 +263,7 @@ export const useStore = create<AppState>()(
                 itemNameColor: '#1A1A1A',
                 accentColor: '#DAA520'
             },
+            landingPhotos: { location: [], climate: [] },
             customerDetails: null,
             contactInfo: {
                 phone: '+919876543210',
@@ -381,9 +387,9 @@ export const useStore = create<AppState>()(
                         });
                     }
                 }));
-                unsubscribers.push(onSnapshot(doc(db, 'settings', 'updates'), (doc) => {
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'valley_updates'), (doc) => {
                     if (doc.exists()) {
-                        set({ valleyUpdates: doc.data().list || [] });
+                        set({ valleyUpdates: doc.data().updates || [] });
                     }
                 }));
 
@@ -391,6 +397,13 @@ export const useStore = create<AppState>()(
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'contact'), (doc) => {
                     if (doc.exists()) {
                         set({ contactInfo: doc.data() as ContactSettings });
+                    }
+                }));
+
+                // Landing Page Photos
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'landing_photos'), (doc) => {
+                    if (doc.exists()) {
+                        set({ landingPhotos: doc.data() as any });
                     }
                 }));
 
@@ -777,6 +790,14 @@ export const useStore = create<AppState>()(
 
             updateSettings: async (settings) => {
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
+            },
+
+            updateLandingPhotos: async (section, urls) => {
+                const photosRef = doc(db, 'settings', 'landing_photos');
+                const current = get().landingPhotos;
+                const updated = { ...current, [section]: urls };
+                await setDoc(photosRef, updated);
+                set({ landingPhotos: updated });
             },
 
             updateContactSettings: async (contact: ContactSettings) => {

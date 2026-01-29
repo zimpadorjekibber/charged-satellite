@@ -1457,10 +1457,109 @@ export default function MenuPage() {
                             </div>
                         )}
 
+                    {/* VALLEY ESSENTIALS - MAIN PAGE VISIBILITY */}
+                    <div className="space-y-12 pb-12 mt-8 border-t border-black/5 pt-12">
+                        {/* 1. Valley Updates Section */}
+                        {valleyUpdates.length > 0 && (
+                            <section className="px-1">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="p-2 bg-tashi-accent/20 rounded-xl text-tashi-accent">
+                                        <Newspaper size={24} />
+                                    </div>
+                                    <h2 className="text-2xl font-bold font-serif text-black tracking-tight" style={{ color: menuAppearance.accentColor }}>
+                                        Valley Updates
+                                    </h2>
+                                </div>
+
+                                <div className="bg-black/5 p-6 rounded-2xl border-l-4" style={{ borderColor: menuAppearance.accentColor }}>
+                                    <ul className="space-y-4">
+                                        {valleyUpdates.map((update: any, idx: number) => (
+                                            <li key={idx} className="flex gap-4 group">
+                                                <div className="flex-shrink-0 mt-1.5">
+                                                    <div className={`w-3 h-3 rounded-full ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : update.statusColor === 'red' ? 'bg-red-500' : 'bg-tashi-accent'}`} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-bold text-gray-900 text-lg">{update.title}</span>
+                                                        {update.description && (
+                                                            <span className="text-sm text-gray-500 leading-relaxed">{update.description}</span>
+                                                        )}
+
+                                                        {update.mediaUrl && (
+                                                            <div
+                                                                className="mt-3 rounded-2xl overflow-hidden border border-black/10 bg-black cursor-pointer group/media relative h-48 w-full shadow-lg"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setFullScreenMedia({
+                                                                        url: update.mediaUrl!,
+                                                                        type: update.mediaType === 'video' ? 'video' : 'image',
+                                                                        title: update.title
+                                                                    });
+                                                                }}
+                                                            >
+                                                                {update.mediaType === 'video' ? (
+                                                                    <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                        <PlayCircle className="text-white opacity-50" size={48} />
+                                                                        <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <img src={update.mediaUrl} alt={update.title} className="w-full h-full object-cover transition-transform group-hover/media:scale-110 duration-700" />
+                                                                )}
+                                                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover/media:opacity-100 transition-opacity">
+                                                                    <div className="bg-white/20 backdrop-blur-md p-3 rounded-full text-white">
+                                                                        {update.mediaType === 'video' ? <PlayCircle size={32} /> : <Info size={32} />}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <p className="text-xs text-gray-400 text-center mt-6 italic font-mono uppercase tracking-widest">Live Updates from Kibber</p>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* 2. Cold Weather Gears Section */}
+                        {gearItems.length > 0 && (
+                            <section className="px-1">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="p-2 bg-orange-500/20 rounded-xl text-orange-400">
+                                        <ShoppingBag size={24} />
+                                    </div>
+                                    <h2 className="text-2xl font-bold font-serif text-black tracking-tight">
+                                        Local Winter Gears <span className="text-orange-400 text-sm font-sans font-normal ml-2 tracking-widest uppercase">Hand Clade</span>
+                                    </h2>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    {gearItems.map((item: any) => (
+                                        <GearItemCard
+                                            key={item.id}
+                                            name={item.name}
+                                            price={item.price}
+                                            items={item.items}
+                                            badge={item.badge}
+                                            available={item.available}
+                                        />
+                                    ))}
+                                </div>
+
+                                <div className="mt-8 p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10 text-center shadow-inner">
+                                    <p className="text-[11px] text-gray-500 leading-relaxed italic">
+                                        "These gears are hand-knitted with love by local Spiti women during long winter months. Every purchase directly supports local families."
+                                    </p>
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
                     {/* End of Menu Indicator */}
                     <div className="h-24 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-50">
-                        <div className="w-16 h-[1px] bg-white/20" />
-                        <p className="text-xs font-mono uppercase">End of Menu</p>
+                        <div className="w-16 h-[1px] bg-black/10" />
+                        <p className="text-[10px] font-mono uppercase tracking-[0.2em] font-black">End of Menu</p>
                     </div>
 
                     {/* Item Details Modal */}

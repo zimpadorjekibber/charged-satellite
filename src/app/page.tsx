@@ -9,11 +9,15 @@ import { useStore } from '@/lib/store';
 export default function Home() {
   const [showFood, setShowFood] = useState(true);
   const reviews = useStore((state: any) => state.reviews);
+  const menu = useStore((state: any) => state.menu);
+  const landingPhotos = useStore((state: any) => state.landingPhotos);
+  const initialize = useStore((state: any) => state.initialize);
 
   useEffect(() => {
     // Clear previous table session for generic app entry
     useStore.getState().setTableId(null);
 
+    initialize();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -174,25 +178,60 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20 text-center">
+            {/* Prime Location */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
-              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group">
+              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col h-full">
                 <MapPin className="w-10 h-10 text-amber-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-white font-bold text-xl mb-2">Prime Location</h3>
-                <p className="text-gray-400 text-sm">Ideally situated in Kibber, near the Chicham Bridge and Kee Monastery.</p>
+                <p className="text-gray-400 text-sm flex-1">Ideally situated in Kibber, near the Chicham Bridge and Kee Monastery.</p>
+                {landingPhotos?.location?.length > 0 && (
+                  <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
+                    {landingPhotos.location.map((url: string, i: number) => (
+                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
+
+            {/* Authentic Taste */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
-              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group">
+              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col h-full">
                 <Utensils className="w-10 h-10 text-amber-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-white font-bold text-xl mb-2">Authentic Taste</h3>
-                <p className="text-gray-400 text-sm">From local Spitian Thukpa to North Indian classics and Pizzas.</p>
+                <p className="text-gray-400 text-sm flex-1">From local Spitian Thukpa to North Indian classics and Pizzas.</p>
+                {menu.filter((m: any) => m.isChefSpecial && m.image).length > 0 && (
+                  <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
+                    {menu.filter((m: any) => m.isChefSpecial && m.image).map((item: any, i: number) => (
+                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-end p-1">
+                          <span className="text-[7px] text-white font-bold leading-tight">{item.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
+
+            {/* Open Always */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group">
+              <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col h-full">
                 <Clock className="w-10 h-10 text-amber-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-white font-bold text-xl mb-2">Open Always</h3>
-                <p className="text-gray-400 text-sm">The only restaurant in Kibber that stays open throughout the winter season.</p>
+                <p className="text-gray-400 text-sm flex-1">The only restaurant in Kibber that stays open throughout the winter season.</p>
+                {landingPhotos?.climate?.length > 0 && (
+                  <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
+                    {landingPhotos.climate.map((url: string, i: number) => (
+                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
