@@ -491,212 +491,214 @@ export default function Home() {
                         className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group/media"
                         onClick={() => setFullScreenMedia({ url: update.mediaUrl!, type: update.mediaType === 'video' ? 'video' : 'image', title: update.title })}
                       >
-                          // Smart Video Preview
-                          (() => {
+                        {update.mediaType === 'video' ? (
+                          <>
+                            {/* Smart Video Preview */}
+                            {(() => {
                               const isYoutube = update.mediaUrl.includes('youtube.com') || update.mediaUrl.includes('youtu.be');
 
-                        if (isYoutube) {
-                                  const videoId = update.mediaUrl.includes('v=') ? update.mediaUrl.split('v=')[1]?.split('&')[0] : update.mediaUrl.split('/').pop();
-                        return (
-                        <>
-                          <PlayCircle className="relative z-10 text-white/90 group-hover/media:scale-110 transition-transform drop-shadow-md" size={48} />
-                          <img
-                            src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                            className="absolute inset-0 w-full h-full object-cover opacity-80"
-                          />
-                        </>
-                        );
+                              if (isYoutube) {
+                                const videoId = update.mediaUrl.includes('v=') ? update.mediaUrl.split('v=')[1]?.split('&')[0] : update.mediaUrl.split('/').pop();
+                                return (
+                                  <>
+                                    <PlayCircle className="relative z-10 text-white/90 group-hover/media:scale-110 transition-transform drop-shadow-md" size={48} />
+                                    <img
+                                      src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                                      className="absolute inset-0 w-full h-full object-cover opacity-80"
+                                    />
+                                  </>
+                                );
                               }
 
-                        // Fallback for others (Facebook/Direct) - Just show play icon on black
-                        return (
-                        <div className="w-full h-full bg-black flex items-center justify-center relative bg-[url('/video-placeholder.jpg')] bg-cover">
-                          <div className="absolute inset-0 bg-black/50" />
-                          <PlayCircle className="relative z-10 text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
-                          {/* Direct video preview attempts to load if possible */}
-                          {!update.mediaUrl.includes('facebook') && (
-                            <video
-                              src={update.mediaUrl}
-                              className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
-                              muted loop playsInline
-                            />
-                          )}
-                        </div>
-                        );
-                          })()
-                      </div>
-                    ) : (
-                    <img src={update.mediaUrl} alt="" className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" />
+                              // Fallback for others (Facebook/Direct) - Just show play icon on black
+                              return (
+                                <div className="w-full h-full bg-black flex items-center justify-center relative bg-[url('/video-placeholder.jpg')] bg-cover">
+                                  <div className="absolute inset-0 bg-black/50" />
+                                  <PlayCircle className="relative z-10 text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
+                                  {/* Direct video preview attempts to load if possible */}
+                                  {!update.mediaUrl.includes('facebook') && (
+                                    <video
+                                      src={update.mediaUrl}
+                                      className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+                                      muted loop playsInline
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <img src={update.mediaUrl} alt="" className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" />
                         )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity flex items-end p-4">
-                      <span className="text-white text-xs font-bold flex items-center gap-2">View Highlight <ArrowRight size={14} /></span>
-                    </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity flex items-end p-4">
+                          <span className="text-white text-xs font-bold flex items-center gap-2">View Highlight <ArrowRight size={14} /></span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
                 ))}
-            </div>
+              </div>
             </motion.div>
           )}
 
-        {/* 2. Local Winter Gears Section */}
-        {gearItems.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-12"
-          >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4 font-mono text-[10px] text-orange-400 uppercase tracking-widest">
-                  Spiti Handmade
+          {/* 2. Local Winter Gears Section */}
+          {gearItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-12"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4 font-mono text-[10px] text-orange-400 uppercase tracking-widest">
+                    Spiti Handmade
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
+                    Local <span className="text-orange-400 italic">Winter Gears</span>
+                  </h2>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
-                  Local <span className="text-orange-400 italic">Winter Gears</span>
-                </h2>
+                <Link href="/customer/menu" className="group h-fit px-8 py-4 bg-orange-500 text-black font-black rounded-xl hover:bg-orange-400 transition-all flex items-center gap-3">
+                  SHOP GEAR <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                </Link>
               </div>
-              <Link href="/customer/menu" className="group h-fit px-8 py-4 bg-orange-500 text-black font-black rounded-xl hover:bg-orange-400 transition-all flex items-center gap-3">
-                SHOP GEAR <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-              </Link>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {gearItems.slice(0, 4).map((item: any) => (
-                <GearItemCard
-                  key={item.id}
-                  name={item.name}
-                  price={item.price}
-                  items={item.items}
-                  badge={item.badge}
-                  available={item.available}
-                />
-              ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {gearItems.slice(0, 4).map((item: any) => (
+                  <GearItemCard
+                    key={item.id}
+                    name={item.name}
+                    price={item.price}
+                    items={item.items}
+                    badge={item.badge}
+                    available={item.available}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+
+        </div>
+      </section>
+      {
+        reviews && reviews.length > 0 && (
+          <section className="bg-tashi-dark py-20 px-6 border-t border-white/5">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                <div className="text-center md:text-left">
+                  <h2 className="text-3xl md:text-4xl font-serif font-black text-white">Guest Stories</h2>
+                  <p className="text-gray-400 mt-2">Hear what travelers say about us</p>
+                </div>
+                <div className="flex items-center gap-4 bg-white/5 px-6 py-3 rounded-2xl border border-white/10">
+                  <Star className="text-amber-500 fill-amber-500" size={24} />
+                  <span className="text-2xl font-bold text-white">4.9 / 5</span>
+                  <span className="text-gray-500 text-sm">({reviews.length} reviews)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {reviews.slice(0, 3).map((review: any, i: number) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-white/5 border border-white/10 p-6 rounded-2xl relative"
+                  >
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(5)].map((_, star) => (
+                        <Star key={star} size={14} className={star < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-600'} />
+                      ))}
+                    </div>
+                    <p className="text-gray-300 text-sm italic mb-6 leading-relaxed">"{review.comment}"</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
+                        {review.customerName?.charAt(0) || 'G'}
+                      </div>
+                      <div>
+                        <h4 className="text-white text-sm font-bold">{review.customerName || 'Happy Guest'}</h4>
+                        <p className="text-gray-500 text-xs">Verified Review</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Link href="/customer/menu" className="text-amber-500 font-bold hover:underline underline-offset-8">
+                  View more experiences & menu →
+                </Link>
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      {/* Footer Branding */}
+      <footer className="bg-black py-8 border-t border-white/5">
+        <div className="max-w-4xl mx-auto flex flex-col items-center gap-4">
+          <img src="/logo_crest.png" alt="TashiZom Logo" className="w-12 h-12 grayscale opacity-40" />
+          <span className="text-[10px] text-gray-500 font-mono tracking-[0.4em] uppercase">
+            © 2026 TashiZom Kibber | Antigravity Systems v1.0
+          </span>
+        </div>
+      </footer>
+
+
+      {/* Media Modal */}
+      <AnimatePresence>
+        {fullScreenMedia && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4"
+          >
+            <button
+              onClick={() => setFullScreenMedia(null)}
+              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            >
+              <X size={32} />
+            </button>
+            <div className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black">
+              {fullScreenMedia.type === 'video' ? (
+                // Helper to determine video type
+                (() => {
+                  const url = fullScreenMedia.url;
+                  const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+                  const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
+
+                  if (isYoutube) {
+                    const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
+                    return <iframe
+                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                      className="w-full h-full"
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />;
+                  }
+                  if (isFacebook) {
+                    return <iframe
+                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1`}
+                      className="w-full h-full"
+                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                      allowFullScreen
+                    />;
+                  }
+                  return <video src={fullScreenMedia.url} className="w-full h-full object-contain" controls autoPlay />;
+                })()
+              ) : (
+                <img src={fullScreenMedia.url} className="w-full h-full object-contain" alt="" />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+                <h2 className="text-2xl font-serif font-black text-white">{fullScreenMedia.title}</h2>
+              </div>
             </div>
           </motion.div>
         )}
-
-
-      </div>
-    </section>
-      {
-    reviews && reviews.length > 0 && (
-      <section className="bg-tashi-dark py-20 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-serif font-black text-white">Guest Stories</h2>
-              <p className="text-gray-400 mt-2">Hear what travelers say about us</p>
-            </div>
-            <div className="flex items-center gap-4 bg-white/5 px-6 py-3 rounded-2xl border border-white/10">
-              <Star className="text-amber-500 fill-amber-500" size={24} />
-              <span className="text-2xl font-bold text-white">4.9 / 5</span>
-              <span className="text-gray-500 text-sm">({reviews.length} reviews)</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.slice(0, 3).map((review: any, i: number) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/5 border border-white/10 p-6 rounded-2xl relative"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, star) => (
-                    <Star key={star} size={14} className={star < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-600'} />
-                  ))}
-                </div>
-                <p className="text-gray-300 text-sm italic mb-6 leading-relaxed">"{review.comment}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
-                    {review.customerName?.charAt(0) || 'G'}
-                  </div>
-                  <div>
-                    <h4 className="text-white text-sm font-bold">{review.customerName || 'Happy Guest'}</h4>
-                    <p className="text-gray-500 text-xs">Verified Review</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/customer/menu" className="text-amber-500 font-bold hover:underline underline-offset-8">
-              View more experiences & menu →
-            </Link>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {/* Footer Branding */ }
-  <footer className="bg-black py-8 border-t border-white/5">
-    <div className="max-w-4xl mx-auto flex flex-col items-center gap-4">
-      <img src="/logo_crest.png" alt="TashiZom Logo" className="w-12 h-12 grayscale opacity-40" />
-      <span className="text-[10px] text-gray-500 font-mono tracking-[0.4em] uppercase">
-        © 2026 TashiZom Kibber | Antigravity Systems v1.0
-      </span>
-    </div>
-  </footer>
-
-
-  {/* Media Modal */ }
-  <AnimatePresence>
-    {fullScreenMedia && (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4"
-      >
-        <button
-          onClick={() => setFullScreenMedia(null)}
-          className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-        >
-          <X size={32} />
-        </button>
-        <div className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black">
-          {fullScreenMedia.type === 'video' ? (
-            // Helper to determine video type
-            (() => {
-              const url = fullScreenMedia.url;
-              const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-              const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
-
-              if (isYoutube) {
-                const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
-                return <iframe
-                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                  className="w-full h-full"
-                  allow="autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />;
-              }
-              if (isFacebook) {
-                return <iframe
-                  src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1`}
-                  className="w-full h-full"
-                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                  allowFullScreen
-                />;
-              }
-              return <video src={fullScreenMedia.url} className="w-full h-full object-contain" controls autoPlay />;
-            })()
-          ) : (
-            <img src={fullScreenMedia.url} className="w-full h-full object-contain" alt="" />
-          )}
-          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-            <h2 className="text-2xl font-serif font-black text-white">{fullScreenMedia.title}</h2>
-          </div>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
+      </AnimatePresence>
 
     </main >
   );
