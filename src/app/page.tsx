@@ -12,7 +12,7 @@ export default function Home() {
   const menu = useStore((state: any) => state.menu);
   const landingPhotos = useStore((state: any) => state.landingPhotos);
   const initialize = useStore((state: any) => state.initialize);
-  const valleyUpdates = useStore((state: any) => state.valleyUpdates);
+  const valleyUpdates = useStore((state: any) => state.valleyUpdates) || [];
   const gearItems = useStore((state: any) => state.gearItems);
   const menuAppearance = useStore((state: any) => state.menuAppearance);
 
@@ -253,6 +253,34 @@ export default function Home() {
             </motion.div>
           </div>
 
+          {/* --- CUSTOM MAP SECTION (New Location) --- */}
+          {landingPhotos?.customMap && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative group mt-16 mb-20"
+            >
+              <div className="absolute inset-0 bg-amber-500/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
+                  Cartography
+                </div>
+                <h3 className="text-3xl md:text-5xl font-serif font-black text-white leading-tight">
+                  <span className="text-amber-500 italic">Gateway</span> to the Wild
+                </h3>
+              </div>
+
+              <div
+                className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in max-w-4xl mx-auto"
+                onClick={() => setFullScreenMedia({ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' })}
+              >
+                <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
+              </div>
+            </motion.div>
+          )}
+
           {/* Hindi Context for Local SEO */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -371,6 +399,50 @@ export default function Home() {
             </div>
 
           </div>
+
+          {/* --- HERITAGE SECTION (Relocated) --- */}
+          {landingPhotos?.registrationDoc && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center gap-16"
+            >
+              <div
+                className="flex-1 w-full max-w-md cursor-zoom-in order-2 md:order-1"
+                onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
+              >
+                <div className="relative group">
+                  <div className="absolute -inset-4 bg-amber-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative bg-white p-4 md:p-8 rounded-lg shadow-2xl transform group-hover:rotate-1 transition-transform duration-500">
+                    <img src={landingPhotos.registrationDoc} alt="First Registration" className="w-full h-auto border border-gray-200" />
+                    <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                      <span className="text-gray-400 font-serif italic">Historical Archive - 1995</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-8 text-left order-1 md:order-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
+                  Our Roots
+                </div>
+                <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
+                  A Legacy of <span className="text-amber-500 italic">Hospitality</span>
+                </h2>
+                <p className="text-gray-300 text-lg leading-relaxed">
+                  टशीज़ोम isn't just a business; it's a dream that started with a single piece of paper and a heart full of hope. This original registration document marks the beginning of our journey to bring world-class hospitality to the Roof of the World.
+                </p>
+                <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="p-3 bg-amber-500/20 rounded-xl text-amber-500"><Clock size={24} /></div>
+                  <div>
+                    <h4 className="text-white font-bold">Since the Early Days</h4>
+                    <p className="text-gray-400 text-sm">Committed to serving the Spiti community and travelers alike.</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Background Texture Element */}
@@ -474,78 +546,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {/* --- CUSTOM MAP SECTION (New) --- */}
-          {landingPhotos?.customMap && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative group pt-12"
-            >
-              <div className="absolute inset-0 bg-amber-500/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
-                  Cartography
-                </div>
-                <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
-                  Gateway to the <span className="text-amber-500 italic">Wilderness</span>
-                </h2>
-                <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Our hand-drawn map to help you navigate the rugged terrain of Kibber and find your way to टशीज़ोम.</p>
-              </div>
 
-              <div
-                className="relative rounded-[2rem] md:rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in"
-                onClick={() => setFullScreenMedia({ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' })}
-              >
-                <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
-              </div>
-            </motion.div>
-          )}
-
-          {/* --- HERITAGE SECTION (New) --- */}
-          {landingPhotos?.registrationDoc && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-col md:flex-row items-center gap-16 pt-12"
-            >
-              <div className="flex-1 space-y-8 text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
-                  Our Roots
-                </div>
-                <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
-                  A Legacy of <span className="text-amber-500 italic">Hospitality</span>
-                </h2>
-                <p className="text-gray-300 text-lg leading-relaxed">
-                  टशीज़ोम isn't just a business; it's a dream that started with a single piece of paper and a heart full of hope. This original registration document marks the beginning of our journey to bring world-class hospitality to the Roof of the World.
-                </p>
-                <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10">
-                  <div className="p-3 bg-amber-500/20 rounded-xl text-amber-500"><Clock size={24} /></div>
-                  <div>
-                    <h4 className="text-white font-bold">Since the Early Days</h4>
-                    <p className="text-gray-400 text-sm">Committed to serving the Spiti community and travelers alike.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="flex-1 w-full max-w-md cursor-zoom-in"
-                onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
-              >
-                <div className="relative group">
-                  <div className="absolute -inset-4 bg-amber-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative bg-white p-4 md:p-8 rounded-lg shadow-2xl transform group-hover:rotate-1 transition-transform duration-500">
-                    <img src={landingPhotos.registrationDoc} alt="First Registration" className="w-full h-auto border border-gray-200" />
-                    <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                      <span className="text-gray-400 font-serif italic">Historical Archive - टशीज़ोम</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </div>
       </section>
       {reviews && reviews.length > 0 && (

@@ -405,7 +405,7 @@ export const useStore = create<AppState>()(
                 // Landing Page Photos
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'landing_photos'), (doc) => {
                     if (doc.exists()) {
-                        set({ landingPhotos: doc.data() as any });
+                        set({ landingPhotos: { ...get().landingPhotos, ...doc.data() } });
                     }
                 }));
 
