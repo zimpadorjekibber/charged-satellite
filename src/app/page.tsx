@@ -520,18 +520,42 @@ export default function Home() {
                               const isFacebook = update.mediaUrl.includes('facebook.com') || update.mediaUrl.includes('fb.watch');
 
                               if (isYoutube) {
-                                const videoId = update.mediaUrl.includes('v=') ? update.mediaUrl.split('v=')[1]?.split('&')[0] : update.mediaUrl.split('/').pop();
-                                return (
-                                  <>
-                                    <img
-                                      src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                                      alt="YouTube Preview"
-                                      className="absolute inset-0 w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black/30" />
-                                    <PlayCircle className="relative z-10 text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl" size={64} />
-                                  </>
-                                );
+                                // Improved YouTube ID extraction for multiple formats
+                                let videoId = null;
+
+                                // Format: youtube.com/watch?v=VIDEO_ID
+                                if (update.mediaUrl.includes('v=')) {
+                                  videoId = update.mediaUrl.split('v=')[1]?.split('&')[0]?.split('#')[0];
+                                }
+                                // Format: youtu.be/VIDEO_ID
+                                else if (update.mediaUrl.includes('youtu.be/')) {
+                                  videoId = update.mediaUrl.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
+                                }
+                                // Format: youtube.com/embed/VIDEO_ID
+                                else if (update.mediaUrl.includes('/embed/')) {
+                                  videoId = update.mediaUrl.split('/embed/')[1]?.split('?')[0];
+                                }
+
+                                if (videoId) {
+                                  return (
+                                    <>
+                                      <img
+                                        src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                                        alt="YouTube Preview"
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                        onError={(e) => {
+                                          // Fallback to maxresdefault if hqdefault fails
+                                          const img = e.target as HTMLImageElement;
+                                          if (!img.src.includes('maxresdefault')) {
+                                            img.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                                          }
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 bg-black/30" />
+                                      <PlayCircle className="relative z-10 text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl" size={64} />
+                                    </>
+                                  );
+                                }
                               }
 
                               if (isFacebook) {
