@@ -446,7 +446,7 @@ function AdminDashboard() {
                         <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
                         <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
                         <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
-                        <TabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
+                        <TabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
                         <TabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
                     </div>
 
@@ -495,7 +495,7 @@ function AdminDashboard() {
                     <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
                     <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
                     <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
-                    <MobileTabButton active={activeTab === 'settings'} label="Admin" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
+                    <MobileTabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
                     <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
@@ -4149,5 +4149,77 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
             </div>
             <span className="text-[10px] font-bold mt-1">{label}</span>
         </button>
+    );
+}
+
+function GearManagementView() {
+    return (
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Local Gear Management</h2>
+            <p className="text-gray-500">Manage T-Shirts, Caps, and other merchandise here.</p>
+            {/* Placeholder for future implementation */}
+            <div className="mt-8 py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
+                <ShoppingBag size={48} className="mb-4 opacity-50" />
+                <p>Gear inventory system coming soon...</p>
+            </div>
+        </div>
+    );
+}
+
+function ReviewsView() {
+    const reviews = useStore((state) => state.reviews);
+    return (
+        <div className="space-y-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 font-serif">Customer Reviews</h2>
+                {reviews.length === 0 ? (
+                    <p className="text-gray-500 italic">No reviews yet.</p>
+                ) : (
+                    <div className="grid gap-4">
+                        {reviews.map((review) => (
+                            <div key={review.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="font-bold text-gray-900">{review.customerName || 'Anonymous'}</span>
+                                    <div className="flex text-yellow-500">
+                                        {[...Array(5)].map((_, i) => (
+                                            <span key={i}>{i < review.rating ? '★' : '☆'}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-gray-600 text-sm">"{review.comment}"</p>
+                                <p className="text-xs text-gray-400 mt-2 text-right">{new Date(review.createdAt).toLocaleDateString()}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function AnalyticsView({ orders, menu }: { orders: any[], menu: any[] }) {
+    const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const completedOrders = orders.filter(o => o.status === 'Paid').length;
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Business Analytics</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-green-50 p-6 rounded-xl border border-green-100">
+                        <h3 className="text-green-800 font-bold uppercase text-xs mb-2">Total Revenue</h3>
+                        <p className="text-3xl font-black text-green-600">₹{totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <h3 className="text-blue-800 font-bold uppercase text-xs mb-2">Completed Orders</h3>
+                        <p className="text-3xl font-black text-blue-600">{completedOrders}</p>
+                    </div>
+                    <div className="bg-purple-50 p-6 rounded-xl border border-purple-100">
+                        <h3 className="text-purple-800 font-bold uppercase text-xs mb-2">Menu Items</h3>
+                        <p className="text-3xl font-black text-purple-600">{menu.length}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
