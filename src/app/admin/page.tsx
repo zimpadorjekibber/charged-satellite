@@ -49,8 +49,6 @@ function AdminDashboard() {
     const login = useStore((state) => state.login);
     const logout = useStore((state) => state.logout);
     const valleyUpdates = useStore((state) => state.valleyUpdates);
-    const landingPhotos = useStore((state: any) => state.landingPhotos);
-    const updateLandingPhotos = useStore((state: any) => state.updateLandingPhotos);
     const initialize = useStore((state) => state.initialize);
     const menuAppearanceRaw = useStore((state: any) => state.menuAppearance);
     const menuAppearance = menuAppearanceRaw || {
@@ -1156,6 +1154,38 @@ function AdminDashboard() {
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Photos</span>
                                 </button>
                             </div>
+
+                            {/* Section: Landing Page Photos (Moved to Top) */}
+                            <div id="landing-photos-top" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm mb-8">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                    <ImageIcon className="text-amber-500" /> Landing Page Photos
+                                </h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Gateway Map Upload */}
+                                    <PhotoUploadSection
+                                        title="Gateway Map (Portrait)"
+                                        description="Upload a portrait-oriented map (3:4) for mobile"
+                                        icon={<MapPin size={20} className="text-amber-500" />}
+                                        aspectRatio="3/4"
+                                        currentImageUrl={landingPhotos?.customMap}
+                                        onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
+                                        placeholder="नक्शा अपलोड करें / Upload Map"
+                                    />
+
+                                    {/* Hotel Registration Document Upload */}
+                                    <PhotoUploadSection
+                                        title="Hotel Registration Document"
+                                        description="Original 1995 Registration Certificate"
+                                        icon={<Clock size={20} className="text-blue-500" />}
+                                        aspectRatio="3/4"
+                                        currentImageUrl={landingPhotos?.registrationDoc}
+                                        onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
+                                        placeholder="पंजीकरण दस्तावेज़ / Upload Doc"
+                                    />
+                                </div>
+                            </div>
+
                             {/* App Sharing & QR */}
                             <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
                                 <div className="flex flex-col md:flex-row gap-8 items-center">
