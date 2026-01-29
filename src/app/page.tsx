@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, MapPin, Clock, Star, Users, Utensils } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, MapPin, Clock, Star, Users, Utensils, Newspaper, ShoppingBag, PlayCircle, Info, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 
@@ -12,6 +12,11 @@ export default function Home() {
   const menu = useStore((state: any) => state.menu);
   const landingPhotos = useStore((state: any) => state.landingPhotos);
   const initialize = useStore((state: any) => state.initialize);
+  const valleyUpdates = useStore((state: any) => state.valleyUpdates);
+  const gearItems = useStore((state: any) => state.gearItems);
+  const menuAppearance = useStore((state: any) => state.menuAppearance);
+
+  const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: 'image' | 'video'; title: string } | null>(null);
 
   useEffect(() => {
     // Clear previous table session for generic app entry
@@ -245,7 +250,7 @@ export default function Home() {
           >
             <h3 className="text-2xl md:text-3xl font-serif font-bold text-amber-200 mb-6 italic">स्पीति घाटी का असली स्वाद</h3>
             <p className="text-gray-300 md:text-lg leading-relaxed mb-6">
-              किब्बर गाँव की सुंदर वादियों के बीच स्थित, ताशीज़ोम (TashiZom) आपको देता है घर जैसा स्वाद और
+              किब्बर गाँव की सुंदर वादियों के बीच स्थित, टशीज़ोम (TashiZom) आपको देता है घर जैसा स्वाद और
               पहाड़ों की ताज़गी। हम केवल खाना ही नहीं, बल्कि स्पीति की संस्कृति और परंपराओं का संगम हैं।
               चाहे आप की मॉनेस्ट्री घूम रहे हों या चिचम ब्रिज, हमारे यहाँ का ठहराव आपकी यात्रा को यादगार बना देगा।
             </p>
@@ -359,6 +364,178 @@ export default function Home() {
         {/* Background Texture Element */}
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-amber-600/5 rounded-full blur-[100px] pointer-events-none" />
       </section>
+
+      {/* --- VALLEY ESSENTIALS (Transferred from Menu) --- */}
+      <section className="bg-black py-24 px-6 relative overflow-hidden border-t border-white/5">
+        <div className="max-w-6xl mx-auto space-y-24">
+
+          {/* 1. Valley Updates Section */}
+          {valleyUpdates.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-12"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 font-mono text-[10px] text-blue-400 uppercase tracking-widest">
+                    Live Status
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
+                    Valley <span className="text-blue-400 italic">Updates</span>
+                  </h2>
+                </div>
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm max-w-sm">
+                  <p className="text-gray-400 text-sm italic italic">"Keeping you connected with the pulse of the valley, even when the snow piles high."</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {valleyUpdates.map((update: any, idx: number) => (
+                  <div key={idx} className="bg-white/5 border border-white/10 p-6 rounded-3xl hover:bg-white/10 transition-all group">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-3 h-3 rounded-full animate-pulse ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : 'bg-red-500'}`} />
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{update.status}</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">{update.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed mb-6">{update.description}</p>
+
+                    {update.mediaUrl && (
+                      <div
+                        className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group/media"
+                        onClick={() => setFullScreenMedia({ url: update.mediaUrl!, type: update.mediaType === 'video' ? 'video' : 'image', title: update.title })}
+                      >
+                        {update.mediaType === 'video' ? (
+                          <div className="w-full h-full bg-black flex items-center justify-center">
+                            <PlayCircle className="text-white/50 group-hover/media:scale-110 transition-transform" size={48} />
+                            <video src={update.mediaUrl} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                          </div>
+                        ) : (
+                          <img src={update.mediaUrl} alt="" className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity flex items-end p-4">
+                          <span className="text-white text-xs font-bold flex items-center gap-2">View Highlight <ArrowRight size={14} /></span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* 2. Local Winter Gears Section */}
+          {gearItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-12"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4 font-mono text-[10px] text-orange-400 uppercase tracking-widest">
+                    Spiti Handmade
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
+                    Local <span className="text-orange-400 italic">Winter Gears</span>
+                  </h2>
+                </div>
+                <Link href="/customer/menu" className="group h-fit px-8 py-4 bg-orange-500 text-black font-black rounded-xl hover:bg-orange-400 transition-all flex items-center gap-3">
+                  SHOP GEAR <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {gearItems.slice(0, 4).map((item: any) => (
+                  <GearItemCard
+                    key={item.id}
+                    name={item.name}
+                    price={item.price}
+                    items={item.items}
+                    badge={item.badge}
+                    available={item.available}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* --- CUSTOM MAP SECTION (New) --- */}
+          {landingPhotos?.customMap && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative group pt-12"
+            >
+              <div className="absolute inset-0 bg-amber-500/10 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
+                  Cartography
+                </div>
+                <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
+                  Gateway to the <span className="text-amber-500 italic">Wilderness</span>
+                </h2>
+                <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Our hand-drawn map to help you navigate the rugged terrain of Kibber and find your way to टशीज़ोम.</p>
+              </div>
+
+              <div
+                className="relative rounded-[2rem] md:rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in"
+                onClick={() => setFullScreenMedia({ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' })}
+              >
+                <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
+              </div>
+            </motion.div>
+          )}
+
+          {/* --- HERITAGE SECTION (New) --- */}
+          {landingPhotos?.registrationDoc && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-col md:flex-row items-center gap-16 pt-12"
+            >
+              <div className="flex-1 space-y-8 text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
+                  Our Roots
+                </div>
+                <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
+                  A Legacy of <span className="text-amber-500 italic">Hospitality</span>
+                </h2>
+                <p className="text-gray-300 text-lg leading-relaxed">
+                  टशीज़ोम isn't just a business; it's a dream that started with a single piece of paper and a heart full of hope. This original registration document marks the beginning of our journey to bring world-class hospitality to the Roof of the World.
+                </p>
+                <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="p-3 bg-amber-500/20 rounded-xl text-amber-500"><Clock size={24} /></div>
+                  <div>
+                    <h4 className="text-white font-bold">Since the Early Days</h4>
+                    <p className="text-gray-400 text-sm">Committed to serving the Spiti community and travelers alike.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="flex-1 w-full max-w-md cursor-zoom-in"
+                onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
+              >
+                <div className="relative group">
+                  <div className="absolute -inset-4 bg-amber-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative bg-white p-4 md:p-8 rounded-lg shadow-2xl transform group-hover:rotate-1 transition-transform duration-500">
+                    <img src={landingPhotos.registrationDoc} alt="First Registration" className="w-full h-auto border border-gray-200" />
+                    <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                      <span className="text-gray-400 font-serif italic">Historical Archive - टशीज़ोम</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </section>
       {reviews && reviews.length > 0 && (
         <section className="bg-tashi-dark py-20 px-6 border-t border-white/5">
           <div className="max-w-6xl mx-auto">
@@ -422,6 +599,99 @@ export default function Home() {
         </div>
       </footer>
 
+
+      {/* Media Modal */}
+      <AnimatePresence>
+        {fullScreenMedia && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4"
+          >
+            <button
+              onClick={() => setFullScreenMedia(null)}
+              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            >
+              <X size={32} />
+            </button>
+            <div className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black">
+              {fullScreenMedia.type === 'video' ? (
+                <video src={fullScreenMedia.url} className="w-full h-full object-contain" controls autoPlay />
+              ) : (
+                <img src={fullScreenMedia.url} className="w-full h-full object-contain" alt="" />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+                <h2 className="text-2xl font-serif font-black text-white">{fullScreenMedia.title}</h2>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </main>
   );
 }
+
+// Reusing GearItemCard component
+const GearItemCard = ({ name, price, items, badge, available }: { name: string, price: number, items: { url: string, label: string, details?: string, worn?: boolean }[], badge: string, available?: boolean }) => {
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-full group hover:bg-white/10 transition-all">
+      <div className="h-48 relative overflow-hidden" onClick={() => setCurrentIdx((currentIdx + 1) % items.length)}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIdx}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full h-full"
+          >
+            <img
+              src={items[currentIdx].url}
+              alt={name}
+              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${!available ? 'grayscale opacity-50' : ''}`}
+            />
+
+            {!available && (
+              <div className="absolute inset-0 flex items-center justify-center p-2">
+                <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-2xl border border-white/20 uppercase tracking-widest rotate-[-12deg]">
+                  Out of Stock
+                </span>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="absolute top-4 left-4 flex flex-col gap-1">
+          <div className="bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-3 py-1 rounded-full border border-white/10 w-fit uppercase tracking-widest">
+            {badge}
+          </div>
+        </div>
+
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          {items.map((_, i) => (
+            <div
+              key={i}
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-amber-500 w-4' : 'bg-white/30'}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="text-white font-bold text-sm mb-2 line-clamp-1">{name}</h3>
+          <div className="flex justify-between items-center">
+            <span className="text-amber-500 font-black font-serif text-lg">₹{price}</span>
+            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+              {items[currentIdx].label}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

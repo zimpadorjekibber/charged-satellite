@@ -1476,7 +1476,7 @@ function AdminDashboard() {
                                     <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><ImageIcon size={24} /></div>
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900">Landing Page Story Photos</h2>
-                                        <p className="text-sm text-gray-500">Manage photos for the 'Prime Location' and 'Hard Winter Conditions' sections on the home page.</p>
+                                        <p className="text-sm text-gray-500">Manage photos for the sections on the home page (Location, Climate, Map, Heritage).</p>
                                     </div>
                                 </div>
 
@@ -1564,10 +1564,95 @@ function AdminDashboard() {
                                             </label>
                                         </div>
                                     </div>
+
+                                    {/* Section: Custom Gateway Map */}
+                                    <div className="pt-12 border-t border-gray-100">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <MapPin size={16} className="text-amber-500" /> Gateway Map
+                                        </h3>
+                                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                                            {landingPhotos?.customMap ? (
+                                                <div className="relative group w-full md:w-80 aspect-video rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                    <img src={landingPhotos.customMap} alt="" className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateLandingPhotos('customMap', '')}
+                                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
+                                                    >
+                                                        <X size={18} />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <label className="w-full md:w-80 aspect-video rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-3 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400">
+                                                    <Plus size={32} />
+                                                    <span className="text-xs font-black uppercase tracking-widest">Upload Map</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    updateLandingPhotos('customMap', url);
+                                                                } catch (err) { alert("Upload failed"); }
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            )}
+                                            <div className="flex-1 text-sm text-gray-500 italic">
+                                                Upload your hand-drawn map to create a personal connection with travelers.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Registration Document */}
+                                    <div className="pt-12 border-t border-gray-100">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <Clock size={16} className="text-amber-600" /> Historical Legacy
+                                        </h3>
+                                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                                            {landingPhotos?.registrationDoc ? (
+                                                <div className="relative group w-full md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm" style={{ height: '320px' }}>
+                                                    <img src={landingPhotos.registrationDoc} alt="" className="w-full h-full object-contain" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateLandingPhotos('registrationDoc', '')}
+                                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
+                                                    >
+                                                        <X size={18} />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <label className="w-full md:w-64 aspect-[3/4] rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-3 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400" style={{ height: '320px' }}>
+                                                    <Plus size={32} />
+                                                    <span className="text-xs font-black uppercase tracking-widest px-8 text-center">Upload Heritage Photo</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    updateLandingPhotos('registrationDoc', url);
+                                                                } catch (err) { alert("Upload failed"); }
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            )}
+                                            <div className="flex-1 text-sm text-gray-500 italic">
+                                                Upload your 1998 hotel registration photo to build trust and authenticity.
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Geo Settings */}
                             {/* Geo Settings */}
                             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6">Geo-Restriction Settings</h2>
