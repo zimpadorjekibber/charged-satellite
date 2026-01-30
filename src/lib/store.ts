@@ -808,33 +808,56 @@ export const useStore = create<AppState>()(
             },
 
             uploadImage: async (file: File, saveToGallery = false) => {
-                console.log('🚀 ULTRA JUGAD: Converting to Base64 (Bypassing Storage)...');
+                console.log('🚀 ULTRA JUGAD V2: Compressing & Converting to Base64...');
 
-                // Validation: File type
                 if (!file.type.startsWith('image/')) {
                     throw new Error('❌ Only image files are allowed');
                 }
 
                 return new Promise((resolve, reject) => {
+                    const img = new Image();
                     const reader = new FileReader();
-                    reader.onload = async () => {
-                        const base64String = reader.result as string;
-                        console.log('✅ ULTRA JUGAD: Base64 Success! String length:', base64String.length);
+                    reader.onload = (e) => {
+                        img.src = e.target?.result as string;
+                    };
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const MAX_DIM = 1200; // Good quality but small enough for Base64
+
+                        if (width > height) {
+                            if (width > MAX_DIM) {
+                                height *= MAX_DIM / width;
+                                width = MAX_DIM;
+                            }
+                        } else {
+                            if (height > MAX_DIM) {
+                                width *= MAX_DIM / height;
+                                height = MAX_DIM;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx?.drawImage(img, 0, 0, width, height);
+
+                        // Convert to Base64 with 70% quality to keep string length small
+                        const base64String = canvas.toDataURL('image/jpeg', 0.7);
+                        console.log('✅ ULTRA JUGAD V2: Success! Length:', base64String.length);
 
                         if (saveToGallery) {
-                            try {
-                                await addDoc(collection(db, 'settings', 'media', 'library'), {
-                                    url: base64String,
-                                    name: file.name,
-                                    isBase64: true,
-                                    createdAt: new Date().toISOString()
-                                });
-                            } catch (e) {
-                                console.error("Gallery save failed, but proceeding with URL", e);
-                            }
+                            addDoc(collection(db, 'settings', 'media', 'library'), {
+                                url: base64String,
+                                name: file.name,
+                                isBase64: true,
+                                createdAt: new Date().toISOString()
+                            }).catch(err => console.error("Gallery save failed", err));
                         }
                         resolve(base64String);
                     };
+                    img.onerror = () => reject(new Error('Failed to load image'));
                     reader.onerror = () => reject(new Error('Failed to read file'));
                     reader.readAsDataURL(file);
                 });

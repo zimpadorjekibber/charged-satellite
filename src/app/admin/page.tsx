@@ -558,18 +558,47 @@ function AdminDashboard() {
 
                                     {manualUploadUrl && (
                                         <div className="flex flex-col justify-center gap-3">
-                                            <p className="text-xs font-black uppercase text-white/80 tracking-widest">Aapka Photo Link (Copy karein):</p>
-                                            <div className="bg-black/20 p-4 rounded-xl font-mono text-xs break-all selection:bg-white selection:text-black border border-white/20">
+                                            <p className="text-[10px] font-black uppercase text-white/60 tracking-widest">Aapka Photo Data (Bahut lamba hoga, niche button dabaiye):</p>
+                                            <div className="bg-black/20 p-2 rounded-xl font-mono text-[8px] break-all h-20 overflow-y-auto border border-white/10 opacity-50">
                                                 {manualUploadUrl}
                                             </div>
+
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await updateLandingPhotos('customMap', manualUploadUrl);
+                                                            alert('✅ MAP UPDATE HO GAYA! Ab wo website par dikhega.');
+                                                        } catch (e) { alert('Error: ' + e); }
+                                                    }}
+                                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg border-2 border-white/20 flex flex-col items-center justify-center text-center leading-tight"
+                                                >
+                                                    <span className="text-xs">Upar Website par</span>
+                                                    <span className="text-[10px] font-black underline">MAP LAGADO</span>
+                                                </button>
+
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await updateLandingPhotos('registrationDoc', manualUploadUrl);
+                                                            alert('✅ REGISTRATION DOC UPDATE HO GAYA!');
+                                                        } catch (e) { alert('Error: ' + e); }
+                                                    }}
+                                                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg border-2 border-white/20 flex flex-col items-center justify-center text-center leading-tight"
+                                                >
+                                                    <span className="text-xs">Upar Website par</span>
+                                                    <span className="text-[10px] font-black underline">DOC LAGADO</span>
+                                                </button>
+                                            </div>
+
                                             <button
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(manualUploadUrl);
-                                                    alert('Link Copy Ho Gaya! ✅\nAb isko upar Settings mein ya mujhe bhej dein.');
+                                                    alert('Link Copy Ho Gaya! ✅');
                                                 }}
-                                                className="bg-white text-orange-600 font-black py-4 rounded-xl hover:bg-gray-100 transition-all shadow-xl flex items-center justify-center gap-2"
+                                                className="bg-white/10 hover:bg-white/20 text-white py-2 rounded-lg text-[10px] font-bold transition-all border border-white/30"
                                             >
-                                                <Share2 size={20} /> LINK COPY KAREIN
+                                                Nakli Link Copy Karein (Optional)
                                             </button>
                                         </div>
                                     )}
