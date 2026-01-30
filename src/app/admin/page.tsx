@@ -1646,19 +1646,45 @@ function AdminDashboard() {
                                             </div>
 
                                             {manualUploadUrl && (
-                                                <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-4 rounded-xl border border-blue-200">
-                                                    <p className="text-xs font-bold text-gray-500 mb-2 uppercase">Your Image Link:</p>
-                                                    <div className="bg-gray-100 p-3 rounded-lg break-all text-xs font-mono text-gray-700 select-all mb-3">
+                                                <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-4 rounded-xl border border-blue-200 shadow-inner">
+                                                    <p className="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-tighter">Photo Data Ready (Don't scroll, use buttons):</p>
+                                                    <div className="bg-gray-50 p-2 rounded-lg break-all h-20 overflow-y-auto text-[8px] font-mono text-gray-400 border border-gray-100 mb-4">
                                                         {manualUploadUrl}
                                                     </div>
+
+                                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('customMap', manualUploadUrl);
+                                                                    alert('✅ MAP SET HO GAYA!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            MAP LAGADO
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('registrationDoc', manualUploadUrl);
+                                                                    alert('✅ DOC SET HO GAYA!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            DOC LAGADO
+                                                        </button>
+                                                    </div>
+
                                                     <button
                                                         onClick={() => {
                                                             navigator.clipboard.writeText(manualUploadUrl);
-                                                            alert('Link Copied! Ab aap is link ko mujhe bhej sakte hain ya Media Gallery mein use kar sakte hain.');
+                                                            alert('Link Copied! (Length: ' + manualUploadUrl.length + ')');
                                                         }}
-                                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                                        className="text-[10px] text-gray-400 hover:text-blue-500 transition-colors underline"
                                                     >
-                                                        <Share2 size={16} /> Copy Link
+                                                        Copy Raw Link (Not Recommended)
                                                     </button>
                                                 </div>
                                             )}
