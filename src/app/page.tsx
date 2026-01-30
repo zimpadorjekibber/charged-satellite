@@ -361,44 +361,51 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Hindi Context for Local SEO */}
+          {/* SEO and Order Ahead Section */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             className="bg-gradient-to-br from-amber-900/40 to-black border border-amber-500/20 p-8 md:p-12 rounded-3xl text-center"
           >
-            <h3 className="text-2xl md:text-3xl font-serif font-bold text-amber-200 mb-6 italic">स्पीति घाटी का असली स्वाद</h3>
-            <p className="text-gray-300 md:text-lg leading-relaxed mb-6">
-              किब्बर गाँव की सुंदर वादियों के बीच स्थित, टशीज़ोम (TashiZom) आपको देता है घर जैसा स्वाद और
-              पहाड़ों की ताज़गी। हम केवल खाना ही नहीं, बल्कि स्पीति की संस्कृति और परंपराओं का संगम हैं।
-              चाहे आप की मॉनेस्ट्री घूम रहे हों या चिचम ब्रिज, हमारे यहाँ का ठहराव आपकी यात्रा को यादगार बना देगा।
+            <h3 className="text-2xl md:text-3xl font-serif font-bold text-amber-200 mb-6 italic tracking-tight">The Authentic Taste of Spiti Valley</h3>
+            <p className="text-gray-300 md:text-lg leading-relaxed mb-10 font-medium">
+              Nestled in the beautiful valleys of Kibber Village, TashiZom offers you the warmth of home-cooked flavors and the freshness of the mountains. We are not just a restaurant, but a junction of Spitian culture and traditions. Whether you are visiting Kee Monastery or Chicham Bridge, a stop at TashiZom will make your journey unforgettable.
             </p>
 
             {/* QR Code Pre-ordering Feature */}
-            <div className="bg-white/5 border border-amber-500/30 rounded-2xl p-6 mb-6 backdrop-blur-sm">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="p-2 bg-amber-500/20 rounded-lg">
-                  <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                  </svg>
+            <div className="bg-white/5 border border-amber-500/30 rounded-3xl p-8 mb-8 backdrop-blur-md relative overflow-hidden group/qr">
+              <div className="absolute inset-0 bg-amber-500/5 opacity-0 group-hover/qr:opacity-100 transition-opacity duration-700" />
+
+              <div className="relative z-10">
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="p-3 bg-amber-500/20 rounded-2xl border border-amber-500/30 group-hover/qr:scale-110 transition-transform duration-500">
+                    <svg className="w-8 h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-2xl font-black text-amber-300 tracking-tight">Order Ahead, Eat Fresh & Hot!</h4>
                 </div>
-                <h4 className="text-xl font-bold text-amber-300">पहले से ऑर्डर करें, गर्म खाना खाएं!</h4>
+
+                <p className="text-gray-200 leading-relaxed text-base md:text-xl font-semibold mb-6">
+                  Visiting <span className="text-amber-500 underline decoration-2 underline-offset-4">Chicham Bridge</span> or <span className="text-amber-500 underline decoration-2 underline-offset-4">Kee Monastery</span>?
+                  Don't wait in line! Simply scan our <span className="text-white font-black bg-amber-500/20 px-2 py-0.5 rounded">QR Code</span> and place your order in advance.
+                  By the time you reach TashiZom, your <span className="text-amber-300 font-bold">hot and fresh meal</span> will be ready for you!
+                </p>
+
+                <div className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-amber-500/20">
+                  <span className="text-amber-500 animate-pulse text-lg">🎯</span>
+                  <p className="text-amber-400/90 text-sm font-bold uppercase tracking-widest">
+                    Our QR Codes are placed throughout Spiti Valley - Scan to start!
+                  </p>
+                </div>
               </div>
-              <p className="text-gray-300 leading-relaxed text-sm md:text-base">
-                <span className="text-amber-400 font-semibold">चिचम ब्रिज</span> या <span className="text-amber-400 font-semibold">की मॉनेस्ट्री</span> घूम रहे हैं?
-                घबराइए मत! हमारा <span className="text-white font-bold">QR Code</span> स्कैन करें और पहले से ऑर्डर कर दें।
-                जब आप टशीज़ोम पहुँचेंगे, तब तक आपका <span className="text-amber-300 font-bold">गर्म और ताज़ा खाना तैयार</span> होगा!
-              </p>
-              <p className="text-amber-500/80 text-xs md:text-sm mt-3 font-medium">
-                🎯 स्पीति घाटी में जगह-जगह हमारे QR Codes लगे हुए हैं - देखते ही स्कैन करें!
-              </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 text-xs font-bold text-amber-500/60 uppercase tracking-widest">
-              <span>#BestRestaurantInSpiti</span>
-              <span>#KibberFood</span>
-              <span>#SpitiValleyLife</span>
+            <div className="flex flex-wrap justify-center gap-6 text-[10px] font-black text-amber-500/40 uppercase tracking-[0.3em]">
+              <span className="hover:text-amber-500 transition-colors cursor-default">#BestRestaurantInSpiti</span>
+              <span className="hover:text-amber-500 transition-colors cursor-default">#KibberFood</span>
+              <span className="hover:text-amber-500 transition-colors cursor-default">#SpitiValleyLife</span>
             </div>
           </motion.div>
         </div>
