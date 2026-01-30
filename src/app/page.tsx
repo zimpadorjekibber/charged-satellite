@@ -201,7 +201,9 @@ export default function Home() {
               <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col h-full">
                 <MapPin className="w-10 h-10 text-amber-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-white font-bold text-xl mb-2">Prime Location</h3>
-                <p className="text-gray-400 text-sm flex-1">Ideally situated in Kibber, near the Chicham Bridge and Kee Monastery.</p>
+                <p className="text-gray-400 text-sm flex-1 leading-relaxed">
+                  Ideally situated in <span className="text-white font-medium">Kibber Village</span>, just a few minutes away from the iconic <span className="text-white font-medium">Chicham Bridge</span> and the historic <span className="text-white font-medium">Kee Monastery</span>. Our restaurant serves as the perfect pitstop for travelers exploring the high-altitude wonders of Spiti.
+                </p>
                 {landingPhotos?.location?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
                     {landingPhotos.location.map((url: string, i: number) => (
@@ -240,7 +242,9 @@ export default function Home() {
               <div className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col h-full">
                 <Clock className="w-10 h-10 text-amber-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-white font-bold text-xl mb-2">Open Always</h3>
-                <p className="text-gray-400 text-sm flex-1">The only restaurant in Kibber that stays open throughout the winter season.</p>
+                <p className="text-gray-400 text-sm flex-1 leading-relaxed">
+                  We are proud to be the only restaurant in <span className="text-white font-medium">Kibber</span> that remains open throughout the harsh <span className="text-white font-medium">winter season</span>. Whether it's heavy snow or sub-zero temperatures, TashiZom continues to serve hot, fresh meals to locals and adventure seekers alike.
+                </p>
                 {landingPhotos?.climate?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
                     {landingPhotos.climate.map((url: string, i: number) => (
@@ -291,10 +295,10 @@ export default function Home() {
                       <h4 className="text-white font-bold text-lg uppercase tracking-tight">Traveler's Guide & Connectivity</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <p className="text-gray-300 text-sm leading-relaxed font-medium italic border-l-2 border-amber-500/30 pl-4">
-                          "यदि आप <span className="text-white font-bold">Kee Monastery</span> से <span className="text-amber-400">Chicham Bridge</span> की ओर आ रहे हैं, तो आप <span className="text-white">TashiZom</span> से होते हुए सीधे आगे जा सकते हैं—रास्ता जुड़ा हुआ है।"
+                          "If you are traveling from <span className="text-white font-bold">Kee Monastery</span> towards <span className="text-amber-400">Chicham Bridge</span>, you can pass directly through <span className="text-white">TashiZom</span>—the road is fully connected."
                         </p>
                         <p className="text-gray-300 text-sm leading-relaxed font-medium italic border-l-2 border-amber-500/30 pl-4">
-                          "इसी तरह, <span className="text-amber-400">Chicham Bridge</span> से <span className="text-white">TashiZom</span> आने के बाद, आप यहाँ से सीधे <span className="text-white font-bold">Kaza</span> की ओर निकल सकते हैं। वापस चिचम जाने की ज़रूरत नहीं है।"
+                          "Similarly, after arriving at <span className="text-white">TashiZom</span> from <span className="text-amber-400">Chicham Bridge</span>, you can proceed directly towards <span className="text-white font-bold">Kaza</span>. There is no need to go back via Chicham."
                         </p>
                       </div>
                       <div className="pt-4 border-t border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/80">
