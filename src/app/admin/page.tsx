@@ -1456,7 +1456,7 @@ function AdminDashboard() {
                                                         className="bg-white text-[10px] text-gray-600 rounded p-1 border border-gray-300 w-20"
                                                     >
                                                         <option value="image">Image</option>
-                                                        <option value="video">Video</option>
+                                                        <option value="video">Video / Instagram</option>
                                                     </select>
                                                     <div className="flex-1">
                                                         <input
