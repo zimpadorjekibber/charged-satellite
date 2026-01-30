@@ -718,6 +718,7 @@ export default function Home() {
                             {(() => {
                               const isYoutube = update.mediaUrl.includes('youtube.com') || update.mediaUrl.includes('youtu.be');
                               const isFacebook = update.mediaUrl.includes('facebook.com') || update.mediaUrl.includes('fb.watch');
+                              const isInstagram = update.mediaUrl.includes('instagram.com');
 
                               if (isYoutube) {
                                 // Improved YouTube ID extraction for multiple formats
@@ -765,6 +766,18 @@ export default function Home() {
                                     <div className="relative z-10 text-center">
                                       <PlayCircle className="mx-auto text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl mb-2" size={64} />
                                       <p className="text-white text-xs font-bold">Facebook Video</p>
+                                    </div>
+                                  </>
+                                );
+                              }
+
+                              if (isInstagram) {
+                                return (
+                                  <>
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888]" />
+                                    <div className="relative z-10 text-center">
+                                      <PlayCircle className="mx-auto text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl mb-2" size={64} />
+                                      <p className="text-white text-xs font-bold uppercase tracking-widest">Instagram Reel</p>
                                     </div>
                                   </>
                                 );
@@ -969,6 +982,7 @@ export default function Home() {
                   const url = fullScreenMedia.url;
                   const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
                   const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
+                  const isInstagram = url.includes('instagram.com');
 
                   if (isYoutube) {
                     const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
@@ -983,6 +997,17 @@ export default function Home() {
                     return <iframe
                       src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1`}
                       className="w-full h-full"
+                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                      allowFullScreen
+                    />;
+                  }
+                  if (isInstagram) {
+                    const cleanUrl = url.split('?')[0];
+                    const embedUrl = cleanUrl.endsWith('/') ? `${cleanUrl}embed` : `${cleanUrl}/embed`;
+                    return <iframe
+                      src={embedUrl}
+                      className="w-full h-full"
+                      allowTransparency={true}
                       allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                       allowFullScreen
                     />;
