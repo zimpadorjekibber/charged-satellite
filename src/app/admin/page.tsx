@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper, Home, Phone } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PhotoUploadSection } from '../../components/PhotoUpload';
 import {
@@ -175,7 +175,7 @@ function AdminDashboard() {
     // Sync tab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        const validTabs = ['live', 'history', 'analytics', 'reviews', 'settings', 'media', 'storage', 'gear'];
+        const validTabs = ['live', 'history', 'analytics', 'reviews', 'settings', 'media', 'storage', 'gear', 'stays'];
         if (tab && validTabs.includes(tab)) {
             setActiveTab(tab as any);
         }
@@ -510,7 +510,7 @@ function AdminDashboard() {
 
             {/* Mobile Bottom Navigation Bar */}
             <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 md:hidden px-2 py-2 pb-safe shadow-lg">
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-8 gap-1">
                     <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={20} />} onClick={() => handleTabChange('live')} />
                     <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => handleTabChange('history')} />
                     <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
@@ -1079,8 +1079,23 @@ function AdminDashboard() {
                     )}
 
                     {/* GEAR MANAGEMENT VIEW (New) */}
-                    {activeTab === 'gear' && <GearManagementView />}
-                    {activeTab === 'stays' && <StaysManagementView />}
+                    {activeTab === 'gear' && (
+                        <motion.div
+                            key="gear"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                        >
+                            <GearManagementView />
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'stays' && (
+                        <motion.div
+                            key="stays"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                        >
+                            <StaysManagementView />
+                        </motion.div>
+                    )}
 
                     {/* ADMIN MANAGEMENT VIEW */}
                     {activeTab === 'settings' && (
@@ -1164,6 +1179,16 @@ function AdminDashboard() {
                                         <ImageIcon size={24} />
                                     </div>
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Photos</span>
+                                </button>
+
+                                <button
+                                    onClick={() => handleTabChange('stays')}
+                                    className="bg-amber-100 hover:bg-amber-200 p-4 rounded-2xl border border-amber-200 flex flex-col items-center gap-2 transition-all group"
+                                >
+                                    <div className="p-3 bg-amber-600 text-white rounded-xl shadow-lg ring-4 ring-amber-100 group-hover:scale-110 transition-transform">
+                                        <Home size={24} />
+                                    </div>
+                                    <span className="text-xs font-bold text-black uppercase tracking-wider">Homestays</span>
                                 </button>
                             </div>
 
@@ -3828,8 +3853,8 @@ const handlePrintBill = (order: any) => {
                         <div class="bill-info-row">
                             <strong>Time:</strong>
                             <span>${new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div >
-                    </div >
+                        </div>
+                    </div>
                     
                     <h3 class="section-title">📋 ORDER DETAILS</h3>
                     <div class="items">
@@ -3874,7 +3899,7 @@ const handlePrintBill = (order: any) => {
                             Generated: ${new Date().toLocaleString('en-IN')}
                         </p>
                     </div>
-                </div >
+                </div>
 
     <div class="button-container">
         <button class="btn btn-print" onclick="window.print()">
@@ -3884,9 +3909,9 @@ const handlePrintBill = (order: any) => {
             ✖️ CLOSE
         </button>
     </div>
-            </div >
-        </body >
-    </html >
+            </div>
+        </body>
+    </html>
     `);
     printWindow.document.close();
 };
@@ -4173,28 +4198,28 @@ function ScanStatsModal({ onClose, stats }: { onClose: () => void; stats: any[] 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 shrink-0">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'all' ? 'bg-gray-100 border-gray-400 ring-2 ring-gray-200' : 'bg-gray-50 border-gray-200 hover:border-gray-300'} `}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'all' ? 'bg-gray-100 border-gray-400 ring-2 ring-gray-200' : 'bg-gray-50 border-gray-200 hover:border-gray-300'} `}
                     >
                         <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
                         <p className="text-3xl font-bold text-gray-900 mt-1">{totalScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('app')}
-                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'app' ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-200' : 'bg-blue-50 border-blue-100 hover:border-blue-300'} `}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'app' ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-200' : 'bg-blue-50 border-blue-100 hover:border-blue-300'} `}
                     >
                         <p className="text-xs text-blue-600 uppercase tracking-wider font-bold">App / Web</p>
                         <p className="text-3xl font-bold text-blue-600 mt-1">{appScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('table')}
-                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'table' ? 'bg-green-100 border-green-400 ring-2 ring-green-200' : 'bg-green-50 border-green-100 hover:border-green-300'} `}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'table' ? 'bg-green-100 border-green-400 ring-2 ring-green-200' : 'bg-green-50 border-green-100 hover:border-green-300'} `}
                     >
                         <p className="text-xs text-green-600 uppercase tracking-wider font-bold">Table QR</p>
                         <p className="text-3xl font-bold text-green-600 mt-1">{tableScans}</p>
                     </button>
                     <button
                         onClick={() => setFilter('unique')}
-                        className={`p - 4 rounded - xl border transition - all text - left ${filter === 'unique' ? 'bg-purple-100 border-purple-400 ring-2 ring-purple-200' : 'bg-purple-50 border-purple-100 hover:border-purple-300'} `}
+                        className={`p-4 rounded-xl border transition-all text-left ${filter === 'unique' ? 'bg-purple-100 border-purple-400 ring-2 ring-purple-200' : 'bg-purple-50 border-purple-100 hover:border-purple-300'} `}
                     >
                         <p className="text-xs text-purple-600 uppercase tracking-wider font-bold">Unique Visitors</p>
                         <p className="text-3xl font-bold text-purple-600 mt-1">{uniqueUsers}</p>
@@ -4415,182 +4440,6 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
             <span className="text-[10px] font-bold mt-1">{label}</span>
         </button>
     );
-} function StaysManagementView() {
-    const homestays = useStore((state) => state.homestays);
-    const addHomestay = useStore((state) => state.addHomestay);
-    const updateHomestay = useStore((state) => state.updateHomestay);
-    const removeHomestay = useStore((state) => state.removeHomestay);
-
-    const [isAdding, setIsAdding] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        ownerName: '',
-        village: 'Kibber' as any,
-        phone: '',
-        image: ''
-    });
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            if (editingId) {
-                await updateHomestay(editingId, formData);
-                setEditingId(null);
-            } else {
-                await addHomestay(formData);
-                setIsAdding(false);
-            }
-            setFormData({ name: '', ownerName: '', village: 'Kibber', phone: '', image: '' });
-        } catch (err) {
-            alert('Operation failed');
-        }
-    };
-
-    return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div>
-                    <h2 className="text-2xl font-black text-gray-900">Homestay Directory</h2>
-                    <p className="text-gray-500 text-sm">Manage village homestays for direct customer connection</p>
-                </div>
-                <button
-                    onClick={() => { setIsAdding(true); setEditingId(null); }}
-                    className="bg-black text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-800 transition-all"
-                >
-                    <Plus size={18} /> Add Homestay
-                </button>
-            </div>
-
-            {(isAdding || editingId) && (
-                <div className="bg-white p-8 rounded-3xl border border-black/5 shadow-xl animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-bold font-serif">{editingId ? 'Edit Homestay' : 'New Village Homestay'}</h3>
-                        <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="p-2 bg-gray-50 rounded-full hover:bg-gray-100"><X size={20} /></button>
-                    </div>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Stay Name</label>
-                            <input
-                                required
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="e.g. Tenzin's Home / Kibber Heights"
-                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:bg-white focus:border-amber-500 outline-none transition-all"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Owner Name</label>
-                            <input
-                                required
-                                value={formData.ownerName}
-                                onChange={e => setFormData({ ...formData, ownerName: e.target.value })}
-                                placeholder="Full Name"
-                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:bg-white focus:border-amber-500 outline-none transition-all"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Village</label>
-                            <select
-                                value={formData.village}
-                                onChange={e => setFormData({ ...formData, village: e.target.value as any })}
-                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:bg-white focus:border-amber-500 outline-none transition-all"
-                            >
-                                <option value="Kibber">Kibber</option>
-                                <option value="Chicham">Chicham</option>
-                                <option value="Kee">Kee</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Phone Number</label>
-                            <input
-                                required
-                                type="tel"
-                                value={formData.phone}
-                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                placeholder="9816xxxxxx"
-                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:bg-white focus:border-amber-500 outline-none transition-all"
-                            />
-                        </div>
-                        <div className="md:col-span-2 space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Homestay Photo URL (Optional)</label>
-                            <div className="flex gap-4">
-                                <input
-                                    value={formData.image}
-                                    onChange={e => setFormData({ ...formData, image: e.target.value })}
-                                    placeholder="https://..."
-                                    className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 focus:bg-white focus:border-amber-500 outline-none transition-all"
-                                />
-                                <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
-                                    {formData.image && <img src={formData.image} className="w-full h-full object-cover" />}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="md:col-span-2 flex gap-4 pt-4">
-                            <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-widest">
-                                {editingId ? 'Update Stay' : 'Save Homestay'}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => { setIsAdding(false); setEditingId(null); }}
-                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black py-4 rounded-xl transition-all uppercase tracking-widest"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {homestays.map(stay => (
-                    <div key={stay.id} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
-                        <div className="flex items-start gap-4">
-                            <div className="w-20 h-20 rounded-2xl bg-amber-50 overflow-hidden shrink-0 border border-amber-100">
-                                {stay.image ? (
-                                    <img src={stay.image} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-amber-200"><Home size={32} /></div>
-                                )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-lg font-bold text-gray-900 truncate">{stay.name}</h4>
-                                <p className="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">{stay.village}</p>
-                                <div className="flex items-center gap-4 text-gray-500 text-xs">
-                                    <span className="flex items-center gap-1"><Users size={12} /> {stay.ownerName}</span>
-                                    <span className="flex items-center gap-1"><Phone size={12} /> {stay.phone}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex gap-2 pt-6 mt-6 border-t border-gray-50 group-hover:bg-gray-50/50 -mx-6 -mb-6 p-6 transition-colors">
-                            <button
-                                onClick={() => {
-                                    setEditingId(stay.id);
-                                    setFormData(stay);
-                                    setIsAdding(false);
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }}
-                                className="flex-1 h-10 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => { if (confirm('Delete homestay directory listing?')) removeHomestay(stay.id); }}
-                                className="flex-1 h-10 rounded-xl bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100 transition-colors"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {homestays.length === 0 && !isAdding && (
-                <div className="text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
-                    <p className="text-gray-400 font-serif italic text-lg">No homestays listed yet. Add your first village home!</p>
-                </div>
-            )}
-        </div>
-    );
 }
+
 
