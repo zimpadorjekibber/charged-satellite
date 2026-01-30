@@ -188,7 +188,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-5xl font-serif font-black text-amber-500 mb-6">Welcome to TashiZom Kibber</h2>
             <div className="w-24 h-1 bg-amber-600 mx-auto mb-8 rounded-full" />
             <p className="text-gray-300 text-lg md:text-xl leading-relaxed font-light">
-              Located at the heart of <span className="text-amber-400 font-bold">Kibber Village</span> at 14,000 feet,
+              Located at the heart of <span className="text-amber-400 font-bold">Kibber Village</span> at 4,270 Meters (14,009 Feet),
               TashiZom is Spiti Valley's premier multi-cuisine destination. We believe food is a journey, and every dish
               we serve carries the essence of the high Himalayas.
             </p>
@@ -816,7 +816,7 @@ export default function Home() {
           </span>
           <div className="flex gap-8 text-[10px] text-gray-500 font-mono uppercase tracking-widest">
             <span>Spiti Valley</span>
-            <span>14,000 Feet</span>
+            <span>4,270 Meters</span>
             <span>Est. 1998</span>
           </div>
         </div>
