@@ -406,20 +406,22 @@ export const useStore = create<AppState>()(
                     }
                 }));
 
-                // Landing Page Photos (Single Documents)
-                unsubscribers.push(onSnapshot(doc(db, 'settings', 'landing_photos'), (doc) => {
-                    if (doc.exists()) {
-                        set({ landingPhotos: { ...get().landingPhotos, ...doc.data() } });
-                    }
+                // Landing Page Photos: Load individual fields from collection to avoid 1MB limit
+                unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'fields'), (snap) => {
+                    const fieldsData: any = {};
+                    snap.docs.forEach(d => {
+                        fieldsData[d.id] = d.data().url || d.data().data;
+                    });
+                    set({ landingPhotos: { ...get().landingPhotos, ...fieldsData } });
                 }));
 
-                // Landing Gallery: Prime Location (Stored as collection to avoid 1MB limit)
+                // Landing Gallery: Prime Location (Stored as collection)
                 unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'location'), (snap) => {
                     const photos = snap.docs.map(d => d.data().url);
                     set({ landingPhotos: { ...get().landingPhotos, location: photos } });
                 }));
 
-                // Landing Gallery: Climate/Winter (Stored as collection to avoid 1MB limit)
+                // Landing Gallery: Climate/Winter (Stored as collection)
                 unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'climate'), (snap) => {
                     const photos = snap.docs.map(d => d.data().url);
                     set({ landingPhotos: { ...get().landingPhotos, climate: photos } });
@@ -840,12 +842,13 @@ export const useStore = create<AppState>()(
                     return;
                 }
 
-                // Normal handling for single strings (Map, Doc, Chef, etc.)
-                const settingsRef = doc(db, 'settings', 'landing_photos');
-                const current = get().landingPhotos;
-                const updated = { ...current, [section]: data };
-                await setDoc(settingsRef, updated);
-                set({ landingPhotos: updated });
+                // HANDLE SINGLE PHOTOS (Map, Doc, Chef, etc.)
+                // We save each to its OWN document to ensure each has a full 1MB budget
+                const fieldRef = doc(db, 'settings', 'landing_photos', 'fields', section);
+                await setDoc(fieldRef, { url: data, updatedAt: new Date().toISOString() });
+
+                // Optimistic UI update
+                set({ landingPhotos: { ...get().landingPhotos, [section]: data } });
             },
 
             updateContactSettings: async (contact: ContactSettings) => {
