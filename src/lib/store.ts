@@ -406,11 +406,23 @@ export const useStore = create<AppState>()(
                     }
                 }));
 
-                // Landing Page Photos
+                // Landing Page Photos (Single Documents)
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'landing_photos'), (doc) => {
                     if (doc.exists()) {
                         set({ landingPhotos: { ...get().landingPhotos, ...doc.data() } });
                     }
+                }));
+
+                // Landing Gallery: Prime Location (Stored as collection to avoid 1MB limit)
+                unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'location'), (snap) => {
+                    const photos = snap.docs.map(d => d.data().url);
+                    set({ landingPhotos: { ...get().landingPhotos, location: photos } });
+                }));
+
+                // Landing Gallery: Climate/Winter (Stored as collection to avoid 1MB limit)
+                unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'climate'), (snap) => {
+                    const photos = snap.docs.map(d => d.data().url);
+                    set({ landingPhotos: { ...get().landingPhotos, climate: photos } });
                 }));
 
                 set({ isListening: true, unsubscribers });
@@ -799,6 +811,36 @@ export const useStore = create<AppState>()(
             },
 
             updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => {
+                // Special handling for galleries (storing as separate docs to avoid 1MB Firestore limit)
+                if (section === 'location' || section === 'climate') {
+                    if (Array.isArray(data)) {
+                        const current = get().landingPhotos[section] || [];
+
+                        // If we are ADDING (data length > current length)
+                        if (data.length > current.length) {
+                            const newUrl = data[data.length - 1]; // The newly added one
+                            await addDoc(collection(db, 'settings', 'landing_photos', section), {
+                                url: newUrl,
+                                createdAt: new Date().toISOString()
+                            });
+                        }
+                        // If we are REMOVING (data length < current length)
+                        else if (data.length < current.length) {
+                            const removedUrl = current.find(url => !data.includes(url));
+                            if (removedUrl) {
+                                const q = query(collection(db, 'settings', 'landing_photos', section), orderBy('createdAt', 'desc'));
+                                const snap = await getDocs(q);
+                                const docToDelete = snap.docs.find(d => d.data().url === removedUrl);
+                                if (docToDelete) {
+                                    await deleteDoc(doc(db, 'settings', 'landing_photos', section, docToDelete.id));
+                                }
+                            }
+                        }
+                    }
+                    return;
+                }
+
+                // Normal handling for single strings (Map, Doc, Chef, etc.)
                 const settingsRef = doc(db, 'settings', 'landing_photos');
                 const current = get().landingPhotos;
                 const updated = { ...current, [section]: data };
@@ -827,7 +869,7 @@ export const useStore = create<AppState>()(
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const MAX_DIM = 1200; // Good quality but small enough for Base64
+                        const MAX_DIM = 1000; // Efficient size for mobile/web viewing
 
                         if (width > height) {
                             if (width > MAX_DIM) {
@@ -846,8 +888,8 @@ export const useStore = create<AppState>()(
                         const ctx = canvas.getContext('2d');
                         ctx?.drawImage(img, 0, 0, width, height);
 
-                        // Convert to Base64 with 70% quality to keep string length small
-                        const base64String = canvas.toDataURL('image/jpeg', 0.7);
+                        // Convert to Base64 with 60% quality to keep strings small
+                        const base64String = canvas.toDataURL('image/jpeg', 0.6);
                         console.log('✅ ULTRA JUGAD V2: Success! Length:', base64String.length);
 
                         if (saveToGallery) {
