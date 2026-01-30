@@ -419,14 +419,14 @@ export default function Home() {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
                   Our Legacy
                 </div>
-                <h2 className="text-4xl md:text-6xl font-serif font-black text-white mb-6 leading-tight">
+                <h2 className="text-4xl md:text-6xl font-serif font-black text-gray-900 mb-6 leading-tight">
                   A Story Carved <br />
-                  <span className="text-amber-500 italic">In High Altitude</span>
+                  <span className="text-amber-600 italic">In High Altitude</span>
                 </h2>
-                <p className="text-gray-300 text-lg leading-relaxed">
-                  Our journey began in <span className="text-white font-bold underline decoration-amber-500 decoration-2 underline-offset-4">1998</span>.
-                  Originally registered as <span className="text-amber-200 italic font-bold">'Resang Hotel'</span> with the Himachal Tourism Department,
-                  we later evolved into <span className="text-amber-500 font-black">TashiZom</span>. Though heavy Himalayan rains once took our rooms,
+                <p className="text-gray-700 text-xl md:text-2xl leading-relaxed">
+                  Our journey began in <span className="text-tashi-primary font-bold underline decoration-amber-500 decoration-2 underline-offset-4">1998</span>.
+                  Originally registered as <span className="text-amber-600 italic font-bold">'Resang Hotel'</span> with the Himachal Tourism Department,
+                  we later evolved into <span className="text-tashi-primary font-black">TashiZom</span>. Though heavy Himalayan rains once took our rooms,
                   leaving only our legendary restaurant, we are currently rebuilding. Soon, you will again be able
                   to wake up to the clouds in our brand new guest rooms.
                 </p>
@@ -440,17 +440,17 @@ export default function Home() {
               >
                 <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
                   <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The Civilization</h4>
-                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
-                    Kibber is more than a village; it is a <span className="text-white font-bold">Living Civilization</span> of about 500 souls.
+                  <p className="text-gray-700 text-base leading-relaxed font-semibold">
+                    Kibber is more than a village; it is a <span className="text-tashi-primary font-bold">Living Civilization</span> of about 500 souls.
                     From tantriks and blacksmiths to farmers and drummers, we are a self-sustaining community
                     preserving traditions for centuries.
                   </p>
                 </div>
                 <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
                   <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The First Road</h4>
-                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
+                  <p className="text-gray-700 text-base leading-relaxed font-semibold">
                     History remembers that when the first roads were carved from Manali,
-                    <span className="text-white font-bold"> Kibber</span> was connected right after Rangrik—long before Kaza.
+                    <span className="text-tashi-primary font-bold"> Kibber</span> was connected right after Rangrik—long before Kaza.
                     For decades, we stood as Asia's highest motorable village.
                   </p>
                 </div>
@@ -471,29 +471,29 @@ export default function Home() {
                 <div className="space-y-6">
                   <div className="flex gap-4">
                     <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-300 text-base">
+                    <p className="text-gray-800 text-lg">
                       Kibber Wildlife Sanctuary is a global hub for wildlife videography.
-                      Giants like <span className="text-amber-400 font-medium">NetGeo, BBC, and Netflix</span> visit annually
-                      to film the elusive <span className="text-white font-bold">Snow Leopard</span>.
+                      Giants like <span className="text-amber-600 font-bold">NetGeo, BBC, and Netflix</span> visit annually
+                      to film the elusive <span className="text-tashi-primary font-bold">Snow Leopard</span>.
                     </p>
                   </div>
                   <div className="flex gap-4">
                     <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-300 text-base">
-                      Before roads stretched further, the legendary <span className="text-white font-bold">Parangla Pass</span> trek to Leh Ladakh
+                    <p className="text-gray-800 text-lg">
+                      Before roads stretched further, the legendary <span className="text-tashi-primary font-bold">Parangla Pass</span> trek to Leh Ladakh
                       started right here at our doorstep in Kibber.
                     </p>
                   </div>
                   <div className="flex gap-4">
                     <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-300 text-base">
-                      For those seeking a climb, the summit of <span className="text-white font-bold">Mount Kanamo (5000m+)</span>
+                    <p className="text-gray-800 text-lg">
+                      For those seeking a climb, the summit of <span className="text-tashi-primary font-bold">Mount Kanamo (5000m+)</span>
                       still finds its path starting through the village of Kibber.
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-white/10 italic text-gray-500 text-sm">
+                <div className="mt-8 pt-8 border-t border-gray-200 italic text-gray-700 text-base font-bold">
                   "While modern tourism shifts to the towns, the true heart and history of Spiti still beat in Kibber."
                 </div>
               </motion.div>
@@ -578,7 +578,7 @@ export default function Home() {
                     <h3 className="text-3xl md:text-4xl font-black text-white font-serif uppercase tracking-tight">Chef Lalit Kumar</h3>
                     <p className="text-pink-500 font-bold text-sm uppercase tracking-[0.2em]">Master of Himalayan Tastes</p>
                   </div>
-                  <p className="text-gray-300 text-lg leading-relaxed italic font-medium">
+                  <p className="text-gray-800 text-xl leading-relaxed italic font-bold">
                     "Chef Lalit has been the pillar of TashiZom's kitchen for over two decades. His passion for authentic Spitian flavors and his mastery over multi-cuisine dishes are what make every meal here a legendary experience."
                   </p>
                   <div className="pt-6 border-t border-white/10 flex items-center gap-6">
@@ -626,8 +626,8 @@ export default function Home() {
                     </div>
                     <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Chicham Bridge</h3>
                   </div>
-                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
-                    Suspended at <span className="text-amber-400 font-bold">13,596 feet</span>, Asia's highest bridge connects Kibber to Chicham village. This engineering marvel spans a deep gorge, offering breathtaking views of the Spiti River below and the starkly beautiful mountains around.
+                  <p className="text-gray-800 text-base leading-relaxed font-bold">
+                    Suspended at <span className="text-amber-600 font-black">13,596 feet</span>, Asia's highest bridge connects Kibber to Chicham village. This engineering marvel spans a deep gorge, offering breathtaking views of the Spiti River below and the starkly beautiful mountains around.
                   </p>
                   <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
                     <MapPin size={14} /> 10 mins from TashiZom
@@ -655,8 +655,8 @@ export default function Home() {
                     </div>
                     <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Kee Monastery</h3>
                   </div>
-                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
-                    A <span className="text-amber-400 font-bold">1000-year-old</span> Tibetan Buddhist monastery that looks like a fortress on a hill. It is the largest in Spiti, housing priceless murals, thangkas, and ancient scriptures. A center for spiritual learning that feels frozen in time.
+                  <p className="text-gray-800 text-base leading-relaxed font-bold">
+                    A <span className="text-amber-600 font-black">1000-year-old</span> Tibetan Buddhist monastery that looks like a fortress on a hill. It is the largest in Spiti, housing priceless murals, thangkas, and ancient scriptures. A center for spiritual learning that feels frozen in time.
                   </p>
                   <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
                     <MapPin size={14} /> 15 mins from TashiZom
@@ -857,13 +857,13 @@ export default function Home() {
             <div className="max-w-6xl mx-auto">
               <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
                 <div className="text-center md:text-left">
-                  <h2 className="text-3xl md:text-4xl font-serif font-black text-white">Guest Stories</h2>
-                  <p className="text-gray-400 mt-2">Hear what travelers say about us</p>
+                  <h2 className="text-3xl md:text-4xl font-serif font-black text-gray-900">Guest Stories</h2>
+                  <p className="text-gray-700 mt-2 font-bold italic text-lg">"Hear what travelers say about us"</p>
                 </div>
-                <div className="flex items-center gap-4 bg-white/5 px-6 py-3 rounded-2xl border border-white/10">
+                <div className="flex items-center gap-4 bg-amber-500/10 px-6 py-3 rounded-2xl border border-amber-500/20">
                   <Star className="text-amber-500 fill-amber-500" size={24} />
-                  <span className="text-2xl font-bold text-white">4.9 / 5</span>
-                  <span className="text-gray-500 text-sm">({reviews.length} reviews)</span>
+                  <span className="text-2xl font-bold text-gray-900">4.9 / 5</span>
+                  <span className="text-gray-600 text-sm font-bold">({reviews.length} reviews)</span>
                 </div>
               </div>
 
@@ -882,14 +882,14 @@ export default function Home() {
                         <Star key={star} size={14} className={star < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-600'} />
                       ))}
                     </div>
-                    <p className="text-gray-300 text-sm italic mb-6 leading-relaxed">"{review.comment}"</p>
+                    <p className="text-gray-800 text-base italic mb-6 leading-relaxed font-bold">"{review.comment}"</p>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
                         {review.customerName?.charAt(0) || 'G'}
                       </div>
                       <div>
-                        <h4 className="text-white text-sm font-bold">{review.customerName || 'Happy Guest'}</h4>
-                        <p className="text-gray-500 text-xs">Verified Review</p>
+                        <h4 className="text-gray-900 text-base font-black">{review.customerName || 'Happy Guest'}</h4>
+                        <p className="text-gray-600 text-xs font-bold uppercase tracking-wider">Verified Review</p>
                       </div>
                     </div>
                   </motion.div>
