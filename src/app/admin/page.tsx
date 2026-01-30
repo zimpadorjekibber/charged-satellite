@@ -26,10 +26,9 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
-import { collection, getDocs, query, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { collection, getDocs, query, limit } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
 
 export default function AdminPage() {
     return (
@@ -1075,7 +1074,12 @@ function AdminDashboard() {
 
                     {/* REVIEWS VIEW (New) */}
                     {activeTab === 'reviews' && (
-                        <ReviewsView />
+                        <motion.div
+                            key="reviews"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                        >
+                            <ReviewsView />
+                        </motion.div>
                     )}
 
                     {/* GEAR MANAGEMENT VIEW (New) */}
@@ -2607,7 +2611,7 @@ function AdminDashboard() {
                                         </div>
                                     )
                                 }
-                            </div >
+                            </div>
 
                             {/* EDIT ITEM MODAL */}
                             {
@@ -2775,12 +2779,12 @@ function AdminDashboard() {
                                     </div>
                                 )
                             }
-                        </motion.div >
+                        </motion.div>
                     )
                     }
-                </AnimatePresence >
-            </div >
-        </div >
+                </AnimatePresence>
+            </div>
+        </div>
     );
 }
 
@@ -2808,14 +2812,23 @@ function StaysManagementView() {
 
     const handleSave = async () => {
         if (!formData.name || !formData.phone) return alert('Name and Phone are required!');
-        if (editingId) {
-            await updateHomestay(editingId, formData);
-            setEditingId(null);
-        } else {
-            await addHomestay(formData);
-            setIsAdding(false);
+
+        // Clean data for Firestore (remove ID if present)
+        const { id, ...dataToSave } = formData as any;
+
+        try {
+            if (editingId) {
+                await updateHomestay(editingId, dataToSave);
+                setEditingId(null);
+            } else {
+                await addHomestay(dataToSave);
+                setIsAdding(false);
+            }
+            setFormData({ name: '', ownerName: '', phone: '', village: 'Kibber', image: '', available: true });
+        } catch (err) {
+            console.error('Error saving homestay:', err);
+            alert('Failed to save homestay. Please check console for details.');
         }
-        setFormData({ name: '', ownerName: '', phone: '', village: 'Kibber', image: '', available: true });
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2904,46 +2917,72 @@ function StaysManagementView() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {homestays.map(stay => (
-                    <div key={stay.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center overflow-hidden">
-                                {stay.image ? <img src={stay.image} className="w-full h-full object-cover" /> : <Home className="text-amber-500" />}
+                    <div key={stay.id} className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all group">
+                        <div className="aspect-video bg-gray-100 relative">
+                            {stay.image ? (
+                                <img src={stay.image} className="w-full h-full object-cover" alt={stay.name} />
+                            ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
+                                    <Home size={40} />
+                                    <span className="text-[10px] mt-2 font-bold uppercase tracking-widest">No Image</span>
+                                </div>
+                            )}
+                            <div className="absolute top-4 left-4">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg ${stay.available ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                                    {stay.available ? 'Available' : 'Sold Out'}
+                                </span>
                             </div>
-                            <div>
-                                <h4 className="font-bold text-lg">{stay.name}</h4>
-                                <span className="text-[10px] font-black uppercase bg-gray-100 px-2 py-0.5 rounded-full">{stay.village}</span>
+                            <div className="absolute top-4 right-4 group-hover:opacity-100 opacity-0 transition-opacity">
+                                <button
+                                    onClick={() => { if (confirm('Delete homestay?')) removeHomestay(stay.id); }}
+                                    className="p-2 bg-white/90 backdrop-blur rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg"
+                                >
+                                    <Trash size={16} />
+                                </button>
                             </div>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs text-gray-500">Owner: {stay.ownerName}</p>
-                            <p className="text-sm font-bold flex items-center gap-2"><Phone size={14} className="text-green-500" /> {stay.phone}</p>
-                        </div>
-                        <div className="flex gap-2 pt-2 border-t border-gray-50">
-                            <button
-                                onClick={() => {
-                                    setEditingId(stay.id);
-                                    setFormData(stay);
-                                }}
-                                className="flex-1 p-2 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => { if (confirm('Delete homestay?')) removeHomestay(stay.id); }}
-                                className="flex-1 p-2 rounded-lg bg-red-50 text-red-600 font-bold text-xs"
-                            >
-                                Delete
-                            </button>
+                        <div className="p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">{stay.village} Village</p>
+                                    <h3 className="text-xl font-bold text-gray-900 font-serif">{stay.name}</h3>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setEditingId(stay.id);
+                                        setFormData(stay);
+                                    }}
+                                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-900 transition-colors"
+                                >
+                                    <Pencil size={18} />
+                                </button>
+                            </div>
+                            <div className="space-y-2 border-t border-gray-100 pt-4 mt-4">
+                                <p className="text-sm text-gray-600 font-medium flex items-center gap-2"><Users size={14} className="text-gray-400" /> {stay.ownerName}</p>
+                                <p className="text-sm font-bold flex items-center gap-2 text-gray-900"><Phone size={14} className="text-green-500" /> {stay.phone}</p>
+                            </div>
                         </div>
                     </div>
                 ))}
+
+                {homestays.length === 0 && !isAdding && (
+                    <div className="col-span-full py-20 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+                        <Home size={48} className="mx-auto text-gray-300 mb-4" />
+                        <p className="text-gray-400 font-serif italic text-lg">No homestays listed yet. Add your first village home!</p>
+                        <button onClick={() => setIsAdding(true)} className="text-amber-600 font-bold mt-2 hover:underline">Add Homestay</button>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 function GearManagementView() {
-    const { gearItems, addGearItem, updateGearItem, removeGearItem, reorderGearItems } = useStore();
+    const gearItems = useStore((state) => state.gearItems);
+    const addGearItem = useStore((state) => state.addGearItem);
+    const updateGearItem = useStore((state) => state.updateGearItem);
+    const removeGearItem = useStore((state) => state.removeGearItem);
+    const reorderGearItems = useStore((state) => state.reorderGearItems);
     const [isAdding, setIsAdding] = useState(false);
     const [editingGear, setEditingGear] = useState<any>(null);
 
