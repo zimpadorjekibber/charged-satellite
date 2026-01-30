@@ -1628,6 +1628,17 @@ function AdminDashboard() {
                                                         >
                                                             KEE PHOTO
                                                         </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('chefPhoto', manualUploadUrl);
+                                                                    alert('✅ CHEF PHOTO SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-pink-600 hover:bg-pink-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-pink-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            CHEF PHOTO
+                                                        </button>
                                                     </div>
 
                                                     <button

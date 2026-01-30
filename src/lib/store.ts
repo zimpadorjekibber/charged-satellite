@@ -174,6 +174,7 @@ interface AppState {
         registrationDoc?: string;
         chichamPhoto?: string;
         keePhoto?: string;
+        chefPhoto?: string;
     };
 
 
@@ -223,7 +224,7 @@ interface AppState {
     updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
 
     login: (username: string, password: string) => Promise<boolean>;
-    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto', data: string[] | string) => Promise<void>;
+    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
@@ -271,9 +272,9 @@ export const useStore = create<AppState>()(
             landingPhotos: { location: [], climate: [], customMap: '', registrationDoc: '' },
             customerDetails: null,
             contactInfo: {
-                phone: '+919876543210',
-                secondaryPhone: '+919418612295',
-                whatsapp: '+919876543210',
+                phone: '+91 94186 12295',
+                secondaryPhone: '+91 97363 30290',
+                whatsapp: '+91 94186 12295',
                 mapsLocation: '32.329112,78.0080953'
             },
 
@@ -797,7 +798,7 @@ export const useStore = create<AppState>()(
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
             },
 
-            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto', data: string[] | string) => {
+            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => {
                 const settingsRef = doc(db, 'settings', 'landing_photos');
                 const current = get().landingPhotos;
                 const updated = { ...current, [section]: data };
