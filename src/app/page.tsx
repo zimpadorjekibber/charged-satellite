@@ -1,7 +1,8 @@
 'use client';
 
+import LocalMapGuide from '@/app/customer/components/LocalMapGuide';
 import Link from 'next/link';
-import { ArrowRight, MapPin, Clock, Star, Users, Utensils, Newspaper, ShoppingBag, PlayCircle, Info, X } from 'lucide-react';
+import { ArrowLeftRight, ArrowRight, MapPin, Clock, Star, Users, Utensils, Newspaper, ShoppingBag, PlayCircle, Info, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
@@ -305,6 +306,30 @@ export default function Home() {
               </div>
             </motion.div>
           )}
+
+          {/* --- INTERACTIVE ROAD LOOP GUIDE --- */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-20"
+          >
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 font-mono text-[10px] text-blue-400 uppercase tracking-widest">
+                Interactive Loop
+              </div>
+              <h3 className="text-3xl md:text-5xl font-serif font-black text-white leading-tight">
+                Smart <span className="text-blue-500 italic">Travel</span> Guide
+              </h3>
+              <p className="text-gray-400 text-sm mt-4 font-medium max-w-2xl mx-auto">
+                Discover the road connectivity between Kee, TashiZom, and Chicham. Play the guide to see the exact loop!
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto rounded-[2rem] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(59,130,246,0.1)]">
+              <LocalMapGuide autoPlay={false} />
+            </div>
+          </motion.div>
 
           {/* Hindi Context for Local SEO */}
           <motion.div
