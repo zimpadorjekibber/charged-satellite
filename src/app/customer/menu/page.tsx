@@ -2298,35 +2298,45 @@ export default function MenuPage() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                             {gearItems
-                                .filter(item => !['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw)))
+                                .filter(item => {
+                                    if (item.category) return item.category === 'wear';
+                                    // Fallback for older items without category field
+                                    return !['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                                })
                                 .map((item: any) => (
                                     <GearItemCard key={item.id} {...item} />
                                 ))}
                         </div>
 
                         {/* 2. Village Harvest / Spices */}
-                        {gearItems.some(item => ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw))) && (
-                            <div className="mt-16">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <Sparkles size={20} className="text-green-500" />
-                                    <h2 className="text-xl font-black font-serif uppercase tracking-widest text-[#1A1A1A]">Village Harvest</h2>
-                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-green-500/20 to-transparent ml-2" />
+                        {gearItems.some(item => {
+                            if (item.category) return item.category === 'harvest';
+                            return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                        }) && (
+                                <div className="mt-16">
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <Sparkles size={20} className="text-green-500" />
+                                        <h2 className="text-xl font-black font-serif uppercase tracking-widest text-[#1A1A1A]">Village Harvest</h2>
+                                        <div className="flex-1 h-[1px] bg-gradient-to-r from-green-500/20 to-transparent ml-2" />
+                                    </div>
+                                    <p className="text-gray-500 text-xs font-bold mb-6 italic leading-relaxed">
+                                        "Hand-harvested by local villagers. We help you source these authentic treasures directly from our mountains."
+                                    </p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {gearItems
+                                            .filter(item => {
+                                                if (item.category) return item.category === 'harvest';
+                                                return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                                            })
+                                            .map((item: any) => (
+                                                <div key={item.id} className="relative group">
+                                                    <div className="absolute -inset-1 bg-gradient-to-br from-green-500/20 to-amber-500/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    <GearItemCard {...item} />
+                                                </div>
+                                            ))}
+                                    </div>
                                 </div>
-                                <p className="text-gray-500 text-xs font-bold mb-6 italic leading-relaxed">
-                                    "Hand-harvested by local villagers. We help you source these authentic treasures directly from our mountains."
-                                </p>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {gearItems
-                                        .filter(item => ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw)))
-                                        .map((item: any) => (
-                                            <div key={item.id} className="relative group">
-                                                <div className="absolute -inset-1 bg-gradient-to-br from-green-500/20 to-amber-500/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <GearItemCard {...item} />
-                                            </div>
-                                        ))}
-                                </div>
-                            </div>
-                        )}
+                            )}
                     </section>
                 )}
 

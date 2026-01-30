@@ -122,6 +122,7 @@ export interface GearItem {
     name: string;
     price: number;
     badge: string;
+    category?: 'wear' | 'harvest'; // New: To distinguish between clothing and spices/harvest
     available: boolean;
     items: GearImage[];
     sortOrder?: number;

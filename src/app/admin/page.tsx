@@ -2995,6 +2995,7 @@ function GearManagementView() {
             name: formData.get('name') as string,
             price: parseFloat(formData.get('price') as string),
             badge: formData.get('badge') as string,
+            category: formData.get('category') as 'wear' | 'harvest',
             available: formData.get('available') === 'on',
             items: [
                 {
@@ -3054,9 +3055,12 @@ function GearManagementView() {
                                     <span className="bg-red-500 text-white font-bold py-1 px-4 rounded-full text-sm">OUT OF STOCK</span>
                                 </div>
                             )}
-                            <div className="absolute top-4 left-4">
+                            <div className="absolute top-4 left-4 flex flex-col gap-2">
                                 <span className="bg-tashi-accent text-tashi-dark text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider">
                                     {item.badge}
+                                </span>
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider ${item.category === 'harvest' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'}`}>
+                                    {item.category === 'harvest' ? 'Spices / Harvest' : 'Clothing / Wear'}
                                 </span>
                             </div>
                         </div>
@@ -3115,10 +3119,17 @@ function GearManagementView() {
                             </div>
 
                             <div className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="space-y-1">
                                         <label className="text-xs font-bold text-gray-500 uppercase">Item Name</label>
                                         <input name="name" required defaultValue={editingGear?.name} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-tashi-accent outline-none" placeholder="e.g. Spitian Ear Warmer" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase">Category</label>
+                                        <select name="category" defaultValue={editingGear?.category || 'wear'} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-tashi-accent outline-none">
+                                            <option value="wear">Clothing / Gear</option>
+                                            <option value="harvest">Local Spices / Harvest</option>
+                                        </select>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-xs font-bold text-gray-500 uppercase">Price (₹)</label>
