@@ -1664,6 +1664,15 @@ function AdminDashboard() {
                                             {(landingPhotos?.location || []).map((url: string, idx: number) => (
                                                 <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
                                                     <img src={url} alt="" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Add caption..."
+                                                            defaultValue={landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                            onBlur={(e) => updateLandingPhotoCaption('location', url, e.target.value)}
+                                                            className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                        />
+                                                    </div>
                                                     <button
                                                         type="button"
                                                         onClick={() => {
@@ -1711,6 +1720,15 @@ function AdminDashboard() {
                                             {(landingPhotos?.climate || []).map((url: string, idx: number) => (
                                                 <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
                                                     <img src={url} alt="" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Add caption..."
+                                                            defaultValue={landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                            onBlur={(e) => updateLandingPhotoCaption('climate', url, e.target.value)}
+                                                            className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                        />
+                                                    </div>
                                                     <button
                                                         type="button"
                                                         onClick={() => {

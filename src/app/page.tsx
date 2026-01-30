@@ -207,8 +207,19 @@ export default function Home() {
                 {landingPhotos?.location?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
                     {landingPhotos.location.map((url: string, i: number) => (
-                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center">
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
+                        onClick={() => setFullScreenMedia({ url, type: 'image', title: landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || 'Prime Location' })}
+                      >
                         <img src={url} alt="" className="w-full h-full object-cover" />
+                        {landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] && (
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                            <span className="text-[8px] text-white font-bold leading-tight line-clamp-2">
+                              {landingPhotos.locationCaptions[btoa(url).substring(0, 100)]}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -225,9 +236,13 @@ export default function Home() {
                 {menu.filter((m: any) => m.isChefSpecial && m.image).length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
                     {menu.filter((m: any) => m.isChefSpecial && m.image).map((item: any, i: number) => (
-                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative">
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative cursor-zoom-in group/food"
+                        onClick={() => setFullScreenMedia({ url: item.image, type: 'image', title: item.name })}
+                      >
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 flex items-end p-1">
+                        <div className="absolute inset-0 bg-black/40 group-hover/food:bg-black/60 transition-colors flex items-end p-1">
                           <span className="text-[7px] text-white font-bold leading-tight">{item.name}</span>
                         </div>
                       </div>
@@ -248,8 +263,19 @@ export default function Home() {
                 {landingPhotos?.climate?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
                     {landingPhotos.climate.map((url: string, i: number) => (
-                      <div key={i} className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center">
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
+                        onClick={() => setFullScreenMedia({ url, type: 'image', title: landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || 'Winter Condition' })}
+                      >
                         <img src={url} alt="" className="w-full h-full object-cover" />
+                        {landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] && (
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                            <span className="text-[8px] text-white font-bold leading-tight line-clamp-3">
+                              {landingPhotos.climateCaptions[btoa(url).substring(0, 100)]}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

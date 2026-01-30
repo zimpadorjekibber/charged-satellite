@@ -175,6 +175,8 @@ interface AppState {
         chichamPhoto?: string;
         keePhoto?: string;
         chefPhoto?: string;
+        locationCaptions?: Record<string, string>;
+        climateCaptions?: Record<string, string>;
     };
 
 
@@ -225,6 +227,7 @@ interface AppState {
 
     login: (username: string, password: string) => Promise<boolean>;
     updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => Promise<void>;
+    updateLandingPhotoCaption: (section: 'location' | 'climate', photoUrl: string, caption: string) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
@@ -269,7 +272,14 @@ export const useStore = create<AppState>()(
                 itemNameColor: '#1A1A1A',
                 accentColor: '#DAA520'
             },
-            landingPhotos: { location: [], climate: [], customMap: '', registrationDoc: '' },
+            landingPhotos: {
+                location: [],
+                climate: [],
+                customMap: '',
+                registrationDoc: '',
+                locationCaptions: {},
+                climateCaptions: {}
+            },
             customerDetails: null,
             contactInfo: {
                 phone: '+91 94186 12295',
@@ -409,10 +419,23 @@ export const useStore = create<AppState>()(
                 // Landing Page Photos: Load individual fields from collection to avoid 1MB limit
                 unsubscribers.push(onSnapshot(collection(db, 'settings', 'landing_photos', 'fields'), (snap) => {
                     const fieldsData: any = {};
+                    let locationCaptions = {};
+                    let climateCaptions = {};
+
                     snap.docs.forEach(d => {
-                        fieldsData[d.id] = d.data().url || d.data().data;
+                        if (d.id === 'locationCaptions') locationCaptions = d.data();
+                        else if (d.id === 'climateCaptions') climateCaptions = d.data();
+                        else fieldsData[d.id] = d.data().url || d.data().data;
                     });
-                    set({ landingPhotos: { ...get().landingPhotos, ...fieldsData } });
+
+                    set({
+                        landingPhotos: {
+                            ...get().landingPhotos,
+                            ...fieldsData,
+                            locationCaptions,
+                            climateCaptions
+                        }
+                    });
                 }));
 
                 // Landing Gallery: Prime Location (Stored as collection)
@@ -849,6 +872,17 @@ export const useStore = create<AppState>()(
 
                 // Optimistic UI update
                 set({ landingPhotos: { ...get().landingPhotos, [section]: data } });
+            },
+
+            updateLandingPhotoCaption: async (section, photoUrl, caption) => {
+                const fieldName = section === 'location' ? 'locationCaptions' : 'climateCaptions';
+                const fieldRef = doc(db, 'settings', 'landing_photos', 'fields', fieldName);
+
+                const currentCaptions = get().landingPhotos[fieldName] || {};
+                const updatedCaptions = { ...currentCaptions, [btoa(photoUrl).substring(0, 100)]: caption };
+
+                await setDoc(fieldRef, updatedCaptions, { merge: true });
+                set({ landingPhotos: { ...get().landingPhotos, [fieldName]: updatedCaptions } });
             },
 
             updateContactSettings: async (contact: ContactSettings) => {
