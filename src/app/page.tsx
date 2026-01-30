@@ -506,8 +506,14 @@ export default function Home() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl"
+                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl flex flex-col"
               >
+                {landingPhotos?.chichamPhoto && (
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={landingPhotos.chichamPhoto} alt="Chicham Bridge" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                )}
                 <div className="p-8 space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">
@@ -529,8 +535,14 @@ export default function Home() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl"
+                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl flex flex-col"
               >
+                {landingPhotos?.keePhoto && (
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={landingPhotos.keePhoto} alt="Kee Monastery" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                )}
                 <div className="p-8 space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">

@@ -172,6 +172,8 @@ interface AppState {
         climate: string[];
         customMap?: string;
         registrationDoc?: string;
+        chichamPhoto?: string;
+        keePhoto?: string;
     };
 
 
@@ -221,7 +223,7 @@ interface AppState {
     updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
 
     login: (username: string, password: string) => Promise<boolean>;
-    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc', data: string[] | string) => Promise<void>;
+    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto', data: string[] | string) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
     uploadImage: (file: File, saveToGallery?: boolean) => Promise<string>;
@@ -795,11 +797,11 @@ export const useStore = create<AppState>()(
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
             },
 
-            updateLandingPhotos: async (section, data) => {
-                const photosRef = doc(db, 'settings', 'landing_photos');
+            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto', data: string[] | string) => {
+                const settingsRef = doc(db, 'settings', 'landing_photos');
                 const current = get().landingPhotos;
                 const updated = { ...current, [section]: data };
-                await setDoc(photosRef, updated, { merge: true });
+                await setDoc(settingsRef, updated);
                 set({ landingPhotos: updated });
             },
 

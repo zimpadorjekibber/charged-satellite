@@ -1604,6 +1604,30 @@ function AdminDashboard() {
                                                         >
                                                             DOC LAGADO
                                                         </button>
+
+                                                        {/* New: Chicham & Kee Buttons */}
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('chichamPhoto', manualUploadUrl);
+                                                                    alert('✅ CHICHAM BRIDGE PHOTO SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-amber-600 hover:bg-amber-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            CHICHAM PHOTO
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('keePhoto', manualUploadUrl);
+                                                                    alert('✅ KEE MONASTERY PHOTO SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-purple-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            KEE PHOTO
+                                                        </button>
                                                     </div>
 
                                                     <button
