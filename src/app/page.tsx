@@ -278,6 +278,31 @@ export default function Home() {
                 <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
               </div>
+
+              {/* Travel Info Box Below Map */}
+              <div className="mt-8 max-w-4xl mx-auto">
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 md:p-8 backdrop-blur-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-amber-500 rounded-lg text-black mt-1">
+                      <Info size={20} strokeWidth={3} />
+                    </div>
+                    <div className="space-y-4">
+                      <h4 className="text-white font-bold text-lg uppercase tracking-tight">Traveler's Guide & Connectivity</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <p className="text-gray-300 text-sm leading-relaxed font-medium italic border-l-2 border-amber-500/30 pl-4">
+                          "यदि आप <span className="text-white font-bold">Kee Monastery</span> से <span className="text-amber-400">Chicham Bridge</span> की ओर आ रहे हैं, तो आप <span className="text-white">TashiZom</span> से होते हुए सीधे आगे जा सकते हैं—रास्ता जुड़ा हुआ है।"
+                        </p>
+                        <p className="text-gray-300 text-sm leading-relaxed font-medium italic border-l-2 border-amber-500/30 pl-4">
+                          "इसी तरह, <span className="text-amber-400">Chicham Bridge</span> से <span className="text-white">TashiZom</span> आने के बाद, आप यहाँ से सीधे <span className="text-white font-bold">Kaza</span> की ओर निकल सकते हैं। वापस चिचम जाने की ज़रूरत नहीं है।"
+                        </p>
+                      </div>
+                      <div className="pt-4 border-t border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/80">
+                        <Clock size={14} /> Seasonal Note: This road is open in SUMMER and remains closed during WINTER.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
 
