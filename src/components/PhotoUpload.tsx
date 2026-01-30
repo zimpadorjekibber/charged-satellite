@@ -30,20 +30,11 @@ export function PhotoUploadSection({
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
     const uploadImage = useStore((state: any) => state.uploadImage);
 
-    useEffect(() => {
-        console.log(`✅ PhotoUploadSection mounted: "${title}"`);
-        console.log('📦 uploadImage function available:', !!uploadImage);
-        console.log('🖼️ Current image URL:', currentImageUrl || 'None');
-    }, [title, uploadImage, currentImageUrl]);
-
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) {
-            console.log('No file selected');
             return;
         }
-
-        console.log('📸 Starting upload for:', file.name, 'Size:', (file.size / 1024).toFixed(2), 'KB');
 
         // Reset states
         setUploadError(null);
@@ -52,10 +43,8 @@ export function PhotoUploadSection({
 
         try {
             // Create preview
-            console.log('Creating preview...');
             const reader = new FileReader();
             reader.onloadend = () => {
-                console.log('Preview created successfully');
                 setPreviewUrl(reader.result as string);
             };
             reader.onerror = () => {
@@ -64,13 +53,11 @@ export function PhotoUploadSection({
             reader.readAsDataURL(file);
 
             // Upload to Firebase
-            console.log('Starting Firebase upload...');
             if (!uploadImage) {
                 throw new Error('Upload function not available. Please refresh the page and try again.');
             }
 
             const url = await uploadImage(file, false);
-            console.log('✅ Upload successful! URL:', url);
 
             // Success!
             setUploadSuccess(true);
@@ -78,8 +65,9 @@ export function PhotoUploadSection({
 
             setTimeout(() => setUploadSuccess(false), 3000);
         } catch (error: any) {
-            console.error('❌ Upload failed:', error);
+            console.error('Upload failed:', error);
             const errorMessage = error.message || 'Upload failed. Please try again.';
+            alert('❌ PHOTO UPLOAD ERROR:\n' + errorMessage);
             setUploadError(errorMessage);
             setPreviewUrl(currentImageUrl || null);
         } finally {
@@ -95,7 +83,7 @@ export function PhotoUploadSection({
     };
 
     return (
-        <div>
+        <div className="pt-12 border-t border-gray-200">
             <div className="flex items-center gap-3 mb-4">
                 {icon}
                 <div>
@@ -108,9 +96,6 @@ export function PhotoUploadSection({
                 {/* Upload Area */}
                 <div className="w-full md:w-1/2">
                     <label
-                        onClick={() => {
-                            console.log('🖱️ Upload area clicked!');
-                        }}
                         className={`block border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all hover:border-amber-400 hover:bg-amber-50/50 group relative ${previewUrl ? 'border-green-300' : 'border-gray-300'
                             }`}
                         style={{ aspectRatio }}
@@ -120,9 +105,6 @@ export function PhotoUploadSection({
                             type="file"
                             accept="image/*"
                             onChange={handleFileSelect}
-                            onClick={(e) => {
-                                console.log('📁 File input clicked!');
-                            }}
                             className="hidden"
                             disabled={isUploading}
                         />

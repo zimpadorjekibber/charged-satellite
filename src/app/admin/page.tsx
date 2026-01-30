@@ -79,6 +79,7 @@ function AdminDashboard() {
     const [showScanStats, setShowScanStats] = useState(false);
     const [scanStats, setScanStats] = useState<any[]>([]);
     const fetchScanStats = useStore((state) => state.fetchScanStats);
+    const [manualUploadUrl, setManualUploadUrl] = useState<string | null>(null);
 
     useEffect(() => {
         if (showScanStats) {
@@ -532,6 +533,48 @@ function AdminDashboard() {
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                             className="space-y-8"
                         >
+                            {/* EMERGENCY PHOTO UPLOAD JUGAD */}
+                            <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-3xl p-6 shadow-2xl border-2 border-white">
+                                <h3 className="text-xl font-black flex items-center gap-2 mb-2">
+                                    🚀 PHOTO UPLOAD JUGAD (EMERGENCY) 🚀
+                                </h3>
+                                <p className="text-sm font-bold opacity-90 mb-6">Agar baaki uploads nahi chal rahe, toh yahan se upload karke Link Copy karein!</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/10 p-4 rounded-2xl">
+                                    <div className="bg-white rounded-xl p-2 h-[200px]">
+                                        <PhotoUploadSection
+                                            title="Yahan Photo Daalein"
+                                            description="Device se select karein"
+                                            icon={<Upload size={24} className="text-red-600" />}
+                                            aspectRatio="video"
+                                            currentImageUrl={manualUploadUrl}
+                                            onUploadSuccess={(url) => {
+                                                setManualUploadUrl(url);
+                                                alert('Success! Link ready hai niche dekho.');
+                                            }}
+                                            placeholder="PHOTO SELECT KAREIN"
+                                        />
+                                    </div>
+
+                                    {manualUploadUrl && (
+                                        <div className="flex flex-col justify-center gap-3">
+                                            <p className="text-xs font-black uppercase text-white/80 tracking-widest">Aapka Photo Link (Copy karein):</p>
+                                            <div className="bg-black/20 p-4 rounded-xl font-mono text-xs break-all selection:bg-white selection:text-black border border-white/20">
+                                                {manualUploadUrl}
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(manualUploadUrl);
+                                                    alert('Link Copy Ho Gaya! ✅\nAb isko upar Settings mein ya mujhe bhej dein.');
+                                                }}
+                                                className="bg-white text-orange-600 font-black py-4 rounded-xl hover:bg-gray-100 transition-all shadow-xl flex items-center justify-center gap-2"
+                                            >
+                                                <Share2 size={20} /> LINK COPY KAREIN
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                             {/* Dashboard Header Stats */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
                                 <StatCard
@@ -1551,6 +1594,48 @@ function AdminDashboard() {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Quick Upload Tool (For when you need a URL) */}
+                                    <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                                        <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                            <Upload size={18} className="text-blue-600" />
+                                            Quick Upload Tool (Get Image Link)
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Device se photo upload karein aur uska Link payein. Phir us Link ko copy karke use karein.</p>
+
+                                        <div className="flex flex-col md:flex-row gap-6">
+                                            <div className="w-full md:w-1/2">
+                                                <PhotoUploadSection
+                                                    title="Generate Link"
+                                                    description="Upload any image here"
+                                                    icon={<ImageIcon size={20} className="text-blue-500" />}
+                                                    aspectRatio="video"
+                                                    currentImageUrl={manualUploadUrl}
+                                                    onUploadSuccess={(url) => setManualUploadUrl(url)}
+                                                    placeholder="Upload to get Link"
+                                                />
+                                            </div>
+
+                                            {manualUploadUrl && (
+                                                <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-4 rounded-xl border border-blue-200">
+                                                    <p className="text-xs font-bold text-gray-500 mb-2 uppercase">Your Image Link:</p>
+                                                    <div className="bg-gray-100 p-3 rounded-lg break-all text-xs font-mono text-gray-700 select-all mb-3">
+                                                        {manualUploadUrl}
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(manualUploadUrl);
+                                                            alert('Link Copied! Ab aap is link ko mujhe bhej sakte hain ya Media Gallery mein use kar sakte hain.');
+                                                        }}
+                                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                                    >
+                                                        <Share2 size={16} /> Copy Link
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     {/* Section: Prime Location */}
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">

@@ -870,12 +870,18 @@ export const useStore = create<AppState>()(
                 };
 
                 try {
-                    const compressedFile = await compressImage(file);
-                    console.log('Image compressed, sub-size:', (compressedFile.size / 1024).toFixed(2), 'KB');
+                    console.log('🚀 Step 1: Using Raw File (Compression Disabled for Jugad)...');
+                    const compressedFile = file; // Skip compression
+                    // const compressedFile = await compressImage(file);
+                    console.log('✅ Size:', (compressedFile.size / 1024).toFixed(2), 'KB');
 
                     const fileRef = ref(storage, `uploads/${Date.now()}_${file.name.replace(/\.[^/.]+$/, "")}.jpg`);
+                    console.log('🚀 Step 3: Starting Firebase Storage upload...');
                     await uploadBytes(fileRef, compressedFile);
+                    console.log('✅ Step 4: Storage upload complete.');
+
                     const url = await getDownloadURL(fileRef);
+                    console.log('✅ Step 5: Download URL obtained:', url);
 
                     if (saveToGallery) {
                         await addDoc(collection(db, 'settings', 'media', 'library'), {
