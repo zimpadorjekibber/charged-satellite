@@ -1,7 +1,7 @@
 // Photo Upload Component for Admin Panel
 // Usage: Import in admin page and use for map & registration document uploads
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, X, Check, Loader2, MapPin, Clock } from 'lucide-react';
 import { useStore } from '@/lib/store';
 
@@ -29,6 +29,12 @@ export function PhotoUploadSection({
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
     const uploadImage = useStore((state: any) => state.uploadImage);
+
+    useEffect(() => {
+        console.log(`✅ PhotoUploadSection mounted: "${title}"`);
+        console.log('📦 uploadImage function available:', !!uploadImage);
+        console.log('🖼️ Current image URL:', currentImageUrl || 'None');
+    }, [title, uploadImage, currentImageUrl]);
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -102,6 +108,9 @@ export function PhotoUploadSection({
                 {/* Upload Area */}
                 <div className="w-full md:w-1/2">
                     <label
+                        onClick={() => {
+                            console.log('🖱️ Upload area clicked!');
+                        }}
                         className={`block border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all hover:border-amber-400 hover:bg-amber-50/50 group relative ${previewUrl ? 'border-green-300' : 'border-gray-300'
                             }`}
                         style={{ aspectRatio }}
@@ -111,6 +120,9 @@ export function PhotoUploadSection({
                             type="file"
                             accept="image/*"
                             onChange={handleFileSelect}
+                            onClick={(e) => {
+                                console.log('📁 File input clicked!');
+                            }}
                             className="hidden"
                             disabled={isUploading}
                         />
