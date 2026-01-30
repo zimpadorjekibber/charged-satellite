@@ -808,103 +808,36 @@ export const useStore = create<AppState>()(
             },
 
             uploadImage: async (file: File, saveToGallery = false) => {
+                console.log('🚀 ULTRA JUGAD: Converting to Base64 (Bypassing Storage)...');
+
                 // Validation: File type
                 if (!file.type.startsWith('image/')) {
-                    throw new Error('❌ Only image files are allowed (JPG, PNG, WEBP)');
+                    throw new Error('❌ Only image files are allowed');
                 }
 
-                // Validation: File size (max 10MB before compression)
-                const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-                if (file.size > MAX_FILE_SIZE) {
-                    throw new Error(`❌ File too large! Maximum size: 10MB. Your file: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-                }
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const base64String = reader.result as string;
+                        console.log('✅ ULTRA JUGAD: Base64 Success! String length:', base64String.length);
 
-                // Client-side compression
-                const compressImage = async (file: File): Promise<Blob | File> => {
-                    if (!file.type.startsWith('image/')) return file;
-                    // Increased threshold for documents
-                    if (file.size < 300 * 1024) return file; // Skip compression if < 300KB
-
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(file);
-                        reader.onload = (event) => {
-                            const img = new Image();
-                            img.src = event.target?.result as string;
-                            img.onload = () => {
-                                try {
-                                    const canvas = document.createElement('canvas');
-                                    let width = img.width;
-                                    let height = img.height;
-                                    const MAX_DIM = 1600; // Increased for better document quality
-                                    if (width > height) {
-                                        if (width > MAX_DIM) {
-                                            height *= MAX_DIM / width;
-                                            width = MAX_DIM;
-                                        }
-                                    } else {
-                                        if (height > MAX_DIM) {
-                                            width *= MAX_DIM / height;
-                                            height = MAX_DIM;
-                                        }
-                                    }
-                                    canvas.width = width;
-                                    canvas.height = height;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx?.drawImage(img, 0, 0, width, height);
-                                    canvas.toBlob((blob) => {
-                                        if (blob) {
-                                            resolve(blob);
-                                        } else {
-                                            reject(new Error('Failed to compress image'));
-                                        }
-                                    }, 'image/jpeg', 0.85); // Slightly higher quality
-                                } catch (err) {
-                                    reject(err);
-                                }
-                            };
-                            img.onerror = () => reject(new Error('Failed to load image'));
-                        };
-                        reader.onerror = () => reject(new Error('Failed to read file'));
-                    });
-                };
-
-                try {
-                    console.log('🚀 Step 1: Using Raw File (Compression Disabled for Jugad)...');
-                    const compressedFile = file; // Skip compression
-                    // const compressedFile = await compressImage(file);
-                    console.log('✅ Size:', (compressedFile.size / 1024).toFixed(2), 'KB');
-
-                    const fileRef = ref(storage, `uploads/${Date.now()}_${file.name.replace(/\.[^/.]+$/, "")}.jpg`);
-                    console.log('🚀 Step 3: Starting Firebase Storage upload...');
-                    await uploadBytes(fileRef, compressedFile);
-                    console.log('✅ Step 4: Storage upload complete.');
-
-                    const url = await getDownloadURL(fileRef);
-                    console.log('✅ Step 5: Download URL obtained:', url);
-
-                    if (saveToGallery) {
-                        await addDoc(collection(db, 'settings', 'media', 'library'), {
-                            url,
-                            name: file.name,
-                            createdAt: new Date().toISOString()
-                        });
-                    }
-                    console.log('Upload successful! URL:', url);
-                    return url;
-                } catch (error: any) {
-                    console.error('Firebase Storage Error:', error);
-                    // Better error messages
-                    if (error.code === 'storage/unauthorized') {
-                        throw new Error('❌ Upload failed: Permission denied. Please ensure you are logged in as admin.');
-                    } else if (error.code === 'storage/quota-exceeded') {
-                        throw new Error('❌ Storage quota exceeded. Contact administrator.');
-                    } else if (error.code === 'storage/retry-limit-exceeded') {
-                        throw new Error('❌ Upload failed: Network error. Please check your internet connection.');
-                    } else {
-                        throw new Error(`❌ Upload failed: ${error.message || 'Unknown error'}`);
-                    }
-                }
+                        if (saveToGallery) {
+                            try {
+                                await addDoc(collection(db, 'settings', 'media', 'library'), {
+                                    url: base64String,
+                                    name: file.name,
+                                    isBase64: true,
+                                    createdAt: new Date().toISOString()
+                                });
+                            } catch (e) {
+                                console.error("Gallery save failed, but proceeding with URL", e);
+                            }
+                        }
+                        resolve(base64String);
+                    };
+                    reader.onerror = () => reject(new Error('Failed to read file'));
+                    reader.readAsDataURL(file);
+                });
             },
 
             addMediaItem: async (url: string, name: string) => {
