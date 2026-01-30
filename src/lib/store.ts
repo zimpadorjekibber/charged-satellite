@@ -409,6 +409,16 @@ export const useStore = create<AppState>()(
                     }
                 }));
 
+                // Landing Page Photos: Legacy Fallback (Extracting single fields from the old 1MB document)
+                unsubscribers.push(onSnapshot(doc(db, 'settings', 'landing_photos'), (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        // Only sync single fields, skip high-volume galleries already handled by collections
+                        const { location, climate, ...singleFields } = data;
+                        set({ landingPhotos: { ...get().landingPhotos, ...singleFields } });
+                    }
+                }));
+
                 // Contact Settings
                 unsubscribers.push(onSnapshot(doc(db, 'settings', 'contact'), (doc) => {
                     if (doc.exists()) {
