@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useStore, Category, MenuItem, Table, Order, getValidDate } from '../../../lib/store';
-import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag, PlayCircle, Share2, ArrowLeft } from 'lucide-react';
+import { Plus, Minus, Bell, Newspaper, Leaf, Drumstick, Phone, X, Info, MessageCircle, MapPin, Sparkles, Navigation, Star, Send, ChevronLeft, ChevronRight, UtensilsCrossed, Utensils, Loader2, ShoppingBag, PlayCircle, Share2, ArrowLeft, Home } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -1389,6 +1389,38 @@ export default function MenuPage() {
                     );
                 })()}
 
+                {/* NEW: Village Stays Promo Banner */}
+                <section className="px-4 mb-8">
+                    <Link href="/customer/stays">
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="bg-gradient-to-tr from-[#1A1A1A] to-[#333] p-6 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden group"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                            <div className="relative z-10 flex items-center justify-between">
+                                <div className="space-y-4">
+                                    <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-amber-500 text-black text-[9px] font-black uppercase tracking-widest">
+                                        <Home size={12} /> New Feature
+                                    </div>
+                                    <h3 className="text-2xl font-serif font-black text-white leading-tight">
+                                        Looking for <span className="text-amber-500 italic">a Place to Stay?</span>
+                                    </h3>
+                                    <p className="text-gray-400 text-xs font-medium max-w-[200px]">
+                                        Directly contact authentic homestays in Kibber, Chicham & Kee.
+                                    </p>
+                                    <div className="flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest pt-2">
+                                        Browse Directory <ChevronRight size={14} />
+                                    </div>
+                                </div>
+                                <div className="w-24 h-24 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 rotate-3 group-hover:rotate-0 transition-transform">
+                                    <MapPin size={40} className="text-amber-500/50" />
+                                </div>
+                            </div>
+                        </motion.div>
+                    </Link>
+                </section>
+
                 {/* Menu Grid - CONTINUOUS SCROLL */}
                 <div className="mt-6 space-y-12">
                     {CATEGORIES.map((cat) => {
@@ -2255,6 +2287,49 @@ export default function MenuPage() {
                     )}
                 </AnimatePresence>
 
+                {/* Gear and Local Mart Section - INTEGRATED DIRECTLY ON PAGE FOR BETTER SEO */}
+                {gearItems.length > 0 && (
+                    <section className="mb-20 px-4 pt-12 border-t border-amber-50">
+                        {/* 1. Winter Gear */}
+                        <div className="flex items-center gap-2 mb-6">
+                            <ShoppingBag size={20} className="text-amber-500" />
+                            <h2 className="text-xl font-black font-serif uppercase tracking-widest text-[#1A1A1A]">Winter Gear</h2>
+                            <div className="flex-1 h-[1px] bg-gradient-to-r from-amber-500/20 to-transparent ml-2" />
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                            {gearItems
+                                .filter(item => !['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw)))
+                                .map((item: any) => (
+                                    <GearItemCard key={item.id} {...item} />
+                                ))}
+                        </div>
+
+                        {/* 2. Village Harvest / Spices */}
+                        {gearItems.some(item => ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw))) && (
+                            <div className="mt-16">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <Sparkles size={20} className="text-green-500" />
+                                    <h2 className="text-xl font-black font-serif uppercase tracking-widest text-[#1A1A1A]">Village Harvest</h2>
+                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-green-500/20 to-transparent ml-2" />
+                                </div>
+                                <p className="text-gray-500 text-xs font-bold mb-6 italic leading-relaxed">
+                                    "Hand-harvested by local villagers. We help you source these authentic treasures directly from our mountains."
+                                </p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {gearItems
+                                        .filter(item => ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw)))
+                                        .map((item: any) => (
+                                            <div key={item.id} className="relative group">
+                                                <div className="absolute -inset-1 bg-gradient-to-br from-green-500/20 to-amber-500/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <GearItemCard {...item} />
+                                            </div>
+                                        ))}
+                                </div>
+                            </div>
+                        )}
+                    </section>
+                )}
+
                 {/* Floating "View Cart" Button - Only visible if Cart has items */}
                 <AnimatePresence>
                     {cart.length > 0 && !selectedItem && (
@@ -2287,6 +2362,6 @@ export default function MenuPage() {
                     )}
                 </AnimatePresence>
             </div>
-        </div >
+        </div>
     );
 }

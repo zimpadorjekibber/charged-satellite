@@ -149,6 +149,17 @@ export interface MediaItem {
     createdAt: string;
 }
 
+export interface Homestay {
+    id: string;
+    name: string;
+    ownerName: string;
+    phone: string;
+    village: 'Kibber' | 'Chicham' | 'Kee';
+    image?: string;
+    available: boolean;
+    sortOrder?: number;
+}
+
 interface AppState {
     tables: Table[];
     menu: MenuItem[];
@@ -166,6 +177,7 @@ interface AppState {
     contactInfo: ContactSettings;
     categoryOrder: string[]; // New: For custom category ordering
     gearItems: GearItem[]; // New: For local gear e-commerce
+    homestays: Homestay[]; // New: For village homestay directory
     menuAppearance: MenuAppearance; // New: For visual customization
     landingPhotos: {
         location: string[];
@@ -223,6 +235,12 @@ interface AppState {
     updateGearItem: (id: string, updates: Partial<GearItem>) => Promise<void>;
     removeGearItem: (id: string) => Promise<void>;
     reorderGearItems: (items: GearItem[]) => Promise<void>;
+
+    // New: Homestay Management
+    addHomestay: (item: Omit<Homestay, 'id'>) => Promise<void>;
+    updateHomestay: (id: string, updates: Partial<Homestay>) => Promise<void>;
+    removeHomestay: (id: string) => Promise<void>;
+
     updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
 
     login: (username: string, password: string) => Promise<boolean>;
@@ -259,6 +277,7 @@ export const useStore = create<AppState>()(
             reviews: [],
             valleyUpdates: [],
             media: [],
+            homestays: [],
             isListening: false,
             unsubscribers: [],
             geoRadius: 5,
@@ -318,6 +337,12 @@ export const useStore = create<AppState>()(
                     if (snap.exists()) {
                         set({ menuAppearance: { ...get().menuAppearance, ...snap.data() } });
                     }
+                }));
+
+                // Homestays
+                unsubscribers.push(onSnapshot(collection(db, 'homestays'), (snap) => {
+                    const homestays = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Homestay[];
+                    set({ homestays: homestays.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) });
                 }));
 
                 // Tables
@@ -835,6 +860,22 @@ export const useStore = create<AppState>()(
                 for (const item of batch) {
                     await updateDoc(doc(db, 'gear', item.id), { sortOrder: item.sortOrder });
                 }
+            },
+
+            // HOMESTAY MANAGEMENT
+            addHomestay: async (item) => {
+                await addDoc(collection(db, 'homestays'), {
+                    ...item,
+                    sortOrder: get().homestays.length
+                });
+            },
+
+            updateHomestay: async (id, updates) => {
+                await updateDoc(doc(db, 'homestays', id), updates);
+            },
+
+            removeHomestay: async (id) => {
+                await deleteDoc(doc(db, 'homestays', id));
             },
 
             updateMenuAppearance: async (updates) => {

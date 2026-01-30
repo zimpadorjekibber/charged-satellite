@@ -168,7 +168,7 @@ function AdminDashboard() {
         ? (window.location.hostname === 'localhost' ? 'http://192.168.1.109:3000' : window.location.origin)
         : '';
 
-    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media' | 'storage' | 'gear'>('live');
+    const [activeTab, setActiveTab] = useState<'live' | 'history' | 'analytics' | 'reviews' | 'settings' | 'media' | 'storage' | 'gear' | 'stays'>('live');
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -451,13 +451,24 @@ function AdminDashboard() {
 
                     {/* Desktop Tab Navigation - Hidden on Mobile */}
                     <div className="hidden md:flex bg-gray-100 p-1 rounded-xl border border-gray-200 text-sm">
-                        <TabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={16} />} onClick={() => handleTabChange('live')} />
-                        <TabButton active={activeTab === 'history'} label="History" icon={<History size={16} />} onClick={() => handleTabChange('history')} />
-                        <TabButton active={activeTab === 'analytics'} label="Analytics" icon={<BarChart3 size={16} />} onClick={() => handleTabChange('analytics')} />
-                        <TabButton active={activeTab === 'reviews'} label="Reviews" icon={<Star size={16} />} onClick={() => handleTabChange('reviews')} />
-                        <TabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={16} />} onClick={() => handleTabChange('settings')} />
-                        <TabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={16} />} onClick={() => handleTabChange('gear')} />
-                        <TabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={16} />} onClick={() => handleTabChange('media')} />
+                        {[
+                            { id: 'live', label: 'Live', icon: <LayoutDashboard size={18} /> },
+                            { id: 'history', label: 'History', icon: <History size={18} /> },
+                            { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={18} /> },
+                            { id: 'reviews', label: 'Reviews', icon: <Star size={18} /> },
+                            { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
+                            { id: 'gear', label: 'Gear & Local', icon: <ShoppingBag size={18} /> },
+                            { id: 'stays', label: 'Stays', icon: <Home size={18} /> },
+                            { id: 'media', label: 'Media', icon: <ImageIcon size={18} /> }
+                        ].map(tab => (
+                            <TabButton
+                                key={tab.id}
+                                active={activeTab === tab.id}
+                                label={tab.label}
+                                icon={tab.icon}
+                                onClick={() => handleTabChange(tab.id)}
+                            />
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -506,6 +517,7 @@ function AdminDashboard() {
                     <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
                     <MobileTabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
                     <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
+                    <MobileTabButton active={activeTab === 'stays'} label="Stays" icon={<Home size={20} />} onClick={() => handleTabChange('stays')} />
                     <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
@@ -1067,9 +1079,8 @@ function AdminDashboard() {
                     )}
 
                     {/* GEAR MANAGEMENT VIEW (New) */}
-                    {activeTab === 'gear' && (
-                        <GearManagementView />
-                    )}
+                    {activeTab === 'gear' && <GearManagementView />}
+                    {activeTab === 'stays' && <StaysManagementView />}
 
                     {/* ADMIN MANAGEMENT VIEW */}
                     {activeTab === 'settings' && (
@@ -1982,7 +1993,7 @@ function AdminDashboard() {
                                             name="tableName"
                                             required
                                             placeholder="New Table Name (e.g. Roof Top 1)"
-                                            className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-tashi-accent"
+                                            className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none"
                                         />
                                         <button type="submit" className="bg-tashi-accent text-tashi-dark font-bold px-6 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
                                             Add
@@ -2752,6 +2763,160 @@ function AdminDashboard() {
 // HELPER COMPONENTS
 // ----------------------------------------------------------------------
 
+function StaysManagementView() {
+    const homestays = useStore((state) => state.homestays);
+    const addHomestay = useStore((state) => state.addHomestay);
+    const updateHomestay = useStore((state) => state.updateHomestay);
+    const removeHomestay = useStore((state) => state.removeHomestay);
+    const uploadImage = useStore((state) => state.uploadImage);
+
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        ownerName: '',
+        phone: '',
+        village: 'Kibber' as 'Kibber' | 'Chicham' | 'Kee',
+        image: '',
+        available: true
+    });
+
+    const handleSave = async () => {
+        if (!formData.name || !formData.phone) return alert('Name and Phone are required!');
+        if (editingId) {
+            await updateHomestay(editingId, formData);
+            setEditingId(null);
+        } else {
+            await addHomestay(formData);
+            setIsAdding(false);
+        }
+        setFormData({ name: '', ownerName: '', phone: '', village: 'Kibber', image: '', available: true });
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            try {
+                const url = await uploadImage(file, true);
+                setFormData(prev => ({ ...prev, image: url }));
+            } catch (err) {
+                alert('Image upload failed');
+            }
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div>
+                    <h2 className="text-2xl font-black text-gray-900">Homestay Directory</h2>
+                    <p className="text-gray-500 text-sm">Manage village homestays for direct customer connection</p>
+                </div>
+                <button
+                    onClick={() => { setIsAdding(true); setEditingId(null); }}
+                    className="bg-black text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-800 transition-all"
+                >
+                    <Plus size={18} /> Add Homestay
+                </button>
+            </div>
+
+            {(isAdding || editingId) && (
+                <div className="bg-amber-50 p-8 rounded-[2rem] border-2 border-amber-200 space-y-6">
+                    <h3 className="text-xl font-bold">{editingId ? 'Edit Homestay' : 'Add New Homestay'}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Homestay / Hotel Name</label>
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                className="w-full p-4 rounded-xl border border-amber-200 focus:ring-2 ring-amber-500 bg-white"
+                                placeholder="e.g. Tashi's Home"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Owner Name</label>
+                            <input
+                                type="text"
+                                value={formData.ownerName}
+                                onChange={e => setFormData({ ...formData, ownerName: e.target.value })}
+                                className="w-full p-4 rounded-xl border border-amber-200 focus:ring-2 ring-amber-500 bg-white"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Phone Number</label>
+                            <input
+                                type="text"
+                                value={formData.phone}
+                                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                className="w-full p-4 rounded-xl border border-amber-200 focus:ring-2 ring-amber-500 bg-white"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Village</label>
+                            <select
+                                value={formData.village}
+                                onChange={e => setFormData({ ...formData, village: e.target.value as any })}
+                                className="w-full p-4 rounded-xl border border-amber-200 focus:ring-2 ring-amber-500 bg-white"
+                            >
+                                <option value="Kibber">Kibber</option>
+                                <option value="Chicham">Chicham</option>
+                                <option value="Kee">Kee</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Photo (Optional)</label>
+                            <input type="file" onChange={handleImageUpload} className="w-full p-3 bg-white rounded-xl border border-amber-200" />
+                            {formData.image && <img src={formData.image} className="w-20 h-20 rounded-lg object-cover mt-2" />}
+                        </div>
+                    </div>
+                    <div className="flex gap-4 pt-4">
+                        <button onClick={handleSave} className="flex-1 bg-black text-white p-4 rounded-xl font-bold text-lg">SAVE HOMESTAY</button>
+                        <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="px-8 bg-gray-200 p-4 rounded-xl font-bold">CANCEL</button>
+                    </div>
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {homestays.map(stay => (
+                    <div key={stay.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center overflow-hidden">
+                                {stay.image ? <img src={stay.image} className="w-full h-full object-cover" /> : <Home className="text-amber-500" />}
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-lg">{stay.name}</h4>
+                                <span className="text-[10px] font-black uppercase bg-gray-100 px-2 py-0.5 rounded-full">{stay.village}</span>
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-gray-500">Owner: {stay.ownerName}</p>
+                            <p className="text-sm font-bold flex items-center gap-2"><Phone size={14} className="text-green-500" /> {stay.phone}</p>
+                        </div>
+                        <div className="flex gap-2 pt-2 border-t border-gray-50">
+                            <button
+                                onClick={() => {
+                                    setEditingId(stay.id);
+                                    setFormData(stay);
+                                }}
+                                className="flex-1 p-2 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={() => { if (confirm('Delete homestay?')) removeHomestay(stay.id); }}
+                                className="flex-1 p-2 rounded-lg bg-red-50 text-red-600 font-bold text-xs"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function GearManagementView() {
     const { gearItems, addGearItem, updateGearItem, removeGearItem, reorderGearItems } = useStore();
     const [isAdding, setIsAdding] = useState(false);
@@ -2933,7 +3098,7 @@ function GearManagementView() {
                                     <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
                                         <div className="flex justify-between">
                                             <span className="text-xs font-bold text-gray-400 uppercase">Frame 3 (Lifestyle - Lady)</span>
-                                            <input name="img2_label" defaultValue={editingGear?.items[2]?.label || 'Local Lady Lifestyle'} className="bg-transparent text-right text-xs font-bold text-tashi-primary focus:outline-none" placeholder="Label" />
+                                            <input name="img2_label" defaultValue={editingGear?.items[2]?.label || 'Fashion Shot'} className="bg-transparent text-right text-xs font-bold text-tashi-primary focus:outline-none" placeholder="Label" />
                                         </div>
                                         <input name="img2_url" defaultValue={editingGear?.items[2]?.url} className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:border-tashi-accent outline-none" placeholder="Image URL (Fashion shot)" />
                                     </div>
