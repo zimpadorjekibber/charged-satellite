@@ -343,10 +343,10 @@ export default function Home() {
                   A Story Carved <br />
                   <span className="text-amber-500 italic">In High Altitude</span>
                 </h2>
-                <p className="text-gray-400 text-lg leading-relaxed font-light">
-                  Our journey began in <span className="text-white font-bold underline decoration-amber-500 decoration-2 underline-offset-4">1995</span>.
-                  Originally registered as <span className="text-amber-200 italic font-medium">'Resang Hotel'</span> with the Himachal Tourism Department,
-                  we later evolved into <span className="text-amber-500 font-bold">TashiZom</span>. Though heavy Himalayan rains once took our rooms,
+                <p className="text-gray-300 text-lg leading-relaxed">
+                  Our journey began in <span className="text-white font-bold underline decoration-amber-500 decoration-2 underline-offset-4">1998</span>.
+                  Originally registered as <span className="text-amber-200 italic font-bold">'Resang Hotel'</span> with the Himachal Tourism Department,
+                  we later evolved into <span className="text-amber-500 font-black">TashiZom</span>. Though heavy Himalayan rains once took our rooms,
                   leaving only our legendary restaurant, we are currently rebuilding. Soon, you will again be able
                   to wake up to the clouds in our brand new guest rooms.
                 </p>
@@ -360,17 +360,17 @@ export default function Home() {
               >
                 <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
                   <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The Civilization</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Kibber is more than a village; it is a <span className="text-white">Living Civilization</span> of about 500 souls.
+                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
+                    Kibber is more than a village; it is a <span className="text-white font-bold">Living Civilization</span> of about 500 souls.
                     From tantriks and blacksmiths to farmers and drummers, we are a self-sustaining community
                     preserving traditions for centuries.
                   </p>
                 </div>
                 <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
                   <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The First Road</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
                     History remembers that when the first roads were carved from Manali,
-                    <span className="text-white"> Kibber</span> was connected right after Rangrik—long before Kaza.
+                    <span className="text-white font-bold"> Kibber</span> was connected right after Rangrik—long before Kaza.
                     For decades, we stood as Asia's highest motorable village.
                   </p>
                 </div>
@@ -465,6 +465,64 @@ export default function Home() {
               </div>
             </motion.div>
           )}
+
+          {/* --- MUST VISIT PLACES SECTION --- */}
+          <div className="mt-24 space-y-12">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
+                Local Wonders
+              </div>
+              <h2 className="text-4xl md:text-6xl font-serif font-black text-white mb-6">Explore the <span className="text-amber-500 italic">Surroundings</span></h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Chicham Bridge */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl"
+              >
+                <div className="p-8 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 18h18M3 6h18M12 3v18" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Chicham Bridge</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
+                    Suspended at <span className="text-amber-400 font-bold">13,596 feet</span>, Asia's highest bridge connects Kibber to Chicham village. This engineering marvel spans a deep gorge, offering breathtaking views of the Spiti River below and the starkly beautiful mountains around.
+                  </p>
+                  <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
+                    <MapPin size={14} /> 10 mins from TashiZom
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Kee Monastery */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl"
+              >
+                <div className="p-8 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3L4 9v12h16V9l-8-6zM12 12h.01" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Kee Monastery</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
+                    A <span className="text-amber-400 font-bold">1000-year-old</span> Tibetan Buddhist monastery that looks like a fortress on a hill. It is the largest in Spiti, housing priceless murals, thangkas, and ancient scriptures. A center for spiritual learning that feels frozen in time.
+                  </p>
+                  <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
+                    <MapPin size={14} /> 15 mins from TashiZom
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
 
         {/* Background Texture Element */}
@@ -694,12 +752,48 @@ export default function Home() {
       }
 
       {/* Footer Branding */}
-      <footer className="bg-black py-8 border-t border-white/5">
-        <div className="max-w-4xl mx-auto flex flex-col items-center gap-4">
-          <img src="/logo_crest.png" alt="TashiZom Logo" className="w-12 h-12 grayscale opacity-40" />
+      <footer className="bg-black py-16 border-t border-white/5 px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+          <div className="space-y-6 text-center md:text-left">
+            <img src="/logo_crest.png" alt="TashiZom Logo" className="w-16 h-16 grayscale opacity-80 mx-auto md:mx-0 shadow-glow" />
+            <h3 className="text-2xl font-serif font-black text-white tracking-widest">TashiZom</h3>
+            <p className="text-gray-400 text-sm italic font-medium leading-relaxed">
+              Serving warmth and authenticity at the roof of the world. Kibber's pride since 1998.
+            </p>
+          </div>
+
+          <div className="space-y-6 text-center md:text-left">
+            <h4 className="text-amber-500 font-bold uppercase tracking-[0.3em] text-[10px]">Contact Us</h4>
+            <div className="space-y-4">
+              <p className="text-white text-lg font-bold">+91 94184 75150</p>
+              <p className="text-gray-400 text-sm">V.P.O. Kibber, Spiti Valley,<br />Lahaul & Spiti, H.P. 172114</p>
+              <p className="text-amber-500/80 text-xs font-mono">tashizomkibber@gmail.com</p>
+            </div>
+          </div>
+
+          <div className="space-y-6 text-center md:text-left">
+            <h4 className="text-amber-500 font-bold uppercase tracking-[0.3em] text-[10px]">Follow Our Journey</h4>
+            <div className="flex justify-center md:justify-start gap-6">
+              <a href="https://instagram.com/tashizom_kibber" target="_blank" className="p-3 bg-white/5 rounded-full text-white hover:bg-amber-600 transition-all shadow-xl">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+              </a>
+              <a href="https://facebook.com/tashizom" target="_blank" className="p-3 bg-white/5 rounded-full text-white hover:bg-blue-600 transition-all shadow-xl">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" /></svg>
+              </a>
+            </div>
+            <p className="text-gray-500 text-xs font-medium pt-4">Tag us: #TashiZomKibber</p>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
           <span className="text-[10px] text-gray-500 font-mono tracking-[0.4em] uppercase">
-            © 2026 TashiZom Kibber | Antigravity Systems v1.0
+            © 2026 TashiZom Kibber | All Rights Reserved
           </span>
+          <div className="flex gap-8 text-[10px] text-gray-500 font-mono uppercase tracking-widest">
+            <span>Spiti Valley</span>
+            <span>14,000 Feet</span>
+            <span>Est. 1998</span>
+          </div>
         </div>
       </footer>
 
