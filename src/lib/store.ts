@@ -14,8 +14,9 @@ import {
     getDoc,
     getDocs
 } from 'firebase/firestore';
-import { auth } from './firebase';
+import { auth, storage } from './firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Safe Date Utility forFirestore Timestamps, ISO strings, etc.
 export const getValidDate = (dateInput: any): Date | null => {
@@ -870,8 +871,7 @@ export const useStore = create<AppState>()(
 
                 try {
                     const compressedFile = await compressImage(file);
-                    const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-                    const { storage } = await import('./firebase');
+                    console.log('Image compressed, sub-size:', (compressedFile.size / 1024).toFixed(2), 'KB');
 
                     const fileRef = ref(storage, `uploads/${Date.now()}_${file.name.replace(/\.[^/.]+$/, "")}.jpg`);
                     await uploadBytes(fileRef, compressedFile);
@@ -884,11 +884,13 @@ export const useStore = create<AppState>()(
                             createdAt: new Date().toISOString()
                         });
                     }
+                    console.log('Upload successful! URL:', url);
                     return url;
                 } catch (error: any) {
+                    console.error('Firebase Storage Error:', error);
                     // Better error messages
                     if (error.code === 'storage/unauthorized') {
-                        throw new Error('❌ Upload failed: Please login again');
+                        throw new Error('❌ Upload failed: Permission denied. Please ensure you are logged in as admin.');
                     } else if (error.code === 'storage/quota-exceeded') {
                         throw new Error('❌ Storage quota exceeded. Contact administrator.');
                     } else if (error.code === 'storage/retry-limit-exceeded') {

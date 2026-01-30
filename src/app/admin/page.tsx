@@ -1156,35 +1156,7 @@ function AdminDashboard() {
                             </div>
 
                             {/* Section: Landing Page Photos (Moved to Top) */}
-                            <div id="landing-photos-top" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm mb-8">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                    <ImageIcon className="text-amber-500" /> Landing Page Photos
-                                </h2>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* Gateway Map Upload */}
-                                    <PhotoUploadSection
-                                        title="Gateway Map (Portrait)"
-                                        description="Upload a portrait-oriented map (3:4) for mobile"
-                                        icon={<MapPin size={20} className="text-amber-500" />}
-                                        aspectRatio="3/4"
-                                        currentImageUrl={landingPhotos?.customMap}
-                                        onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
-                                        placeholder="नक्शा अपलोड करें / Upload Map"
-                                    />
-
-                                    {/* Hotel Registration Document Upload */}
-                                    <PhotoUploadSection
-                                        title="Hotel Registration Document"
-                                        description="Original 1995 Registration Certificate"
-                                        icon={<Clock size={20} className="text-blue-500" />}
-                                        aspectRatio="3/4"
-                                        currentImageUrl={landingPhotos?.registrationDoc}
-                                        onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
-                                        placeholder="पंजीकरण दस्तावेज़ / Upload Doc"
-                                    />
-                                </div>
-                            </div>
 
                             {/* App Sharing & QR */}
                             <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
@@ -1538,16 +1510,47 @@ function AdminDashboard() {
 
 
                             {/* Landing Page Contextual Photos */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            {/* Section: Landing Page Photos */}
+                            <div id="landing-photos" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><ImageIcon size={24} /></div>
                                     <div>
-                                        <h2 className="text-xl font-bold text-gray-900">Landing Page Story Photos</h2>
-                                        <p className="text-sm text-gray-500">Manage photos for the sections on the home page (Location, Climate, Map, Heritage).</p>
+                                        <h2 className="text-xl font-bold text-gray-900">Landing Page Photos</h2>
+                                        <p className="text-sm text-gray-500">Manage all photos for the home page (Map, Documents, Location, and Climate).</p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-12">
+                                    {/* Core Documents: Map & Registration */}
+                                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
+                                        <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                            <MapPin size={18} className="text-amber-600" />
+                                            Core Documents for Landing Page
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Upload the main map and registration certificate visible on your homepage</p>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <PhotoUploadSection
+                                                title="Gateway Map"
+                                                description="Upload a map of the region or Spiti Valley"
+                                                icon={<MapPin size={20} className="text-amber-500" />}
+                                                aspectRatio="3/4"
+                                                currentImageUrl={landingPhotos?.customMap}
+                                                onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
+                                                placeholder="नक्शा अपलोड करें / Upload Map"
+                                            />
+
+                                            <PhotoUploadSection
+                                                title="Hotel Registration Document"
+                                                description="Original 1995 Registration Certificate (Landscape Recommended)"
+                                                icon={<Clock size={20} className="text-blue-500" />}
+                                                aspectRatio="4/3"
+                                                currentImageUrl={landingPhotos?.registrationDoc}
+                                                onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
+                                                placeholder="पंजीकरण दस्तावेज़ / Upload Doc"
+                                            />
+                                        </div>
+                                    </div>
                                     {/* Section: Prime Location */}
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -1637,36 +1640,7 @@ function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    {/* Section: Landing Page Photos (Using New Component) */}
-                                    <div id="landing-photos" className="pt-12 border-t border-gray-100">
-                                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                            <ImageIcon className="text-amber-500" /> Landing Page Photos
-                                        </h2>
 
-                                        <div className="bg-gray-50 rounded-3xl p-6 md:p-8 border border-gray-200 space-y-8">
-                                            {/* Gateway Map Upload */}
-                                            <PhotoUploadSection
-                                                title="Gateway Map (Portrait)"
-                                                description="Upload a portrait-oriented map (3:4 aspect ratio) for mobile viewing"
-                                                icon={<MapPin size={20} className="text-amber-500" />}
-                                                aspectRatio="3/4"
-                                                currentImageUrl={landingPhotos?.customMap}
-                                                onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
-                                                placeholder="नक्शा अपलोड करें / Upload Valley Map"
-                                            />
-
-                                            {/* Hotel Registration Document Upload */}
-                                            <PhotoUploadSection
-                                                title="Hotel Registration Document"
-                                                description="Original 1995 Registration Certificate"
-                                                icon={<Clock size={20} className="text-blue-500" />}
-                                                aspectRatio="3/4"
-                                                currentImageUrl={landingPhotos?.registrationDoc}
-                                                onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
-                                                placeholder="पंजीकरण दस्तावेज़ / Upload Registration"
-                                            />
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 

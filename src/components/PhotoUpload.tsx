@@ -32,7 +32,12 @@ export function PhotoUploadSection({
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+        if (!file) {
+            console.log('No file selected');
+            return;
+        }
+
+        console.log('📸 Starting upload for:', file.name, 'Size:', (file.size / 1024).toFixed(2), 'KB');
 
         // Reset states
         setUploadError(null);
@@ -41,14 +46,25 @@ export function PhotoUploadSection({
 
         try {
             // Create preview
+            console.log('Creating preview...');
             const reader = new FileReader();
             reader.onloadend = () => {
+                console.log('Preview created successfully');
                 setPreviewUrl(reader.result as string);
+            };
+            reader.onerror = () => {
+                console.error('Failed to read file for preview');
             };
             reader.readAsDataURL(file);
 
             // Upload to Firebase
+            console.log('Starting Firebase upload...');
+            if (!uploadImage) {
+                throw new Error('Upload function not available. Please refresh the page and try again.');
+            }
+
             const url = await uploadImage(file, false);
+            console.log('✅ Upload successful! URL:', url);
 
             // Success!
             setUploadSuccess(true);
@@ -56,7 +72,9 @@ export function PhotoUploadSection({
 
             setTimeout(() => setUploadSuccess(false), 3000);
         } catch (error: any) {
-            setUploadError(error.message || 'Upload failed');
+            console.error('❌ Upload failed:', error);
+            const errorMessage = error.message || 'Upload failed. Please try again.';
+            setUploadError(errorMessage);
             setPreviewUrl(currentImageUrl || null);
         } finally {
             setIsUploading(false);
@@ -71,7 +89,7 @@ export function PhotoUploadSection({
     };
 
     return (
-        <div className="pt-12 border-t border-gray-100">
+        <div>
             <div className="flex items-center gap-3 mb-4">
                 {icon}
                 <div>
@@ -89,6 +107,7 @@ export function PhotoUploadSection({
                         style={{ aspectRatio }}
                     >
                         <input
+                            key={previewUrl || 'empty'}
                             type="file"
                             accept="image/*"
                             onChange={handleFileSelect}
@@ -102,14 +121,20 @@ export function PhotoUploadSection({
                                     src={previewUrl}
                                     alt={title}
                                     className="w-full h-full object-cover"
+                                    onError={() => {
+                                        console.error('Image preview failed for:', previewUrl);
+                                        setUploadError('Failed to load image preview. The file might be corrupted.');
+                                    }}
                                 />
                                 {!isUploading && (
                                     <button
+                                        type="button"
                                         onClick={(e) => {
                                             e.preventDefault();
+                                            e.stopPropagation();
                                             handleRemove();
                                         }}
-                                        className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                                        className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg z-20"
                                     >
                                         <X size={16} />
                                     </button>
@@ -130,7 +155,7 @@ export function PhotoUploadSection({
 
                         {/* Loading Overlay */}
                         {isUploading && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-30">
                                 <Loader2 className="animate-spin text-white mb-3" size={40} />
                                 <p className="text-white font-bold">Uploading...</p>
                                 <p className="text-white/70 text-xs">Compressing & optimizing</p>
@@ -139,7 +164,7 @@ export function PhotoUploadSection({
 
                         {/* Success Overlay */}
                         {uploadSuccess && (
-                            <div className="absolute inset-0 bg-green-500/90 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in">
+                            <div className="absolute inset-0 bg-green-500/90 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in z-30">
                                 <div className="p-4 bg-white rounded-full mb-3">
                                     <Check className="text-green-600" size={40} />
                                 </div>
