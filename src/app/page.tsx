@@ -867,10 +867,12 @@ export default function Home() {
                               if (isFacebook) {
                                 return (
                                   <>
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[#1877F2] to-[#0051C1]" />
                                     <div className="relative z-10 text-center">
-                                      <PlayCircle className="mx-auto text-white group-hover/media:scale-125 transition-transform drop-shadow-2xl mb-2" size={64} />
-                                      <p className="text-white text-xs font-bold">Facebook Video</p>
+                                      <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-md border border-white/20">
+                                        <PlayCircle className="text-white group-hover/media:scale-110 transition-transform drop-shadow-2xl" size={40} />
+                                      </div>
+                                      <p className="text-white text-[10px] font-black uppercase tracking-[0.2em]">Facebook Video</p>
                                     </div>
                                   </>
                                 );
@@ -1113,9 +1115,11 @@ export default function Home() {
                     />;
                   }
                   if (isFacebook) {
+                    // Normalize FB short links (fb.watch) or mobile links if possible
+                    // Note: Short links like fb.watch sometimes need direct view
                     return <iframe
-                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1`}
-                      className="w-full h-full"
+                      src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1&mute=0`}
+                      className="w-full h-full border-0 overflow-hidden"
                       allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                       allowFullScreen
                     />;
@@ -1125,7 +1129,7 @@ export default function Home() {
                     const embedUrl = cleanUrl.endsWith('/') ? `${cleanUrl}embed` : `${cleanUrl}/embed`;
                     return <iframe
                       src={embedUrl}
-                      className="w-full h-full"
+                      className="w-full h-full border-0 overflow-hidden"
                       allowTransparency={true}
                       allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                       allowFullScreen
@@ -1136,8 +1140,22 @@ export default function Home() {
               ) : (
                 <img src={fullScreenMedia.url} className="w-full h-full object-contain" alt="" />
               )}
-              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                <h2 className="text-2xl font-serif font-black text-white">{fullScreenMedia.title}</h2>
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col md:flex-row items-end justify-between gap-6 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <h2 className="text-2xl font-serif font-black text-white drop-shadow-lg">{fullScreenMedia.title}</h2>
+                  {(fullScreenMedia.url.includes('facebook') || fullScreenMedia.url.includes('fb.watch') || fullScreenMedia.url.includes('instagram')) && (
+                    <p className="text-amber-500/80 text-[10px] font-bold uppercase tracking-widest mt-1">Social media embed might have viewing restrictions</p>
+                  )}
+                </div>
+                <a
+                  href={fullScreenMedia.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pointer-events-auto flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl border border-white/20 transition-all font-bold text-xs uppercase tracking-widest group"
+                >
+                  <PlayCircle size={16} className="text-amber-500 group-hover:scale-110 transition-transform" />
+                  View Original
+                </a>
               </div>
             </div>
           </motion.div>
