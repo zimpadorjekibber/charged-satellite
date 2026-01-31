@@ -586,13 +586,36 @@ export default function Home() {
                 onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
               >
                 <div className="relative group">
-                  <div className="absolute -inset-4 bg-amber-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative bg-white p-4 md:p-8 rounded-lg shadow-2xl transform group-hover:rotate-1 transition-transform duration-500">
-                    <img src={landingPhotos.registrationDoc} alt="First Registration" className="w-full h-auto border border-gray-200" />
-                    <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                      <span className="text-gray-400 font-serif italic">Historical Archive - 1995</span>
+                  {/* Outer Frame - Dark Wood texture effect */}
+                  <div className="absolute -inset-1 bg-[#2a1b0a] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+
+                  {/* Inner Frame / Matting */}
+                  <div className="relative bg-[#3d2b1f] p-3 md:p-6 rounded-lg shadow-inner transform group-hover:rotate-1 transition-transform duration-500 border-[8px] border-[#1a1108]">
+                    <div className="bg-[#f4f1ea] p-4 md:p-10 shadow-inner relative overflow-hidden border-2 border-black/5">
+                      {/* Glass Reflection Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none z-10" />
+                      <div className="absolute top-0 left-0 w-full h-1 bg-white/20 z-20" />
+
+                      {/* The Document */}
+                      <img
+                        src={landingPhotos.registrationDoc}
+                        alt="First Registration"
+                        className="w-full h-auto shadow-md relative z-0 opacity-90 group-hover:opacity-100 transition-opacity"
+                      />
+
+                      <div className="mt-6 pt-6 border-t border-black/10 text-center">
+                        <span className="text-gray-500 font-serif italic text-sm tracking-widest uppercase">
+                          Historical Archive - 1995
+                        </span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Decorative Frame Nails/Corners */}
+                  <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
+                  <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
+                  <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
                 </div>
               </div>
 
