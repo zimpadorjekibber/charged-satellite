@@ -572,13 +572,83 @@ export default function Home() {
 
           </div>
 
+          {/* --- THE SOUL OF TASHIZOM: ASHTAMANGALA --- */}
+          <section className="mt-32 pb-24 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/5 to-transparent pointer-events-none" />
+
+            <div className="text-center mb-16 relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
+                Our Identity
+              </div>
+              <h2 className="text-4xl md:text-7xl font-serif font-black text-white mb-6">
+                The Soul of <span className="text-amber-500 italic">TashiZom</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-gray-400 text-lg md:text-xl font-medium leading-relaxed">
+                <span className="text-amber-400 font-bold">"Tashi"</span> represents the Eight Auspicious Signs of Himalayan wisdom,
+                and <span className="text-amber-400 font-bold">"Zom"</span> means gathering them all together in one sacred place.
+              </p>
+            </div>
+
+            {/* Symbols Grid Pattern */}
+            <div className="max-w-5xl mx-auto px-4 md:px-0">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                {[
+                  { name: 'Lotus', img: '/symbols/lotus.png', desc: 'Purity & spiritual awakening' },
+                  { name: 'Treasure Vase', img: '/symbols/vase.png', desc: 'Infinite health & wealth' },
+                  { name: 'Golden Fish', img: '/symbols/fish.png', desc: 'Freedom & fearlessness' },
+                  { name: 'Parasol', img: '/symbols/parasol.png', desc: 'Protection & royalty' },
+                  { name: 'Endless Knot', img: '/symbols/knot.png', desc: 'Unity & eternal wisdom' },
+                  { name: 'Victory Banner', img: '/symbols/banner.png', desc: 'Victory over obstacles' },
+                  { name: 'Dharma Wheel', img: '/symbols/wheel.png', desc: 'Spiritual law & path' },
+                  { name: 'Conch Shell', img: '/symbols/conch.png', desc: 'Awakening from ignorance' }
+                ].map((symbol, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="group relative"
+                  >
+                    <div className="absolute -inset-2 bg-amber-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
+                    <div className="relative bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col items-center gap-4 hover:border-amber-500/30 transition-all hover:-translate-y-2 backdrop-blur-sm">
+                      <div className="w-20 h-20 md:w-24 md:h-24 p-2">
+                        <img
+                          src={symbol.img}
+                          alt={symbol.name}
+                          className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(218,165,32,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(218,165,32,0.6)] transition-all"
+                        />
+                      </div>
+                      <div className="text-center">
+                        <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-1">{symbol.name}</h4>
+                        <p className="text-[10px] text-gray-500 font-medium italic leading-tight">{symbol.desc}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-16 p-8 bg-amber-500/5 border border-amber-500/10 rounded-3xl text-center"
+              >
+                <p className="text-amber-500/80 font-serif italic text-lg md:text-xl">
+                  "Every brick and ہر corner of TashiZom is built upon the essence of these blessings.
+                  When you step in, you step into a union of all eight signs."
+                </p>
+              </motion.div>
+            </div>
+          </section>
+
           {/* --- HERITAGE SECTION (Relocated) --- */}
           {landingPhotos?.registrationDoc && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center gap-16"
+              className="mt-12 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center gap-16"
             >
               <div
                 className="flex-1 w-full max-w-2xl cursor-zoom-in order-2 md:order-1"
