@@ -54,7 +54,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col bg-tashi-dark relative overflow-x-hidden">
       {/* --- PRAYER FLAGS SECTION --- */}
       {landingPhotos?.prayerFlags && (
-        <div className="absolute top-0 left-0 right-0 z-10 h-14 md:h-16 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/10 backdrop-blur-sm">
+        <div className="absolute top-0 left-0 right-0 z-20 h-14 md:h-20 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/5 backdrop-blur-[2px]">
           <div className="flex animate-[flags_30s_linear_infinite] min-w-full">
             {[...Array(10)].map((_, i) => (
               <img key={i} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" title="Tashi Delek" />
@@ -82,7 +82,7 @@ export default function Home() {
 
         {/* --- MODE 2: 3-SECTION BUILDING SPLIT --- */}
         <div
-          className={`absolute inset-0 z-10 flex flex-col transition-opacity duration-[2000ms] ease-in-out ${!showFood ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 z-[5] flex flex-col transition-opacity duration-[2000ms] ease-in-out ${!showFood ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className="flex-1 relative overflow-hidden group border-b border-black/20">
             <div className="absolute inset-0 bg-black/20 z-10" />
@@ -113,16 +113,16 @@ export default function Home() {
                 <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   Tash
                 </span>
-                <span className="relative inline-flex items-center justify-center px-[0.02em]">
+                <span className="relative inline-flex items-center justify-center px-2">
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                     i
                   </span>
                   <motion.img
-                    initial={{ scale: 0, y: 10 }}
-                    animate={{ scale: 1, y: 0 }}
-                    transition={{ delay: 0.8, type: 'spring', damping: 15 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.8, type: 'spring', stiffness: 100 }}
                     src="/logo_crest.png"
-                    className="absolute bottom-[82%] left-1/2 -translate-x-1/2 w-[1.1em] h-[1.1em] aspect-square rounded-full border-2 border-amber-500/80 shadow-[0_0_30px_rgba(218,165,32,0.6)] z-50 bg-black/40 backdrop-blur-sm object-contain pointer-events-none"
+                    className="absolute -top-10 md:-top-16 left-1/2 -translate-x-1/2 w-14 h-14 md:w-24 md:h-24 aspect-square rounded-full border-2 border-amber-500/80 shadow-[0_0_30px_rgba(218,165,32,0.6)] z-50 bg-black/40 backdrop-blur-sm object-contain pointer-events-none p-1"
                     alt="Logo"
                   />
                 </span>
