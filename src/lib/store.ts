@@ -191,6 +191,8 @@ interface AppState {
         chefPhoto?: string;
         locationCaptions?: Record<string, string>;
         climateCaptions?: Record<string, string>;
+        prayerFlags?: string;
+        prayerWheel?: string;
     };
 
 
@@ -299,7 +301,9 @@ export const useStore = create<AppState>()(
                 customMap: '',
                 registrationDoc: '',
                 locationCaptions: {},
-                climateCaptions: {}
+                climateCaptions: {},
+                prayerFlags: '',
+                prayerWheel: ''
             },
             customerDetails: null,
             contactInfo: {
@@ -891,7 +895,7 @@ export const useStore = create<AppState>()(
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
             },
 
-            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => {
+            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto' | 'prayerFlags' | 'prayerWheel', data: string[] | string) => {
                 // Special handling for galleries (storing as separate docs to avoid 1MB Firestore limit)
                 if (section === 'location' || section === 'climate') {
                     if (Array.isArray(data)) {
@@ -952,6 +956,26 @@ export const useStore = create<AppState>()(
 
                 if (!file.type.startsWith('image/')) {
                     throw new Error('❌ Only image files are allowed');
+                }
+
+                if (file.type === 'image/gif') {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const base64String = e.target?.result as string;
+                            if (saveToGallery) {
+                                addDoc(collection(db, 'settings', 'media', 'library'), {
+                                    url: base64String,
+                                    name: file.name,
+                                    isBase64: true,
+                                    createdAt: new Date().toISOString()
+                                }).catch(err => console.error("Gallery save failed", err));
+                            }
+                            resolve(base64String);
+                        };
+                        reader.onerror = () => reject(new Error('Failed to read GIF'));
+                        reader.readAsDataURL(file);
+                    });
                 }
 
                 return new Promise((resolve, reject) => {

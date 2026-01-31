@@ -10,7 +10,8 @@
   --color-tashi-dark: #ffffff;
   --color-tashi-darker: #f5f5f5;
   --color-tashi-light: #1a1a1a;
-  --color-tashi-neutral: #4a4a4a; /* Darker neutral for better contrast */
+  --color-tashi-neutral: #4a4a4a;
+  /* Darker neutral for better contrast */
 }
 
 @layer utilities {
@@ -56,10 +57,22 @@
   --foreground: #000000;
 }
 
+
+@keyframes flags {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
-  font-size: 15px; /* Increased from 12px for better readability */
+  font-size: 15px;
+  /* Increased from 12px for better readability */
 }
 
 /* Light mode override if needed, but going for premium dark theme as default */
@@ -132,6 +145,7 @@ body {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }

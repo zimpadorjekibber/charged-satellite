@@ -142,7 +142,7 @@ export function PhotoUploadSection({
                                 </div>
                                 <p className="text-sm font-bold text-gray-700 text-center mb-2">{placeholder}</p>
                                 <p className="text-xs text-gray-500 text-center max-w-xs">
-                                    Click to upload • Max 10MB • JPG, PNG, WEBP
+                                    Click to upload • Max 10MB • JPG, PNG, WEBP, GIF
                                 </p>
                             </div>
                         )}

@@ -1612,6 +1612,37 @@ function AdminDashboard() {
                                         </div>
                                     </div>
 
+                                    {/* GIFT Assets: Prayer Flags & Wheel */}
+                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100 shadow-sm">
+                                        <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                            <Sparkles size={18} className="text-indigo-600" />
+                                            Spiritual & Cultural Assets (GIFs)
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Upload animated GIFs for prayer flags and prayer wheels to add a local vibe</p>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <PhotoUploadSection
+                                                title="Prayer Flags (Animated GIF)"
+                                                description="Long strip of repeating prayer flags (GIF recommended)"
+                                                icon={<ImageIcon size={20} className="text-indigo-500" />}
+                                                aspectRatio="video"
+                                                currentImageUrl={landingPhotos?.prayerFlags}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerFlags', url)}
+                                                placeholder="Flag GIF Upload"
+                                            />
+
+                                            <PhotoUploadSection
+                                                title="Prayer Wheel (Animated GIF)"
+                                                description="Circular rotating prayer wheel asset"
+                                                icon={<ImageIcon size={20} className="text-purple-500" />}
+                                                aspectRatio="square"
+                                                currentImageUrl={landingPhotos?.prayerWheel}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerWheel', url)}
+                                                placeholder="Wheel GIF Upload"
+                                            />
+                                        </div>
+                                    </div>
+
                                     {/* Quick Upload Tool (For when you need a URL) */}
                                     <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
                                         <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
@@ -1690,13 +1721,24 @@ function AdminDashboard() {
                                                         <button
                                                             onClick={async () => {
                                                                 try {
-                                                                    await updateLandingPhotos('chefPhoto', manualUploadUrl);
-                                                                    alert('✅ CHEF PHOTO SET!');
+                                                                    await updateLandingPhotos('prayerFlags', manualUploadUrl);
+                                                                    alert('✅ PRAYER FLAGS SET!');
                                                                 } catch (e) { alert('Error: ' + e); }
                                                             }}
-                                                            className="bg-pink-600 hover:bg-pink-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-pink-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 transition-all"
                                                         >
-                                                            CHEF PHOTO
+                                                            PRAYER FLAGS
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('prayerWheel', manualUploadUrl);
+                                                                    alert('✅ PRAYER WHEEL SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-teal-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            PRAYER WHEEL
                                                         </button>
                                                     </div>
 

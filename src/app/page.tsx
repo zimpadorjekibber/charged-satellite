@@ -52,6 +52,19 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col bg-tashi-dark relative overflow-x-hidden">
+      {/* --- PRAYER FLAGS SECTION --- */}
+      {landingPhotos?.prayerFlags && (
+        <div className="absolute top-0 left-0 right-0 z-[100] h-10 md:h-12 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/20 backdrop-blur-sm">
+          <div className="flex animate-[flags_30s_linear_infinite] min-w-full">
+            {[...Array(10)].map((_, i) => (
+              <img key={i} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" title="Tashi Delek" />
+            ))}
+            {[...Array(10)].map((_, i) => (
+              <img key={`dup-${i}`} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* --- HERO SECTION (100vh) --- */}
       <section className="h-[100dvh] w-full flex flex-col items-center justify-center relative overflow-hidden flex-shrink-0">
@@ -102,12 +115,28 @@ export default function Home() {
         {/* Hero Content */}
         <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12 items-center">
           <div className="flex-1 flex flex-col items-center justify-start pt-4">
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="pointer-events-auto text-center">
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="pointer-events-auto text-center flex items-center justify-center gap-4 md:gap-8">
+              {landingPhotos?.prayerWheel && (
+                <motion.img
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  src={landingPhotos.prayerWheel}
+                  className="w-16 h-16 md:w-28 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(218,165,32,0.5)]"
+                />
+              )}
               <h1 className="text-6xl md:text-8xl font-black tracking-tighter font-serif">
                 <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   TashiZom
                 </span>
               </h1>
+              {landingPhotos?.prayerWheel && (
+                <motion.img
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  src={landingPhotos.prayerWheel}
+                  className="w-16 h-16 md:w-28 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(218,165,32,0.5)]"
+                />
+              )}
             </motion.div>
           </div>
 
@@ -186,7 +215,25 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-serif font-black text-amber-500 mb-6">Welcome to TashiZom Kibber</h2>
+            <div className="flex items-center justify-center gap-6 mb-6">
+              {landingPhotos?.prayerWheel && (
+                <motion.img
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  src={landingPhotos.prayerWheel}
+                  className="w-12 h-12 md:w-20 md:h-20 object-contain"
+                />
+              )}
+              <h2 className="text-3xl md:text-5xl font-serif font-black text-amber-500">Welcome to TashiZom Kibber</h2>
+              {landingPhotos?.prayerWheel && (
+                <motion.img
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  src={landingPhotos.prayerWheel}
+                  className="w-12 h-12 md:w-20 md:h-20 object-contain"
+                />
+              )}
+            </div>
             <div className="w-24 h-1 bg-amber-600 mx-auto mb-8 rounded-full" />
             <p className="text-gray-300 text-lg md:text-xl leading-relaxed font-light">
               Located at the heart of <span className="text-amber-400 font-bold">Kibber Village</span> at 4,270 Meters (14,009 Feet),
