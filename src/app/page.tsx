@@ -687,7 +687,12 @@ export default function Home() {
                 {landingPhotos?.chichamPhoto && (
                   <div className="h-48 overflow-hidden relative">
                     <img src={landingPhotos.chichamPhoto} alt="Chicham Bridge" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-6">
+                      <div className="bg-amber-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                        Chicham Bridge
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div className="p-8 space-y-4">
@@ -716,7 +721,12 @@ export default function Home() {
                 {landingPhotos?.keePhoto && (
                   <div className="h-48 overflow-hidden relative">
                     <img src={landingPhotos.keePhoto} alt="Kee Monastery" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-6">
+                      <div className="bg-amber-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                        Kee Monastery
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div className="p-8 space-y-4">
