@@ -98,41 +98,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Top Center Crest Logo */}
-        <motion.div
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 100 }}
-          className="absolute top-0 left-1/2 -translate-x-1/2 z-50 rounded-full shadow-2xl border-2 border-amber-500/50"
-        >
-          <img
-            src="/logo_crest.png"
-            alt="TashiZom Crest Logo"
-            className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover scale-[1.2]"
-          />
-        </motion.div>
 
         {/* Hero Content */}
         <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12 items-center">
           <div className="flex-1 flex flex-col items-center justify-start pt-4">
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="pointer-events-auto text-center flex items-center justify-center gap-4 md:gap-8">
               {landingPhotos?.prayerWheel && (
-                <motion.img
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                <img
                   src={landingPhotos.prayerWheel}
                   className="w-16 h-16 md:w-28 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(218,165,32,0.5)]"
                 />
               )}
               <h1 className="text-6xl md:text-8xl font-black tracking-tighter font-serif">
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-                  TashiZom
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] relative">
+                  Tash
+                  <span className="relative">
+                    i
+                    <motion.img
+                      initial={{ scale: 0, y: 20 }}
+                      animate={{ scale: 1.2, y: 0 }}
+                      transition={{ delay: 0.8, type: 'spring' }}
+                      src="/logo_crest.png"
+                      className="absolute bottom-[80%] left-1/2 -translate-x-1/2 w-8 h-8 md:w-12 md:h-12 rounded-full border border-amber-500/30 shadow-xl z-50 bg-black/20 backdrop-blur-sm"
+                      alt="Logo"
+                    />
+                  </span>
+                  Zom
                 </span>
               </h1>
               {landingPhotos?.prayerWheel && (
-                <motion.img
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                <img
                   src={landingPhotos.prayerWheel}
                   className="w-16 h-16 md:w-28 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(218,165,32,0.5)]"
                 />
@@ -217,18 +212,14 @@ export default function Home() {
           >
             <div className="flex items-center justify-center gap-6 mb-6">
               {landingPhotos?.prayerWheel && (
-                <motion.img
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                <img
                   src={landingPhotos.prayerWheel}
                   className="w-12 h-12 md:w-20 md:h-20 object-contain"
                 />
               )}
               <h2 className="text-3xl md:text-5xl font-serif font-black text-amber-500">Welcome to TashiZom Kibber</h2>
               {landingPhotos?.prayerWheel && (
-                <motion.img
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                <img
                   src={landingPhotos.prayerWheel}
                   className="w-12 h-12 md:w-20 md:h-20 object-contain"
                 />
