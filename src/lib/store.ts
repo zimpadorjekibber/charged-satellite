@@ -134,6 +134,7 @@ export interface MenuAppearance {
     itemNameFontSize: string;
     itemNameColor: string;
     accentColor: string;
+    layout?: 'grid' | 'list' | 'auto';
 }
 
 export interface ContactSettings {
@@ -831,9 +832,10 @@ export const useStore = create<AppState>()(
             },
 
             saveValleyUpdates: async (updates) => {
+                const newUpdates = updates.map(u => ({ ...u, id: u.id || Math.random().toString(36).substring(7) }));
+                set({ valleyUpdates: newUpdates });
                 const settingsRef = doc(db, 'settings', 'valley_updates');
-                await setDoc(settingsRef, { updates: updates.map(u => ({ ...u, id: Math.random().toString(36).substring(7) })) });
-                set({ valleyUpdates: updates });
+                await setDoc(settingsRef, { updates: newUpdates });
             },
 
             // LOCAL GEAR MANAGEMENT
@@ -880,10 +882,12 @@ export const useStore = create<AppState>()(
             },
 
             updateMenuAppearance: async (updates) => {
+                set({ menuAppearance: { ...get().menuAppearance, ...updates } });
                 await setDoc(doc(db, 'settings', 'menu-appearance'), updates, { merge: true });
             },
 
             updateSettings: async (settings) => {
+                set((state: any) => ({ ...state, ...settings }));
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
             },
 
@@ -913,6 +917,7 @@ export const useStore = create<AppState>()(
                                 }
                             }
                         }
+                        set({ landingPhotos: { ...get().landingPhotos, [section]: data } });
                     }
                     return;
                 }
@@ -938,6 +943,7 @@ export const useStore = create<AppState>()(
             },
 
             updateContactSettings: async (contact: ContactSettings) => {
+                set({ contactInfo: contact });
                 await setDoc(doc(db, 'settings', 'contact'), contact);
             },
 

@@ -176,12 +176,14 @@ function AdminDashboard() {
         const tab = searchParams.get('tab');
         const validTabs = ['live', 'history', 'analytics', 'reviews', 'settings', 'media', 'storage', 'gear', 'stays'];
         if (tab && validTabs.includes(tab)) {
+            console.log('🔗 URL search param detected tab:', tab);
             setActiveTab(tab as any);
         }
     }, [searchParams]);
 
     // Update URL when tab changes
     const handleTabChange = (tab: string) => {
+        console.log('🔄 Changing admin tab to:', tab);
         setActiveTab(tab as any);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -671,7 +673,7 @@ function AdminDashboard() {
                                                     </div>
                                                     <ArrowRight size={14} className="text-gray-300" />
                                                 </button>
-                                                <button onClick={() => updateMenuAppearance(menuAppearance === 'grid' ? 'list' : 'grid')} className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-sm font-medium text-gray-700 border border-gray-100">
+                                                <button onClick={() => updateMenuAppearance({ layout: menuAppearance.layout === 'grid' ? 'list' : 'grid' })} className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-sm font-medium text-gray-700 border border-gray-100">
                                                     <div className="flex items-center gap-3">
                                                         <Grid size={18} className="text-gray-400" />
                                                         Switch Menu Layout
@@ -1552,6 +1554,9 @@ function AdminDashboard() {
                                                     mediaUrl: ''
                                                 };
                                                 useStore.getState().saveValleyUpdates([...currentUpdates, newUpdate]);
+                                                (document.getElementById('update-title') as HTMLInputElement).value = '';
+                                                (document.getElementById('update-desc') as HTMLTextAreaElement).value = '';
+                                                alert('Update posted successfully!');
                                             }}
                                             className="bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-gray-500 hover:text-gray-900 transition-colors min-h-[160px]"
                                         >
