@@ -102,27 +102,31 @@ export default function Home() {
         {/* Hero Content */}
         <div className="absolute inset-0 z-30 pointer-events-none flex flex-col pt-12 pb-12 items-center">
           <div className="flex-1 flex flex-col items-center justify-start pt-4">
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="pointer-events-auto text-center flex items-center justify-center gap-4 md:gap-8">
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="pointer-events-auto text-center flex items-center justify-center gap-2 md:gap-8">
               {landingPhotos?.prayerWheel && (
                 <img
                   src={landingPhotos.prayerWheel}
                   className="w-16 h-16 md:w-28 md:h-28 object-contain drop-shadow-[0_0_15px_rgba(218,165,32,0.5)]"
                 />
               )}
-              <h1 className="text-6xl md:text-8xl font-black tracking-tighter font-serif">
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] relative">
+              <h1 className="text-5xl md:text-8xl font-black tracking-tighter font-serif flex flex-row items-center justify-center whitespace-nowrap">
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   Tash
-                  <span className="relative">
+                </span>
+                <span className="relative inline-flex items-center justify-center px-[0.02em]">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                     i
-                    <motion.img
-                      initial={{ scale: 0, y: 20 }}
-                      animate={{ scale: 1.2, y: 0 }}
-                      transition={{ delay: 0.8, type: 'spring' }}
-                      src="/logo_crest.png"
-                      className="absolute bottom-[80%] left-1/2 -translate-x-1/2 w-8 h-8 md:w-12 md:h-12 rounded-full border border-amber-500/30 shadow-xl z-50 bg-black/20 backdrop-blur-sm"
-                      alt="Logo"
-                    />
                   </span>
+                  <motion.img
+                    initial={{ scale: 0, y: 10 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ delay: 0.8, type: 'spring', damping: 15 }}
+                    src="/logo_crest.png"
+                    className="absolute bottom-[85%] left-1/2 -translate-x-1/2 w-[0.7em] h-[0.7em] rounded-full border-2 border-amber-500/80 shadow-[0_0_20px_rgba(218,165,32,0.6)] z-[100] bg-black/40 backdrop-blur-sm object-cover pointer-events-none"
+                    alt="Logo"
+                  />
+                </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   Zom
                 </span>
               </h1>
