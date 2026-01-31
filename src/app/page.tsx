@@ -54,7 +54,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col bg-tashi-dark relative overflow-x-hidden">
       {/* --- PRAYER FLAGS SECTION --- */}
       {landingPhotos?.prayerFlags && (
-        <div className="absolute top-0 left-0 right-0 z-[100] h-10 md:h-12 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/20 backdrop-blur-sm">
+        <div className="absolute top-0 left-0 right-0 z-20 h-14 md:h-16 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/10 backdrop-blur-sm">
           <div className="flex animate-[flags_30s_linear_infinite] min-w-full">
             {[...Array(10)].map((_, i) => (
               <img key={i} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" title="Tashi Delek" />
@@ -122,7 +122,7 @@ export default function Home() {
                     animate={{ scale: 1, y: 0 }}
                     transition={{ delay: 0.8, type: 'spring', damping: 15 }}
                     src="/logo_crest.png"
-                    className="absolute bottom-[85%] left-1/2 -translate-x-1/2 w-[0.7em] h-[0.7em] rounded-full border-2 border-amber-500/80 shadow-[0_0_20px_rgba(218,165,32,0.6)] z-[100] bg-black/40 backdrop-blur-sm object-cover pointer-events-none"
+                    className="absolute bottom-[88%] left-1/2 -translate-x-1/2 w-[0.85em] h-[0.85em] aspect-square rounded-full border-2 border-amber-500/80 shadow-[0_0_20px_rgba(218,165,32,0.6)] z-50 bg-black/40 backdrop-blur-sm object-contain pointer-events-none"
                     alt="Logo"
                   />
                 </span>
