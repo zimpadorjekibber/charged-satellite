@@ -1513,12 +1513,25 @@ function AdminDashboard() {
                                                 </div>
                                                 {/* Media Preview */}
                                                 {update.mediaUrl && (
-                                                    <div className="w-full h-32 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 mt-2">
-                                                        {update.mediaType === 'video' ? (
-                                                            <video src={update.mediaUrl} controls className="h-full max-w-full" />
-                                                        ) : (
-                                                            <img src={update.mediaUrl} className="h-full object-cover" alt="Preview" />
-                                                        )}
+                                                    <div className="w-full h-32 rounded bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 mt-2 relative">
+                                                        {(() => {
+                                                            const url = update.mediaUrl;
+                                                            const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+                                                            const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
+                                                            const isInstagram = url.includes('instagram.com');
+
+                                                            if (update.mediaType === 'video') {
+                                                                if (isYoutube) {
+                                                                    const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
+                                                                    return <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} className="h-full w-full object-cover" />;
+                                                                }
+                                                                if (isFacebook) return <div className="bg-blue-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">FB Video</div>;
+                                                                if (isInstagram) return <div className="bg-pink-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">Insta Reel</div>;
+                                                                return <video src={url} className="h-full max-w-full" />;
+                                                            }
+                                                            return <img src={url} className="h-full object-cover" alt="Preview" />;
+                                                        })()}
+                                                        {update.mediaType === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/20"><PlayCircle size={32} className="text-white opacity-80" /></div>}
                                                     </div>
                                                 )}
                                             </div>
@@ -1701,53 +1714,76 @@ function AdminDashboard() {
                                             <MapPin size={16} className="text-amber-500" /> Prime Location Photo Gallery (Real Place)
                                         </h3>
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                            {(landingPhotos?.location || []).map((url: string, idx: number) => (
-                                                <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                    <img src={url} alt="" className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Add caption..."
-                                                            defaultValue={landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || ''}
-                                                            onBlur={(e) => updateLandingPhotoCaption('location', url, e.target.value)}
-                                                            className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
-                                                        />
+                                            {(landingPhotos?.location || []).map((url: string, idx: number) => {
+                                                const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                                                return (
+                                                    <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                        {isVideo ? (
+                                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                <PlayCircle className="text-white/50" size={32} />
+                                                            </div>
+                                                        ) : (
+                                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Add caption..."
+                                                                defaultValue={landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                                onBlur={(e) => updateLandingPhotoCaption('location', url, e.target.value)}
+                                                                className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
+                                                                updateLandingPhotos('location', newUrls);
+                                                            }}
+                                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
-                                                            updateLandingPhotos('location', newUrls);
-                                                        }}
-                                                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400 hover:text-amber-600">
-                                                <Plus size={24} />
-                                                <span className="text-[10px] font-bold uppercase">Upload</span>
-                                                <input
-                                                    type="file"
-                                                    className="hidden"
-                                                    accept="image/*"
-                                                    onChange={async (e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) {
-                                                            try {
-                                                                const url = await uploadImage(file);
-                                                                const currentUrls = landingPhotos.location || [];
-                                                                await updateLandingPhotos('location', [...currentUrls, url]);
-                                                                alert('Image uploaded successfully!');
-                                                            } catch (err: any) {
-                                                                console.error("Upload error details:", err);
-                                                                alert(`Upload failed: ${err.message || "Unknown error"}`);
+                                                );
+                                            })}
+                                            <div className="flex flex-col gap-2">
+                                                <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400 hover:text-amber-600">
+                                                    <Plus size={24} />
+                                                    <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    const currentUrls = landingPhotos.location || [];
+                                                                    await updateLandingPhotos('location', [...currentUrls, url]);
+                                                                    alert('Image uploaded successfully!');
+                                                                } catch (err: any) {
+                                                                    console.error("Upload error details:", err);
+                                                                    alert(`Upload failed: ${err.message || "Unknown error"}`);
+                                                                }
                                                             }
+                                                        }}
+                                                    />
+                                                </label>
+                                                <button
+                                                    onClick={() => {
+                                                        const url = prompt('Paste YouTube/Facebook Video Link:');
+                                                        if (url) {
+                                                            const currentUrls = landingPhotos.location || [];
+                                                            updateLandingPhotos('location', [...currentUrls, url]);
                                                         }
                                                     }}
-                                                />
-                                            </label>
+                                                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
+                                                >
+                                                    Add Video Link
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -1757,48 +1793,71 @@ function AdminDashboard() {
                                             <CloudSnow size={16} className="text-blue-500" /> Winter Hardships & Survival Stories
                                         </h3>
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                            {(landingPhotos?.climate || []).map((url: string, idx: number) => (
-                                                <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                    <img src={url} alt="" className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Add caption..."
-                                                            defaultValue={landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || ''}
-                                                            onBlur={(e) => updateLandingPhotoCaption('climate', url, e.target.value)}
-                                                            className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
-                                                        />
+                                            {(landingPhotos?.climate || []).map((url: string, idx: number) => {
+                                                const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                                                return (
+                                                    <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                        {isVideo ? (
+                                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                <PlayCircle className="text-white/50" size={32} />
+                                                            </div>
+                                                        ) : (
+                                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Add caption..."
+                                                                defaultValue={landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                                onBlur={(e) => updateLandingPhotoCaption('climate', url, e.target.value)}
+                                                                className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
+                                                                updateLandingPhotos('climate', newUrls);
+                                                            }}
+                                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
-                                                            updateLandingPhotos('climate', newUrls);
+                                                );
+                                            })}
+                                            <div className="flex flex-col gap-2">
+                                                <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400 hover:text-blue-600">
+                                                    <Plus size={24} />
+                                                    <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    updateLandingPhotos('climate', [...(landingPhotos.climate || []), url]);
+                                                                } catch (err) { alert("Upload failed"); }
+                                                            }
                                                         }}
-                                                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400 hover:text-blue-600">
-                                                <Plus size={24} />
-                                                <span className="text-[10px] font-bold uppercase">Upload</span>
-                                                <input
-                                                    type="file"
-                                                    className="hidden"
-                                                    accept="image/*"
-                                                    onChange={async (e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) {
-                                                            try {
-                                                                const url = await uploadImage(file);
-                                                                updateLandingPhotos('climate', [...(landingPhotos.climate || []), url]);
-                                                            } catch (err) { alert("Upload failed"); }
+                                                    />
+                                                </label>
+                                                <button
+                                                    onClick={() => {
+                                                        const url = prompt('Paste YouTube/Facebook Video Link:');
+                                                        if (url) {
+                                                            const currentUrls = landingPhotos.climate || [];
+                                                            updateLandingPhotos('climate', [...currentUrls, url]);
                                                         }
                                                     }}
-                                                />
-                                            </label>
+                                                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
+                                                >
+                                                    Add Video Link
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 

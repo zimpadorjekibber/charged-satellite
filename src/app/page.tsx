@@ -206,22 +206,33 @@ export default function Home() {
                 </p>
                 {landingPhotos?.location?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
-                    {landingPhotos.location.map((url: string, i: number) => (
-                      <div
-                        key={i}
-                        className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
-                        onClick={() => setFullScreenMedia({ url, type: 'image', title: landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || 'Prime Location' })}
-                      >
-                        <img src={url} alt="" className="w-full h-full object-cover" />
-                        {landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] && (
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
-                            <span className="text-[8px] text-white font-bold leading-tight line-clamp-2">
-                              {landingPhotos.locationCaptions[btoa(url).substring(0, 100)]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {landingPhotos.location.map((url: string, i: number) => {
+                      const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                      const title = landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || 'Prime Location';
+
+                      return (
+                        <div
+                          key={i}
+                          className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
+                          onClick={() => setFullScreenMedia({ url, type: isVideo ? 'video' : 'image', title })}
+                        >
+                          {isVideo ? (
+                            <div className="w-full h-full bg-black flex items-center justify-center">
+                              <PlayCircle className="text-white/50" size={32} />
+                            </div>
+                          ) : (
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          )}
+                          {landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] && (
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                              <span className="text-[8px] text-white font-bold leading-tight line-clamp-2">
+                                {landingPhotos.locationCaptions[btoa(url).substring(0, 100)]}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -262,22 +273,33 @@ export default function Home() {
                 </p>
                 {landingPhotos?.climate?.length > 0 && (
                   <div className="mt-6 flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
-                    {landingPhotos.climate.map((url: string, i: number) => (
-                      <div
-                        key={i}
-                        className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
-                        onClick={() => setFullScreenMedia({ url, type: 'image', title: landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || 'Winter Condition' })}
-                      >
-                        <img src={url} alt="" className="w-full h-full object-cover" />
-                        {landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] && (
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
-                            <span className="text-[8px] text-white font-bold leading-tight line-clamp-3">
-                              {landingPhotos.climateCaptions[btoa(url).substring(0, 100)]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {landingPhotos.climate.map((url: string, i: number) => {
+                      const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                      const title = landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || 'Winter Condition';
+
+                      return (
+                        <div
+                          key={i}
+                          className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
+                          onClick={() => setFullScreenMedia({ url, type: isVideo ? 'video' : 'image', title })}
+                        >
+                          {isVideo ? (
+                            <div className="w-full h-full bg-black flex items-center justify-center">
+                              <PlayCircle className="text-white/50" size={32} />
+                            </div>
+                          ) : (
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          )}
+                          {landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] && (
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                              <span className="text-[8px] text-white font-bold leading-tight line-clamp-3">
+                                {landingPhotos.climateCaptions[btoa(url).substring(0, 100)]}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
