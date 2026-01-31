@@ -801,7 +801,7 @@ export default function MenuPage() {
         const element = document.getElementById(cat);
         if (element) {
             // Offset for fixed header (approx 120px)
-            const y = element.getBoundingClientRect().top + window.scrollY - 120;
+            const y = element.getBoundingClientRect().top + window.scrollY - 180;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
     };
@@ -1437,7 +1437,7 @@ export default function MenuPage() {
                         if (categoryItems.length === 0) return null;
 
                         return (
-                            <section key={cat} id={cat} className="scroll-mt-32">
+                            <section key={cat} id={cat} className="scroll-mt-52">
                                 {/* Typewriter Header */}
                                 <div className="flex items-center gap-4 mb-6 sticky top-[130px] z-30 py-2 bg-gradient-to-b from-white via-white/95 to-transparent backdrop-blur-sm -mx-2 px-2">
                                     <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-black/10" />

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper, Home, Phone } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper, Home, Phone, PlayCircle } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef, Suspense } from 'react';
@@ -60,6 +60,7 @@ function AdminDashboard() {
     const updateMenuAppearance = useStore((state: any) => state.updateMenuAppearance);
     const landingPhotos = useStore((state) => state.landingPhotos);
     const updateLandingPhotos = useStore((state) => state.updateLandingPhotos);
+    const updateLandingPhotoCaption = useStore((state) => state.updateLandingPhotoCaption);
     const uploadImage = useStore((state) => state.uploadImage);
 
     // Sound Logic
@@ -175,11 +176,11 @@ function AdminDashboard() {
     useEffect(() => {
         const tab = searchParams.get('tab');
         const validTabs = ['live', 'history', 'analytics', 'reviews', 'settings', 'media', 'storage', 'gear', 'stays'];
-        if (tab && validTabs.includes(tab)) {
-            console.log('🔗 URL search param detected tab:', tab);
+        if (tab && validTabs.includes(tab) && tab !== activeTab) {
+            console.log('🔗 URL search param sync activeTab:', tab);
             setActiveTab(tab as any);
         }
-    }, [searchParams]);
+    }, [searchParams, activeTab]);
 
     // Update URL when tab changes
     const handleTabChange = (tab: string) => {
@@ -400,7 +401,7 @@ function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen pb-24 bg-gray-50 text-gray-900 selection:bg-orange-100 selection:text-orange-900">
+        <div className="min-h-screen pb-32 bg-gray-50 text-gray-900 selection:bg-orange-100 selection:text-orange-900">
             {/* Hidden Audio Element for Reliable Playback */}
             <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" />
 
@@ -510,20 +511,20 @@ function AdminDashboard() {
             </div>
 
             {/* Mobile Bottom Navigation Bar */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 md:hidden px-2 py-2 pb-safe shadow-lg">
-                <div className="grid grid-cols-8 gap-1">
-                    <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={20} />} onClick={() => handleTabChange('live')} />
-                    <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={20} />} onClick={() => handleTabChange('history')} />
-                    <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={20} />} onClick={() => handleTabChange('analytics')} />
-                    <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={20} />} onClick={() => handleTabChange('reviews')} />
-                    <MobileTabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={20} />} onClick={() => handleTabChange('settings')} />
-                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={20} />} onClick={() => handleTabChange('gear')} />
-                    <MobileTabButton active={activeTab === 'stays'} label="Stays" icon={<Home size={20} />} onClick={() => handleTabChange('stays')} />
-                    <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={20} />} onClick={() => handleTabChange('media')} />
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-200 md:hidden px-4 py-3 pb-safe shadow-2xl">
+                <div className="flex items-center gap-6 overflow-x-auto hide-scrollbar scroll-smooth">
+                    <MobileTabButton active={activeTab === 'live'} label="Live" icon={<LayoutDashboard size={22} />} onClick={() => handleTabChange('live')} />
+                    <MobileTabButton active={activeTab === 'history'} label="History" icon={<History size={22} />} onClick={() => handleTabChange('history')} />
+                    <MobileTabButton active={activeTab === 'analytics'} label="Stats" icon={<BarChart3 size={22} />} onClick={() => handleTabChange('analytics')} />
+                    <MobileTabButton active={activeTab === 'reviews'} label="Review" icon={<Star size={22} />} onClick={() => handleTabChange('reviews')} />
+                    <MobileTabButton active={activeTab === 'settings'} label="Settings" icon={<Settings size={22} />} onClick={() => handleTabChange('settings')} />
+                    <MobileTabButton active={activeTab === 'gear'} label="Gear" icon={<ShoppingBag size={22} />} onClick={() => handleTabChange('gear')} />
+                    <MobileTabButton active={activeTab === 'stays'} label="Stays" icon={<Home size={22} />} onClick={() => handleTabChange('stays')} />
+                    <MobileTabButton active={activeTab === 'media'} label="Media" icon={<ImageIcon size={22} />} onClick={() => handleTabChange('media')} />
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto p-4 md:p-8">
+            <div className="max-w-7xl mx-auto p-4 md:p-8 pb-32 md:pb-8">
                 {/* Traffic Stats Button - Floating or Header? Header is crowded. Let's put a banner or a card in Live view? */}
                 {/* User asked for a BUTTON on admin portal. */}
                 <div className="flex justify-end mb-4">
@@ -1427,7 +1428,7 @@ function AdminDashboard() {
                             </div>
 
                             {/* Valley Updates Management */}
-                            <div id="valley-updates-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            <div id="valley-updates-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
                                 <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Valley Updates</h2>
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2053,7 +2054,7 @@ function AdminDashboard() {
                             </div>
 
                             {/* Table Management */}
-                            <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
                                     <button
@@ -2123,7 +2124,7 @@ function AdminDashboard() {
                             </div>
 
                             {/* Menu Management */}
-                            <div id="menu-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                            <div id="menu-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-bold text-gray-900">Menu Management</h2>
                                     <button
@@ -2509,7 +2510,7 @@ function AdminDashboard() {
                                 </div>
 
                                 {/* Search and Filter Section */}
-                                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
+                                <div className="bg-gray-50/95 backdrop-blur-md border border-gray-200 rounded-2xl p-4 md:p-6 mb-6 space-y-4 sticky top-[72px] z-30 shadow-sm transition-all">
                                     {/* Search Bar */}
                                     <div className="relative">
                                         <input
@@ -2681,7 +2682,7 @@ function AdminDashboard() {
                             {
                                 editingItem && (
                                     <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative">
+                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto mt-4 mb-4">
                                             <button
                                                 onClick={() => setEditingItem(null)}
                                                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -2816,26 +2817,26 @@ function AdminDashboard() {
 
                                                 <div>
                                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:border-tashi-accent outline-none min-h-[80px]" />
+                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none min-h-[80px]" />
                                                 </div>
 
-                                                <div className="flex gap-6 p-2 bg-white/5 rounded-lg">
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                <div className="flex flex-wrap gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
                                                         <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
                                                         <span>Vegetarian</span>
                                                     </label>
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
                                                         <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
                                                         <span>Spicy</span>
                                                     </label>
-                                                    <label className="flex items-center gap-2 text-white cursor-pointer select-none">
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
                                                         <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
                                                         <span>Chef's Special</span>
                                                     </label>
                                                 </div>
 
-                                                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">Cancel</button>
+                                                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Cancel</button>
                                                     <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
                                                 </div>
                                             </form>
@@ -4185,7 +4186,7 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center justify-between bg-white p-3 rounded-lg border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'} `}
+            className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border ${isDragging ? 'border-tashi-primary shadow-lg' : 'border-gray-200 hover:border-gray-300'} `}
         >
             {/* Drag Handle */}
             <div
@@ -4218,32 +4219,34 @@ function SortableMenuItem({ item, onEdit }: { item: any; onEdit: (item: any) => 
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0">
                 <button
                     onClick={() => useStore.getState().updateMenuItem(item.id, { available: !(item.available !== false) })}
-                    className={`px-2 py-1 rounded text-xs font-bold ${item.available !== false ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'} `}
+                    className={`px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${item.available !== false ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'} `}
                 >
                     {item.available !== false ? 'Active' : 'Sold Out'}
                 </button>
-                <button
-                    onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
-                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center ${item.isVegetarian ? 'bg-green-900/50 text-green-400 border border-green-500/50' : 'bg-red-900/50 text-red-400 border border-red-500/50'} `}
-                    title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
-                >
-                    {item.isVegetarian ? <Leaf size={14} /> : <Drumstick size={14} />}
+                <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-100">
+                    <button
+                        onClick={() => useStore.getState().updateMenuItem(item.id, { isVegetarian: !item.isVegetarian })}
+                        className={`p-1.5 rounded-md transition-colors ${item.isVegetarian ? 'bg-green-500 text-white shadow-sm' : 'text-gray-400 hover:bg-gray-200'} `}
+                        title={item.isVegetarian ? "Switch to Non-Veg" : "Switch to Veg"}
+                    >
+                        <Leaf size={14} />
+                    </button>
+                    <button
+                        onClick={() => useStore.getState().updateMenuItem(item.id, { isChefSpecial: !item.isChefSpecial })}
+                        className={`p-1.5 rounded-md transition-colors ${item.isChefSpecial ? 'bg-yellow-500 text-black shadow-sm' : 'text-gray-400 hover:bg-gray-200'} `}
+                        title={item.isChefSpecial ? "Remove from Chef's Specials" : "Mark as Chef's Special"}
+                    >
+                        <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
+                    </button>
+                </div>
+                <button onClick={() => onEdit(item)} className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-all border border-blue-100">
+                    <Pencil size={18} />
                 </button>
-                <button
-                    onClick={() => useStore.getState().updateMenuItem(item.id, { isChefSpecial: !item.isChefSpecial })}
-                    className={`p-1.5 rounded text-xs font-bold flex items-center justify-center border transition-colors ${item.isChefSpecial ? 'bg-yellow-500 text-black border-yellow-400' : 'text-gray-500 border-gray-700 hover:text-yellow-500'} `}
-                    title={item.isChefSpecial ? "Remove from Chef's Specials" : "Mark as Chef's Special"}
-                >
-                    <Star size={14} className={item.isChefSpecial ? "fill-black" : ""} />
-                </button>
-                <button onClick={() => onEdit(item)} className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded transition-colors">
-                    <Pencil size={16} />
-                </button>
-                <button onClick={() => useStore.getState().removeMenuItem(item.id)} className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded transition-colors">
-                    <Trash size={16} />
+                <button onClick={() => { if (confirm('Delete?')) useStore.getState().removeMenuItem(item.id); }} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-all border border-red-100">
+                    <Trash size={18} />
                 </button>
             </div>
         </div>
@@ -4543,8 +4546,8 @@ function MobileTabButton({ active, label, icon, onClick }: { active: boolean; la
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center py-2 rounded-lg transition-all ${active
-                ? 'text-tashi-primary'
+            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all flex-shrink-0 min-w-[64px] ${active
+                ? 'text-tashi-primary bg-tashi-primary/5'
                 : 'text-gray-400 hover:text-gray-600'
                 } `}
         >
