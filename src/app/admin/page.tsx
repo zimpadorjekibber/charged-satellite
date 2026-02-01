@@ -1434,8 +1434,8 @@ function AdminDashboard() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {(valleyUpdates || []).map((update, idx) => (
                                             <div key={update.id || idx} className={`bg-white p-5 rounded-2xl border-l-4 shadow-sm hover:shadow-md transition-all relative group ${update.statusColor === 'red' ? 'border-l-red-500 bg-red-50/10' :
-                                                    update.statusColor === 'blue' ? 'border-l-blue-500 bg-blue-50/10' :
-                                                        'border-l-green-500 bg-green-50/10'
+                                                update.statusColor === 'blue' ? 'border-l-blue-500 bg-blue-50/10' :
+                                                    'border-l-green-500 bg-green-50/10'
                                                 } border border-gray-100`}>
                                                 <div className="flex justify-between items-start mb-4 gap-4">
                                                     <div className="flex-1">
@@ -1819,12 +1819,15 @@ function AdminDashboard() {
                                                         <button
                                                             type="button"
                                                             onClick={() => {
-                                                                const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
-                                                                updateLandingPhotos('location', newUrls);
+                                                                if (window.confirm('Delete this photo/video?')) {
+                                                                    const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
+                                                                    updateLandingPhotos('location', newUrls);
+                                                                }
                                                             }}
-                                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
+                                                            title="Delete Media"
                                                         >
-                                                            <X size={14} />
+                                                            <X size={16} />
                                                         </button>
                                                     </div>
                                                 );
@@ -1898,12 +1901,15 @@ function AdminDashboard() {
                                                         <button
                                                             type="button"
                                                             onClick={() => {
-                                                                const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
-                                                                updateLandingPhotos('climate', newUrls);
+                                                                if (window.confirm('Delete this photo/video?')) {
+                                                                    const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
+                                                                    updateLandingPhotos('climate', newUrls);
+                                                                }
                                                             }}
-                                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
+                                                            title="Delete Media"
                                                         >
-                                                            <X size={14} />
+                                                            <X size={16} />
                                                         </button>
                                                     </div>
                                                 );

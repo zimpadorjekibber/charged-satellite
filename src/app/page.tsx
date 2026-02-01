@@ -2,7 +2,7 @@
 
 import LocalMapGuide from '@/app/customer/components/LocalMapGuide';
 import Link from 'next/link';
-import { ArrowLeftRight, ArrowRight, MapPin, Clock, Star, Users, Utensils, Newspaper, ShoppingBag, PlayCircle, Info, X } from 'lucide-react';
+import { ArrowLeftRight, ArrowRight, MapPin, Clock, Star, Users, Utensils, Newspaper, ShoppingBag, PlayCircle, Info, X, Home as HomeIcon, ChevronRight, Phone, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
@@ -14,10 +14,20 @@ export default function Home() {
   const landingPhotos = useStore((state: any) => state.landingPhotos);
   const initialize = useStore((state: any) => state.initialize);
   const valleyUpdates = useStore((state: any) => state.valleyUpdates) || [];
+  const homestays = useStore((state: any) => state.homestays);
   const gearItems = useStore((state: any) => state.gearItems);
   const menuAppearance = useStore((state: any) => state.menuAppearance);
 
-  const [fullScreenMedia, setFullScreenMedia] = useState<{ url: string; type: 'image' | 'video'; title: string } | null>(null);
+  const [fullScreenMedia, setFullScreenMedia] = useState<{ items: { url: string; type: 'image' | 'video'; title: string }[]; index: number } | null>(null);
+
+  const navigateMedia = (direction: 'next' | 'prev') => {
+    if (!fullScreenMedia) return;
+    const { items, index } = fullScreenMedia;
+    let newIndex = direction === 'next' ? index + 1 : index - 1;
+    if (newIndex >= items.length) newIndex = 0;
+    if (newIndex < 0) newIndex = items.length - 1;
+    setFullScreenMedia({ items, index: newIndex });
+  };
 
   useEffect(() => {
     // Clear previous table session for generic app entry
@@ -257,7 +267,14 @@ export default function Home() {
                         <div
                           key={i}
                           className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
-                          onClick={() => setFullScreenMedia({ url, type: isVideo ? 'video' : 'image', title })}
+                          onClick={() => {
+                            const items = landingPhotos.location.map((u: string) => {
+                              const isVid = u.includes('youtube.com') || u.includes('youtu.be') || u.includes('facebook.com') || u.includes('fb.watch') || u.includes('instagram.com') || u.endsWith('.mp4');
+                              const t = landingPhotos.locationCaptions?.[btoa(u).substring(0, 100)] || 'Prime Location';
+                              return { url: u, type: isVid ? 'video' : 'image', title: t };
+                            });
+                            setFullScreenMedia({ items, index: i });
+                          }}
                         >
                           {isVideo ? (
                             <div className="w-full h-full bg-black flex items-center justify-center">
@@ -293,7 +310,10 @@ export default function Home() {
                       <div
                         key={i}
                         className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative cursor-zoom-in group/food"
-                        onClick={() => setFullScreenMedia({ url: item.image, type: 'image', title: item.name })}
+                        onClick={() => {
+                          const items = menu.filter((m: any) => m.isChefSpecial && m.image).map((m: any) => ({ url: m.image, type: 'image', title: m.name }));
+                          setFullScreenMedia({ items, index: i });
+                        }}
                       >
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/40 group-hover/food:bg-black/60 transition-colors flex items-end p-1">
@@ -324,7 +344,14 @@ export default function Home() {
                         <div
                           key={i}
                           className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-white/10 snap-center relative group/img cursor-zoom-in"
-                          onClick={() => setFullScreenMedia({ url, type: isVideo ? 'video' : 'image', title })}
+                          onClick={() => {
+                            const items = landingPhotos.climate.map((u: string) => {
+                              const isVid = u.includes('youtube.com') || u.includes('youtu.be') || u.includes('facebook.com') || u.includes('fb.watch') || u.includes('instagram.com') || u.endsWith('.mp4');
+                              const t = landingPhotos.climateCaptions?.[btoa(u).substring(0, 100)] || 'Winter Condition';
+                              return { url: u, type: isVid ? 'video' : 'image', title: t };
+                            });
+                            setFullScreenMedia({ items, index: i });
+                          }}
                         >
                           {isVideo ? (
                             <div className="w-full h-full bg-black flex items-center justify-center">
@@ -369,7 +396,7 @@ export default function Home() {
 
               <div
                 className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl cursor-zoom-in w-full md:max-w-4xl mx-auto"
-                onClick={() => setFullScreenMedia({ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' })}
+                onClick={() => setFullScreenMedia({ items: [{ url: landingPhotos.customMap!, type: 'image', title: 'Hand-drawn Valley Map' }], index: 0 })}
               >
                 <img src={landingPhotos.customMap} alt="Custom Valley Map" className="w-full h-auto" />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all" />
@@ -426,7 +453,64 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* SEO and Order Ahead Section */}
+          {/* --- VILLAGE STAYS DIRECTORY (New Home Feature) --- */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="mb-20 px-4 md:px-0"
+          >
+            <div className="bg-gradient-to-br from-indigo-900/40 to-black border border-indigo-500/20 rounded-[3rem] p-8 md:p-12 relative overflow-hidden group/stays">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] -mr-48 -mt-48 group-hover/stays:bg-indigo-500/20 transition-colors duration-1000" />
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                <div className="space-y-8">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 font-mono text-[10px] text-indigo-400 uppercase tracking-widest">
+                    <HomeIcon size={14} /> Local Community Support
+                  </div>
+                  <h3 className="text-4xl md:text-6xl font-serif font-black text-white leading-[1.1]">
+                    Wanderer's <span className="text-indigo-400 italic">Rest</span> in the High Himalayas
+                  </h3>
+                  <p className="text-gray-400 text-lg leading-relaxed font-medium">
+                    TashiZom is proud to bridge the gap between travelers and authentic local hosts. Discover verified homestays in <span className="text-white">Kibber</span>, <span className="text-white">Chicham</span>, and <span className="text-white">Kee</span> villages.
+                  </p>
+
+                  <div className="flex flex-wrap gap-4">
+                    <Link href="/customer/stays" className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all flex items-center gap-3 shadow-xl shadow-indigo-600/20 group/btn">
+                      Explore Stays <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
+                    <div className="flex -space-x-3 items-center px-2">
+                      {homestays.slice(0, 3).map((stay: any, i: number) => (
+                        <div key={i} className="w-10 h-10 rounded-full border-2 border-indigo-900 overflow-hidden bg-gray-800">
+                          {stay.image ? <img src={stay.image} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold">{stay.village[0]}</div>}
+                        </div>
+                      ))}
+                      <div className="ml-6 text-[10px] font-black uppercase tracking-tighter text-indigo-400/80">
+                        {homestays.length}+ Verified Homes
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 backdrop-blur-md rounded-[2rem] p-6 border border-white/10 hover:border-indigo-500/30 transition-colors">
+                    <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-400 mb-4">
+                      <Phone size={20} />
+                    </div>
+                    <h4 className="text-white font-bold mb-2">Direct Contact</h4>
+                    <p className="text-gray-500 text-[10px] font-medium leading-relaxed">No middleman or commission. Talk directly to host families for bookings.</p>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-md rounded-[2rem] p-6 border border-white/10 hover:border-indigo-500/30 transition-colors mt-8">
+                    <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-400 mb-4">
+                      <ShieldCheck size={20} />
+                    </div>
+                    <h4 className="text-white font-bold mb-2">Verified Only</h4>
+                    <p className="text-gray-500 text-[10px] font-medium leading-relaxed">We only list homes that meet our standards of Himalayan hospitality.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -461,7 +545,7 @@ export default function Home() {
                 <div className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-amber-500/20">
                   <span className="text-amber-500 animate-pulse text-lg">🎯</span>
                   <p className="text-amber-400/90 text-sm font-bold uppercase tracking-widest">
-                    Our QR Codes are placed throughout Spiti Valley - Scan to start!
+                    Our QR Codes are placed at all nearby prime locations - Scan to start!
                   </p>
                 </div>
               </div>
@@ -583,7 +667,7 @@ export default function Home() {
             >
               <div
                 className="flex-1 w-full max-w-2xl cursor-zoom-in order-2 md:order-1"
-                onClick={() => setFullScreenMedia({ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' })}
+                onClick={() => setFullScreenMedia({ items: [{ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' }], index: 0 })}
               >
                 <div className="relative group">
                   {/* Outer Frame - Dark Wood texture effect */}
@@ -809,13 +893,17 @@ export default function Home() {
                       <div className={`w-3 h-3 rounded-full animate-pulse ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : 'bg-red-500'}`} />
                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{update.status}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{update.title}</h3>
+                    <h3 className="text-base font-bold text-white mb-2">{update.title}</h3>
                     <p className="text-gray-400 text-sm leading-relaxed mb-6">{update.description}</p>
 
                     {update.mediaUrl && (
                       <div
                         className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group/media"
-                        onClick={() => setFullScreenMedia({ url: update.mediaUrl!, type: update.mediaType === 'video' ? 'video' : 'image', title: update.title })}
+                        onClick={() => {
+                          const items = valleyUpdates.filter((u: any) => u.mediaUrl).map((u: any) => ({ url: u.mediaUrl, type: u.mediaType === 'video' ? 'video' : 'image', title: u.title }));
+                          const idx = items.findIndex((item: any) => item.url === update.mediaUrl);
+                          setFullScreenMedia({ items, index: idx >= 0 ? idx : 0 });
+                        }}
                       >
                         {update.mediaType === 'video' ? (
                           <div className="w-full h-full bg-black flex items-center justify-center relative">
@@ -1084,26 +1172,63 @@ export default function Home() {
       </footer>
 
 
-      {/* Media Modal */}
       <AnimatePresence>
         {fullScreenMedia && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 touch-none"
           >
-            <button
-              onClick={() => setFullScreenMedia(null)}
-              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            {/* Navigation Controls */}
+            <div className="absolute top-6 left-6 right-6 flex justify-between items-center z-[110]">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black text-white/70 uppercase">
+                  {fullScreenMedia.index + 1} / {fullScreenMedia.items.length}
+                </div>
+              </div>
+              <button
+                onClick={() => setFullScreenMedia(null)}
+                className="p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+              >
+                <X size={32} />
+              </button>
+            </div>
+
+            {fullScreenMedia.items.length > 1 && (
+              <>
+                <button
+                  onClick={() => navigateMedia('prev')}
+                  className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[110] p-4 bg-white/5 hover:bg-white/10 text-white rounded-full border border-white/10 transition-all hidden md:block"
+                >
+                  <ArrowLeftRight className="rotate-180" size={32} />
+                </button>
+                <button
+                  onClick={() => navigateMedia('next')}
+                  className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[110] p-4 bg-white/5 hover:bg-white/10 text-white rounded-full border border-white/10 transition-all hidden md:block"
+                >
+                  <ArrowRight size={32} />
+                </button>
+              </>
+            )}
+
+            <motion.div
+              key={fullScreenMedia.items[fullScreenMedia.index].url}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, { offset, velocity }) => {
+                const swipe = offset.x;
+                if (swipe < -100) navigateMedia('next');
+                else if (swipe > 100) navigateMedia('prev');
+              }}
             >
-              <X size={32} />
-            </button>
-            <div className="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black">
-              {fullScreenMedia.type === 'video' ? (
-                // Helper to determine video type
+              {fullScreenMedia.items[fullScreenMedia.index].type === 'video' ? (
                 (() => {
-                  const url = fullScreenMedia.url;
+                  const url = fullScreenMedia.items[fullScreenMedia.index].url;
                   const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
                   const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
                   const isInstagram = url.includes('instagram.com');
@@ -1118,8 +1243,6 @@ export default function Home() {
                     />;
                   }
                   if (isFacebook) {
-                    // Normalize FB short links (fb.watch) or mobile links if possible
-                    // Note: Short links like fb.watch sometimes need direct view
                     return <iframe
                       src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&autoplay=1&mute=0`}
                       className="w-full h-full border-0 overflow-hidden"
@@ -1138,20 +1261,21 @@ export default function Home() {
                       allowFullScreen
                     />;
                   }
-                  return <video src={fullScreenMedia.url} className="w-full h-full object-contain" controls autoPlay />;
+                  return <video src={url} className="w-full h-full object-contain" controls autoPlay />;
                 })()
               ) : (
-                <img src={fullScreenMedia.url} className="w-full h-full object-contain" alt="" />
+                <img src={fullScreenMedia.items[fullScreenMedia.index].url} className="w-full h-full object-contain" alt="" />
               )}
-              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col md:flex-row items-end justify-between gap-6 pointer-events-none">
+
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col md:flex-row items-end justify-between gap-4 pointer-events-none">
                 <div className="pointer-events-auto">
-                  <h2 className="text-2xl font-serif font-black text-white drop-shadow-lg">{fullScreenMedia.title}</h2>
-                  {(fullScreenMedia.url.includes('facebook') || fullScreenMedia.url.includes('fb.watch') || fullScreenMedia.url.includes('instagram')) && (
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-white/90 drop-shadow-lg">{fullScreenMedia.items[fullScreenMedia.index].title}</h2>
+                  {(fullScreenMedia.items[fullScreenMedia.index].url.includes('facebook') || fullScreenMedia.items[fullScreenMedia.index].url.includes('fb.watch') || fullScreenMedia.items[fullScreenMedia.index].url.includes('instagram')) && (
                     <p className="text-amber-500/80 text-[10px] font-bold uppercase tracking-widest mt-1">Social media embed might have viewing restrictions</p>
                   )}
                 </div>
                 <a
-                  href={fullScreenMedia.url}
+                  href={fullScreenMedia.items[fullScreenMedia.index].url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="pointer-events-auto flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl border border-white/20 transition-all font-bold text-xs uppercase tracking-widest group"
@@ -1160,10 +1284,45 @@ export default function Home() {
                   View Original
                 </a>
               </div>
+            </motion.div>
+
+            {/* Mobile Indicator */}
+            <div className="mt-8 flex gap-2 md:hidden">
+              {fullScreenMedia.items.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === fullScreenMedia.index ? 'bg-amber-500 w-4' : 'bg-white/20'}`}
+                />
+              ))}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Floating Navigation Bar */}
+      <div className="fixed bottom-10 left-0 right-0 z-[100] flex justify-center px-4 pointer-events-none">
+        <div className="flex bg-white/10 backdrop-blur-xl border border-white/20 rounded-full px-4 py-2 shadow-2xl items-center gap-1 md:gap-4 pointer-events-auto">
+          <Link href="/customer/menu" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest bg-amber-500/10 border border-amber-500/20">
+            <Utensils size={14} className="text-amber-500" />
+            <span>Menu</span>
+          </Link>
+          <div className="w-[1px] h-4 bg-white/10 hidden md:block" />
+          <Link href="/customer/stays" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
+            <HomeIcon size={14} className="text-amber-500" />
+            <span>Stays</span>
+          </Link>
+          <div className="w-[1px] h-4 bg-white/10" />
+          <Link href="/customer/menu#valley-updates" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
+            <Newspaper size={14} className="text-amber-500" />
+            <span>Updates</span>
+          </Link>
+          <div className="w-[1px] h-4 bg-white/10 hidden md:block" />
+          <Link href="/customer/menu#village-harvest" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
+            <ShoppingBag size={14} className="text-amber-500" />
+            <span>Harvest</span>
+          </Link>
+        </div>
+      </div>
 
     </main >
   );
