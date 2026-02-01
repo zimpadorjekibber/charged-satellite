@@ -109,17 +109,18 @@ export default function Home() {
                 <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                   Tash
                 </span>
-                <span className="relative inline-flex items-center justify-center px-2">
+                <span className="relative inline-flex items-center justify-center px-0"> {/* Removed px-2 to fix spacing */}
                   <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                     i
                   </span>
+                  {/* Replaced Logo with Floating Flag GIF */}
                   <motion.img
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.8, type: 'spring', stiffness: 100 }}
-                    src="/logo_crest.png"
-                    className="absolute -top-10 md:-top-16 left-1/2 -translate-x-1/2 w-14 h-14 md:w-24 md:h-24 aspect-square z-50 object-contain pointer-events-none"
-                    alt="Logo"
+                    initial={{ y: 0 }}
+                    animate={{ y: [-5, 5, -5] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    src={landingPhotos?.logoGif || "/tashizom-logo.png"}
+                    className="absolute -top-12 md:-top-20 left-1/2 -translate-x-1/2 w-16 h-16 md:w-28 md:h-28 object-contain z-50 pointer-events-none drop-shadow-xl"
+                    alt="Floating Flag"
                   />
                 </span>
                 <span className="bg-clip-text text-transparent bg-gradient-to-b from-amber-200 via-tashi-accent to-amber-700 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
