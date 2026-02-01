@@ -62,20 +62,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col bg-tashi-dark relative overflow-x-hidden">
-      {/* --- PRAYER FLAGS SECTION --- */}
-      {landingPhotos?.prayerFlags && (
-        <div className="absolute top-0 left-0 right-0 z-20 h-14 md:h-20 overflow-hidden flex pointer-events-none select-none border-b border-white/5 bg-black/5 backdrop-blur-[2px]">
-          <div className="flex animate-[flags_30s_linear_infinite] min-w-full">
-            {[...Array(10)].map((_, i) => (
-              <img key={i} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" title="Tashi Delek" />
-            ))}
-            {[...Array(10)].map((_, i) => (
-              <img key={`dup-${i}`} src={landingPhotos.prayerFlags} alt="" className="h-full w-auto object-contain flex-shrink-0" />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* --- HERO SECTION (100vh) --- */}
       <section className="h-[100dvh] w-full flex flex-col items-center justify-center relative overflow-hidden flex-shrink-0">
         {/* --- MODE 1: FULL SCREEN FOOD BACKGROUND --- */}

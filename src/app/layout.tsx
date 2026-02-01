@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import { StateInitializer } from '@/components/StateInitializer';
+import GlobalSpirituals from '@/components/GlobalSpirituals';
 
 
 export const metadata: Metadata = {
@@ -111,6 +112,7 @@ export default function RootLayout({
       >
         <ServiceWorkerRegister />
         <StateInitializer />
+        <GlobalSpirituals />
         {children}
       </body>
     </html>
