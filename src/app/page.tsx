@@ -14,8 +14,8 @@ export default function Home() {
   const landingPhotos = useStore((state: any) => state.landingPhotos);
   const initialize = useStore((state: any) => state.initialize);
   const valleyUpdates = useStore((state: any) => state.valleyUpdates) || [];
-  const homestays = useStore((state: any) => state.homestays);
-  const gearItems = useStore((state: any) => state.gearItems);
+  const homestays = useStore((state: any) => state.homestays) || [];
+  const gearItems = useStore((state: any) => state.gearItems) || [];
   const menuAppearance = useStore((state: any) => state.menuAppearance);
 
   const [fullScreenMedia, setFullScreenMedia] = useState<{ items: { url: string; type: 'image' | 'video'; title: string }[]; index: number } | null>(null);
@@ -178,25 +178,13 @@ export default function Home() {
 
           <div className="flex-1 flex flex-col items-center justify-start pt-8">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="pointer-events-auto text-center">
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                <Link
-                  href="/customer/menu"
-                  className="group relative inline-flex items-center gap-3 bg-gradient-to-b from-amber-400 to-amber-600 text-tashi-dark px-10 py-4 rounded-xl font-black shadow-[0_0_30px_rgba(218,165,32,0.3)] hover:shadow-[0_0_50px_rgba(218,165,32,0.5)] transition-all duration-500 active:scale-95"
-                >
-                  <span className="relative z-10 text-lg md:text-xl font-serif uppercase tracking-widest">Digital Menu</span>
-                  <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform duration-300" />
-                </Link>
-
-                <button
-                  onClick={() => {
-                    document.getElementById('valley-essentials')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="group px-8 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white font-bold rounded-xl border border-white/20 transition-all flex items-center gap-3"
-                >
-                  <Newspaper size={20} className="text-blue-400" />
-                  LATEST NEWS
-                </button>
-              </div>
+              <Link
+                href="/customer/menu"
+                className="group relative inline-flex items-center gap-3 bg-gradient-to-b from-amber-400 to-amber-600 text-tashi-dark px-10 py-4 rounded-xl font-black shadow-[0_0_30px_rgba(218,165,32,0.3)] hover:shadow-[0_0_50px_rgba(218,165,32,0.5)] transition-all duration-500 active:scale-95"
+              >
+                <span className="relative z-10 text-lg md:text-xl font-serif uppercase tracking-widest">Digital Menu</span>
+                <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform duration-300" />
+              </Link>
             </motion.div>
           </div>
         </div>
@@ -1324,7 +1312,7 @@ export default function Home() {
         </div>
       </div>
 
-    </main >
+    </main>
   );
 }
 
