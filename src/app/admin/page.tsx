@@ -1666,7 +1666,7 @@ function AdminDashboard() {
                                                 icon={<ImageIcon size={20} className="text-indigo-500" />}
                                                 aspectRatio="video"
                                                 currentImageUrl={landingPhotos?.prayerFlags}
-                                                onUploadSuccess={(url) => updateLandingPhotos({ prayerFlags: url })}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerFlags', url)}
                                                 placeholder="Flag GIF Upload"
                                             />
 
@@ -1676,7 +1676,7 @@ function AdminDashboard() {
                                                 icon={<ImageIcon size={20} className="text-purple-500" />}
                                                 aspectRatio="square"
                                                 currentImageUrl={landingPhotos?.prayerWheel}
-                                                onUploadSuccess={(url) => updateLandingPhotos({ prayerWheel: url })}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerWheel', url)}
                                                 placeholder="Wheel GIF Upload"
                                             />
 
@@ -1686,7 +1686,7 @@ function AdminDashboard() {
                                                 icon={<Sparkles size={20} className="text-amber-500" />}
                                                 aspectRatio="square"
                                                 currentImageUrl={landingPhotos?.logoGif}
-                                                onUploadSuccess={(url) => updateLandingPhotos({ logoGif: url })}
+                                                onUploadSuccess={(url) => updateLandingPhotos('logoGif', url)}
                                                 placeholder="Logo GIF Upload"
                                             />
                                         </div>

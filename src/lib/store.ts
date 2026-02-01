@@ -250,7 +250,7 @@ interface AppState {
     updateMenuAppearance: (updates: Partial<MenuAppearance>) => Promise<void>;
 
     login: (username: string, password: string) => Promise<boolean>;
-    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto', data: string[] | string) => Promise<void>;
+    updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto' | 'prayerFlags' | 'prayerWheel' | 'logoGif', data: string[] | string) => Promise<void>;
     updateLandingPhotoCaption: (section: 'location' | 'climate', photoUrl: string, caption: string) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
@@ -906,7 +906,7 @@ export const useStore = create<AppState>()(
                 await setDoc(doc(db, 'settings', 'global'), settings, { merge: true });
             },
 
-            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto' | 'prayerFlags' | 'prayerWheel', data: string[] | string) => {
+            updateLandingPhotos: async (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto' | 'prayerFlags' | 'prayerWheel' | 'logoGif', data: string[] | string) => {
                 // Special handling for galleries (storing as separate docs to avoid 1MB Firestore limit)
                 if (section === 'location' || section === 'climate') {
                     if (Array.isArray(data)) {
