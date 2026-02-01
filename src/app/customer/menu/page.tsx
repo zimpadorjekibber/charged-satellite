@@ -1916,9 +1916,9 @@ export default function MenuPage() {
 
                                 <div className="space-y-4 pt-2">
                                     <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                                        <p className="text-sm text-gray-700"><strong>Opening Hours:</strong> 8:00 AM - 10:00 PM</p>
+                                        <p className="text-sm text-gray-700"><strong>Opening Hours:</strong> {isSummerSeason() ? '8:00 AM - 10:00 PM' : '9:00 AM - 9:30 PM'}</p>
                                         <p className="text-sm text-gray-700"><strong>Location:</strong> Near Chicham Bridge, Kibber</p>
-                                        <p className="text-sm text-gray-700"><strong>Cuisine:</strong> Multi-Cuisine (Indian, Chinese, Tibetan, Pizza)</p>
+                                        <p className="text-sm text-gray-700"><strong>Cuisine:</strong> Multi-Cuisine (Indian, Chinese, Italian, Pizza)</p>
                                     </div>
                                     <div className="text-xs text-gray-500 text-center pt-2">
                                         Designed & Powered by <span className="font-bold text-tashi-accent">Antigravity</span>

@@ -173,7 +173,7 @@ export default function Home() {
                   href="/customer/menu"
                   className="group relative inline-flex items-center gap-3 bg-gradient-to-b from-amber-400 to-amber-600 text-tashi-dark px-10 py-4 rounded-xl font-black shadow-[0_0_30px_rgba(218,165,32,0.3)] hover:shadow-[0_0_50px_rgba(218,165,32,0.5)] transition-all duration-500 active:scale-95"
                 >
-                  <span className="relative z-10 text-lg md:text-xl font-serif uppercase tracking-widest">Discover Flavors</span>
+                  <span className="relative z-10 text-lg md:text-xl font-serif uppercase tracking-widest">Digital Menu</span>
                   <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform duration-300" />
                 </Link>
 
@@ -803,8 +803,8 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {valleyUpdates.map((update: any, idx: number) => (
-                  <div key={idx} className="bg-white/5 border border-white/10 p-6 rounded-3xl hover:bg-white/10 transition-all group">
+                {valleyUpdates.map((update: any) => (
+                  <div key={update.id} className="bg-white/5 border border-white/10 p-6 rounded-3xl hover:bg-white/10 transition-all group">
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-3 h-3 rounded-full animate-pulse ${update.statusColor === 'green' ? 'bg-green-500' : update.statusColor === 'blue' ? 'bg-blue-500' : 'bg-red-500'}`} />
                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{update.status}</span>

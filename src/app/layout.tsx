@@ -84,7 +84,7 @@ const jsonLd = {
     "opens": "08:00",
     "closes": "22:00"
   },
-  "servesCuisine": ["Indian", "Tibetan", "Chinese", "Continental"],
+  "servesCuisine": ["Indian", "Italian", "Chinese", "Continental"],
   "priceRange": "$$"
 };
 

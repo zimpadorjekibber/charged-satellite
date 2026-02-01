@@ -102,6 +102,7 @@ export interface Review {
 }
 
 export interface ValleyUpdate {
+    id: string;
     title: string;
     description: string;
     status: string;
@@ -836,10 +837,18 @@ export const useStore = create<AppState>()(
             },
 
             saveValleyUpdates: async (updates) => {
-                const newUpdates = updates.map(u => ({ ...u, id: u.id || Math.random().toString(36).substring(7) }));
-                set({ valleyUpdates: newUpdates });
-                const settingsRef = doc(db, 'settings', 'valley_updates');
-                await setDoc(settingsRef, { updates: newUpdates });
+                try {
+                    const newUpdates = updates.map(u => ({
+                        ...u,
+                        id: u.id || Math.random().toString(36).substring(7)
+                    }));
+                    set({ valleyUpdates: newUpdates });
+                    const settingsRef = doc(db, 'settings', 'valley_updates');
+                    await setDoc(settingsRef, { updates: newUpdates });
+                } catch (e) {
+                    console.error("Failed to save valley updates:", e);
+                    // Optionally alert or revert state if critical
+                }
             },
 
             // LOCAL GEAR MANAGEMENT
