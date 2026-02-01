@@ -545,297 +545,110 @@ export default function Home() {
       </section>
 
       {/* --- KIBBER LEGACY & HISTORY SECTION --- */}
+      {/* --- KIBBER LEGACY, CHEF & SURROUNDINGS --- */}
       <section className="bg-tashi-dark py-24 px-6 relative overflow-hidden border-t border-white/5">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row gap-16 items-start">
+        <div className="max-w-6xl mx-auto relative z-10 space-y-24">
 
-            {/* Left Column: The Story */}
-            <div className="flex-1 space-y-12">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
-                  Our Legacy
-                </div>
-                <h2 className="text-4xl md:text-6xl font-serif font-black text-gray-900 mb-6 leading-tight">
-                  A Story Carved <br />
-                  <span className="text-amber-600 italic">In High Altitude</span>
-                </h2>
-                <p className="text-gray-700 text-xl md:text-2xl leading-relaxed">
-                  Our journey began in <span className="text-tashi-primary font-bold underline decoration-amber-500 decoration-2 underline-offset-4">1998</span>.
-                  Originally registered as <span className="text-amber-600 italic font-bold">'Resang Hotel'</span> with the Himachal Tourism Department,
-                  we later evolved into <span className="text-tashi-primary font-black">TashiZom</span>. Though heavy Himalayan rains once took our rooms,
-                  leaving only our legendary restaurant, we are currently rebuilding. Soon, you will again be able
-                  to wake up to the clouds in our brand new guest rooms.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-8"
-              >
-                <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
-                  <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The Civilization</h4>
-                  <p className="text-gray-700 text-base leading-relaxed font-semibold">
-                    Kibber is more than a village; it is a <span className="text-tashi-primary font-bold">Living Civilization</span> of about 500 souls.
-                    From tantriks and blacksmiths to farmers and drummers, we are a self-sustaining community
-                    preserving traditions for centuries.
-                  </p>
-                </div>
-                <div className="space-y-4 border-l-2 border-amber-500/30 pl-6">
-                  <h4 className="text-amber-500 font-bold uppercase tracking-widest text-xs">The First Road</h4>
-                  <p className="text-gray-700 text-base leading-relaxed font-semibold">
-                    History remembers that when the first roads were carved from Manali,
-                    <span className="text-tashi-primary font-bold"> Kibber</span> was connected right after Rangrik—long before Kaza.
-                    For decades, we stood as Asia's highest motorable village.
-                  </p>
-                </div>
-              </motion.div>
+          {/* 1. Village Heritage Teaser */}
+          <div className="text-center space-y-8 max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
+              Village Heritage
             </div>
-
-            {/* Right Column: Adventure & Nature */}
-            <div className="flex-1 w-full space-y-8">
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="bg-white/5 rounded-3xl p-8 border border-white/10 backdrop-blur-sm shadow-2xl"
-              >
-                <h3 className="text-2xl font-serif font-bold text-white mb-6 flex items-center gap-3">
-                  <Users className="text-amber-500" /> Gateway to the Wild
-                </h3>
-                <div className="space-y-6">
-                  <div className="flex gap-4">
-                    <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-800 text-lg">
-                      Kibber Wildlife Sanctuary is a global hub for wildlife videography.
-                      Giants like <span className="text-amber-600 font-bold">NetGeo, BBC, and Netflix</span> visit annually
-                      to film the elusive <span className="text-tashi-primary font-bold">Snow Leopard</span>.
-                    </p>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-800 text-lg">
-                      Before roads stretched further, the legendary <span className="text-tashi-primary font-bold">Parangla Pass</span> trek to Leh Ladakh
-                      started right here at our doorstep in Kibber.
-                    </p>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="h-2 w-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                    <p className="text-gray-800 text-lg">
-                      For those seeking a climb, the summit of <span className="text-tashi-primary font-bold">Mount Kanamo (5000m+)</span>
-                      still finds its path starting through the village of Kibber.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-8 border-t border-gray-200 italic text-gray-700 text-base font-bold">
-                  "While modern tourism shifts to the towns, the true heart and history of Spiti still beat in Kibber."
-                </div>
-              </motion.div>
-            </div>
-
+            <h2 className="text-3xl md:text-5xl font-serif font-black text-gray-900 leading-tight">
+              A Story Carved <span className="text-amber-600 italic">In High Altitude</span>
+            </h2>
+            <p className="text-gray-700 text-lg leading-relaxed">
+              Kibber is more than just a destination; it's a living civilization of 500 souls, preserving traditions at 14,000 feet. From the first road to the wild Snow Leopards, our roots run deep.
+            </p>
+            <Link href="/story" className="inline-flex items-center gap-2 bg-amber-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-amber-700 transition-all shadow-lg mx-auto">
+              Learn about our History <ArrowRight size={14} />
+            </Link>
           </div>
 
-          {/* --- HERITAGE SECTION (Relocated) --- */}
+          {/* 2. Heritage Document Teaser */}
           {landingPhotos?.registrationDoc && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center gap-16"
+              className="flex flex-col md:flex-row items-center gap-12 pt-12 border-t border-white/5"
             >
               <div
-                className="flex-1 w-full max-w-2xl cursor-zoom-in order-2 md:order-1"
+                className="flex-1 w-full max-w-xl cursor-zoom-in"
                 onClick={() => setFullScreenMedia({ items: [{ url: landingPhotos.registrationDoc!, type: 'image', title: 'Original Registration Document' }], index: 0 })}
               >
+                {/* ... Document Frame ... */}
                 <div className="relative group">
-                  {/* Outer Frame - Dark Wood texture effect */}
-                  <div className="absolute -inset-1 bg-[#2a1b0a] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
-
-                  {/* Inner Frame / Matting */}
-                  <div className="relative bg-[#3d2b1f] p-3 md:p-6 rounded-lg shadow-inner transform group-hover:rotate-1 transition-transform duration-500 border-[8px] border-[#1a1108]">
-                    <div className="bg-[#f4f1ea] p-4 md:p-10 shadow-inner relative overflow-hidden border-2 border-black/5">
-                      {/* Glass Reflection Effect */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none z-10" />
-                      <div className="absolute top-0 left-0 w-full h-1 bg-white/20 z-20" />
-
-                      {/* The Document */}
-                      <img
-                        src={landingPhotos.registrationDoc}
-                        alt="First Registration"
-                        className="w-full h-auto shadow-md relative z-0 opacity-90 group-hover:opacity-100 transition-opacity"
-                      />
-
-                      <div className="mt-6 pt-6 border-t border-black/10 text-center">
-                        <span className="text-gray-500 font-serif italic text-sm tracking-widest uppercase">
-                          Historical Archive - 1995
-                        </span>
-                      </div>
+                  <div className="absolute -inset-1 bg-[#2a1b0a] rounded-lg shadow-2xl" />
+                  <div className="relative bg-[#3d2b1f] p-3 md:p-6 rounded-lg border-[8px] border-[#1a1108]">
+                    <div className="bg-[#f4f1ea] p-4 md:p-8 shadow-inner relative overflow-hidden">
+                      <img src={landingPhotos.registrationDoc} alt="Heritage" className="w-full h-auto opacity-90" />
                     </div>
                   </div>
-
-                  {/* Decorative Frame Nails/Corners */}
-                  <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
-                  <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
-                  <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-amber-900/40 shadow-inner" />
                 </div>
               </div>
-
-              <div className="flex-1 space-y-8 text-left order-1 md:order-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono text-[10px] text-amber-400 uppercase tracking-widest">
-                  Our Roots
-                </div>
-                {/* ... text content remains same ... */}
-                <h2 className="text-4xl md:text-5xl font-serif font-black text-white leading-tight">
+              <div className="flex-1 space-y-6">
+                <h3 className="text-2xl md:text-3xl font-serif font-black text-white leading-tight">
                   A Legacy of <span className="text-amber-500 italic">Hospitality</span>
-                </h2>
-                <p className="text-gray-300 text-lg leading-relaxed">
-                  टशीज़ोम isn't just a business; it's a dream that started with a single piece of paper and a heart full of hope. This original registration document marks the beginning of our journey to bring world-class hospitality to the Roof of the World.
+                </h3>
+                <p className="text-gray-400 text-base leading-relaxed">
+                  टशीज़ोम isn't just a business; it's a dream that started with a single piece of paper and a heart full of hope.
                 </p>
-                <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10">
-                  <div className="p-3 bg-amber-500/20 rounded-xl text-amber-500"><Clock size={24} /></div>
-                  <div>
-                    <h4 className="text-white font-bold">Since the Early Days</h4>
-                    <p className="text-gray-400 text-sm">Committed to serving the Spiti community and travelers alike.</p>
-                  </div>
-                </div>
+                <Link href="/story" className="inline-flex items-center gap-2 text-amber-500 font-black text-xs uppercase tracking-widest">
+                  View Full Document & Story <ArrowRight size={16} />
+                </Link>
               </div>
             </motion.div>
           )}
 
-          {/* --- THE SOUL OF TASHIZOM: MEET OUR CHEF --- */}
-          <div className="mt-24 space-y-12">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 mb-6 font-mono text-[10px] text-pink-400 uppercase tracking-widest">
-                The Heart of our Kitchen
+          {/* 3. Meet the Chef Teaser */}
+          <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden group hover:border-pink-500/30 transition-all">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="w-full md:w-1/3 aspect-square relative overflow-hidden bg-gray-900 shrink-0">
+                {landingPhotos?.chefPhoto ? (
+                  <img src={landingPhotos.chefPhoto} alt="Chef Lalit" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-600"><Utensils size={48} /></div>
+                )}
               </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-black text-white mb-6">The <span className="text-amber-500 italic">Soul</span> of TashiZom</h2>
-            </div>
-
-            <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden group hover:border-pink-500/30 transition-all shadow-2xl">
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="w-full md:w-2/5 aspect-square relative overflow-hidden bg-gray-900">
-                  {landingPhotos?.chefPhoto ? (
-                    <img src={landingPhotos.chefPhoto} alt="Chef Lalit Kumar" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 gap-4">
-                      <Utensils size={48} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Chef Photo Pending</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6">
-                    <div className="px-3 py-1 rounded-full bg-pink-600 text-white text-[10px] font-black uppercase tracking-widest ">
-                      Since 2004
-                    </div>
-                  </div>
+              <div className="flex-1 p-8 space-y-4">
+                <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 font-mono text-[9px] text-pink-400 uppercase tracking-widest">
+                  The Soul of TashiZom
                 </div>
-                <div className="w-full md:w-3/5 p-8 md:p-12 space-y-6">
-                  <div className="space-y-2">
-                    <h3 className="text-3xl md:text-4xl font-black text-white font-serif uppercase tracking-tight">Chef Lalit Kumar</h3>
-                    <p className="text-pink-500 font-bold text-sm uppercase tracking-[0.2em]">Master of Himalayan Tastes</p>
-                  </div>
-                  <p className="text-gray-800 text-xl leading-relaxed italic font-bold">
-                    "Chef Lalit has been the pillar of TashiZom's kitchen for over two decades. His passion for authentic Spitian flavors and his mastery over multi-cuisine dishes are what make every meal here a legendary experience."
-                  </p>
-                  <div className="pt-6 border-t border-white/10 flex items-center gap-6">
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Experience</p>
-                      <p className="text-white font-bold text-xl">20+ Years</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Speciality</p>
-                      <p className="text-white font-bold text-xl">Spitian & Continental</p>
-                    </div>
-                  </div>
-                </div>
+                <h3 className="text-2xl font-black text-white font-serif tracking-tight">Chef Lalit Kumar</h3>
+                <p className="text-gray-400 text-sm leading-relaxed italic">
+                  "Chef Lalit has been the pillar of TashiZom's kitchen for over two decades, mastering both Spitian and Continental flavors."
+                </p>
+                <Link href="/story" className="inline-flex items-center gap-2 text-pink-500 font-black text-[10px] uppercase tracking-widest hover:gap-3 transition-all">
+                  Full Interview & Specials <ArrowRight size={14} />
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* --- MUST VISIT PLACES SECTION --- */}
-          <div className="mt-24 space-y-12">
+          {/* 4. Local Wonders Teaser */}
+          <div className="space-y-12">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 font-mono text-[10px] text-amber-500 uppercase tracking-widest">
-                Local Wonders
-              </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-black text-white mb-6">Explore the <span className="text-amber-500 italic">Surroundings</span></h2>
+              <h2 className="text-3xl md:text-5xl font-serif font-black text-white mb-4">Explore the <span className="text-amber-500 italic">Surroundings</span></h2>
+              <p className="text-gray-400 max-w-xl mx-auto text-sm">Beyond our kitchen, Kibber is home to some of Asia's most iconic landmarks.</p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Chicham Bridge */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl flex flex-col"
-              >
-                {landingPhotos?.chichamPhoto && (
-                  <div className="h-48 overflow-hidden relative">
-                    <img src={landingPhotos.chichamPhoto} alt="Chicham Bridge" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-6">
-                      <div className="bg-amber-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
-                        Chicham Bridge
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="p-8 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M3 18h18M3 6h18M12 3v18" /></svg>
-                    </div>
-                    <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Chicham Bridge</h3>
-                  </div>
-                  <p className="text-gray-800 text-base leading-relaxed font-bold">
-                    Suspended at <span className="text-amber-600 font-black">13,596 feet</span>, Asia's highest bridge connects Kibber to Chicham village. This engineering marvel spans a deep gorge, offering breathtaking views of the Spiti River below and the starkly beautiful mountains around.
-                  </p>
-                  <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
-                    <MapPin size={14} /> 10 mins from TashiZom
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Link href="/explore" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden group hover:border-amber-500/30 transition-all flex flex-col">
+                <div className="h-40 overflow-hidden relative">
+                  <img src={landingPhotos?.chichamPhoto} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent" />
+                  <div className="absolute bottom-3 left-4 text-white font-serif font-black text-sm uppercase">Chicham Bridge</div>
                 </div>
-              </motion.div>
-
-              {/* Kee Monastery */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden group hover:border-amber-500/50 transition-all shadow-xl flex flex-col"
-              >
-                {landingPhotos?.keePhoto && (
-                  <div className="h-48 overflow-hidden relative">
-                    <img src={landingPhotos.keePhoto} alt="Kee Monastery" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-6">
-                      <div className="bg-amber-500 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
-                        Kee Monastery
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="p-8 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-amber-500 text-black rounded-2xl shadow-lg">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 3L4 9v12h16V9l-8-6zM12 12h.01" /></svg>
-                    </div>
-                    <h3 className="text-2xl font-black text-white font-serif uppercase tracking-tight">Kee Monastery</h3>
-                  </div>
-                  <p className="text-gray-800 text-base leading-relaxed font-bold">
-                    A <span className="text-amber-600 font-black">1000-year-old</span> Tibetan Buddhist monastery that looks like a fortress on a hill. It is the largest in Spiti, housing priceless murals, thangkas, and ancient scriptures. A center for spiritual learning that feels frozen in time.
-                  </p>
-                  <div className="pt-4 flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-widest">
-                    <MapPin size={14} /> 15 mins from TashiZom
-                  </div>
+                <div className="p-4"><p className="text-gray-400 text-xs leading-relaxed line-clamp-2 italic underline underline-offset-4">Click to see details and directions</p></div>
+              </Link>
+              <Link href="/explore" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden group hover:border-amber-500/30 transition-all flex flex-col">
+                <div className="h-40 overflow-hidden relative">
+                  <img src={landingPhotos?.keePhoto} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent" />
+                  <div className="absolute bottom-3 left-4 text-white font-serif font-black text-sm uppercase">Kee Monastery</div>
                 </div>
-              </motion.div>
+                <div className="p-4"><p className="text-gray-400 text-xs leading-relaxed line-clamp-2 italic underline underline-offset-4">Click to see details and directions</p></div>
+              </Link>
             </div>
           </div>
         </div>
@@ -1032,60 +845,59 @@ export default function Home() {
 
         </div>
       </section>
-      {
-        reviews && reviews.length > 0 && (
-          <section className="bg-tashi-dark py-20 px-6 border-t border-white/5">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                <div className="text-center md:text-left">
-                  <h2 className="text-3xl md:text-4xl font-serif font-black text-gray-900">Guest Stories</h2>
-                  <p className="text-gray-700 mt-2 font-bold italic text-lg">"Hear what travelers say about us"</p>
-                </div>
-                <div className="flex items-center gap-4 bg-amber-500/10 px-6 py-3 rounded-2xl border border-amber-500/20">
-                  <Star className="text-amber-500 fill-amber-500" size={24} />
-                  <span className="text-2xl font-bold text-gray-900">4.9 / 5</span>
-                  <span className="text-gray-600 text-sm font-bold">({reviews.length} reviews)</span>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {reviews.slice(0, 3).map((review: any, i: number) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-white/5 border border-white/10 p-6 rounded-2xl relative"
-                  >
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, star) => (
-                        <Star key={star} size={14} className={star < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-600'} />
-                      ))}
-                    </div>
-                    <p className="text-gray-800 text-base italic mb-6 leading-relaxed font-bold">"{review.comment}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
-                        {review.customerName?.charAt(0) || 'G'}
-                      </div>
-                      <div>
-                        <h4 className="text-gray-900 text-base font-black">{review.customerName || 'Happy Guest'}</h4>
-                        <p className="text-gray-600 text-xs font-bold uppercase tracking-wider">Verified Review</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+      {reviews && reviews.length > 0 && (
+        <section className="bg-tashi-dark py-20 px-6 border-t border-white/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+              <div className="text-center md:text-left">
+                <h2 className="text-3xl md:text-4xl font-serif font-black text-gray-900">Guest Stories</h2>
+                <p className="text-gray-700 mt-2 font-bold italic text-lg">"Hear what travelers say about us"</p>
               </div>
-
-              <div className="text-center mt-12">
-                <Link href="/customer/menu" className="text-amber-500 font-bold hover:underline underline-offset-8">
-                  View more experiences & menu →
-                </Link>
+              <div className="flex items-center gap-4 bg-amber-500/10 px-6 py-3 rounded-2xl border border-amber-500/20">
+                <Star className="text-amber-500 fill-amber-500" size={24} />
+                <span className="text-2xl font-bold text-gray-900">4.9 / 5</span>
+                <span className="text-gray-600 text-sm font-bold">({reviews.length} reviews)</span>
               </div>
             </div>
-          </section>
-        )
-      }
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {reviews.slice(0, 3).map((review: any, i: number) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white/5 border border-white/10 p-6 rounded-2xl relative"
+                >
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, star) => (
+                      <Star key={star} size={14} className={star < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-600'} />
+                    ))}
+                  </div>
+                  <p className="text-gray-800 text-base italic mb-6 leading-relaxed font-bold">"{review.comment}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
+                      {review.customerName?.charAt(0) || 'G'}
+                    </div>
+                    <div>
+                      <h4 className="text-gray-900 text-base font-black">{review.customerName || 'Happy Guest'}</h4>
+                      <p className="text-gray-600 text-xs font-bold uppercase tracking-wider">Verified Review</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link href="/customer/menu" className="text-amber-500 font-bold hover:underline underline-offset-8">
+                View more experiences & menu →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Footer Branding */}
       <footer className="bg-black py-20 border-t border-white/5 px-6 relative overflow-hidden">
