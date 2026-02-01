@@ -128,10 +128,26 @@ export default function GlobalSpirituals() {
     useEffect(() => {
         if (!currentSource && targetSource && audioRef.current) {
             console.log('🎵 Initializing audio source:', targetSource);
+            const audio = audioRef.current;
+
             setCurrentSource(targetSource);
-            audioRef.current.src = targetSource;
-            audioRef.current.volume = 0.2;
-            audioRef.current.load(); // Important: preload the audio
+            audio.src = targetSource;
+            audio.volume = 0.2;
+            audio.preload = 'auto'; // Force preload
+
+            // Add error listener
+            audio.addEventListener('error', (e) => {
+                console.error('❌ Audio load error:', {
+                    error: audio.error,
+                    code: audio.error?.code,
+                    message: audio.error?.message,
+                    src: audio.src
+                });
+            }, { once: true });
+
+            // Try to load
+            audio.load();
+            console.log('📥 Audio load initiated, readyState:', audio.readyState);
         }
     }, [targetSource]); // Run when targetSource changes (Firestore loads)
 
