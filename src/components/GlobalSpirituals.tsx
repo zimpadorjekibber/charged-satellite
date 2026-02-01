@@ -69,6 +69,17 @@ export default function GlobalSpirituals() {
                     </div>
                 </div>
             )}
+
+            {/* Centered Fixed Logo (Endless Knot) */}
+            {landingPhotos.logoGif && (
+                <div className="fixed top-2 md:top-4 left-1/2 -translate-x-1/2 z-[200] pointer-events-none mix-blend-normal">
+                    <img
+                        src={landingPhotos.logoGif}
+                        alt="TashiZom Logo"
+                        className="w-20 h-20 md:w-32 md:h-32 object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+                    />
+                </div>
+            )}
         </>
     );
 }
