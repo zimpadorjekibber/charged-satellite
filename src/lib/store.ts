@@ -194,6 +194,7 @@ interface AppState {
         climateCaptions?: Record<string, string>;
         prayerFlags?: string;
         prayerWheel?: string;
+        logoGif?: string; // Floating logo animation
     };
 
 
@@ -304,7 +305,8 @@ export const useStore = create<AppState>()(
                 locationCaptions: {},
                 climateCaptions: {},
                 prayerFlags: '',
-                prayerWheel: ''
+                prayerWheel: '',
+                logoGif: ''
             },
             customerDetails: null,
             contactInfo: {

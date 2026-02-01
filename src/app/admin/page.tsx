@@ -815,7 +815,7 @@ function AdminDashboard() {
                                 <p className="text-gray-600 text-sm mb-4">Upload a transparent GIF here to replace the "i" dot animation in the main title.</p>
                                 <PhotoUploadSection
                                     title="Floating Logo GIF"
-                                    photoUrl={landingPhotos.logoGif || null}
+                                    photoUrl={landingPhotos?.logoGif || null}
                                     onUpload={(url) => updateLandingPhotos({ logoGif: url })}
                                     onDelete={() => updateLandingPhotos({ logoGif: null })}
                                     helperText="Recommended: Transparent GIF, 150x150px."
