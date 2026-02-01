@@ -998,6 +998,9 @@ export const useStore = create<AppState>()(
                 }
 
                 if (file.type === 'image/gif') {
+                    if (file.size > 900 * 1024) {
+                        throw new Error(`GIF too large (${(file.size / 1024).toFixed(0)}KB). Max 900KB allowed for Internal Storage. Use a direct URL instead.`);
+                    }
                     return new Promise((resolve, reject) => {
                         const reader = new FileReader();
                         reader.onload = (e) => {
