@@ -121,7 +121,7 @@ export default function Home() {
                     animate={{ y: [-5, 5, -5] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     src={landingPhotos?.logoGif || "/tashizom-logo.png"}
-                    className="absolute -top-12 md:-top-20 left-1/2 -translate-x-1/2 w-16 h-16 md:w-28 md:h-28 object-contain z-50 pointer-events-none drop-shadow-xl"
+                    className="absolute -top-16 md:-top-36 left-1/2 -translate-x-1/2 w-24 h-24 md:w-40 md:h-40 object-contain z-[120] pointer-events-none drop-shadow-2xl"
                     alt="Floating Flag"
                   />
                 </span>
