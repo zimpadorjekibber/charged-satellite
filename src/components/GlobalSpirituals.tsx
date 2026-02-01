@@ -148,23 +148,49 @@ export default function GlobalSpirituals() {
 
     // Handle Mute Toggle
     const toggleMute = () => {
-        if (!audioRef.current) return;
+        console.log('🔊 Speaker button clicked!');
+        if (!audioRef.current) {
+            console.error('❌ Audio element not initialized');
+            return;
+        }
+
+        const audio = audioRef.current;
+        console.log('🎵 Current state:', {
+            src: audio.src,
+            paused: audio.paused,
+            muted: audio.muted,
+            volume: audio.volume,
+            readyState: audio.readyState
+        });
 
         if (isMuted) {
-            audioRef.current.muted = false;
-            audioRef.current.volume = 0.2;
-            audioRef.current.play().then(() => {
+            // Unmute and play
+            audio.muted = false;
+            audio.volume = 0.2;
+
+            // Force reload if needed
+            if (!audio.src || audio.src === window.location.href) {
+                console.log('🔄 Reloading audio source:', targetSource);
+                audio.src = targetSource;
+                audio.load();
+            }
+
+            audio.play().then(() => {
+                console.log('✅ Audio playing successfully!');
                 setIsPlaying(true);
                 setIsMuted(false);
             }).catch((err) => {
-                console.log('Play failed:', err);
+                console.error('❌ Play failed:', err);
+                alert('Cannot play audio: ' + err.message + '\n\nPlease check:\n1. Valid music URL in admin\n2. Browser allows autoplay\n3. Internet connection');
                 setIsMuted(false); // Still unmute visually
             });
         } else {
-            audioRef.current.pause();
-            audioRef.current.muted = true;
+            // Mute and pause
+            audio.pause();
+            audio.muted = true;
             setIsMuted(true);
             setIsPlaying(false);
+            console.log('⏸️ Audio paused');
         }
     };
 

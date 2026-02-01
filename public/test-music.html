@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Test</title>
+</head>
+<body style="padding: 50px; font-family: Arial;">
+    <h2>🎵 Music Playback Test</h2>
+    
+    <div style="margin: 20px 0;">
+        <h3>Test 1: Archive.org (Default)</h3>
+        <audio id="audio1" controls>
+            <source src="https://archive.org/download/TibetanSingingBowlMeditation7Minutes/TibetanSingingBowlMeditation7Minutes.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div style="margin: 20px 0;">
+        <h3>Test 2: Your Custom URL</h3>
+        <input type="text" id="customUrl" placeholder="Paste your music URL here" style="width: 400px; padding: 5px;">
+        <button onclick="testCustomUrl()">Test</button>
+        <br><br>
+        <audio id="audio2" controls></audio>
+    </div>
+
+    <div id="result" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+
+    <script>
+        function testCustomUrl() {
+            const url = document.getElementById('customUrl').value;
+            const audio = document.getElementById('audio2');
+            const result = document.getElementById('result');
+            
+            if (!url) {
+                result.innerHTML = '❌ Please enter a URL';
+                return;
+            }
+
+            audio.src = url;
+            audio.load();
+            
+            audio.addEventListener('canplay', () => {
+                result.innerHTML = '✅ URL is valid and can play!';
+            });
+            
+            audio.addEventListener('error', (e) => {
+                result.innerHTML = '❌ Error: ' + (audio.error ? audio.error.message : 'Cannot load audio');
+            });
+        }
+
+        // Test default URL on load
+        const audio1 = document.getElementById('audio1');
+        audio1.addEventListener('canplay', () => {
+            console.log('✅ Default URL works!');
+        });
+        audio1.addEventListener('error', () => {
+            console.log('❌ Default URL failed!');
+        });
+    </script>
+</body>
+</html>
