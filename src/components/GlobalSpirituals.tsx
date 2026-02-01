@@ -27,12 +27,10 @@ export default function GlobalSpirituals() {
                                     className="h-6 md:h-10 w-auto object-contain opacity-80"
                                 />
 
-                                {/* The Rotating Prayer Wheel (Moves with Flags) */}
+                                {/* The Prayer Wheel (GIF - rotates itself) */}
                                 {landingPhotos.prayerWheel && (
                                     <div className="mx-4 md:mx-8">
-                                        <motion.img
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                                        <img
                                             src={landingPhotos.prayerWheel}
                                             alt="Spiritual Wheel"
                                             className="h-8 md:h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(218,165,32,0.4)] opacity-70"
@@ -51,9 +49,7 @@ export default function GlobalSpirituals() {
                                 />
                                 {landingPhotos.prayerWheel && (
                                     <div className="mx-4 md:mx-8">
-                                        <motion.img
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                                        <img
                                             src={landingPhotos.prayerWheel}
                                             alt="Spiritual Wheel"
                                             className="h-8 md:h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(218,165,32,0.4)] opacity-70"
