@@ -114,7 +114,9 @@ export default function Home() {
                     i
                   </span>
                   {/* Replaced Logo with Floating Flag GIF */}
+                  {/* Replaced Logo with Floating Flag GIF */}
                   <motion.img
+                    key={landingPhotos?.logoGif || 'default-logo'}
                     initial={{ y: 0 }}
                     animate={{ y: [-5, 5, -5] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
