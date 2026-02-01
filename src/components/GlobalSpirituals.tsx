@@ -135,17 +135,16 @@ export default function GlobalSpirituals() {
         };
     }, [targetSource, isMuted]); // Note: currentSource is excluded to avoid loops, we update it inside
 
-    // Handle initial auto-play attempt (only one time)
+    // Handle initial source setting when data loads
     useEffect(() => {
-        // Just set the initial source without fading if it's the first load
-        if (!currentSource && targetSource) {
+        if (!currentSource && targetSource && audioRef.current) {
+            console.log('🎵 Initializing audio source:', targetSource);
             setCurrentSource(targetSource);
-            if (audioRef.current) {
-                audioRef.current.src = targetSource;
-                audioRef.current.volume = 0.2;
-            }
+            audioRef.current.src = targetSource;
+            audioRef.current.volume = 0.2;
+            audioRef.current.load(); // Important: preload the audio
         }
-    }, []);
+    }, [targetSource]); // Run when targetSource changes (Firestore loads)
 
     // Handle Mute Toggle
     const toggleMute = () => {
