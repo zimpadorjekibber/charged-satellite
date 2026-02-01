@@ -49,17 +49,6 @@ export default function GlobalSpirituals() {
 
     const targetSource = getTargetSource();
 
-    // Debug logging
-    useEffect(() => {
-        console.log('🎵 Music Debug:', {
-            bgMusic: landingPhotos?.backgroundMusic,
-            targetSource,
-            currentSource,
-            isMuted,
-            pathname
-        });
-    }, [landingPhotos?.backgroundMusic, targetSource, pathname]);
-
     // --- 2. SCROLL OBSERVER (Home Page Only) ---
     useEffect(() => {
         if (pathname !== '/') {

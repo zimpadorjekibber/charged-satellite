@@ -1740,6 +1740,7 @@ function AdminDashboard() {
                                                                 onChange={(e) => {
                                                                     const file = e.target.files?.[0];
                                                                     if (!file) return;
+                                                                    console.log('📁 File selected:', file.name, file.size, 'bytes');
 
                                                                     if (file.size > 900 * 1024) {
                                                                         alert(`Audio too large (${(file.size / 1024).toFixed(0)}KB). Max 900KB.`);
@@ -1749,12 +1750,19 @@ function AdminDashboard() {
                                                                     const reader = new FileReader();
                                                                     reader.onload = (event) => {
                                                                         const base64 = event.target?.result as string;
+                                                                        console.log('✅ Base64 conversion done, length:', base64.length);
                                                                         const latestMusic = useStore.getState().landingPhotos?.backgroundMusic;
                                                                         const latestMap = typeof latestMusic === 'string' ? { home: latestMusic } : (latestMusic || {});
 
                                                                         const updates = { ...latestMap, [track.key]: base64 };
-                                                                        useStore.getState().updateBackgroundMusic(updates);
-                                                                        alert('Audio uploaded!');
+                                                                        console.log('💾 Saving to Firestore...');
+                                                                        useStore.getState().updateBackgroundMusic(updates).then(() => {
+                                                                            console.log('✅ Upload complete!');
+                                                                            alert('Audio uploaded! Refresh page to hear it.');
+                                                                        }).catch(err => {
+                                                                            console.error('❌ Upload failed:', err);
+                                                                            alert('Upload failed: ' + err.message);
+                                                                        });
                                                                     };
                                                                     reader.onerror = () => alert('Failed to read file');
                                                                     reader.readAsDataURL(file);
