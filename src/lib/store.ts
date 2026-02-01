@@ -484,6 +484,10 @@ export const useStore = create<AppState>()(
                     snap.docs.forEach(d => {
                         if (d.id === 'locationCaptions') locationCaptions = d.data();
                         else if (d.id === 'climateCaptions') climateCaptions = d.data();
+                        else if (d.id === 'backgroundMusic') {
+                            // backgroundMusic is an object structure, extract it properly
+                            fieldsData[d.id] = d.data().url || d.data();
+                        }
                         else fieldsData[d.id] = d.data().url || d.data().data;
                     });
 
