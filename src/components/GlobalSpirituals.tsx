@@ -231,27 +231,30 @@ export default function GlobalSpirituals() {
                     </div>
                 )}
 
-                {/* Audio Control - Floating Right in the Strip */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[210] pointer-events-auto flex items-center gap-2">
-                    {/* Now Playing Indicator (Optional) */}
-                    <div className="hidden md:flex flex-col items-end mr-2">
-                        <span className="text-[8px] text-amber-500 uppercase tracking-widest font-bold">
-                            {activeSection === 'location' ? 'Prime Location' :
-                                activeSection === 'winter' ? 'Winter Mode' :
-                                    pathname.includes('menu') ? 'Dining Ambience' :
-                                        pathname.includes('story') ? 'Legacy & History' : 'TashiZom Ambience'}
-                        </span>
-                    </div>
 
-                    <button
-                        onClick={toggleMute}
-                        className={`backdrop-blur-md p-1.5 md:p-2 rounded-full transition-all active:scale-95 border ${isMuted ? 'bg-red-500/20 border-red-500/30 text-red-300' : 'bg-green-500/20 border-green-500/30 text-green-300'}`}
-                        title={isMuted ? "Play Music" : "Mute Music"}
-                    >
-                        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className="animate-pulse" />}
-                    </button>
+            </div>
+
+            {/* Floating Music Control (Bottom Left - High Visibility) */}
+            <div className="fixed bottom-6 left-6 z-[250] pointer-events-auto flex items-center gap-3 group">
+                <button
+                    onClick={toggleMute}
+                    className={`p-3.5 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.6)] transition-all active:scale-95 border-2 hover:scale-110 ${isMuted ? 'bg-gray-800 border-gray-600 text-gray-400' : 'bg-amber-500 border-white text-black'}`}
+                    title={isMuted ? "Unmute Ambience" : "Mute Ambience"}
+                >
+                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={24} className="animate-pulse" />}
+                </button>
+
+                {/* Label that appears on hover */}
+                <div className="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none translate-x-[-10px] group-hover:translate-x-0 duration-300">
+                    <span className="text-[10px] text-amber-500 uppercase tracking-widest font-bold block">
+                        {activeSection === 'location' ? 'Prime Location' :
+                            activeSection === 'winter' ? 'Winter Mode' :
+                                pathname.includes('menu') ? 'Dining Ambience' :
+                                    pathname.includes('story') ? 'Legacy & History' : 'TashiZom Ambience'}
+                    </span>
                 </div>
             </div>
+
 
             {/* Centered Fixed Logo (Endless Knot) */}
             {landingPhotos.logoGif && (
