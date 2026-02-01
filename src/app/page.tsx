@@ -842,13 +842,13 @@ export default function Home() {
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4 font-mono text-[10px] text-orange-400 uppercase tracking-widest">
                     Spiti Handmade
                   </div>
-                  <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight">
-                    Local <span className="text-orange-400 italic">Winter Gears</span>
+                  <h2 className="text-4xl md:text-6xl font-serif font-black text-white leading-tight mb-4">
+                    Local <span className="text-orange-400 italic">Winter Gears & Harvest</span>
                   </h2>
+                  <p className="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed italic border-l-2 border-orange-500/30 pl-4">
+                    "Authentically handcrafted and harvested by the locals of Kibber Village. These rare items are available for purchase at our place. Please inquire with our staff for availability and details."
+                  </p>
                 </div>
-                <Link href="/customer/menu" className="group h-fit px-8 py-4 bg-orange-500 text-black font-black rounded-xl hover:bg-orange-400 transition-all flex items-center gap-3">
-                  SHOP GEAR <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                </Link>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
