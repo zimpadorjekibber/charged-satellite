@@ -195,6 +195,13 @@ interface AppState {
         prayerFlags?: string;
         prayerWheel?: string;
         logoGif?: string; // Floating logo animation
+        backgroundMusic?: {
+            home?: string;
+            menu?: string;
+            story?: string;
+            location?: string;
+            winter?: string;
+        } | string; // Support both old string and new object for backward compatibility/migration
     };
 
 
@@ -251,6 +258,7 @@ interface AppState {
 
     login: (username: string, password: string) => Promise<boolean>;
     updateLandingPhotos: (section: 'location' | 'climate' | 'customMap' | 'registrationDoc' | 'chichamPhoto' | 'keePhoto' | 'chefPhoto' | 'prayerFlags' | 'prayerWheel' | 'logoGif', data: string[] | string) => Promise<void>;
+    updateBackgroundMusic: (music: any) => Promise<void>;
     updateLandingPhotoCaption: (section: 'location' | 'climate', photoUrl: string, caption: string) => Promise<void>;
     updateSettings: (settings: any) => Promise<void>;
     updateContactSettings: (contact: ContactSettings) => Promise<void>;
@@ -306,7 +314,14 @@ export const useStore = create<AppState>()(
                 climateCaptions: {},
                 prayerFlags: '',
                 prayerWheel: '',
-                logoGif: ''
+                logoGif: '',
+                backgroundMusic: {
+                    home: '',
+                    menu: '',
+                    story: '',
+                    location: '',
+                    winter: ''
+                }
             },
             customerDetails: null,
             contactInfo: {
@@ -947,6 +962,16 @@ export const useStore = create<AppState>()(
 
                 // Optimistic UI update
                 set({ landingPhotos: { ...get().landingPhotos, [section]: data } });
+            },
+
+            updateBackgroundMusic: async (music: any) => {
+                // Save to Firestore as a dedicated field doc in landing_photos
+                const fieldRef = doc(db, 'settings', 'landing_photos', 'fields', 'backgroundMusic');
+                await setDoc(fieldRef, { url: music, updatedAt: new Date().toISOString() });
+
+                // Update Store correctly nested
+                const current = get().landingPhotos;
+                set({ landingPhotos: { ...current, backgroundMusic: music } });
             },
 
             updateLandingPhotoCaption: async (section, photoUrl, caption) => {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper, Home, Phone, PlayCircle } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, Users, Lock, LogOut, History, BarChart3, LayoutDashboard, Settings, Leaf, Drumstick, Star, ArrowRight, Plus, Trash, Pencil, X, Printer, FolderOpen, Image as ImageIcon, Upload, Share2, Download, Sun, Moon, MapPin, ShoppingBag, Grid, BookOpen, Sparkles, Bell, Check, CloudSnow, Snowflake, Clock, Newspaper, Home, Phone, PlayCircle, Music } from 'lucide-react';
 import { useStore, Order } from '@/lib/store';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useEffect, useRef, Suspense } from 'react';
@@ -1689,6 +1689,64 @@ function AdminDashboard() {
                                                 onUploadSuccess={(url) => updateLandingPhotos('logoGif', url)}
                                                 placeholder="Logo GIF Upload"
                                             />
+                                        </div>
+                                    </div>
+
+                                    {/* Background Ambience Music */}
+                                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100 shadow-sm mt-8">
+                                        <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                            <Music size={18} className="text-green-600" />
+                                            Background Ambience Music
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6 font-medium">Set specific music tracks for different sections. Use direct audio URLs (MP3).</p>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {[
+                                                { key: 'home', label: 'Home / Hero', desc: 'Main landing ambience' },
+                                                { key: 'menu', label: 'Menu Section', desc: 'Dining area vibes' },
+                                                { key: 'story', label: 'Our Story', desc: 'Heritage section audio' },
+                                                { key: 'location', label: 'Prime Location', desc: 'Map & travel section' },
+                                                { key: 'winter', label: 'Winter Hardships', desc: 'Winter mode audio' }
+                                            ].map((track) => {
+                                                const bgMusic = landingPhotos?.backgroundMusic;
+                                                const musicMap = typeof bgMusic === 'string' ? { home: bgMusic } : (bgMusic || {});
+
+                                                return (
+                                                    <div key={track.key} className="bg-white p-4 rounded-xl border border-green-200 shadow-sm">
+                                                        <label className="text-[10px] font-bold text-gray-500 uppercase mb-2 block tracking-wider">{track.label}</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder={`https://...`}
+                                                            defaultValue={(musicMap as any)[track.key] || ''}
+                                                            onBlur={(e) => {
+                                                                const currentVal = e.target.value;
+                                                                const latestMusic = useStore.getState().landingPhotos?.backgroundMusic;
+                                                                const latestMap = typeof latestMusic === 'string' ? { home: latestMusic } : (latestMusic || {});
+
+                                                                const updates = { ...latestMap, [track.key]: currentVal };
+                                                                // Use the new action
+                                                                useStore.getState().updateBackgroundMusic(updates);
+                                                            }}
+                                                            className="w-full bg-gray-50 text-xs font-mono text-green-700 border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 ring-green-500 mb-2 truncate transition-all focus:bg-white"
+                                                        />
+                                                        <div className="flex justify-between items-center">
+                                                            <p className="text-[9px] text-gray-400 font-medium">{track.desc}</p>
+                                                            {(musicMap as any)[track.key] && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const audio = new Audio((musicMap as any)[track.key]);
+                                                                        audio.play().catch(e => alert('Cannot play URL'));
+                                                                        setTimeout(() => audio.pause(), 5000); // Preview 5s
+                                                                    }}
+                                                                    className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full hover:bg-green-200 transition-colors"
+                                                                >
+                                                                    Preview
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 

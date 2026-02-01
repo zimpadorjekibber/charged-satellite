@@ -136,3 +136,23 @@ Use Firebase Console directly:
    - `hotelRegistration`: [URL]
 
 This will work immediately without code changes!
+
+---
+
+## 🎵 Background Ambience Music (New Feature)
+
+Navigate to **Admin > Settings > Photos > Background Ambience Music**.
+
+We support 5 distinct sections:
+1. **Home / Hero**: Main landing page ambience
+2. **Menu Section**: Dining area vibes
+3. **Our Story**: Heritage section audio
+4. **Prime Location**: Map & travel section
+5. **Winter Hardships**: Winter mode audio
+
+### Instructions:
+1. Prepare your audio files (MP3 preferred).
+2. Host them online (Archive.org, Dropbox Direct Link, etc.).
+3. **Paste the Direct URL** in the respective field.
+4. Click **Preview** to verify the sound.
+5. The changes apply immediately.
