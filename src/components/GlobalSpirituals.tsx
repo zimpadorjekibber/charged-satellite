@@ -235,7 +235,7 @@ export default function GlobalSpirituals() {
             </div>
 
             {/* Floating Music Control (Bottom Left - High Visibility) */}
-            <div className="fixed bottom-6 left-6 z-[250] pointer-events-auto flex items-center gap-3 group">
+            <div className="fixed bottom-32 left-6 z-[250] pointer-events-auto flex items-center gap-3 group">
                 <button
                     onClick={toggleMute}
                     className={`p-3.5 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.6)] transition-all active:scale-95 border-2 hover:scale-110 ${isMuted ? 'bg-gray-800 border-gray-600 text-gray-400' : 'bg-amber-500 border-white text-black'}`}

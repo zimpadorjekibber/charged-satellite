@@ -1729,6 +1729,45 @@ function AdminDashboard() {
                                                             }}
                                                             className="w-full bg-gray-50 text-xs font-mono text-green-700 border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 ring-green-500 mb-2 truncate transition-all focus:bg-white"
                                                         />
+
+                                                        {/* File Upload Button */}
+                                                        <div className="mb-2">
+                                                            <input
+                                                                type="file"
+                                                                accept="audio/*"
+                                                                className="hidden"
+                                                                id={`audio-upload-${track.key}`}
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (!file) return;
+
+                                                                    if (file.size > 900 * 1024) {
+                                                                        alert(`Audio too large (${(file.size / 1024).toFixed(0)}KB). Max 900KB.`);
+                                                                        return;
+                                                                    }
+
+                                                                    const reader = new FileReader();
+                                                                    reader.onload = (event) => {
+                                                                        const base64 = event.target?.result as string;
+                                                                        const latestMusic = useStore.getState().landingPhotos?.backgroundMusic;
+                                                                        const latestMap = typeof latestMusic === 'string' ? { home: latestMusic } : (latestMusic || {});
+
+                                                                        const updates = { ...latestMap, [track.key]: base64 };
+                                                                        useStore.getState().updateBackgroundMusic(updates);
+                                                                        alert('Audio uploaded!');
+                                                                    };
+                                                                    reader.onerror = () => alert('Failed to read file');
+                                                                    reader.readAsDataURL(file);
+                                                                }}
+                                                            />
+                                                            <label
+                                                                htmlFor={`audio-upload-${track.key}`}
+                                                                className="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition-colors cursor-pointer inline-block"
+                                                            >
+                                                                📁 Upload Audio (Max 900KB)
+                                                            </label>
+                                                        </div>
+
                                                         <div className="flex justify-between items-center">
                                                             <p className="text-[9px] text-gray-400 font-medium">{track.desc}</p>
                                                             {(musicMap as any)[track.key] && (
