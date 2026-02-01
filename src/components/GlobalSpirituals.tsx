@@ -12,7 +12,7 @@ export default function GlobalSpirituals() {
     const pathname = usePathname();
 
     // Background Music State
-    const [isMuted, setIsMuted] = useState(false);
+    const [isMuted, setIsMuted] = useState(true); // Start muted for mobile compatibility
     const [isPlaying, setIsPlaying] = useState(false);
     const [activeSection, setActiveSection] = useState<'home' | 'location' | 'winter'>('home');
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -143,9 +143,15 @@ export default function GlobalSpirituals() {
         if (isMuted) {
             audioRef.current.muted = false;
             audioRef.current.volume = 0.2;
-            audioRef.current.play().then(() => setIsPlaying(true));
-            setIsMuted(false);
+            audioRef.current.play().then(() => {
+                setIsPlaying(true);
+                setIsMuted(false);
+            }).catch((err) => {
+                console.log('Play failed:', err);
+                setIsMuted(false); // Still unmute visually
+            });
         } else {
+            audioRef.current.pause();
             audioRef.current.muted = true;
             setIsMuted(true);
             setIsPlaying(false);
@@ -238,10 +244,10 @@ export default function GlobalSpirituals() {
             <div className="fixed bottom-32 left-6 z-[250] pointer-events-auto flex items-center gap-3 group">
                 <button
                     onClick={toggleMute}
-                    className={`p-2 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all active:scale-95 border-2 hover:scale-110 ${isMuted ? 'bg-red-900 border-red-700 text-red-400' : 'bg-red-600 border-red-400 text-white'}`}
-                    title={isMuted ? "Unmute Ambience" : "Mute Ambience"}
+                    className={`p-2 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all active:scale-95 border-2 hover:scale-110 ${isMuted ? 'bg-red-900 border-red-700 text-red-400 animate-pulse' : 'bg-red-600 border-red-400 text-white'}`}
+                    title={isMuted ? "Click to Play Music" : "Mute Music"}
                 >
-                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className="animate-pulse" />}
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
                 </button>
 
                 {/* Label that appears on hover */}
