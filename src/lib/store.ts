@@ -922,7 +922,10 @@ export const useStore = create<AppState>()(
                         }
                         // If we are REMOVING (data length < current length)
                         else if (data.length < current.length) {
-                            const removedUrl = current.find(url => !data.includes(url));
+                            // Robust check: works for uniques AND duplicates by checking count decrease
+                            const removedUrl = current.find(url =>
+                                current.filter(u => u === url).length > data.filter(u => u === url).length
+                            );
                             if (removedUrl) {
                                 const q = query(collection(db, 'settings', 'landing_photos', section), orderBy('createdAt', 'desc'));
                                 const snap = await getDocs(q);
