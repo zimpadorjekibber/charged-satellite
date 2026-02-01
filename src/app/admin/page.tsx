@@ -790,32 +790,37 @@ function AdminDashboard() {
                                     <h2 className="text-2xl font-bold text-gray-900">Media Gallery</h2>
                                     <p className="text-gray-500 text-sm">Upload and manage photos for your menu and updates.</p>
                                 </div>
-                                <button
-                                    onClick={async () => {
-                                        const url = prompt("Paste the image URL here:");
-                                        if (url) {
-                                            const name = prompt("Give this image a name (optional):") || 'Saved Image';
-                                            // Directly save to firestore "gallery" equivalent
-                                            // We need a store function for this or just hack it here, but store is cleaner.
-                                            // Since we haven't exposed 'addMedia' helper, I'll assume we can call the firestore methods or mock 'upload' for now,
-                                            // BUT wait, we modified 'uploadImage' to SAVE if flag is true.
-                                            // However, 'uploadImage' expects a FILE.
-                                            // We should add a new store method `addMediaLink`.
-                                            // For now, let's just inline the addDoc call since we have imports elsewhere or just add method to store quickly.
-                                            // Actually I can't easily add method to store without reading it again.
+                                <div className="flex flex-col gap-2 items-end">
+                                    <button
+                                        onClick={async () => {
+                                            const url = prompt("Paste the image URL here:");
+                                            if (url) {
+                                                const name = prompt("Give this image a name (optional):") || 'Saved Image';
+                                                await useStore.getState().addMediaItem(url, name);
+                                            }
+                                        }}
+                                        className="bg-tashi-primary hover:bg-tashi-primary/90 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center gap-2 transition-colors font-bold shadow-lg text-sm"
+                                    >
+                                        <Plus size={18} /> Add Link
+                                    </button>
+                                </div>
+                            </div>
 
-                                            // Let's us use the 'uploadImage' but we can't because it takes File.
-                                            // I will instruct user I will add `addMediaItem` to store first.
-                                            // WAIT - I can just use `addDoc` if I import it? No, imports are not top level here.
-                                            // I will just modify the label to be a button that calls a new Store method I will create in next step.
-
-                                            await useStore.getState().addMediaItem(url, name);
-                                        }
-                                    }}
-                                    className="bg-tashi-primary hover:bg-red-700 text-white px-4 py-2 rounded-lg cursor-pointer flex items-center gap-2 transition-colors font-bold shadow-lg"
-                                >
-                                    <Plus size={20} /> Save New Link
-                                </button>
+                            {/* Section: Floating Logo GIF Upload */}
+                            <div className="bg-orange-50 rounded-xl border border-orange-200 p-6 shadow-sm mb-8">
+                                <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                    <Sparkles size={20} className="text-orange-500" />
+                                    Floating Logo Animation
+                                </h3>
+                                <p className="text-gray-600 text-sm mb-4">Upload a transparent GIF here to replace the "i" dot animation in the main title.</p>
+                                <PhotoUploadSection
+                                    title="Floating Logo GIF"
+                                    photoUrl={landingPhotos.logoGif || null}
+                                    onUpload={(url) => updateLandingPhotos({ logoGif: url })}
+                                    onDelete={() => updateLandingPhotos({ logoGif: null })}
+                                    helperText="Recommended: Transparent GIF, 150x150px."
+                                    aspectRatio="square"
+                                />
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -1197,19 +1202,6 @@ function AdminDashboard() {
                                     </div>
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Homestays</span>
                                 </button>
-                                {/* Section: Floating Logo GIF Upload */}
-                                <div className="bg-white rounded-xl border-l-4 border-l-amber-500 p-6 shadow-sm mb-8">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">Floating Logo Animation</h3>
-                                    <p className="text-gray-500 text-sm mb-4">Upload a transparent GIF here to replace the "i" dot animation in the main title.</p>
-                                    <PhotoUploadSection
-                                        title="Floating Logo GIF"
-                                        photoUrl={landingPhotos.logoGif || null}
-                                        onUpload={(url) => updateLandingPhotos({ logoGif: url })}
-                                        onDelete={() => updateLandingPhotos({ logoGif: null })}
-                                        helperText="Recommended: Transparent GIF, 150x150px. This will float above the 'i' in TashiZom."
-                                        aspectRatio="square"
-                                    />
-                                </div>
 
                                 {/* Section: Landing Page Photos (Moved to Top) */}
 
