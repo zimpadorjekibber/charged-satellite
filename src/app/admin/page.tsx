@@ -1202,1115 +1202,1116 @@ function AdminDashboard() {
                                     </div>
                                     <span className="text-xs font-bold text-black uppercase tracking-wider">Homestays</span>
                                 </button>
+                            </div>
 
-                                {/* Section: Landing Page Photos (Moved to Top) */}
+                            {/* Section: Landing Page Photos (Moved to Top) */}
 
 
-                                {/* App Sharing & QR */}
-                                <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
-                                    <div className="flex flex-col md:flex-row gap-8 items-center">
-                                        <div className="bg-white p-4 rounded-xl shadow-lg shadow-orange-100 border border-orange-100">
-                                            <QRCodeSVG
-                                                value="https://tashizomcafe.in"
-                                                size={200}
-                                                level="H"
-                                                includeMargin={true}
-                                                id="app-home-qr"
-                                            />
-                                        </div>
-                                        <div className="flex-1 text-center md:text-left space-y-4">
-                                            <div>
-                                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Share TashiZom App</h2>
-                                                <p className="text-gray-600">
-                                                    Scan to open the home page immediately. Share this link with guests to let them access the menu from anywhere.
-                                                </p>
-                                            </div>
-
-                                            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                                                <button
-                                                    onClick={async () => {
-                                                        const shareData = {
-                                                            title: 'TashiZom | Digital Dining',
-                                                            text: 'Check out the TashiZom menu and order food instantly!',
-                                                            url: 'https://tashizomcafe.in'
-                                                        };
-                                                        if (navigator.share) {
-                                                            try {
-                                                                await navigator.share(shareData);
-                                                            } catch (err) {
-                                                                console.error('Share failed:', err);
-                                                            }
-                                                        } else {
-                                                            navigator.clipboard.writeText('https://tashizomcafe.in');
-                                                            alert('Link copied to clipboard!');
-                                                        }
-                                                    }}
-                                                    className="bg-tashi-accent hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shadow-md shadow-yellow-500/20"
-                                                >
-                                                    <Share2 size={20} />
-                                                    Share App Link
-                                                </button>
-
-                                                <button
-                                                    onClick={() => {
-                                                        const svg = document.getElementById('app-home-qr');
-                                                        if (svg) {
-                                                            const svgData = new XMLSerializer().serializeToString(svg);
-                                                            const canvas = document.createElement('canvas');
-                                                            const ctx = canvas.getContext('2d');
-                                                            const img = new Image();
-                                                            img.onload = () => {
-                                                                canvas.width = img.width;
-                                                                canvas.height = img.height;
-                                                                if (ctx) {
-                                                                    ctx.fillStyle = 'white';
-                                                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                                                                    ctx.drawImage(img, 0, 0);
-                                                                    const pngFile = canvas.toDataURL('image/png');
-                                                                    const downloadLink = document.createElement('a');
-                                                                    downloadLink.download = 'tashizom-app-qr.png';
-                                                                    downloadLink.href = pngFile;
-                                                                    downloadLink.click();
-                                                                }
-                                                            };
-                                                            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-                                                        }
-                                                    }}
-                                                    className="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl flex items-center gap-2 border border-gray-200 shadow-sm"
-                                                >
-                                                    <Download size={20} />
-                                                    Download QR
-                                                </button>
-                                            </div>
-                                            <p className="text-xs text-orange-500 font-mono">https://tashizomcafe.in</p>
-                                        </div>
+                            {/* App Sharing & QR */}
+                            <div className="bg-gradient-to-br from-orange-100 to-white border border-tashi-accent/30 rounded-2xl p-8 shadow-sm">
+                                <div className="flex flex-col md:flex-row gap-8 items-center">
+                                    <div className="bg-white p-4 rounded-xl shadow-lg shadow-orange-100 border border-orange-100">
+                                        <QRCodeSVG
+                                            value="https://tashizomcafe.in"
+                                            size={200}
+                                            level="H"
+                                            includeMargin={true}
+                                            id="app-home-qr"
+                                        />
                                     </div>
-                                </div>
-
-                                {/* Menu Appearance Settings (New) */}
-                                <div id="appearance-settings" className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm scroll-mt-24">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                    <div className="flex-1 text-center md:text-left space-y-4">
                                         <div>
-                                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                                <span className="p-2 bg-purple-100 rounded-lg text-purple-600"><Sparkles size={20} /></span>
-                                                Menu Appearance Styling
-                                            </h2>
-                                            <p className="text-gray-500 text-sm mt-1">Customize fonts and colors for your customer-facing menu. Changes are live instantly.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {/* Category Headers */}
-                                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Category Headers</h3>
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">Font Size</label>
-                                                <select
-                                                    value={menuAppearance.categoryFontSize}
-                                                    onChange={(e) => updateMenuAppearance({ categoryFontSize: e.target.value })}
-                                                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
-                                                >
-                                                    <option value="1rem">Normal (1rem)</option>
-                                                    <option value="1.25rem">Large (1.25rem)</option>
-                                                    <option value="1.5rem">Extra Large (1.5rem)</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">Text Color</label>
-                                                <div className="flex gap-2 items-center">
-                                                    <input
-                                                        type="color"
-                                                        value={menuAppearance.categoryColor}
-                                                        onChange={(e) => updateMenuAppearance({ categoryColor: e.target.value })}
-                                                        className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
-                                                    />
-                                                    <span className="text-xs text-gray-500 uppercase">{menuAppearance.categoryColor}</span>
-                                                </div>
-                                            </div>
+                                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Share TashiZom App</h2>
+                                            <p className="text-gray-600">
+                                                Scan to open the home page immediately. Share this link with guests to let them access the menu from anywhere.
+                                            </p>
                                         </div>
 
-                                        {/* Item Titles */}
-                                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Item Names</h3>
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">Font Size</label>
-                                                <select
-                                                    value={menuAppearance.itemNameFontSize}
-                                                    onChange={(e) => updateMenuAppearance({ itemNameFontSize: e.target.value })}
-                                                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
-                                                >
-                                                    <option value="0.9rem">Compact (0.9rem)</option>
-                                                    <option value="1rem">Standard (1rem)</option>
-                                                    <option value="1.1rem">Large (1.1rem)</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">Text Color</label>
-                                                <div className="flex gap-2 items-center">
-                                                    <input
-                                                        type="color"
-                                                        value={menuAppearance.itemNameColor}
-                                                        onChange={(e) => updateMenuAppearance({ itemNameColor: e.target.value })}
-                                                        className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
-                                                    />
-                                                    <span className="text-xs text-gray-500 uppercase">{menuAppearance.itemNameColor}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Price & Accent */}
-                                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Accents & Prices</h3>
-                                            <div>
-                                                <label className="text-xs text-gray-500 block mb-1">Accent Color</label>
-                                                <div className="flex gap-2 items-center">
-                                                    <input
-                                                        type="color"
-                                                        value={menuAppearance.accentColor}
-                                                        onChange={(e) => updateMenuAppearance({ accentColor: e.target.value })}
-                                                        className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
-                                                    />
-                                                    <span className="text-xs text-gray-500 uppercase">{menuAppearance.accentColor}</span>
-                                                </div>
-                                            </div>
-                                            <div className="pt-2">
-                                                <button
-                                                    onClick={() => updateMenuAppearance({
-                                                        categoryFontSize: '1.25rem',
-                                                        categoryColor: '#FFFFFF',
-                                                        itemNameFontSize: '1rem',
-                                                        itemNameColor: '#E5E5E5',
-                                                        accentColor: '#DAA520'
-                                                    })}
-                                                    className="w-full bg-white hover:bg-gray-100 text-xs font-bold py-2 rounded text-gray-600 border border-gray-300 transition-colors"
-                                                >
-                                                    Reset to Default
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Live Preview Section */}
-                                    <div className="bg-neutral-900 rounded-2xl p-6 border border-white/10 shadow-inner">
-                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                            Live Style Preview (Customer View)
-                                        </h3>
-                                        <div className="space-y-4">
-                                            <h2 style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }} className="font-serif border-b border-white/5 pb-2 transition-all">
-                                                Signature Starters
-                                            </h2>
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h3 style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }} className="font-bold transition-all">
-                                                        Tibetan Butter Tea
-                                                    </h3>
-                                                    <p className="text-xs text-gray-500 max-w-[200px]">Hand-churned with local butter and Himalayan salt.</p>
-                                                </div>
-                                                <span style={{ color: menuAppearance.accentColor }} className="font-bold text-sm">
-                                                    ₹120
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="mt-6 pt-4 border-t border-white/5 flex gap-2 overflow-x-auto pb-2">
-                                            {['Breakfast', 'Lunch', 'Dinner'].map(cat => (
-                                                <div key={cat} className="px-3 py-1 rounded-full text-[10px] uppercase font-bold border" style={{ borderColor: `${menuAppearance.accentColor}40`, color: menuAppearance.accentColor }}>
-                                                    {cat}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="mt-4 flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                    <p className="text-xs text-gray-500 italic">
-                                        <strong>💡 Tip:</strong> These styles apply to ALL devices instantly.
-                                    </p>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-100">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        Saved to Cloud
-                                    </div>
-                                </div>
-
-                                {/* Valley Updates Management */}
-                                <div id="valley-updates-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Valley Updates</h2>
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {(valleyUpdates || []).map((update, idx) => (
-                                                <div key={update.id || idx} className={`bg-white p-5 rounded-2xl border-l-4 shadow-sm hover:shadow-md transition-all relative group ${update.statusColor === 'red' ? 'border-l-red-500 bg-red-50/10' :
-                                                    update.statusColor === 'blue' ? 'border-l-blue-500 bg-blue-50/10' :
-                                                        'border-l-green-500 bg-green-50/10'
-                                                    } border border-gray-100`}>
-                                                    <div className="flex justify-between items-start mb-4 gap-4">
-                                                        <div className="flex-1">
-                                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Title / Headline</label>
-                                                            <input
-                                                                defaultValue={update.title}
-                                                                onBlur={(e) => {
-                                                                    const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                    newUpdates[idx].title = e.target.value;
-                                                                    useStore.getState().saveValleyUpdates(newUpdates);
-                                                                }}
-                                                                placeholder="e.g. Road Block Alert"
-                                                                className="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-gray-900 font-bold text-sm w-full focus:ring-2 ring-tashi-accent outline-none shadow-inner"
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            onClick={() => {
-                                                                if (confirm('Delete this update?')) {
-                                                                    const newUpdates = useStore.getState().valleyUpdates.filter((_, i) => i !== idx);
-                                                                    useStore.getState().saveValleyUpdates(newUpdates);
-                                                                }
-                                                            }}
-                                                            className="text-gray-300 hover:text-red-500 p-2 hover:bg-red-50 rounded-full transition-colors"
-                                                        >
-                                                            <Trash size={16} />
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-2 gap-3 mb-4">
-                                                        <div>
-                                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Category</label>
-                                                            <select
-                                                                defaultValue={update.statusColor}
-                                                                onChange={(e) => {
-                                                                    const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                    newUpdates[idx].statusColor = e.target.value;
-                                                                    useStore.getState().saveValleyUpdates(newUpdates);
-                                                                }}
-                                                                className="w-full bg-white text-xs font-bold text-gray-700 rounded-lg p-2 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none"
-                                                            >
-                                                                <option value="green">🟢 GOOD / NORMAL</option>
-                                                                <option value="blue">🔵 INFO / STATUS</option>
-                                                                <option value="red">🔴 DANGER / ALERT</option>
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Badge Text</label>
-                                                            <input
-                                                                defaultValue={update.status}
-                                                                onBlur={(e) => {
-                                                                    const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                    newUpdates[idx].status = e.target.value;
-                                                                    useStore.getState().saveValleyUpdates(newUpdates);
-                                                                }}
-                                                                placeholder="LIVE"
-                                                                className="w-full bg-white text-xs font-bold text-gray-700 rounded-lg p-2 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none placeholder:text-gray-300"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="mb-4">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Detail Description</label>
-                                                        <textarea
-                                                            defaultValue={update.description}
-                                                            onBlur={(e) => {
-                                                                const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                newUpdates[idx].description = e.target.value;
-                                                                useStore.getState().saveValleyUpdates(newUpdates);
-                                                            }}
-                                                            placeholder="Describe the update in detail..."
-                                                            className="w-full bg-white text-xs text-gray-600 rounded-lg p-3 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none resize-none h-20 shadow-inner"
-                                                        />
-                                                    </div>
-
-                                                    {/* Media Inputs */}
-                                                    <div className="space-y-3 bg-gray-50/50 p-3 rounded-xl border border-gray-100 shadow-inner">
-                                                        <div className="flex gap-2 items-end">
-                                                            <div className="w-1/3">
-                                                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Media Type</label>
-                                                                <select
-                                                                    defaultValue={update.mediaType || 'image'}
-                                                                    onChange={(e) => {
-                                                                        const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                        newUpdates[idx].mediaType = e.target.value as any;
-                                                                        useStore.getState().saveValleyUpdates(newUpdates);
-                                                                    }}
-                                                                    className="w-full bg-white text-[10px] text-gray-600 rounded-lg p-2 border border-gray-200"
-                                                                >
-                                                                    <option value="image">🖼️ IMAGE</option>
-                                                                    <option value="video">🎥 VIDEO</option>
-                                                                </select>
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Media URL</label>
-                                                                <input
-                                                                    placeholder="Paste Link (YouTube/Insta/Direct)..."
-                                                                    defaultValue={update.mediaUrl || ''}
-                                                                    onBlur={(e) => {
-                                                                        const newUpdates = [...useStore.getState().valleyUpdates];
-                                                                        newUpdates[idx].mediaUrl = e.target.value;
-                                                                        useStore.getState().saveValleyUpdates(newUpdates);
-                                                                    }}
-                                                                    className="w-full bg-white text-[10px] text-blue-600 font-mono rounded-lg p-2 border border-gray-200 focus:ring-2 ring-blue-100 outline-none"
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Media Preview */}
-                                                        {update.mediaUrl && (
-                                                            <div className="w-full h-32 rounded-xl bg-black/5 flex items-center justify-center overflow-hidden border border-gray-200 relative group/preview">
-                                                                {(() => {
-                                                                    const url = update.mediaUrl;
-                                                                    const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-                                                                    const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
-                                                                    const isInstagram = url.includes('instagram.com');
-
-                                                                    if (update.mediaType === 'video') {
-                                                                        if (isYoutube) {
-                                                                            const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
-                                                                            return <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} className="h-full w-full object-cover grayscale group-hover/preview:grayscale-0 transition-all" />;
-                                                                        }
-                                                                        if (isFacebook) return <div className="bg-blue-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">FB Video Preview</div>;
-                                                                        if (isInstagram) return <div className="bg-pink-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">Insta Reel Preview</div>;
-                                                                        return <video src={url} className="h-full max-w-full" />;
-                                                                    }
-                                                                    return <img src={url} className="h-full w-full object-cover" alt="Preview" />;
-                                                                })()}
-                                                                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover/preview:bg-transparent transition-all">
-                                                                    {update.mediaType === 'video' && <PlayCircle size={32} className="text-white drop-shadow-lg opacity-80" />}
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
-
-                                            {/* Add New Button */}
-
+                                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                                             <button
-                                                onClick={() => {
-                                                    const currentUpdates = useStore.getState().valleyUpdates || [];
-                                                    const newUpdate = {
-                                                        id: Math.random().toString(36).substr(7),
-                                                        title: 'Road Status Update',
-                                                        status: 'LIVE',
-                                                        statusColor: 'green',
-                                                        description: 'Everything is normal...',
-                                                        mediaType: 'image',
-                                                        mediaUrl: ''
+                                                onClick={async () => {
+                                                    const shareData = {
+                                                        title: 'TashiZom | Digital Dining',
+                                                        text: 'Check out the TashiZom menu and order food instantly!',
+                                                        url: 'https://tashizomcafe.in'
                                                     };
-                                                    useStore.getState().saveValleyUpdates([...currentUpdates, newUpdate]);
+                                                    if (navigator.share) {
+                                                        try {
+                                                            await navigator.share(shareData);
+                                                        } catch (err) {
+                                                            console.error('Share failed:', err);
+                                                        }
+                                                    } else {
+                                                        navigator.clipboard.writeText('https://tashizomcafe.in');
+                                                        alert('Link copied to clipboard!');
+                                                    }
                                                 }}
-                                                className="bg-white hover:bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-gray-400 hover:text-gray-900 transition-all min-h-[300px] shadow-sm hover:shadow-md"
+                                                className="bg-tashi-accent hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shadow-md shadow-yellow-500/20"
                                             >
-                                                <div className="p-4 bg-gray-50 rounded-full border border-gray-100 group-hover:scale-110 transition-transform">
-                                                    <Plus size={32} className="text-gray-300" />
-                                                </div>
-                                                <div className="text-center">
-                                                    <span className="text-sm font-black uppercase tracking-widest block">Add New Post</span>
-                                                    <span className="text-[10px] font-medium opacity-60">Notify travelers about valley status</span>
-                                                </div>
+                                                <Share2 size={20} />
+                                                Share App Link
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
 
-
-                                {/* Landing Page Contextual Photos */}
-                                {/* Section: Landing Page Photos */}
-                                <div id="landing-photos" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><ImageIcon size={24} /></div>
-                                        <div>
-                                            <h2 className="text-xl font-bold text-gray-900">Landing Page Photos</h2>
-                                            <p className="text-sm text-gray-500">Manage all photos for the home page (Map, Documents, Location, and Climate).</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-12">
-                                        {/* Core Documents: Map & Registration */}
-                                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
-                                            <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-                                                <MapPin size={18} className="text-amber-600" />
-                                                Core Documents for Landing Page
-                                            </h3>
-                                            <p className="text-xs text-gray-600 mb-6">Upload the main map and registration certificate visible on your homepage</p>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <PhotoUploadSection
-                                                    title="Gateway Map"
-                                                    description="Upload a map of the region or Spiti Valley"
-                                                    icon={<MapPin size={20} className="text-amber-500" />}
-                                                    aspectRatio="3/4"
-                                                    currentImageUrl={landingPhotos?.customMap}
-                                                    onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
-                                                    placeholder="नक्शा अपलोड करें / Upload Map"
-                                                />
-
-                                                <PhotoUploadSection
-                                                    title="Hotel Registration Document"
-                                                    description="Original 1995 Registration Certificate (Landscape Recommended)"
-                                                    icon={<Clock size={20} className="text-blue-500" />}
-                                                    aspectRatio="4/3"
-                                                    currentImageUrl={landingPhotos?.registrationDoc}
-                                                    onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
-                                                    placeholder="पंजीकरण दस्तावेज़ / Upload Doc"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* GIFT Assets: Prayer Flags & Wheel */}
-                                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100 shadow-sm">
-                                            <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-                                                <Sparkles size={18} className="text-indigo-600" />
-                                                Spiritual & Cultural Assets (GIFs)
-                                            </h3>
-                                            <p className="text-xs text-gray-600 mb-6">Upload animated GIFs for prayer flags and prayer wheels to add a local vibe</p>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <PhotoUploadSection
-                                                    title="Prayer Flags (Animated GIF)"
-                                                    description="Long strip of repeating prayer flags (GIF recommended)"
-                                                    icon={<ImageIcon size={20} className="text-indigo-500" />}
-                                                    aspectRatio="video"
-                                                    currentImageUrl={landingPhotos?.prayerFlags}
-                                                    onUploadSuccess={(url) => updateLandingPhotos('prayerFlags', url)}
-                                                    placeholder="Flag GIF Upload"
-                                                />
-
-                                                <PhotoUploadSection
-                                                    title="Prayer Wheel (Animated GIF)"
-                                                    description="Circular rotating prayer wheel asset"
-                                                    icon={<ImageIcon size={20} className="text-purple-500" />}
-                                                    aspectRatio="square"
-                                                    currentImageUrl={landingPhotos?.prayerWheel}
-                                                    onUploadSuccess={(url) => updateLandingPhotos('prayerWheel', url)}
-                                                    placeholder="Wheel GIF Upload"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Quick Upload Tool (For when you need a URL) */}
-                                        <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
-                                            <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                                <Upload size={18} className="text-blue-600" />
-                                                Quick Upload Tool (Get Image Link)
-                                            </h3>
-                                            <p className="text-xs text-gray-600 mb-6">Device se photo upload karein aur uska Link payein. Phir us Link ko copy karke use karein.</p>
-
-                                            <div className="flex flex-col md:flex-row gap-6">
-                                                <div className="w-full md:w-1/2">
-                                                    <PhotoUploadSection
-                                                        title="Generate Link"
-                                                        description="Upload any image here"
-                                                        icon={<ImageIcon size={20} className="text-blue-500" />}
-                                                        aspectRatio="video"
-                                                        currentImageUrl={manualUploadUrl}
-                                                        onUploadSuccess={(url) => setManualUploadUrl(url)}
-                                                        placeholder="Upload to get Link"
-                                                    />
-                                                </div>
-
-                                                {manualUploadUrl && (
-                                                    <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-4 rounded-xl border border-blue-200 shadow-inner">
-                                                        <p className="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-tighter">Photo Data Ready (Don't scroll, use buttons):</p>
-                                                        <div className="bg-gray-50 p-2 rounded-lg break-all h-20 overflow-y-auto text-[8px] font-mono text-gray-400 border border-gray-100 mb-4">
-                                                            {manualUploadUrl}
-                                                        </div>
-
-                                                        <div className="grid grid-cols-2 gap-3 mb-3">
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('customMap', manualUploadUrl);
-                                                                        alert('✅ MAP SET HO GAYA!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                MAP LAGADO
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('registrationDoc', manualUploadUrl);
-                                                                        alert('✅ DOC SET HO GAYA!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                DOC LAGADO
-                                                            </button>
-
-                                                            {/* New: Chicham & Kee Buttons */}
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('chichamPhoto', manualUploadUrl);
-                                                                        alert('✅ CHICHAM BRIDGE PHOTO SET!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-amber-600 hover:bg-amber-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                CHICHAM PHOTO
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('keePhoto', manualUploadUrl);
-                                                                        alert('✅ KEE MONASTERY PHOTO SET!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-purple-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                KEE PHOTO
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('prayerFlags', manualUploadUrl);
-                                                                        alert('✅ PRAYER FLAGS SET!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                PRAYER FLAGS
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await updateLandingPhotos('prayerWheel', manualUploadUrl);
-                                                                        alert('✅ PRAYER WHEEL SET!');
-                                                                    } catch (e) { alert('Error: ' + e); }
-                                                                }}
-                                                                className="bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-teal-800 active:border-b-0 active:translate-y-1 transition-all"
-                                                            >
-                                                                PRAYER WHEEL
-                                                            </button>
-                                                        </div>
-
-                                                        <button
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(manualUploadUrl);
-                                                                alert('Link Copied! (Length: ' + manualUploadUrl.length + ')');
-                                                            }}
-                                                            className="text-[10px] text-gray-400 hover:text-blue-500 transition-colors underline"
-                                                        >
-                                                            Copy Raw Link (Not Recommended)
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Section: Prime Location */}
-                                        <div>
-                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                <MapPin size={16} className="text-amber-500" /> Prime Location Photo Gallery (Real Place)
-                                            </h3>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                                {(landingPhotos?.location || []).map((url: string, idx: number) => {
-                                                    const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
-                                                    return (
-                                                        <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                            {isVideo ? (
-                                                                <div className="w-full h-full bg-black flex items-center justify-center">
-                                                                    <PlayCircle className="text-white/50" size={32} />
-                                                                </div>
-                                                            ) : (
-                                                                <img src={url} alt="" className="w-full h-full object-cover" />
-                                                            )}
-                                                            <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="Add caption..."
-                                                                    defaultValue={landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || ''}
-                                                                    onBlur={(e) => updateLandingPhotoCaption('location', url, e.target.value)}
-                                                                    className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    if (window.confirm('Delete this photo/video?')) {
-                                                                        const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
-                                                                        updateLandingPhotos('location', newUrls);
-                                                                    }
-                                                                }}
-                                                                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
-                                                                title="Delete Media"
-                                                            >
-                                                                <X size={16} />
-                                                            </button>
-                                                        </div>
-                                                    );
-                                                })}
-                                                <div className="flex flex-col gap-2">
-                                                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400 hover:text-amber-600">
-                                                        <Plus size={24} />
-                                                        <span className="text-[10px] font-bold uppercase">Upload</span>
-                                                        <input
-                                                            type="file"
-                                                            className="hidden"
-                                                            accept="image/*"
-                                                            onChange={async (e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) {
-                                                                    try {
-                                                                        const url = await uploadImage(file);
-                                                                        const currentUrls = landingPhotos.location || [];
-                                                                        await updateLandingPhotos('location', [...currentUrls, url]);
-                                                                        alert('Image uploaded successfully!');
-                                                                    } catch (err: any) {
-                                                                        console.error("Upload error details:", err);
-                                                                        alert(`Upload failed: ${err.message || "Unknown error"}`);
-                                                                    }
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                    <button
-                                                        onClick={() => {
-                                                            const url = prompt('Paste YouTube/Facebook Video Link:');
-                                                            if (url) {
-                                                                const currentUrls = landingPhotos.location || [];
-                                                                updateLandingPhotos('location', [...currentUrls, url]);
-                                                            }
-                                                        }}
-                                                        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
-                                                    >
-                                                        Add Video Link
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Section: Hard Winter Conditions */}
-                                        <div>
-                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                <CloudSnow size={16} className="text-blue-500" /> Winter Hardships & Survival Stories
-                                            </h3>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                                {(landingPhotos?.climate || []).map((url: string, idx: number) => {
-                                                    const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
-                                                    return (
-                                                        <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                                                            {isVideo ? (
-                                                                <div className="w-full h-full bg-black flex items-center justify-center">
-                                                                    <PlayCircle className="text-white/50" size={32} />
-                                                                </div>
-                                                            ) : (
-                                                                <img src={url} alt="" className="w-full h-full object-cover" />
-                                                            )}
-                                                            <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="Add caption..."
-                                                                    defaultValue={landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || ''}
-                                                                    onBlur={(e) => updateLandingPhotoCaption('climate', url, e.target.value)}
-                                                                    className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    if (window.confirm('Delete this photo/video?')) {
-                                                                        const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
-                                                                        updateLandingPhotos('climate', newUrls);
-                                                                    }
-                                                                }}
-                                                                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
-                                                                title="Delete Media"
-                                                            >
-                                                                <X size={16} />
-                                                            </button>
-                                                        </div>
-                                                    );
-                                                })}
-                                                <div className="flex flex-col gap-2">
-                                                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400 hover:text-blue-600">
-                                                        <Plus size={24} />
-                                                        <span className="text-[10px] font-bold uppercase">Upload</span>
-                                                        <input
-                                                            type="file"
-                                                            className="hidden"
-                                                            accept="image/*"
-                                                            onChange={async (e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) {
-                                                                    try {
-                                                                        const url = await uploadImage(file);
-                                                                        updateLandingPhotos('climate', [...(landingPhotos.climate || []), url]);
-                                                                    } catch (err) { alert("Upload failed"); }
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                    <button
-                                                        onClick={() => {
-                                                            const url = prompt('Paste YouTube/Facebook Video Link:');
-                                                            if (url) {
-                                                                const currentUrls = landingPhotos.climate || [];
-                                                                updateLandingPhotos('climate', [...currentUrls, url]);
-                                                            }
-                                                        }}
-                                                        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
-                                                    >
-                                                        Add Video Link
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-
-                                {/* Geo Settings */}
-                                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">Geo-Restriction Settings</h2>
-                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
-                                        <div className="flex-1">
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">Allowed Radius (km)</label>
-                                            <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to place orders.</p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative">
-                                                <input
-                                                    id="geo-radius-input"
-                                                    type="number"
-                                                    defaultValue={useStore.getState().geoRadius || 5}
-                                                    className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
-                                                />
-                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">km</span>
-                                            </div>
                                             <button
                                                 onClick={() => {
-                                                    const input = document.getElementById('geo-radius-input') as HTMLInputElement;
-                                                    if (input) {
-                                                        const val = parseFloat(input.value);
-                                                        if (!isNaN(val) && val > 0) {
-                                                            useStore.getState().updateSettings({ geoRadius: val });
-                                                            alert("Geo-radius updated successfully!");
-                                                        } else {
-                                                            alert("Please enter a valid number greater than 0.");
-                                                        }
+                                                    const svg = document.getElementById('app-home-qr');
+                                                    if (svg) {
+                                                        const svgData = new XMLSerializer().serializeToString(svg);
+                                                        const canvas = document.createElement('canvas');
+                                                        const ctx = canvas.getContext('2d');
+                                                        const img = new Image();
+                                                        img.onload = () => {
+                                                            canvas.width = img.width;
+                                                            canvas.height = img.height;
+                                                            if (ctx) {
+                                                                ctx.fillStyle = 'white';
+                                                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                                                ctx.drawImage(img, 0, 0);
+                                                                const pngFile = canvas.toDataURL('image/png');
+                                                                const downloadLink = document.createElement('a');
+                                                                downloadLink.download = 'tashizom-app-qr.png';
+                                                                downloadLink.href = pngFile;
+                                                                downloadLink.click();
+                                                            }
+                                                        };
+                                                        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
                                                     }
                                                 }}
-                                                className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                                className="bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl flex items-center gap-2 border border-gray-200 shadow-sm"
                                             >
-                                                Update
+                                                <Download size={20} />
+                                                Download QR
                                             </button>
                                         </div>
+                                        <p className="text-xs text-orange-500 font-mono">https://tashizomcafe.in</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Menu Appearance Settings (New) */}
+                            <div id="appearance-settings" className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm scroll-mt-24">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                            <span className="p-2 bg-purple-100 rounded-lg text-purple-600"><Sparkles size={20} /></span>
+                                            Menu Appearance Styling
+                                        </h2>
+                                        <p className="text-gray-500 text-sm mt-1">Customize fonts and colors for your customer-facing menu. Changes are live instantly.</p>
                                     </div>
                                 </div>
 
-                                {/* Call Staff Radius Settings */}
-                                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">Call Staff Geofencing</h2>
-                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
-                                        <div className="flex-1">
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">Call Staff Radius (meters)</label>
-                                            <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to use the "Call Staff" button. Beyond this, they'll see a direct phone number to call.</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Category Headers */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Category Headers</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Font Size</label>
+                                            <select
+                                                value={menuAppearance.categoryFontSize}
+                                                onChange={(e) => updateMenuAppearance({ categoryFontSize: e.target.value })}
+                                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
+                                            >
+                                                <option value="1rem">Normal (1rem)</option>
+                                                <option value="1.25rem">Large (1.25rem)</option>
+                                                <option value="1.5rem">Extra Large (1.5rem)</option>
+                                            </select>
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative">
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Text Color</label>
+                                            <div className="flex gap-2 items-center">
                                                 <input
-                                                    id="call-staff-radius-input"
-                                                    type="number"
-                                                    defaultValue={useStore.getState().callStaffRadius || 200}
-                                                    className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
+                                                    type="color"
+                                                    value={menuAppearance.categoryColor}
+                                                    onChange={(e) => updateMenuAppearance({ categoryColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
                                                 />
-                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.categoryColor}</span>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    const input = document.getElementById('call-staff-radius-input') as HTMLInputElement;
-                                                    if (input) {
-                                                        const val = parseFloat(input.value);
-                                                        if (!isNaN(val) && val > 0) {
-                                                            useStore.getState().updateSettings({ callStaffRadius: val });
-                                                            alert("Call Staff radius updated successfully!");
-                                                        } else {
-                                                            alert("Please enter a valid number greater than 0.");
-                                                        }
-                                                    }
-                                                }}
-                                                className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        </div>
+                                    </div>
+
+                                    {/* Item Titles */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Item Names</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Font Size</label>
+                                            <select
+                                                value={menuAppearance.itemNameFontSize}
+                                                onChange={(e) => updateMenuAppearance({ itemNameFontSize: e.target.value })}
+                                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm text-gray-900 focus:border-tashi-primary outline-none"
                                             >
-                                                Update
+                                                <option value="0.9rem">Compact (0.9rem)</option>
+                                                <option value="1rem">Standard (1rem)</option>
+                                                <option value="1.1rem">Large (1.1rem)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Text Color</label>
+                                            <div className="flex gap-2 items-center">
+                                                <input
+                                                    type="color"
+                                                    value={menuAppearance.itemNameColor}
+                                                    onChange={(e) => updateMenuAppearance({ itemNameColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
+                                                />
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.itemNameColor}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price & Accent */}
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200 pb-2">Accents & Prices</h3>
+                                        <div>
+                                            <label className="text-xs text-gray-500 block mb-1">Accent Color</label>
+                                            <div className="flex gap-2 items-center">
+                                                <input
+                                                    type="color"
+                                                    value={menuAppearance.accentColor}
+                                                    onChange={(e) => updateMenuAppearance({ accentColor: e.target.value })}
+                                                    className="bg-white h-8 w-8 rounded cursor-pointer border border-gray-300"
+                                                />
+                                                <span className="text-xs text-gray-500 uppercase">{menuAppearance.accentColor}</span>
+                                            </div>
+                                        </div>
+                                        <div className="pt-2">
+                                            <button
+                                                onClick={() => updateMenuAppearance({
+                                                    categoryFontSize: '1.25rem',
+                                                    categoryColor: '#FFFFFF',
+                                                    itemNameFontSize: '1rem',
+                                                    itemNameColor: '#E5E5E5',
+                                                    accentColor: '#DAA520'
+                                                })}
+                                                className="w-full bg-white hover:bg-gray-100 text-xs font-bold py-2 rounded text-gray-600 border border-gray-300 transition-colors"
+                                            >
+                                                Reset to Default
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Contact Settings */}
-                                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
-                                    <p className="text-sm text-gray-500 mb-6">Update your homestay contact details that appear in the customer menu.</p>
-                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">Phone Number</label>
-                                            <input
-                                                type="tel"
-                                                defaultValue={useStore.getState().contactInfo.phone}
-                                                onBlur={(e) => {
-                                                    const val = e.target.value.trim();
-                                                    if (val) {
-                                                        useStore.getState().updateContactSettings({
-                                                            ...useStore.getState().contactInfo,
-                                                            phone: val
-                                                        });
-                                                    }
-                                                }}
-                                                placeholder="+91 98765 43210"
-                                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">Owner Phone (Alternate)</label>
-                                            <input
-                                                type="tel"
-                                                defaultValue={useStore.getState().contactInfo.secondaryPhone}
-                                                onBlur={(e) => {
-                                                    const val = e.target.value.trim();
-                                                    // Allow empty string to clear it
-                                                    useStore.getState().updateContactSettings({
-                                                        ...useStore.getState().contactInfo,
-                                                        secondaryPhone: val
-                                                    });
-                                                }}
-                                                placeholder="+91 98765 43210"
-                                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">WhatsApp Number</label>
-                                            <input
-                                                type="tel"
-                                                defaultValue={useStore.getState().contactInfo.whatsapp}
-                                                onBlur={(e) => {
-                                                    const val = e.target.value.trim();
-                                                    if (val) {
-                                                        useStore.getState().updateContactSettings({
-                                                            ...useStore.getState().contactInfo,
-                                                            whatsapp: val
-                                                        });
-                                                    }
-                                                }}
-                                                placeholder="+91 98765 43210"
-                                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                            <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +91 for India)</p>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-600 mb-2">Google Maps Location</label>
-                                            <input
-                                                type="text"
-                                                defaultValue={useStore.getState().contactInfo.mapsLocation}
-                                                onBlur={(e) => {
-                                                    const val = e.target.value.trim();
-                                                    if (val) {
-                                                        useStore.getState().updateContactSettings({
-                                                            ...useStore.getState().contactInfo,
-                                                            mapsLocation: val
-                                                        });
-                                                    }
-                                                }}
-                                                placeholder="TashiZom+Resort or Coordinates"
-                                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                            <p className="text-xs text-gray-500 mt-1">Enter your business name or exact location (use + for spaces)</p>
+                                {/* Live Preview Section */}
+                                <div className="bg-neutral-900 rounded-2xl p-6 border border-white/10 shadow-inner">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                        Live Style Preview (Customer View)
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <h2 style={{ fontSize: menuAppearance.categoryFontSize, color: menuAppearance.categoryColor }} className="font-serif border-b border-white/5 pb-2 transition-all">
+                                            Signature Starters
+                                        </h2>
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 style={{ fontSize: menuAppearance.itemNameFontSize, color: menuAppearance.itemNameColor }} className="font-bold transition-all">
+                                                    Tibetan Butter Tea
+                                                </h3>
+                                                <p className="text-xs text-gray-500 max-w-[200px]">Hand-churned with local butter and Himalayan salt.</p>
+                                            </div>
+                                            <span style={{ color: menuAppearance.accentColor }} className="font-bold text-sm">
+                                                ₹120
+                                            </span>
                                         </div>
                                     </div>
-                                </div>
-
-
-
-                                {/* DANGER ZONE */}
-                                <div className="bg-red-50 border border-red-200 rounded-2xl p-8 shadow-sm">
-                                    <h2 className="text-xl font-bold text-red-900 mb-6 flex items-center gap-2">
-                                        <div className="p-2 bg-red-200 rounded-full"><Trash size={20} /></div>
-                                        Danger Zone
-                                    </h2>
-                                    <p className="text-sm text-red-700 mb-6">
-                                        These actions are irreversible. Use with caution.
-                                    </p>
-                                    <button
-                                        onClick={() => useStore.getState().clearAllData_Dangerous()}
-                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 active:scale-95 transition-all flex items-center justify-center gap-3"
-                                    >
-                                        <Trash size={24} />
-                                        DELETE ALL ORDERS & DATA
-                                    </button>
-                                    <p className="text-xs text-red-500 mt-2 text-center">
-                                        Clears: Orders, Reviews, Notifications, Scan History
-                                    </p>
-                                </div>
-
-                                {/* Table Management */}
-                                <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
-                                        <button
-                                            onClick={handlePrintAllQRs}
-                                            className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition-colors text-xs sm:text-sm"
-                                        >
-                                            <Printer size={16} /> Print All QRs (A4)
-                                        </button>
-                                    </div>
-                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
-                                        <form
-                                            onSubmit={async (e) => {
-                                                e.preventDefault();
-                                                const form = e.target as HTMLFormElement;
-                                                const nameInput = form.elements.namedItem('tableName') as HTMLInputElement;
-                                                const name = nameInput.value;
-
-                                                if (name.trim()) {
-                                                    try {
-                                                        await useStore.getState().addTable(name);
-                                                        nameInput.value = '';
-                                                    } catch (err: any) {
-                                                        alert("Failed to add table: " + err.message);
-                                                    }
-                                                }
-                                            }}
-                                            className="flex gap-4"
-                                        >
-                                            <input
-                                                name="tableName"
-                                                required
-                                                placeholder="New Table Name (e.g. Roof Top 1)"
-                                                className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none"
-                                            />
-                                            <button type="submit" className="bg-tashi-accent text-tashi-dark font-bold px-6 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
-                                                Add
-                                            </button>
-                                        </form>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-                                        {tables.map((table) => (
-                                            <div key={table.id} className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col gap-4 group shadow-sm hover:border-gray-300">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-gray-900 font-medium">{table.name}</span>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={() => { const n = prompt('New name:', table.name); if (n) useStore.getState().updateTable(table.id, n); }} className="text-xs bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200">Edit</button>
-                                                        <button onClick={() => { if (confirm('Delete?')) useStore.getState().removeTable(table.id); }} className="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded hover:bg-red-500/20">Del</button>
-                                                    </div>
-                                                </div>
-                                                <div className="bg-white p-2 rounded flex items-center justify-center">
-                                                    <QRCodeSVG value={`${HOST_URL}/scan?tableId=${table.id}`} size={120} />
-                                                </div>
-                                                <button
-                                                    onClick={() => {
-                                                        const printWindow = window.open('', '_blank');
-                                                        printWindow?.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><h1 style="font-size:32px;margin-bottom:20px;">${table.name}</h1><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${HOST_URL}/scan?tableId=${table.id}`)}" style="width:300px;height:300px;" /><p style="margin-top:20px;color:#666;">Scan to View Menu</p></body></html>`);
-                                                        printWindow?.document.close();
-                                                        printWindow?.print();
-                                                    }}
-                                                    className="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded"
-                                                >
-                                                    Print QR
-                                                </button>
+                                    <div className="mt-6 pt-4 border-t border-white/5 flex gap-2 overflow-x-auto pb-2">
+                                        {['Breakfast', 'Lunch', 'Dinner'].map(cat => (
+                                            <div key={cat} className="px-3 py-1 rounded-full text-[10px] uppercase font-bold border" style={{ borderColor: `${menuAppearance.accentColor}40`, color: menuAppearance.accentColor }}>
+                                                {cat}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                            <div className="mt-4 flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <p className="text-xs text-gray-500 italic">
+                                    <strong>💡 Tip:</strong> These styles apply to ALL devices instantly.
+                                </p>
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-100">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                    Saved to Cloud
+                                </div>
+                            </div>
 
-                                {/* Menu Management */}
-                                <div id="menu-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl font-bold text-gray-900">Menu Management</h2>
+                            {/* Valley Updates Management */}
+                            <div id="valley-updates-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Valley Updates</h2>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {(valleyUpdates || []).map((update, idx) => (
+                                            <div key={update.id || idx} className={`bg-white p-5 rounded-2xl border-l-4 shadow-sm hover:shadow-md transition-all relative group ${update.statusColor === 'red' ? 'border-l-red-500 bg-red-50/10' :
+                                                update.statusColor === 'blue' ? 'border-l-blue-500 bg-blue-50/10' :
+                                                    'border-l-green-500 bg-green-50/10'
+                                                } border border-gray-100`}>
+                                                <div className="flex justify-between items-start mb-4 gap-4">
+                                                    <div className="flex-1">
+                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Title / Headline</label>
+                                                        <input
+                                                            defaultValue={update.title}
+                                                            onBlur={(e) => {
+                                                                const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                newUpdates[idx].title = e.target.value;
+                                                                useStore.getState().saveValleyUpdates(newUpdates);
+                                                            }}
+                                                            placeholder="e.g. Road Block Alert"
+                                                            className="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-gray-900 font-bold text-sm w-full focus:ring-2 ring-tashi-accent outline-none shadow-inner"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm('Delete this update?')) {
+                                                                const newUpdates = useStore.getState().valleyUpdates.filter((_, i) => i !== idx);
+                                                                useStore.getState().saveValleyUpdates(newUpdates);
+                                                            }
+                                                        }}
+                                                        className="text-gray-300 hover:text-red-500 p-2 hover:bg-red-50 rounded-full transition-colors"
+                                                    >
+                                                        <Trash size={16} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-3 mb-4">
+                                                    <div>
+                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Category</label>
+                                                        <select
+                                                            defaultValue={update.statusColor}
+                                                            onChange={(e) => {
+                                                                const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                newUpdates[idx].statusColor = e.target.value;
+                                                                useStore.getState().saveValleyUpdates(newUpdates);
+                                                            }}
+                                                            className="w-full bg-white text-xs font-bold text-gray-700 rounded-lg p-2 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none"
+                                                        >
+                                                            <option value="green">🟢 GOOD / NORMAL</option>
+                                                            <option value="blue">🔵 INFO / STATUS</option>
+                                                            <option value="red">🔴 DANGER / ALERT</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Badge Text</label>
+                                                        <input
+                                                            defaultValue={update.status}
+                                                            onBlur={(e) => {
+                                                                const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                newUpdates[idx].status = e.target.value;
+                                                                useStore.getState().saveValleyUpdates(newUpdates);
+                                                            }}
+                                                            placeholder="LIVE"
+                                                            className="w-full bg-white text-xs font-bold text-gray-700 rounded-lg p-2 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none placeholder:text-gray-300"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-4">
+                                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Detail Description</label>
+                                                    <textarea
+                                                        defaultValue={update.description}
+                                                        onBlur={(e) => {
+                                                            const newUpdates = [...useStore.getState().valleyUpdates];
+                                                            newUpdates[idx].description = e.target.value;
+                                                            useStore.getState().saveValleyUpdates(newUpdates);
+                                                        }}
+                                                        placeholder="Describe the update in detail..."
+                                                        className="w-full bg-white text-xs text-gray-600 rounded-lg p-3 border border-gray-200 focus:ring-2 ring-tashi-accent outline-none resize-none h-20 shadow-inner"
+                                                    />
+                                                </div>
+
+                                                {/* Media Inputs */}
+                                                <div className="space-y-3 bg-gray-50/50 p-3 rounded-xl border border-gray-100 shadow-inner">
+                                                    <div className="flex gap-2 items-end">
+                                                        <div className="w-1/3">
+                                                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Media Type</label>
+                                                            <select
+                                                                defaultValue={update.mediaType || 'image'}
+                                                                onChange={(e) => {
+                                                                    const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                    newUpdates[idx].mediaType = e.target.value as any;
+                                                                    useStore.getState().saveValleyUpdates(newUpdates);
+                                                                }}
+                                                                className="w-full bg-white text-[10px] text-gray-600 rounded-lg p-2 border border-gray-200"
+                                                            >
+                                                                <option value="image">🖼️ IMAGE</option>
+                                                                <option value="video">🎥 VIDEO</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1 block">Media URL</label>
+                                                            <input
+                                                                placeholder="Paste Link (YouTube/Insta/Direct)..."
+                                                                defaultValue={update.mediaUrl || ''}
+                                                                onBlur={(e) => {
+                                                                    const newUpdates = [...useStore.getState().valleyUpdates];
+                                                                    newUpdates[idx].mediaUrl = e.target.value;
+                                                                    useStore.getState().saveValleyUpdates(newUpdates);
+                                                                }}
+                                                                className="w-full bg-white text-[10px] text-blue-600 font-mono rounded-lg p-2 border border-gray-200 focus:ring-2 ring-blue-100 outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Media Preview */}
+                                                    {update.mediaUrl && (
+                                                        <div className="w-full h-32 rounded-xl bg-black/5 flex items-center justify-center overflow-hidden border border-gray-200 relative group/preview">
+                                                            {(() => {
+                                                                const url = update.mediaUrl;
+                                                                const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+                                                                const isFacebook = url.includes('facebook.com') || url.includes('fb.watch');
+                                                                const isInstagram = url.includes('instagram.com');
+
+                                                                if (update.mediaType === 'video') {
+                                                                    if (isYoutube) {
+                                                                        const videoId = url.includes('v=') ? url.split('v=')[1]?.split('&')[0] : url.split('/').pop();
+                                                                        return <img src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} className="h-full w-full object-cover grayscale group-hover/preview:grayscale-0 transition-all" />;
+                                                                    }
+                                                                    if (isFacebook) return <div className="bg-blue-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">FB Video Preview</div>;
+                                                                    if (isInstagram) return <div className="bg-pink-600 w-full h-full flex items-center justify-center text-white font-bold text-[10px]">Insta Reel Preview</div>;
+                                                                    return <video src={url} className="h-full max-w-full" />;
+                                                                }
+                                                                return <img src={url} className="h-full w-full object-cover" alt="Preview" />;
+                                                            })()}
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover/preview:bg-transparent transition-all">
+                                                                {update.mediaType === 'video' && <PlayCircle size={32} className="text-white drop-shadow-lg opacity-80" />}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {/* Add New Button */}
+
                                         <button
                                             onClick={() => {
-                                                const printWindow = window.open('', '_blank');
-                                                if (!printWindow) return;
-
-                                                // 1. Define Category Mappings (DB -> Display)
-                                                const CATEGORY_MAPPING: Record<string, string> = {
-                                                    'Hot Beverages': 'Tea & Coffee',
-                                                    'Tea & Coffee': 'Tea & Coffee',
-                                                    'Omelettes': 'Omelets & Egg Dishes',
-                                                    'Omelets & Egg Dishes': 'Omelets & Egg Dishes',
-                                                    'Indian Bread': 'Indian Tawa/Tandoori Roti',
-                                                    'Indian Breads': 'Indian Tawa/Tandoori Roti',
-                                                    'Indian Tawa/Tandoori Roti': 'Indian Tawa/Tandoori Roti',
-                                                    'Snacks': 'Snacks & Starters',
-                                                    'Snacks & Starters': 'Snacks & Starters',
-                                                    'Chinese Course': 'Chinese',
-                                                    'Chinese': 'Chinese',
-                                                    'Italian Course': 'Pizza & Pasta',
-                                                    'Pizza': 'Pizza & Pasta',
-                                                    'Pizza & Pasta': 'Pizza & Pasta',
-                                                    'Salads': 'Soups & Salads',
-                                                    'Soups': 'Soups & Salads',
-                                                    'Soups & Salads': 'Soups & Salads',
-                                                    'Vegetable & Dishes': 'Main Course (Vegetarian)',
-                                                    'Main Course (Vegetarian)': 'Main Course (Vegetarian)',
-                                                    'Non-Veg': 'Main Course (Non-Vegetarian)',
-                                                    'Main Course (Non-Vegetarian)': 'Main Course (Non-Vegetarian)',
-                                                    'Rice, Pulao, Biryani': 'Rice & Biryani',
-                                                    'Rice & Biryani': 'Rice & Biryani',
-                                                    'Toasts': 'Toasts',
-                                                    'Cereals': 'Cereals',
-                                                    'Pancakes': 'Pancakes',
-                                                    'Sandwiches': 'Sandwiches',
-                                                    'Desserts': 'Desserts',
-                                                    'Cold Beverages & Shakes': 'Cold Beverages & Shakes',
-                                                    'Breakfast': 'Breakfast'
+                                                const currentUpdates = useStore.getState().valleyUpdates || [];
+                                                const newUpdate = {
+                                                    id: Math.random().toString(36).substr(7),
+                                                    title: 'Road Status Update',
+                                                    status: 'LIVE',
+                                                    statusColor: 'green',
+                                                    description: 'Everything is normal...',
+                                                    mediaType: 'image',
+                                                    mediaUrl: ''
                                                 };
+                                                useStore.getState().saveValleyUpdates([...currentUpdates, newUpdate]);
+                                            }}
+                                            className="bg-white hover:bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-gray-400 hover:text-gray-900 transition-all min-h-[300px] shadow-sm hover:shadow-md"
+                                        >
+                                            <div className="p-4 bg-gray-50 rounded-full border border-gray-100 group-hover:scale-110 transition-transform">
+                                                <Plus size={32} className="text-gray-300" />
+                                            </div>
+                                            <div className="text-center">
+                                                <span className="text-sm font-black uppercase tracking-widest block">Add New Post</span>
+                                                <span className="text-[10px] font-medium opacity-60">Notify travelers about valley status</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                const PREFERRED_ORDER = [
-                                                    'Breakfast',
-                                                    'Tea & Coffee',
-                                                    'Toasts',
-                                                    'Cereals',
-                                                    'Omelets & Egg Dishes',
-                                                    'Main Course (Vegetarian)',
-                                                    'Main Course (Non-Vegetarian)',
-                                                    'Indian Tawa/Tandoori Roti',
-                                                    'Snacks & Starters',
-                                                    'Chinese',
-                                                    'Pancakes',
-                                                    'Pizza & Pasta',
-                                                    'Rice & Biryani',
-                                                    'Sandwiches',
-                                                    'Desserts',
-                                                    'Soups & Salads',
-                                                    'Cold Beverages & Shakes'
-                                                ];
 
-                                                // 2. Group Items by Category
-                                                const groupedMenu: Record<string, any[]> = {};
+                            {/* Landing Page Contextual Photos */}
+                            {/* Section: Landing Page Photos */}
+                            <div id="landing-photos" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-amber-100 rounded-lg text-amber-600"><ImageIcon size={24} /></div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900">Landing Page Photos</h2>
+                                        <p className="text-sm text-gray-500">Manage all photos for the home page (Map, Documents, Location, and Climate).</p>
+                                    </div>
+                                </div>
 
-                                                // Initialize preferred groups
-                                                PREFERRED_ORDER.forEach(c => groupedMenu[c] = []);
+                                <div className="space-y-12">
+                                    {/* Core Documents: Map & Registration */}
+                                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
+                                        <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                            <MapPin size={18} className="text-amber-600" />
+                                            Core Documents for Landing Page
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Upload the main map and registration certificate visible on your homepage</p>
 
-                                                menu.forEach(item => {
-                                                    const rawCat = item.category?.trim();
-                                                    let displayCat = CATEGORY_MAPPING[rawCat] || rawCat;
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <PhotoUploadSection
+                                                title="Gateway Map"
+                                                description="Upload a map of the region or Spiti Valley"
+                                                icon={<MapPin size={20} className="text-amber-500" />}
+                                                aspectRatio="3/4"
+                                                currentImageUrl={landingPhotos?.customMap}
+                                                onUploadSuccess={(url) => updateLandingPhotos('customMap', url)}
+                                                placeholder="नक्शा अपलोड करें / Upload Map"
+                                            />
 
-                                                    // Clean Description
-                                                    if (item.description) {
-                                                        const desc = item.description.toLowerCase();
-                                                        if (desc.includes('delicious') && desc.includes('item')) {
-                                                            item.description = '';
+                                            <PhotoUploadSection
+                                                title="Hotel Registration Document"
+                                                description="Original 1995 Registration Certificate (Landscape Recommended)"
+                                                icon={<Clock size={20} className="text-blue-500" />}
+                                                aspectRatio="4/3"
+                                                currentImageUrl={landingPhotos?.registrationDoc}
+                                                onUploadSuccess={(url) => updateLandingPhotos('registrationDoc', url)}
+                                                placeholder="पंजीकरण दस्तावेज़ / Upload Doc"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* GIFT Assets: Prayer Flags & Wheel */}
+                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100 shadow-sm">
+                                        <h3 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                                            <Sparkles size={18} className="text-indigo-600" />
+                                            Spiritual & Cultural Assets (GIFs)
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Upload animated GIFs for prayer flags and prayer wheels to add a local vibe</p>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <PhotoUploadSection
+                                                title="Prayer Flags (Animated GIF)"
+                                                description="Long strip of repeating prayer flags (GIF recommended)"
+                                                icon={<ImageIcon size={20} className="text-indigo-500" />}
+                                                aspectRatio="video"
+                                                currentImageUrl={landingPhotos?.prayerFlags}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerFlags', url)}
+                                                placeholder="Flag GIF Upload"
+                                            />
+
+                                            <PhotoUploadSection
+                                                title="Prayer Wheel (Animated GIF)"
+                                                description="Circular rotating prayer wheel asset"
+                                                icon={<ImageIcon size={20} className="text-purple-500" />}
+                                                aspectRatio="square"
+                                                currentImageUrl={landingPhotos?.prayerWheel}
+                                                onUploadSuccess={(url) => updateLandingPhotos('prayerWheel', url)}
+                                                placeholder="Wheel GIF Upload"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Quick Upload Tool (For when you need a URL) */}
+                                    <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                                        <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                            <Upload size={18} className="text-blue-600" />
+                                            Quick Upload Tool (Get Image Link)
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-6">Device se photo upload karein aur uska Link payein. Phir us Link ko copy karke use karein.</p>
+
+                                        <div className="flex flex-col md:flex-row gap-6">
+                                            <div className="w-full md:w-1/2">
+                                                <PhotoUploadSection
+                                                    title="Generate Link"
+                                                    description="Upload any image here"
+                                                    icon={<ImageIcon size={20} className="text-blue-500" />}
+                                                    aspectRatio="video"
+                                                    currentImageUrl={manualUploadUrl}
+                                                    onUploadSuccess={(url) => setManualUploadUrl(url)}
+                                                    placeholder="Upload to get Link"
+                                                />
+                                            </div>
+
+                                            {manualUploadUrl && (
+                                                <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-4 rounded-xl border border-blue-200 shadow-inner">
+                                                    <p className="text-[10px] font-black text-blue-400 mb-2 uppercase tracking-tighter">Photo Data Ready (Don't scroll, use buttons):</p>
+                                                    <div className="bg-gray-50 p-2 rounded-lg break-all h-20 overflow-y-auto text-[8px] font-mono text-gray-400 border border-gray-100 mb-4">
+                                                        {manualUploadUrl}
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('customMap', manualUploadUrl);
+                                                                    alert('✅ MAP SET HO GAYA!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            MAP LAGADO
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('registrationDoc', manualUploadUrl);
+                                                                    alert('✅ DOC SET HO GAYA!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl text-xs shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            DOC LAGADO
+                                                        </button>
+
+                                                        {/* New: Chicham & Kee Buttons */}
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('chichamPhoto', manualUploadUrl);
+                                                                    alert('✅ CHICHAM BRIDGE PHOTO SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-amber-600 hover:bg-amber-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            CHICHAM PHOTO
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('keePhoto', manualUploadUrl);
+                                                                    alert('✅ KEE MONASTERY PHOTO SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-purple-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            KEE PHOTO
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('prayerFlags', manualUploadUrl);
+                                                                    alert('✅ PRAYER FLAGS SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            PRAYER FLAGS
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await updateLandingPhotos('prayerWheel', manualUploadUrl);
+                                                                    alert('✅ PRAYER WHEEL SET!');
+                                                                } catch (e) { alert('Error: ' + e); }
+                                                            }}
+                                                            className="bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-xl text-[10px] shadow-lg border-b-4 border-teal-800 active:border-b-0 active:translate-y-1 transition-all"
+                                                        >
+                                                            PRAYER WHEEL
+                                                        </button>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(manualUploadUrl);
+                                                            alert('Link Copied! (Length: ' + manualUploadUrl.length + ')');
+                                                        }}
+                                                        className="text-[10px] text-gray-400 hover:text-blue-500 transition-colors underline"
+                                                    >
+                                                        Copy Raw Link (Not Recommended)
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Section: Prime Location */}
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <MapPin size={16} className="text-amber-500" /> Prime Location Photo Gallery (Real Place)
+                                        </h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {(landingPhotos?.location || []).map((url: string, idx: number) => {
+                                                const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                                                return (
+                                                    <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                        {isVideo ? (
+                                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                <PlayCircle className="text-white/50" size={32} />
+                                                            </div>
+                                                        ) : (
+                                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Add caption..."
+                                                                defaultValue={landingPhotos.locationCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                                onBlur={(e) => updateLandingPhotoCaption('location', url, e.target.value)}
+                                                                className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (window.confirm('Delete this photo/video?')) {
+                                                                    const newUrls = (landingPhotos.location || []).filter((_, i) => i !== idx);
+                                                                    updateLandingPhotos('location', newUrls);
+                                                                }
+                                                            }}
+                                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
+                                                            title="Delete Media"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                            <div className="flex flex-col gap-2">
+                                                <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-amber-500 hover:bg-amber-50 cursor-pointer transition-all text-gray-400 hover:text-amber-600">
+                                                    <Plus size={24} />
+                                                    <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    const currentUrls = landingPhotos.location || [];
+                                                                    await updateLandingPhotos('location', [...currentUrls, url]);
+                                                                    alert('Image uploaded successfully!');
+                                                                } catch (err: any) {
+                                                                    console.error("Upload error details:", err);
+                                                                    alert(`Upload failed: ${err.message || "Unknown error"}`);
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                                <button
+                                                    onClick={() => {
+                                                        const url = prompt('Paste YouTube/Facebook Video Link:');
+                                                        if (url) {
+                                                            const currentUrls = landingPhotos.location || [];
+                                                            updateLandingPhotos('location', [...currentUrls, url]);
                                                         }
-                                                    }
+                                                    }}
+                                                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
+                                                >
+                                                    Add Video Link
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                                    // Fallback fuzzy match if exact match not found
-                                                    if (!groupedMenu[displayCat]) {
-                                                        const fuzzy = PREFERRED_ORDER.find(p => p.includes(displayCat) || displayCat.includes(p));
-                                                        if (fuzzy) displayCat = fuzzy;
-                                                        else {
-                                                            if (!groupedMenu[displayCat]) groupedMenu[displayCat] = [];
+                                    {/* Section: Hard Winter Conditions */}
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <CloudSnow size={16} className="text-blue-500" /> Winter Hardships & Survival Stories
+                                        </h3>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {(landingPhotos?.climate || []).map((url: string, idx: number) => {
+                                                const isVideo = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('facebook.com') || url.includes('fb.watch') || url.includes('instagram.com') || url.endsWith('.mp4');
+                                                return (
+                                                    <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                                                        {isVideo ? (
+                                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                                <PlayCircle className="text-white/50" size={32} />
+                                                            </div>
+                                                        ) : (
+                                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        )}
+                                                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Add caption..."
+                                                                defaultValue={landingPhotos.climateCaptions?.[btoa(url).substring(0, 100)] || ''}
+                                                                onBlur={(e) => updateLandingPhotoCaption('climate', url, e.target.value)}
+                                                                className="w-full bg-transparent text-[8px] text-white border-none focus:ring-0 p-0 placeholder:text-gray-400"
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (window.confirm('Delete this photo/video?')) {
+                                                                    const newUrls = (landingPhotos.climate || []).filter((_, i) => i !== idx);
+                                                                    updateLandingPhotos('climate', newUrls);
+                                                                }
+                                                            }}
+                                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full shadow-lg md:opacity-0 md:group-hover:opacity-100 transition-opacity z-20"
+                                                            title="Delete Media"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                            <div className="flex flex-col gap-2">
+                                                <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all text-gray-400 hover:text-blue-600">
+                                                    <Plus size={24} />
+                                                    <span className="text-[10px] font-bold uppercase">Upload</span>
+                                                    <input
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const url = await uploadImage(file);
+                                                                    updateLandingPhotos('climate', [...(landingPhotos.climate || []), url]);
+                                                                } catch (err) { alert("Upload failed"); }
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                                <button
+                                                    onClick={() => {
+                                                        const url = prompt('Paste YouTube/Facebook Video Link:');
+                                                        if (url) {
+                                                            const currentUrls = landingPhotos.climate || [];
+                                                            updateLandingPhotos('climate', [...currentUrls, url]);
                                                         }
-                                                    }
-                                                    groupedMenu[displayCat].push(item);
-                                                });
+                                                    }}
+                                                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-[8px] font-black py-1.5 rounded-lg border border-gray-200 transition-all uppercase tracking-tighter"
+                                                >
+                                                    Add Video Link
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                                // Sort items within categories with strictly correct 0 handling
-                                                Object.keys(groupedMenu).forEach(key => {
-                                                    groupedMenu[key].sort((a, b) => {
-                                                        const orderA = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : 999;
-                                                        const orderB = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : 999;
-                                                        return orderA - orderB;
+
+                                </div>
+                            </div>
+
+                            {/* Geo Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Geo-Restriction Settings</h2>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Allowed Radius (km)</label>
+                                        <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to place orders.</p>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative">
+                                            <input
+                                                id="geo-radius-input"
+                                                type="number"
+                                                defaultValue={useStore.getState().geoRadius || 5}
+                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">km</span>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                const input = document.getElementById('geo-radius-input') as HTMLInputElement;
+                                                if (input) {
+                                                    const val = parseFloat(input.value);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        useStore.getState().updateSettings({ geoRadius: val });
+                                                        alert("Geo-radius updated successfully!");
+                                                    } else {
+                                                        alert("Please enter a valid number greater than 0.");
+                                                    }
+                                                }
+                                            }}
+                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        >
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Call Staff Radius Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Call Staff Geofencing</h2>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Call Staff Radius (meters)</label>
+                                        <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to use the "Call Staff" button. Beyond this, they'll see a direct phone number to call.</p>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative">
+                                            <input
+                                                id="call-staff-radius-input"
+                                                type="number"
+                                                defaultValue={useStore.getState().callStaffRadius || 200}
+                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                const input = document.getElementById('call-staff-radius-input') as HTMLInputElement;
+                                                if (input) {
+                                                    const val = parseFloat(input.value);
+                                                    if (!isNaN(val) && val > 0) {
+                                                        useStore.getState().updateSettings({ callStaffRadius: val });
+                                                        alert("Call Staff radius updated successfully!");
+                                                    } else {
+                                                        alert("Please enter a valid number greater than 0.");
+                                                    }
+                                                }
+                                            }}
+                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
+                                        >
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Contact Settings */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
+                                <p className="text-sm text-gray-500 mb-6">Update your homestay contact details that appear in the customer menu.</p>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.phone}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        phone: val
                                                     });
+                                                }
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Owner Phone (Alternate)</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.secondaryPhone}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                // Allow empty string to clear it
+                                                useStore.getState().updateContactSettings({
+                                                    ...useStore.getState().contactInfo,
+                                                    secondaryPhone: val
                                                 });
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">WhatsApp Number</label>
+                                        <input
+                                            type="tel"
+                                            defaultValue={useStore.getState().contactInfo.whatsapp}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        whatsapp: val
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +91 for India)</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-600 mb-2">Google Maps Location</label>
+                                        <input
+                                            type="text"
+                                            defaultValue={useStore.getState().contactInfo.mapsLocation}
+                                            onBlur={(e) => {
+                                                const val = e.target.value.trim();
+                                                if (val) {
+                                                    useStore.getState().updateContactSettings({
+                                                        ...useStore.getState().contactInfo,
+                                                        mapsLocation: val
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="TashiZom+Resort or Coordinates"
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 focus:outline-none focus:border-tashi-accent"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Enter your business name or exact location (use + for spaces)</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                printWindow.document.write(`
+
+
+                            {/* DANGER ZONE */}
+                            <div className="bg-red-50 border border-red-200 rounded-2xl p-8 shadow-sm">
+                                <h2 className="text-xl font-bold text-red-900 mb-6 flex items-center gap-2">
+                                    <div className="p-2 bg-red-200 rounded-full"><Trash size={20} /></div>
+                                    Danger Zone
+                                </h2>
+                                <p className="text-sm text-red-700 mb-6">
+                                    These actions are irreversible. Use with caution.
+                                </p>
+                                <button
+                                    onClick={() => useStore.getState().clearAllData_Dangerous()}
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 active:scale-95 transition-all flex items-center justify-center gap-3"
+                                >
+                                    <Trash size={24} />
+                                    DELETE ALL ORDERS & DATA
+                                </button>
+                                <p className="text-xs text-red-500 mt-2 text-center">
+                                    Clears: Orders, Reviews, Notifications, Scan History
+                                </p>
+                            </div>
+
+                            {/* Table Management */}
+                            <div id="table-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold text-gray-900">Table Management</h2>
+                                    <button
+                                        onClick={handlePrintAllQRs}
+                                        className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition-colors text-xs sm:text-sm"
+                                    >
+                                        <Printer size={16} /> Print All QRs (A4)
+                                    </button>
+                                </div>
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
+                                    <form
+                                        onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            const form = e.target as HTMLFormElement;
+                                            const nameInput = form.elements.namedItem('tableName') as HTMLInputElement;
+                                            const name = nameInput.value;
+
+                                            if (name.trim()) {
+                                                try {
+                                                    await useStore.getState().addTable(name);
+                                                    nameInput.value = '';
+                                                } catch (err: any) {
+                                                    alert("Failed to add table: " + err.message);
+                                                }
+                                            }
+                                        }}
+                                        className="flex gap-4"
+                                    >
+                                        <input
+                                            name="tableName"
+                                            required
+                                            placeholder="New Table Name (e.g. Roof Top 1)"
+                                            className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none"
+                                        />
+                                        <button type="submit" className="bg-tashi-accent text-tashi-dark font-bold px-6 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
+                                            Add
+                                        </button>
+                                    </form>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+                                    {tables.map((table) => (
+                                        <div key={table.id} className="bg-white p-4 rounded-xl border border-gray-200 flex flex-col gap-4 group shadow-sm hover:border-gray-300">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-900 font-medium">{table.name}</span>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => { const n = prompt('New name:', table.name); if (n) useStore.getState().updateTable(table.id, n); }} className="text-xs bg-gray-100 border border-gray-200 px-2 py-1 rounded hover:bg-gray-200">Edit</button>
+                                                    <button onClick={() => { if (confirm('Delete?')) useStore.getState().removeTable(table.id); }} className="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded hover:bg-red-500/20">Del</button>
+                                                </div>
+                                            </div>
+                                            <div className="bg-white p-2 rounded flex items-center justify-center">
+                                                <QRCodeSVG value={`${HOST_URL}/scan?tableId=${table.id}`} size={120} />
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const printWindow = window.open('', '_blank');
+                                                    printWindow?.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><h1 style="font-size:32px;margin-bottom:20px;">${table.name}</h1><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${HOST_URL}/scan?tableId=${table.id}`)}" style="width:300px;height:300px;" /><p style="margin-top:20px;color:#666;">Scan to View Menu</p></body></html>`);
+                                                    printWindow?.document.close();
+                                                    printWindow?.print();
+                                                }}
+                                                className="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded"
+                                            >
+                                                Print QR
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Menu Management */}
+                            <div id="menu-management" className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm scroll-mt-24">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold text-gray-900">Menu Management</h2>
+                                    <button
+                                        onClick={() => {
+                                            const printWindow = window.open('', '_blank');
+                                            if (!printWindow) return;
+
+                                            // 1. Define Category Mappings (DB -> Display)
+                                            const CATEGORY_MAPPING: Record<string, string> = {
+                                                'Hot Beverages': 'Tea & Coffee',
+                                                'Tea & Coffee': 'Tea & Coffee',
+                                                'Omelettes': 'Omelets & Egg Dishes',
+                                                'Omelets & Egg Dishes': 'Omelets & Egg Dishes',
+                                                'Indian Bread': 'Indian Tawa/Tandoori Roti',
+                                                'Indian Breads': 'Indian Tawa/Tandoori Roti',
+                                                'Indian Tawa/Tandoori Roti': 'Indian Tawa/Tandoori Roti',
+                                                'Snacks': 'Snacks & Starters',
+                                                'Snacks & Starters': 'Snacks & Starters',
+                                                'Chinese Course': 'Chinese',
+                                                'Chinese': 'Chinese',
+                                                'Italian Course': 'Pizza & Pasta',
+                                                'Pizza': 'Pizza & Pasta',
+                                                'Pizza & Pasta': 'Pizza & Pasta',
+                                                'Salads': 'Soups & Salads',
+                                                'Soups': 'Soups & Salads',
+                                                'Soups & Salads': 'Soups & Salads',
+                                                'Vegetable & Dishes': 'Main Course (Vegetarian)',
+                                                'Main Course (Vegetarian)': 'Main Course (Vegetarian)',
+                                                'Non-Veg': 'Main Course (Non-Vegetarian)',
+                                                'Main Course (Non-Vegetarian)': 'Main Course (Non-Vegetarian)',
+                                                'Rice, Pulao, Biryani': 'Rice & Biryani',
+                                                'Rice & Biryani': 'Rice & Biryani',
+                                                'Toasts': 'Toasts',
+                                                'Cereals': 'Cereals',
+                                                'Pancakes': 'Pancakes',
+                                                'Sandwiches': 'Sandwiches',
+                                                'Desserts': 'Desserts',
+                                                'Cold Beverages & Shakes': 'Cold Beverages & Shakes',
+                                                'Breakfast': 'Breakfast'
+                                            };
+
+                                            const PREFERRED_ORDER = [
+                                                'Breakfast',
+                                                'Tea & Coffee',
+                                                'Toasts',
+                                                'Cereals',
+                                                'Omelets & Egg Dishes',
+                                                'Main Course (Vegetarian)',
+                                                'Main Course (Non-Vegetarian)',
+                                                'Indian Tawa/Tandoori Roti',
+                                                'Snacks & Starters',
+                                                'Chinese',
+                                                'Pancakes',
+                                                'Pizza & Pasta',
+                                                'Rice & Biryani',
+                                                'Sandwiches',
+                                                'Desserts',
+                                                'Soups & Salads',
+                                                'Cold Beverages & Shakes'
+                                            ];
+
+                                            // 2. Group Items by Category
+                                            const groupedMenu: Record<string, any[]> = {};
+
+                                            // Initialize preferred groups
+                                            PREFERRED_ORDER.forEach(c => groupedMenu[c] = []);
+
+                                            menu.forEach(item => {
+                                                const rawCat = item.category?.trim();
+                                                let displayCat = CATEGORY_MAPPING[rawCat] || rawCat;
+
+                                                // Clean Description
+                                                if (item.description) {
+                                                    const desc = item.description.toLowerCase();
+                                                    if (desc.includes('delicious') && desc.includes('item')) {
+                                                        item.description = '';
+                                                    }
+                                                }
+
+                                                // Fallback fuzzy match if exact match not found
+                                                if (!groupedMenu[displayCat]) {
+                                                    const fuzzy = PREFERRED_ORDER.find(p => p.includes(displayCat) || displayCat.includes(p));
+                                                    if (fuzzy) displayCat = fuzzy;
+                                                    else {
+                                                        if (!groupedMenu[displayCat]) groupedMenu[displayCat] = [];
+                                                    }
+                                                }
+                                                groupedMenu[displayCat].push(item);
+                                            });
+
+                                            // Sort items within categories with strictly correct 0 handling
+                                            Object.keys(groupedMenu).forEach(key => {
+                                                groupedMenu[key].sort((a, b) => {
+                                                    const orderA = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : 999;
+                                                    const orderB = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : 999;
+                                                    return orderA - orderB;
+                                                });
+                                            });
+
+                                            printWindow.document.write(`
                                                 <html>
                                                 <head>
                                                     <title>TashiZom Menu</title>
@@ -2347,19 +2348,19 @@ function AdminDashboard() {
                                                     <p class="subtitle">KIBBER • SPITI VALLEY</p>
                                                     
                                                     ${PREFERRED_ORDER.map(cat => {
-                                                    const items = groupedMenu[cat];
-                                                    if (!items || items.length === 0) return '';
+                                                const items = groupedMenu[cat];
+                                                if (!items || items.length === 0) return '';
 
-                                                    const HIDE_TYPE_FOR = [
-                                                        'Tea & Coffee',
-                                                        'Cold Beverages & Shakes',
-                                                        'Indian Tawa/Tandoori Roti',
-                                                        'Cereals',
-                                                        'Toasts'
-                                                    ];
-                                                    const hideType = HIDE_TYPE_FOR.includes(cat);
+                                                const HIDE_TYPE_FOR = [
+                                                    'Tea & Coffee',
+                                                    'Cold Beverages & Shakes',
+                                                    'Indian Tawa/Tandoori Roti',
+                                                    'Cereals',
+                                                    'Toasts'
+                                                ];
+                                                const hideType = HIDE_TYPE_FOR.includes(cat);
 
-                                                    return `
+                                                return `
                                                         <div class="category-section">
                                                             <div class="category-title">${cat}</div>
                                                             <table>
@@ -2389,11 +2390,11 @@ function AdminDashboard() {
                                                                 </tbody>
                                                             </table>
                                                         </div>`;
-                                                }).join('')}
+                                            }).join('')}
 
                                                     ${Object.keys(groupedMenu).filter(k => !PREFERRED_ORDER.includes(k) && groupedMenu[k].length > 0).map(cat => {
-                                                    const hideType = ['Tea & Coffee', 'Cold Beverages & Shakes'].includes(cat);
-                                                    return `
+                                                const hideType = ['Tea & Coffee', 'Cold Beverages & Shakes'].includes(cat);
+                                                return `
                                                         <div class="category-section">
                                                             <div class="category-title">${cat}</div>
                                                              <table>
@@ -2431,505 +2432,505 @@ function AdminDashboard() {
                                                 </body>
                                                 </html>
                                             `);
-                                                printWindow.document.close();
-                                            }}
-                                            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm border border-gray-300 shadow-sm"
-                                        >
-                                            <Printer size={16} /> Print Full Menu
-                                        </button>
-                                    </div>
+                                            printWindow.document.close();
+                                        }}
+                                        className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition-colors text-xs sm:text-sm border border-gray-300 shadow-sm"
+                                    >
+                                        <Printer size={16} /> Print Full Menu
+                                    </button>
+                                </div>
 
-                                    {/* Category Management */}
-                                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Manage Categories</h3>
-                                                <p className="text-xs text-gray-500 mt-1">Categories are created automatically when you add an item to them.</p>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    const cat = prompt("Enter name for new category:");
-                                                    if (cat) {
-                                                        const form = document.querySelector('form') as HTMLFormElement; // refined selector if needed
-                                                        if (form) {
-                                                            const catInput = form.elements.namedItem('category') as HTMLInputElement;
-                                                            const nameInput = form.elements.namedItem('name') as HTMLInputElement;
-                                                            if (catInput) catInput.value = cat;
-                                                            if (nameInput) nameInput.focus();
-                                                            alert(`Category "${cat}" selected! Now add the first item below to create it.`);
-                                                            form.scrollIntoView({ behavior: 'smooth' });
-                                                        }
-                                                    }
-                                                }}
-                                                className="text-xs bg-tashi-accent text-tashi-dark font-bold px-3 py-2 rounded hover:bg-yellow-400 flex items-center gap-2"
-                                            >
-                                                <Plus size={14} /> Create Category
-                                            </button>
+                                {/* Category Management */}
+                                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Manage Categories</h3>
+                                            <p className="text-xs text-gray-500 mt-1">Categories are created automatically when you add an item to them.</p>
                                         </div>
-                                        <div className="mb-4">
-                                            <SortableCategoryList
-                                                categories={(Array.from(new Set(menu.map(i => i.category))) as string[]).sort((a, b) => {
-                                                    const idxA = categoryOrder.indexOf(a);
-                                                    const idxB = categoryOrder.indexOf(b);
-                                                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                                                    if (idxA !== -1) return -1;
-                                                    if (idxB !== -1) return 1;
-                                                    return a.localeCompare(b);
-                                                })}
-                                                onReorder={(newOrder) => {
-                                                    useStore.getState().updateCategoryOrder(newOrder);
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
-                                        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Add Item</h3>
-                                        <form
-                                            onSubmit={async (e) => {
-                                                e.preventDefault();
-                                                const form = e.target as HTMLFormElement;
-                                                const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-
-                                                try {
-                                                    if (submitBtn) {
-                                                        submitBtn.disabled = true;
-                                                        submitBtn.textContent = 'Adding...';
-                                                    }
-
-                                                    const formData = new FormData(form);
-                                                    const priceRaw = formData.get('price');
-                                                    const price = priceRaw ? Number(priceRaw) : 0;
-
-                                                    // Handle Empty Image URL
-                                                    // Handle Image URL - ONLY add if present
-                                                    const rawImage = formData.get('image') as string;
-                                                    const image = rawImage && rawImage.trim() !== '' ? rawImage.trim() : null;
-
-                                                    const newItem: any = {
-                                                        name: (formData.get('name') as string) || 'Unnamed Item',
-                                                        description: (formData.get('description') as string) || '',
-                                                        price: price,
-                                                        category: (formData.get('category') as any) || 'Main Course',
-                                                        isVegetarian: formData.get('isVegetarian') === 'on',
-                                                        isSpicy: formData.get('isSpicy') === 'on',
-                                                        isChefSpecial: formData.get('isChefSpecial') === 'on',
-                                                        available: true
-                                                    };
-
-                                                    if (image) {
-                                                        newItem.image = image;
-                                                    }
-
-
-                                                    await useStore.getState().addMenuItem(newItem);
-
-                                                    form.reset();
-                                                    alert("Item added successfully!");
-                                                } catch (err: any) {
-                                                    console.error("Add item failed:", err);
-                                                    alert("Failed to add item. Error: " + err.message);
-                                                } finally {
-                                                    if (submitBtn) {
-                                                        submitBtn.disabled = false;
-                                                        submitBtn.textContent = 'Add Item';
+                                        <button
+                                            onClick={() => {
+                                                const cat = prompt("Enter name for new category:");
+                                                if (cat) {
+                                                    const form = document.querySelector('form') as HTMLFormElement; // refined selector if needed
+                                                    if (form) {
+                                                        const catInput = form.elements.namedItem('category') as HTMLInputElement;
+                                                        const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+                                                        if (catInput) catInput.value = cat;
+                                                        if (nameInput) nameInput.focus();
+                                                        alert(`Category "${cat}" selected! Now add the first item below to create it.`);
+                                                        form.scrollIntoView({ behavior: 'smooth' });
                                                     }
                                                 }
                                             }}
-                                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                            className="text-xs bg-tashi-accent text-tashi-dark font-bold px-3 py-2 rounded hover:bg-yellow-400 flex items-center gap-2"
                                         >
-                                            <input name="name" required placeholder="Name" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                            <input name="price" type="number" required placeholder="Price" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                            <input list="category-list" name="category" required placeholder="Category" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                            <datalist id="category-list">
-                                                {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                    <option key={c} value={c} />
-                                                ))}
-                                                <option value="Soups & Salads" />
-                                                <option value="Snacks & Starters" />
-                                                <option value="Main Course (Vegetarian)" />
-                                                <option value="Main Course (Non-Vegetarian)" />
-                                                <option value="Rice & Biryani" />
-                                                <option value="Indian Breads" />
-                                                <option value="Chinese" />
-                                                <option value="Pizza & Pasta" />
-                                                <option value="Beverages & Shakes" />
-                                                <option value="Desserts" />
-                                            </datalist>
-                                            <div className="flex gap-4 items-center">
-                                                <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
-                                                <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
-                                                <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isChefSpecial" type="checkbox" className="accent-yellow-500" /> Chef's Special</label>
-                                            </div>
-                                            <div className="md:col-span-3">
-                                                <div className="flex gap-2">
-                                                    <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                    <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            className="hidden"
-                                                            onChange={async (e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) {
-                                                                    if (confirm(`Upload ${file.name}?`)) {
-                                                                        try {
-                                                                            const url = await useStore.getState().uploadImage(file, true);
-                                                                            const input = document.getElementById('add-item-image-url') as HTMLInputElement;
-                                                                            if (input) input.value = url;
-                                                                        } catch (err) {
-                                                                            alert('Upload failed');
-                                                                            console.error(err);
-                                                                        }
+                                            <Plus size={14} /> Create Category
+                                        </button>
+                                    </div>
+                                    <div className="mb-4">
+                                        <SortableCategoryList
+                                            categories={(Array.from(new Set(menu.map(i => i.category))) as string[]).sort((a, b) => {
+                                                const idxA = categoryOrder.indexOf(a);
+                                                const idxB = categoryOrder.indexOf(b);
+                                                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                                                if (idxA !== -1) return -1;
+                                                if (idxB !== -1) return 1;
+                                                return a.localeCompare(b);
+                                            })}
+                                            onReorder={(newOrder) => {
+                                                useStore.getState().updateCategoryOrder(newOrder);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-8">
+                                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Add Item</h3>
+                                    <form
+                                        onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            const form = e.target as HTMLFormElement;
+                                            const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+                                            try {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = true;
+                                                    submitBtn.textContent = 'Adding...';
+                                                }
+
+                                                const formData = new FormData(form);
+                                                const priceRaw = formData.get('price');
+                                                const price = priceRaw ? Number(priceRaw) : 0;
+
+                                                // Handle Empty Image URL
+                                                // Handle Image URL - ONLY add if present
+                                                const rawImage = formData.get('image') as string;
+                                                const image = rawImage && rawImage.trim() !== '' ? rawImage.trim() : null;
+
+                                                const newItem: any = {
+                                                    name: (formData.get('name') as string) || 'Unnamed Item',
+                                                    description: (formData.get('description') as string) || '',
+                                                    price: price,
+                                                    category: (formData.get('category') as any) || 'Main Course',
+                                                    isVegetarian: formData.get('isVegetarian') === 'on',
+                                                    isSpicy: formData.get('isSpicy') === 'on',
+                                                    isChefSpecial: formData.get('isChefSpecial') === 'on',
+                                                    available: true
+                                                };
+
+                                                if (image) {
+                                                    newItem.image = image;
+                                                }
+
+
+                                                await useStore.getState().addMenuItem(newItem);
+
+                                                form.reset();
+                                                alert("Item added successfully!");
+                                            } catch (err: any) {
+                                                console.error("Add item failed:", err);
+                                                alert("Failed to add item. Error: " + err.message);
+                                            } finally {
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = false;
+                                                    submitBtn.textContent = 'Add Item';
+                                                }
+                                            }
+                                        }}
+                                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                                    >
+                                        <input name="name" required placeholder="Name" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <input name="price" type="number" required placeholder="Price" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <input list="category-list" name="category" required placeholder="Category" className="bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <datalist id="category-list">
+                                            {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                <option key={c} value={c} />
+                                            ))}
+                                            <option value="Soups & Salads" />
+                                            <option value="Snacks & Starters" />
+                                            <option value="Main Course (Vegetarian)" />
+                                            <option value="Main Course (Non-Vegetarian)" />
+                                            <option value="Rice & Biryani" />
+                                            <option value="Indian Breads" />
+                                            <option value="Chinese" />
+                                            <option value="Pizza & Pasta" />
+                                            <option value="Beverages & Shakes" />
+                                            <option value="Desserts" />
+                                        </datalist>
+                                        <div className="flex gap-4 items-center">
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isVegetarian" type="checkbox" className="accent-green-500" /> Veg</label>
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isSpicy" type="checkbox" className="accent-red-500" /> Spicy</label>
+                                            <label className="flex items-center gap-2 text-gray-700 text-sm"><input name="isChefSpecial" type="checkbox" className="accent-yellow-500" /> Chef's Special</label>
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <div className="flex gap-2">
+                                                <input name="image" id="add-item-image-url" placeholder="Paste Image Link (URL)..." className="flex-1 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                if (confirm(`Upload ${file.name}?`)) {
+                                                                    try {
+                                                                        const url = await useStore.getState().uploadImage(file, true);
+                                                                        const input = document.getElementById('add-item-image-url') as HTMLInputElement;
+                                                                        if (input) input.value = url;
+                                                                    } catch (err) {
+                                                                        alert('Upload failed');
+                                                                        console.error(err);
                                                                     }
                                                                 }
-                                                            }}
-                                                        />
-                                                        <Upload size={20} />
-                                                    </label>
-                                                </div>
-                                                <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Upload size={20} />
+                                                </label>
                                             </div>
-                                            <input name="description" required placeholder="Description" className="md:col-span-4 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                            <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
-                                        </form>
+                                            <p className="text-[10px] text-gray-500 mt-1">Paste a link or click the icon to upload.</p>
+                                        </div>
+                                        <input name="description" required placeholder="Description" className="md:col-span-4 bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                        <button type="submit" className="md:col-span-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Add Item</button>
+                                    </form>
+                                </div>
+
+                                {/* Search and Filter Section */}
+                                <div className="bg-gray-50/95 backdrop-blur-md border border-gray-200 rounded-2xl p-4 md:p-6 mb-6 space-y-4 sticky top-[72px] z-30 shadow-sm transition-all">
+                                    {/* Search Bar */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="🔍 Search menu items by name..."
+                                            value={menuSearchQuery}
+                                            onChange={(e) => setMenuSearchQuery(e.target.value)}
+                                            className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-tashi-accent transition-colors"
+                                        />
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+                                        {menuSearchQuery && (
+                                            <button
+                                                onClick={() => setMenuSearchQuery('')}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                        )}
                                     </div>
 
-                                    {/* Search and Filter Section */}
-                                    <div className="bg-gray-50/95 backdrop-blur-md border border-gray-200 rounded-2xl p-4 md:p-6 mb-6 space-y-4 sticky top-[72px] z-30 shadow-sm transition-all">
-                                        {/* Search Bar */}
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="🔍 Search menu items by name..."
-                                                value={menuSearchQuery}
-                                                onChange={(e) => setMenuSearchQuery(e.target.value)}
-                                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 pl-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-tashi-accent transition-colors"
-                                            />
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
-                                            {menuSearchQuery && (
-                                                <button
-                                                    onClick={() => setMenuSearchQuery('')}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                >
-                                                    <X size={18} />
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {/* Category Filter Tabs */}
-                                        <div className="flex flex-wrap gap-2">
-                                            {['All', ...Array.from(new Set(menu.map(i => i.category))).sort()].map((cat) => (
-                                                <button
-                                                    key={cat}
-                                                    onClick={() => setMenuCategoryFilter(cat)}
-                                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
-                                                        ? 'bg-tashi-accent text-tashi-dark shadow-lg'
-                                                        : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
-                                                        }`}
-                                                >
-                                                    {cat}
-                                                    {cat !== 'All' && (
-                                                        <span className="ml-2 text-xs opacity-60">
-                                                            ({menu.filter(i => i.category === cat).length})
-                                                        </span>
-                                                    )}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        {/* Results Count */}
-                                        <div className="text-sm text-gray-400 flex items-center justify-between">
-                                            <span>
-                                                Showing {menu.filter(item => {
-                                                    const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
-                                                    const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
-                                                    return matchesSearch && matchesCategory;
-                                                }).length} of {menu.length} items
-                                            </span>
-                                            {(menuSearchQuery || menuCategoryFilter !== 'All') && (
-                                                <button
-                                                    onClick={() => {
-                                                        setMenuSearchQuery('');
-                                                        setMenuCategoryFilter('All');
-                                                    }}
-                                                    className="text-xs text-tashi-accent hover:text-yellow-400 font-bold"
-                                                >
-                                                    Clear Filters
-                                                </button>
-                                            )}
-                                        </div>
+                                    {/* Category Filter Tabs */}
+                                    <div className="flex flex-wrap gap-2">
+                                        {['All', ...Array.from(new Set(menu.map(i => i.category))).sort()].map((cat) => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => setMenuCategoryFilter(cat)}
+                                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${menuCategoryFilter === cat
+                                                    ? 'bg-tashi-accent text-tashi-dark shadow-lg'
+                                                    : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
+                                                    }`}
+                                            >
+                                                {cat}
+                                                {cat !== 'All' && (
+                                                    <span className="ml-2 text-xs opacity-60">
+                                                        ({menu.filter(i => i.category === cat).length})
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
                                     </div>
 
-                                    {/* Menu Items List - Drag and Drop */}
-                                    <SortableMenuList
-                                        items={menu
-                                            .filter(item => {
+                                    {/* Results Count */}
+                                    <div className="text-sm text-gray-400 flex items-center justify-between">
+                                        <span>
+                                            Showing {menu.filter(item => {
                                                 const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
                                                 const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
                                                 return matchesSearch && matchesCategory;
-                                            })
-                                            .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))}
-                                        onReorder={(newItems) => {
-                                            useStore.getState().reorderMenuItems(newItems);
-                                        }}
-                                        onEdit={setEditingItem}
-                                    />
+                                            }).length} of {menu.length} items
+                                        </span>
+                                        {(menuSearchQuery || menuCategoryFilter !== 'All') && (
+                                            <button
+                                                onClick={() => {
+                                                    setMenuSearchQuery('');
+                                                    setMenuCategoryFilter('All');
+                                                }}
+                                                className="text-xs text-tashi-accent hover:text-yellow-400 font-bold"
+                                            >
+                                                Clear Filters
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
 
-                                    {/* GALLERY PICKER MODAL */}
-                                    {
-                                        showGalleryPicker && (
-                                            <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                                                <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
-                                                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                                                        <h3 className="font-bold text-gray-800">Select Image</h3>
-                                                        <button onClick={() => setShowGalleryPicker(false)} className="p-2 hover:bg-gray-200 rounded-full">
-                                                            <X size={20} />
-                                                        </button>
-                                                    </div>
-                                                    <div className="flex-1 overflow-auto p-6 space-y-8">
-                                                        {/* Local Gallery */}
-                                                        <section>
-                                                            <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
-                                                            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                                                                {localGallery.map((file, idx) => (
+                                {/* Menu Items List - Drag and Drop */}
+                                <SortableMenuList
+                                    items={menu
+                                        .filter(item => {
+                                            const matchesSearch = item.name.toLowerCase().includes(menuSearchQuery.toLowerCase());
+                                            const matchesCategory = menuCategoryFilter === 'All' || item.category === menuCategoryFilter;
+                                            return matchesSearch && matchesCategory;
+                                        })
+                                        .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999))}
+                                    onReorder={(newItems) => {
+                                        useStore.getState().reorderMenuItems(newItems);
+                                    }}
+                                    onEdit={setEditingItem}
+                                />
+
+                                {/* GALLERY PICKER MODAL */}
+                                {
+                                    showGalleryPicker && (
+                                        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                                            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+                                                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                                    <h3 className="font-bold text-gray-800">Select Image</h3>
+                                                    <button onClick={() => setShowGalleryPicker(false)} className="p-2 hover:bg-gray-200 rounded-full">
+                                                        <X size={20} />
+                                                    </button>
+                                                </div>
+                                                <div className="flex-1 overflow-auto p-6 space-y-8">
+                                                    {/* Local Gallery */}
+                                                    <section>
+                                                        <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Local Gallery</h4>
+                                                        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                            {localGallery.map((file, idx) => (
+                                                                <div
+                                                                    key={`local-${idx}`}
+                                                                    className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                                >
+                                                                    <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
+
+                                                                    {/* Select Overlay */}
                                                                     <div
-                                                                        key={`local-${idx}`}
-                                                                        className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
-                                                                    >
-                                                                        <img src={file.path} alt={file.name} className="w-full h-full object-cover" />
-
-                                                                        {/* Select Overlay */}
-                                                                        <div
-                                                                            onClick={() => {
-                                                                                const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                if (input) {
-                                                                                    input.value = file.path;
-                                                                                    const event = new Event('input', { bubbles: true });
-                                                                                    input.dispatchEvent(event);
-                                                                                }
-                                                                                setShowGalleryPicker(false);
-                                                                            }}
-                                                                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold cursor-pointer"
-                                                                        >
-                                                                            Select
-                                                                        </div>
-
-                                                                        {/* Delete Button */}
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleDeleteLocal(file.path);
-                                                                            }}
-                                                                            className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
-                                                                            title="Delete File"
-                                                                        >
-                                                                            <Trash size={12} />
-                                                                        </button>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </section>
-
-                                                        {/* Firebase Gallery */}
-                                                        <section>
-                                                            <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
-                                                            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                                                                {media?.map((item) => (
-                                                                    <button
-                                                                        key={item.id}
                                                                         onClick={() => {
                                                                             const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
                                                                             if (input) {
-                                                                                input.value = item.url;
+                                                                                input.value = file.path;
                                                                                 const event = new Event('input', { bubbles: true });
                                                                                 input.dispatchEvent(event);
                                                                             }
                                                                             setShowGalleryPicker(false);
                                                                         }}
-                                                                        className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold cursor-pointer"
                                                                     >
-                                                                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                                                            Select
-                                                                        </div>
+                                                                        Select
+                                                                    </div>
+
+                                                                    {/* Delete Button */}
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteLocal(file.path);
+                                                                        }}
+                                                                        className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20"
+                                                                        title="Delete File"
+                                                                    >
+                                                                        <Trash size={12} />
                                                                     </button>
-                                                                ))}
-                                                            </div>
-                                                        </section>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                </div>
-
-                                {/* EDIT ITEM MODAL */}
-                                {
-                                    editingItem && (
-                                        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                                            <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto mt-4 mb-4">
-                                                <button
-                                                    onClick={() => setEditingItem(null)}
-                                                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                                                >
-                                                    <X size={24} />
-                                                </button>
-
-                                                <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
-
-                                                <form
-                                                    onSubmit={async (e) => {
-                                                        e.preventDefault();
-                                                        const form = e.target as HTMLFormElement;
-                                                        const formData = new FormData(form);
-
-                                                        const updates: any = {
-                                                            name: formData.get('name'),
-                                                            price: Number(formData.get('price')),
-                                                            category: formData.get('category'),
-                                                            description: formData.get('description'),
-                                                            image: formData.get('image'),
-                                                            isVegetarian: formData.get('isVegetarian') === 'on',
-                                                            isSpicy: formData.get('isSpicy') === 'on',
-                                                            isChefSpecial: formData.get('isChefSpecial') === 'on',
-                                                        };
-
-                                                        await useStore.getState().updateMenuItem(editingItem.id, updates);
-                                                        setEditingItem(null);
-                                                        alert('Item updated successfully!');
-                                                    }}
-                                                    className="space-y-4"
-                                                >
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
-                                                            <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
-                                                            <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
-                                                        <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
-                                                        <datalist id="category-list-edit">
-                                                            {Array.from(new Set(menu.map(i => i.category))).map(c => (
-                                                                <option key={c} value={c} />
+                                                                </div>
                                                             ))}
-                                                        </datalist>
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
-                                                        <div className="flex flex-col gap-3">
-                                                            <div className="flex gap-2">
-                                                                <div className="flex-1 relative">
-                                                                    <input
-                                                                        name="image"
-                                                                        id="edit-item-image-url"
-                                                                        defaultValue={editingItem.image}
-                                                                        placeholder="Paste URL or Select..."
-                                                                        className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
-                                                                        onChange={(e) => {
-                                                                            // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
-                                                                            // Since it's uncontrolled, we use a simple ref-like approach for preview.
-                                                                            const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                            if (img) img.src = e.target.value;
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setShowGalleryPicker(true)}
-                                                                    className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
-                                                                >
-                                                                    <ImageIcon size={16} /> Gallery
-                                                                </button>
-                                                                <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
-                                                                    <input
-                                                                        type="file"
-                                                                        accept="image/*"
-                                                                        className="hidden"
-                                                                        onChange={async (e) => {
-                                                                            const file = e.target.files?.[0];
-                                                                            if (file) {
-                                                                                if (confirm(`Upload ${file.name}?`)) {
-                                                                                    try {
-                                                                                        const url = await useStore.getState().uploadImage(file, true);
-                                                                                        const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
-                                                                                        const img = document.getElementById('edit-item-preview') as HTMLImageElement;
-                                                                                        if (input) {
-                                                                                            input.value = url;
-                                                                                            // Dispatch input event for any listeners
-                                                                                            input.dispatchEvent(new Event('input', { bubbles: true }));
-                                                                                        }
-                                                                                        if (img) img.src = url;
-                                                                                    } catch (err) {
-                                                                                        alert('Upload failed');
-                                                                                        console.error(err);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <Upload size={20} />
-                                                                </label>
-                                                            </div>
-
-                                                            {/* Image Preview */}
-                                                            <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
-                                                                <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
-                                                                    <img
-                                                                        id="edit-item-preview"
-                                                                        src={editingItem.image || '/images/placeholders/default.png'}
-                                                                        alt="Preview"
-                                                                        className="w-full h-full object-cover"
-                                                                        onError={(e) => {
-                                                                            (e.target as HTMLImageElement).style.display = 'none';
-                                                                            (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
-                                                                            (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                                <p className="text-xs text-gray-500">
-                                                                    Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
-                                                                </p>
-                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </section>
 
-                                                    <div>
-                                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                                                        <textarea name="description" defaultValue={editingItem.description} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none min-h-[80px]" />
-                                                    </div>
-
-                                                    <div className="flex flex-wrap gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                        <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
-                                                            <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
-                                                            <span>Vegetarian</span>
-                                                        </label>
-                                                        <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
-                                                            <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
-                                                            <span>Spicy</span>
-                                                        </label>
-                                                        <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
-                                                            <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
-                                                            <span>Chef's Special</span>
-                                                        </label>
-                                                    </div>
-
-                                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                                                        <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Cancel</button>
-                                                        <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
-                                                    </div>
-                                                </form>
+                                                    {/* Firebase Gallery */}
+                                                    <section>
+                                                        <h4 className="font-bold text-gray-500 uppercase text-xs mb-4 sticky top-0 bg-white z-10 py-2">Uploaded Media</h4>
+                                                        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                                            {media?.map((item) => (
+                                                                <button
+                                                                    key={item.id}
+                                                                    onClick={() => {
+                                                                        const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                        if (input) {
+                                                                            input.value = item.url;
+                                                                            const event = new Event('input', { bubbles: true });
+                                                                            input.dispatchEvent(event);
+                                                                        }
+                                                                        setShowGalleryPicker(false);
+                                                                    }}
+                                                                    className="group relative aspect-square border-2 border-transparent hover:border-tashi-primary rounded-lg overflow-hidden bg-gray-100 text-left transition-all"
+                                                                >
+                                                                    <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                                        Select
+                                                                    </div>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </section>
+                                                </div>
                                             </div>
                                         </div>
                                     )
                                 }
+                            </div>
+
+                            {/* EDIT ITEM MODAL */}
+                            {
+                                editingItem && (
+                                    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                                        <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto mt-4 mb-4">
+                                            <button
+                                                onClick={() => setEditingItem(null)}
+                                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                                            >
+                                                <X size={24} />
+                                            </button>
+
+                                            <h2 className="text-xl font-bold text-gray-900 mb-6">Edit Item</h2>
+
+                                            <form
+                                                onSubmit={async (e) => {
+                                                    e.preventDefault();
+                                                    const form = e.target as HTMLFormElement;
+                                                    const formData = new FormData(form);
+
+                                                    const updates: any = {
+                                                        name: formData.get('name'),
+                                                        price: Number(formData.get('price')),
+                                                        category: formData.get('category'),
+                                                        description: formData.get('description'),
+                                                        image: formData.get('image'),
+                                                        isVegetarian: formData.get('isVegetarian') === 'on',
+                                                        isSpicy: formData.get('isSpicy') === 'on',
+                                                        isChefSpecial: formData.get('isChefSpecial') === 'on',
+                                                    };
+
+                                                    await useStore.getState().updateMenuItem(editingItem.id, updates);
+                                                    setEditingItem(null);
+                                                    alert('Item updated successfully!');
+                                                }}
+                                                className="space-y-4"
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Name</label>
+                                                        <input name="name" defaultValue={editingItem.name} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Price</label>
+                                                        <input name="price" type="number" defaultValue={editingItem.price} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Category</label>
+                                                    <input list="category-list-edit" name="category" defaultValue={editingItem.category} required className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none" />
+                                                    <datalist id="category-list-edit">
+                                                        {Array.from(new Set(menu.map(i => i.category))).map(c => (
+                                                            <option key={c} value={c} />
+                                                        ))}
+                                                    </datalist>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL</label>
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex gap-2">
+                                                            <div className="flex-1 relative">
+                                                                <input
+                                                                    name="image"
+                                                                    id="edit-item-image-url"
+                                                                    defaultValue={editingItem.image}
+                                                                    placeholder="Paste URL or Select..."
+                                                                    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none pr-10"
+                                                                    onChange={(e) => {
+                                                                        // Update preview state locally if possible, or just rely on the img tag using the input value if we controlled it.
+                                                                        // Since it's uncontrolled, we use a simple ref-like approach for preview.
+                                                                        const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                        if (img) img.src = e.target.value;
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowGalleryPicker(true)}
+                                                                className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 rounded-lg font-bold text-sm border border-gray-300 transition-colors flex items-center gap-2"
+                                                            >
+                                                                <ImageIcon size={16} /> Gallery
+                                                            </button>
+                                                            <label className="cursor-pointer bg-white hover:bg-gray-100 text-gray-600 rounded-lg px-4 flex items-center justify-center transition-colors border border-gray-300">
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="hidden"
+                                                                    onChange={async (e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) {
+                                                                            if (confirm(`Upload ${file.name}?`)) {
+                                                                                try {
+                                                                                    const url = await useStore.getState().uploadImage(file, true);
+                                                                                    const input = document.getElementById('edit-item-image-url') as HTMLInputElement;
+                                                                                    const img = document.getElementById('edit-item-preview') as HTMLImageElement;
+                                                                                    if (input) {
+                                                                                        input.value = url;
+                                                                                        // Dispatch input event for any listeners
+                                                                                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                                                                                    }
+                                                                                    if (img) img.src = url;
+                                                                                } catch (err) {
+                                                                                    alert('Upload failed');
+                                                                                    console.error(err);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <Upload size={20} />
+                                                            </label>
+                                                        </div>
+
+                                                        {/* Image Preview */}
+                                                        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200 flex items-center gap-4">
+                                                            <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden relative border border-gray-300 shrink-0">
+                                                                <img
+                                                                    id="edit-item-preview"
+                                                                    src={editingItem.image || '/images/placeholders/default.png'}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                                        (e.target as HTMLImageElement).parentElement!.classList.add('bg-red-50');
+                                                                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-red-400 text-xs flex items-center justify-center h-full w-full">Error</span>';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">
+                                                                Current Preview. <span className="text-gray-400">(If blank, URL is invalid)</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                                    <textarea name="description" defaultValue={editingItem.description} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-tashi-accent outline-none min-h-[80px]" />
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
+                                                        <input name="isVegetarian" type="checkbox" defaultChecked={editingItem.isVegetarian} className="w-5 h-5 accent-green-500" />
+                                                        <span>Vegetarian</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
+                                                        <input name="isSpicy" type="checkbox" defaultChecked={editingItem.isSpicy} className="w-5 h-5 accent-red-500" />
+                                                        <span>Spicy</span>
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-gray-700 font-bold text-sm cursor-pointer select-none">
+                                                        <input name="isChefSpecial" type="checkbox" defaultChecked={editingItem.isChefSpecial} className="w-5 h-5 accent-yellow-500" />
+                                                        <span>Chef's Special</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                                    <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Cancel</button>
+                                                    <button type="submit" className="px-6 py-2 rounded-lg bg-tashi-primary hover:bg-red-600 text-white font-bold transition-colors shadow-lg shadow-red-500/20">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </motion.div>
                     )
                     }
