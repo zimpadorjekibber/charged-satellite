@@ -16,7 +16,15 @@ export default function GlobalSpirituals() {
         <>
             {/* Global Moving Spiritual Strip (Flags + Rotating Wheels) */}
             {landingPhotos.prayerFlags && (
-                <div className="fixed top-0 left-0 right-0 z-[100] h-10 md:h-14 overflow-hidden flex pointer-events-none select-none bg-black/5 backdrop-blur-[1px] border-b border-white/10">
+                <div
+                    className="fixed top-0 left-0 right-0 z-[100] h-10 md:h-14 overflow-hidden flex pointer-events-none select-none bg-black/5 backdrop-blur-[1px] border-b border-white/10"
+                    style={{
+                        transform: 'translate3d(0,0,0)',
+                        WebkitTransform: 'translate3d(0,0,0)',
+                        willChange: 'transform',
+                        paddingTop: 'env(safe-area-inset-top)'
+                    }}
+                >
                     <div className="flex animate-[flags_60s_linear_infinite] items-center">
                         {[...Array(12)].map((_, i) => (
                             <div key={`group-${i}`} className="flex items-center flex-shrink-0">
