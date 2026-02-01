@@ -855,10 +855,11 @@ export default function Home() {
           {/* 1. Valley Updates Section */}
           {valleyUpdates.length > 0 && (
             <motion.div
+              id="valley-updates"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="space-y-12"
+              className="space-y-12 scroll-mt-24"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -997,10 +998,11 @@ export default function Home() {
           {/* 2. Local Winter Gears Section */}
           {gearItems.length > 0 && (
             <motion.div
+              id="village-harvest"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="space-y-12"
+              className="space-y-12 scroll-mt-24"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -1300,12 +1302,12 @@ export default function Home() {
             <span>Stays</span>
           </Link>
           <div className="w-[1px] h-4 bg-white/10" />
-          <Link href="/customer/menu#valley-updates" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
+          <Link href="#valley-updates" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
             <Newspaper size={14} className="text-amber-500" />
             <span>Updates</span>
           </Link>
           <div className="w-[1px] h-4 bg-white/10 hidden md:block" />
-          <Link href="/customer/menu#village-harvest" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
+          <Link href="#village-harvest" className="flex items-center gap-2 text-white hover:text-amber-400 px-3 py-1.5 rounded-full transition-all text-[10px] md:text-xs font-black uppercase tracking-widest">
             <ShoppingBag size={14} className="text-amber-500" />
             <span>Harvest</span>
           </Link>

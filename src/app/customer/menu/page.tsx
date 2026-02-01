@@ -1389,37 +1389,7 @@ export default function MenuPage() {
                     );
                 })()}
 
-                {/* NEW: Village Stays Promo Banner */}
-                <section className="px-4 mb-8">
-                    <Link href="/customer/stays">
-                        <motion.div
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-gradient-to-tr from-[#1A1A1A] to-[#333] p-6 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden group"
-                        >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -mr-16 -mt-16" />
-                            <div className="relative z-10 flex items-center justify-between">
-                                <div className="space-y-4">
-                                    <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-amber-500 text-black text-[9px] font-black uppercase tracking-widest">
-                                        <Home size={12} /> New Feature
-                                    </div>
-                                    <h3 className="text-2xl font-serif font-black text-white leading-tight">
-                                        Looking for <span className="text-amber-500 italic">a Place to Stay?</span>
-                                    </h3>
-                                    <p className="text-gray-400 text-xs font-medium max-w-[200px]">
-                                        Directly contact authentic homestays in Kibber, Chicham & Kee.
-                                    </p>
-                                    <div className="flex items-center gap-2 text-amber-500 font-black text-[10px] uppercase tracking-widest pt-2">
-                                        Browse Directory <ChevronRight size={14} />
-                                    </div>
-                                </div>
-                                <div className="w-24 h-24 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 rotate-3 group-hover:rotate-0 transition-transform">
-                                    <MapPin size={40} className="text-amber-500/50" />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </Link>
-                </section>
+
 
                 {/* Menu Grid - CONTINUOUS SCROLL */}
                 <div className="mt-6 space-y-12">
