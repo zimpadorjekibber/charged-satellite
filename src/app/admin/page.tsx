@@ -806,23 +806,6 @@ function AdminDashboard() {
                                 </div>
                             </div>
 
-                            {/* Section: Floating Logo GIF Upload */}
-                            <div className="bg-orange-50 rounded-xl border border-orange-200 p-6 shadow-sm mb-8">
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                    <Sparkles size={20} className="text-orange-500" />
-                                    Floating Logo Animation
-                                </h3>
-                                <p className="text-gray-600 text-sm mb-4">Upload a transparent GIF here to replace the "i" dot animation in the main title.</p>
-                                <PhotoUploadSection
-                                    title="Floating Logo GIF"
-                                    photoUrl={landingPhotos?.logoGif || null}
-                                    onUpload={(url) => updateLandingPhotos({ logoGif: url })}
-                                    onDelete={() => updateLandingPhotos({ logoGif: null })}
-                                    helperText="Recommended: Transparent GIF, 150x150px."
-                                    aspectRatio="square"
-                                />
-                            </div>
-
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {media?.length === 0 ? (
                                     <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-300 rounded-xl">
@@ -1659,7 +1642,7 @@ function AdminDashboard() {
                                         </h3>
                                         <p className="text-xs text-gray-600 mb-6">Upload animated GIFs for prayer flags and prayer wheels to add a local vibe</p>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             <PhotoUploadSection
                                                 title="Prayer Flags (Animated GIF)"
                                                 description="Long strip of repeating prayer flags (GIF recommended)"
@@ -1678,16 +1661,6 @@ function AdminDashboard() {
                                                 currentImageUrl={landingPhotos?.prayerWheel}
                                                 onUploadSuccess={(url) => updateLandingPhotos('prayerWheel', url)}
                                                 placeholder="Wheel GIF Upload"
-                                            />
-
-                                            <PhotoUploadSection
-                                                title="Floating Logo GIF"
-                                                description="Spiritual spinning/floating logo above title"
-                                                icon={<Sparkles size={20} className="text-amber-500" />}
-                                                aspectRatio="square"
-                                                currentImageUrl={landingPhotos?.logoGif}
-                                                onUploadSuccess={(url) => updateLandingPhotos('logoGif', url)}
-                                                placeholder="Logo GIF Upload"
                                             />
                                         </div>
                                     </div>
