@@ -2046,80 +2046,87 @@ function AdminDashboard() {
                                 </div>
                             </div>
 
-                            {/* Geo Settings */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">Geo-Restriction Settings</h2>
-                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
-                                    <div className="flex-1">
-                                        <label className="block text-sm font-bold text-gray-600 mb-2">Allowed Radius (km)</label>
-                                        <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to place orders.</p>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative">
-                                            <input
-                                                id="geo-radius-input"
-                                                type="number"
-                                                defaultValue={useStore.getState().geoRadius || 5}
-                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">km</span>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                const input = document.getElementById('geo-radius-input') as HTMLInputElement;
-                                                if (input) {
-                                                    const val = parseFloat(input.value);
-                                                    if (!isNaN(val) && val > 0) {
-                                                        useStore.getState().updateSettings({ geoRadius: val });
-                                                        alert("Geo-radius updated successfully!");
-                                                    } else {
-                                                        alert("Please enter a valid number greater than 0.");
-                                                    }
-                                                }
-                                            }}
-                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
-                                        >
-                                            Update
-                                        </button>
-                                    </div>
+                            {/* Distance & Geofencing Settings (Combined & Clarified) */}
+                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm space-y-8">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-2">Distance & Geofencing</h2>
+                                    <p className="text-sm text-gray-500">Manage how far guests can be to place orders or call staff. Current setting: <span className="text-blue-600 font-bold">{useStore.getState().geoRadius || 5}km</span> for orders and <span className="text-green-600 font-bold">{useStore.getState().callStaffRadius || 100}m</span> for staff.</p>
                                 </div>
-                            </div>
 
-                            {/* Call Staff Radius Settings */}
-                            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">Call Staff Geofencing</h2>
-                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-6 items-center">
-                                    <div className="flex-1">
-                                        <label className="block text-sm font-bold text-gray-600 mb-2">Call Staff Radius (meters)</label>
-                                        <p className="text-xs text-gray-500 mb-4">Maximum distance allowed for customers to use the "Call Staff" button. Beyond this, they'll see a direct phone number to call.</p>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative">
-                                            <input
-                                                id="call-staff-radius-input"
-                                                type="number"
-                                                defaultValue={useStore.getState().callStaffRadius || 100}
-                                                className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
-                                            />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Order Radius */}
+                                    <div className="bg-blue-50/50 p-6 rounded-xl border border-blue-100 flex flex-col gap-4">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <ShoppingBag size={18} className="text-blue-600" />
+                                                <label className="block text-sm font-bold text-gray-700">Order Distance (KM)</label>
+                                            </div>
+                                            <p className="text-[10px] text-gray-500">Maximum distance for placing food orders. (Standard: 5-10km)</p>
                                         </div>
-                                        <button
-                                            onClick={() => {
-                                                const input = document.getElementById('call-staff-radius-input') as HTMLInputElement;
-                                                if (input) {
-                                                    const val = parseFloat(input.value);
-                                                    if (!isNaN(val) && val > 0) {
-                                                        useStore.getState().updateSettings({ callStaffRadius: val });
-                                                        alert("Call Staff radius updated successfully!");
-                                                    } else {
-                                                        alert("Please enter a valid number greater than 0.");
+                                        <div className="flex items-center gap-2">
+                                            <div className="relative flex-1">
+                                                <input
+                                                    id="geo-radius-input-v2"
+                                                    type="number"
+                                                    step="0.1"
+                                                    defaultValue={useStore.getState().geoRadius || 5}
+                                                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg focus:ring-2 ring-blue-500 outline-none"
+                                                />
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">km</span>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const input = document.getElementById('geo-radius-input-v2') as HTMLInputElement;
+                                                    if (input) {
+                                                        const val = parseFloat(input.value);
+                                                        if (!isNaN(val) && val > 0) {
+                                                            useStore.getState().updateSettings({ geoRadius: val });
+                                                            alert(`Order distance updated to ${val}km`);
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                            className="bg-tashi-accent text-tashi-dark font-bold px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
-                                        >
-                                            Update
-                                        </button>
+                                                }}
+                                                className="bg-blue-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                                            >
+                                                Set
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Call Staff Radius */}
+                                    <div className="bg-green-50/50 p-6 rounded-xl border border-green-100 flex flex-col gap-4">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Phone size={18} className="text-green-600" />
+                                                <label className="block text-sm font-bold text-gray-700">Call Staff Distance (Meters)</label>
+                                            </div>
+                                            <p className="text-[10px] text-gray-500">In-app ringing distance. Use <span className="font-bold">1000</span> for 1km, <span className="font-bold">4000</span> for 4km.</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="relative flex-1">
+                                                <input
+                                                    id="call-staff-radius-input-v2"
+                                                    type="number"
+                                                    defaultValue={useStore.getState().callStaffRadius || 100}
+                                                    className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg focus:ring-2 ring-green-500 outline-none"
+                                                />
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const input = document.getElementById('call-staff-radius-input-v2') as HTMLInputElement;
+                                                    if (input) {
+                                                        const val = parseFloat(input.value);
+                                                        if (!isNaN(val) && val > 0) {
+                                                            useStore.getState().updateSettings({ callStaffRadius: val });
+                                                            alert(`Call Staff distance updated to ${val} meters`);
+                                                        }
+                                                    }
+                                                }}
+                                                className="bg-green-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-md"
+                                            >
+                                                Set
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
