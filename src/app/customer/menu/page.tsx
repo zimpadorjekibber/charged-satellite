@@ -555,8 +555,8 @@ export default function MenuPage() {
             try {
                 let storeCoords = parseCoordinates(contactInfo.mapsLocation);
                 if (!storeCoords) {
-                    // Fallback for TashiZom Kibber if not configured
-                    storeCoords = { lat: 32.2215, lon: 78.0069 };
+                    // Correct fallback for TashiZom Kibber (32.329112, 78.0080953)
+                    storeCoords = { lat: 32.329112, lon: 78.0080953 };
                 }
 
                 if (!storeCoords) {
@@ -976,20 +976,35 @@ export default function MenuPage() {
 
         // If already calling, allow "Cut Call" - This cancels the notification on BOTH sides
         if (isCalling) {
-            // Stop local audio and visual feedback
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-                callSoundRef.current.currentTime = 0;
-            }
-            setIsCalling(false);
+            setIsCancelling(true);
+            try {
+                // Find any pending call for this session or table
+                const activeCall = notifications.find((n: any) =>
+                    n.status === 'pending' &&
+                    n.type === 'call_staff' &&
+                    (n.sessionId === sessionId || n.tableId === (currentTableId || callLastOrder?.tableId || 'REQUEST'))
+                );
 
-            // Cancel the server-side notification so staff's phone stops ringing too
-            const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
+                if (activeCall && !activeCall.id.startsWith('temp_')) {
+                    console.log("Cancelling Call with ID:", activeCall.id);
+                    await resolveNotification(activeCall.id);
+                } else {
+                    // Fallback to table-based cancellation
+                    const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
+                    console.log("Cancelling Call by Table ID:", tableIdToUse);
+                    await cancelNotification(tableIdToUse, 'call_staff');
+                }
 
-            if (pendingCallNotification) {
-                resolveNotification(pendingCallNotification.id);
-            } else if (hasPendingCall && tableIdToUse) {
-                cancelNotification(tableIdToUse, 'call_staff');
+                setIsCalling(false);
+                if (callSoundRef.current) {
+                    callSoundRef.current.pause();
+                    callSoundRef.current.currentTime = 0;
+                }
+            } catch (e) {
+                console.error("Failed to cancel call:", e);
+                setIsCalling(false); // Reset UI anyway
+            } finally {
+                setIsCancelling(false);
             }
             return;
         }
@@ -1003,47 +1018,9 @@ export default function MenuPage() {
             return;
         }
 
-        // If already calling, this is a "Cut Call" action
-        if (isCalling) {
-            setIsCancelling(true);
-            try {
-                // Find the active call notification for this session
-                let activeCall = notifications.find(
-                    (n: any) => n.sessionId === sessionId && n.type === 'call_staff' && n.status === 'pending'
-                );
-
-                // Fallback: Check by tableId if session match fails (e.g. strict session mismatch)
-                if (!activeCall && (currentTableId || callLastOrder?.tableId)) {
-                    const checkTableId = currentTableId || callLastOrder?.tableId;
-                    activeCall = notifications.find(
-                        (n: any) => n.tableId === checkTableId && n.type === 'call_staff' && n.status === 'pending'
-                    );
-                }
-
-                if (activeCall && !activeCall.id.startsWith('temp_')) {
-                    console.log("Cancelling Call with ID:", activeCall.id);
-                    await resolveNotification(activeCall.id);
-                } else {
-                    // Fallback to table-based cancellation if ID is temp or not found
-                    const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
-                    console.log("Cancelling Call by Table ID:", tableIdToUse);
-                    await cancelNotification(tableIdToUse, 'call_staff');
-                }
-
-                setIsCalling(false);
-                if (callSoundRef.current) {
-                    callSoundRef.current.pause();
-                }
-            } catch (e) {
-                console.error("Failed to cancel call:", e);
-                // Force UI reset anyway
-                setIsCalling(false);
-            } finally {
-                setIsCancelling(false);
-                if (callSoundRef.current) {
-                    callSoundRef.current.pause();
-                }
-            }
+        // PREVENT CALL if already has a pending call in the system
+        if (hasPendingCall) {
+            alert("Staff have already been notified. They are on their way!");
             return;
         }
 
@@ -1061,9 +1038,9 @@ export default function MenuPage() {
             // Static import used above - no network request needed here
             let storeCoords = parseCoordinates(contactInfo.mapsLocation);
 
-            // Hardcoded fallback for TashiZom Kibber (32.2215, 78.0069)
+            // Fallback for TashiZom Kibber (32.329112, 78.0080953)
             if (!storeCoords) {
-                storeCoords = { lat: 32.2215, lon: 78.0069 };
+                storeCoords = { lat: 32.329112, lon: 78.0080953 };
             }
 
             if (storeCoords) {
@@ -1078,7 +1055,7 @@ export default function MenuPage() {
                     if (distanceMeters > callStaffRadius) {
                         // Customer is too far - STRICT BLOCK in-app notification
                         const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
-                        alert(`Distance Error: You appear to be ${distanceMeters.toFixed(1)}km away.\n\n"Call Staff" is only available within ${callStaffRadius}m of the homestay. \n\nPlease use the direct call button instead.`);
+                        alert(`Distance Error: You appear to be ${distanceKm.toFixed(1)}km away.\n\n"Call Staff" is only available within ${callStaffRadius}m of the homestay.\n\nPlease use the direct call button instead.`);
                         window.location.href = `tel:${phoneNumber}`;
                         setIsLocating(false);
                         return;
@@ -1300,27 +1277,26 @@ export default function MenuPage() {
                                 </button>
                             </Link>
                         )}
-                        {/* Call Staff Button */}
                         <motion.button
                             onClick={handleCallStaff}
-                            disabled={isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)}
+                            disabled={locationStatus.isChecking || isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)}
                             animate={isCalling ? {
                                 x: [-4, 4, -4, 4, 0],
                                 transition: {
-                                    repeat: Infinity,
                                     duration: 0.4,
+                                    repeat: Infinity,
                                     repeatDelay: 1
                                 }
                             } : {}}
                             className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all active:scale-95 shadow-lg ${isCalling
                                 ? 'bg-red-600 text-white animate-pulse shadow-red-500/50'
-                                : isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)
+                                : locationStatus.isChecking || isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
                                 }`}
                         >
-                            {isLocating ? (
-                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            {locationStatus.isChecking || isLocating ? (
+                                <div className="w-6 h-6 border-2 border-black/10 border-t-black rounded-full animate-spin" />
                             ) : isCancelling ? (
                                 <Loader2 size={24} className="animate-spin" />
                             ) : isCalling ? (
@@ -1329,7 +1305,7 @@ export default function MenuPage() {
                                 <Phone size={24} />
                             )}
                             <span className="text-[10px] uppercase tracking-wider font-bold">
-                                {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : locationStatus.isOutOfRange ? 'Out of Range' : 'Call Staff'}
+                                {locationStatus.isChecking || isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : locationStatus.isOutOfRange ? 'Out of Range' : 'Call Staff'}
                             </span>
                         </motion.button>
 
