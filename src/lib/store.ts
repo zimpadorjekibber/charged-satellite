@@ -295,7 +295,7 @@ export const useStore = create<AppState>()(
             isListening: false,
             unsubscribers: [],
             geoRadius: 5,
-            callStaffRadius: 200, // Default: 200 meters (increased from 50 to handle GPS drift)
+            callStaffRadius: 100, // Default: 100 meters (reduced from 200 to be stricter per user request)
             categoryOrder: [], // Initial empty state
             gearItems: [], // Initial empty state
             menuAppearance: {
@@ -447,7 +447,7 @@ export const useStore = create<AppState>()(
                         const data = doc.data();
                         set({
                             geoRadius: data.geoRadius ?? get().geoRadius ?? 5,
-                            callStaffRadius: data.callStaffRadius ?? get().callStaffRadius ?? 200, // Load Call Staff radius
+                            callStaffRadius: data.callStaffRadius ?? get().callStaffRadius ?? 100, // Load Call Staff radius
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }

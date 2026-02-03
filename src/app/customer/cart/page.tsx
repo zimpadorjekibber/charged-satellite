@@ -62,7 +62,12 @@ export default function CartPage() {
             if (contactInfo.mapsLocation && geoRadius > 0) {
                 try {
                     const { getCurrentPosition, parseCoordinates, calculateDistanceKm } = await import('../../../lib/location');
-                    const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+                    let storeCoords = parseCoordinates(contactInfo.mapsLocation);
+
+                    // Hardcoded fallback for TashiZom Kibber (32.2215, 78.0069)
+                    if (!storeCoords) {
+                        storeCoords = { lat: 32.2215, lon: 78.0069 };
+                    }
 
                     if (storeCoords) {
                         const pos = await getCurrentPosition();
@@ -71,9 +76,9 @@ export default function CartPage() {
                         const distance = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
 
 
-                        // NEW: Check if they're outside 50m radius → require advance payment
+                        // NEW: Check if they're outside 100m radius (or configured) → require advance payment
                         const distanceMeters = distance * 1000;
-                        const ADVANCE_PAYMENT_RADIUS_METERS = state.callStaffRadius || 50;
+                        const ADVANCE_PAYMENT_RADIUS_METERS = state.callStaffRadius || 100;
                         if (distanceMeters > ADVANCE_PAYMENT_RADIUS_METERS) {
                             // FIX: If we are already paying (isPrePaid=true), DO NOT stop the flow.
                             if (!isPrePaid) {
@@ -84,16 +89,22 @@ export default function CartPage() {
                         }
 
                         if (!isPrePaid && distance > geoRadius) {
-                            alert(`You are out of our service area. \n\nYour distance: ${distance.toFixed(2)}km\nLimit: ${geoRadius}km\n\nYou can still browse our menu, but we cannot accept orders from your current location.`);
+                            alert(`Order Blocked: You are out of our service area. \n\nYour distance: ${distance.toFixed(2)}km\nLimit: ${geoRadius}km\n\nPlease call us directly if you believe this is an error.`);
                             setIsOrdering(false);
                             return; // BLOCK ORDER
                         }
+                    } else {
+                        // If no coordinates, block order for safety
+                        alert("Technical Error: Homestay location not found. Please call us to place your order.");
+                        setIsOrdering(false);
+                        return;
                     }
                 } catch (locError: any) {
+                    console.error("Order Geo Error:", locError);
                     if (locError instanceof Error && (locError.message.includes('permission') || (locError as any).code === 1)) {
-                        alert("Location access is required to verify you are within our service area. Please allow location access to place an order.");
+                        alert("Location access is required to verify your distance. Please allow location access to place an order.");
                     } else {
-                        alert("Could not verify your location. Please ensure location services are enabled.");
+                        alert("Could not verify your location. For safety in the valley, location services must be enabled to place an order.");
                     }
                     setIsOrdering(false);
                     return; // BLOCK ORDER

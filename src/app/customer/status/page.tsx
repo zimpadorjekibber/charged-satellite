@@ -38,13 +38,86 @@ export default function OrderStatusPage() {
     const orders = useStore((state: any) => state.orders || []);
     const currentTableId = useStore((state: any) => state.currentTableId);
     const sessionId = useStore((state: any) => state.sessionId);
-    const callStaff = useStore((state: any) => state.callStaff);
+    const addNotification = useStore((state: any) => state.addNotification);
+    const contactInfo = useStore((state: any) => state.contactInfo);
+    const configuredCallRadius = useStore((state: any) => state.callStaffRadius || 100);
+    const customerDetails = useStore((state: any) => state.customerDetails);
+
     const [isCalling, setIsCalling] = useState(false);
+    const [isLocating, setIsLocating] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const handleCallStaff = async () => {
+        if (isCalling || isLocating) return;
+
+        const tableId = currentTableId || 'Table?';
+        const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
+
+        // GEOFENCE CHECK
+        const callStaffRadius = Math.max(configuredCallRadius, 50);
+        setIsLocating(true);
+
+        try {
+            const { parseCoordinates, getCurrentPosition, calculateDistanceKm } = await import('../../../lib/location');
+            // Try to get coordinates from mapsLocation
+            let storeCoords = parseCoordinates(contactInfo.mapsLocation);
+
+            // Hardcoded fallback for TashiZom Kibber if string parsing fails
+            if (!storeCoords) {
+                storeCoords = { lat: 32.2215, lon: 78.0069 };
+            }
+
+            if (storeCoords) {
+                try {
+                    const pos = await getCurrentPosition();
+                    const userLat = pos.coords.latitude;
+                    const userLon = pos.coords.longitude;
+                    const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+                    const distanceMeters = distanceKm * 1000;
+
+                    if (distanceMeters > callStaffRadius) {
+                        alert(`Distance Error: You appear to be ${distanceMeters.toFixed(1)}km away.\n\nIn-app assistance is only available within ${callStaffRadius}m of the homestay. \n\nPlease call us directly.`);
+                        window.location.href = `tel:${phoneNumber}`;
+                        setIsLocating(false);
+                        return;
+                    }
+                } catch (geoErr) {
+                    console.error("Geo error on status page:", geoErr);
+                    alert("Location Error: We couldn't verify your location. \n\nFor security, please call us directly on our mobile number.");
+                    window.location.href = `tel:${phoneNumber}`;
+                    setIsLocating(false);
+                    return;
+                }
+            } else {
+                alert("Technical Error: Homestay location not configured. Please call us directly.");
+                setIsLocating(false);
+                return;
+            }
+        } catch (err) {
+            console.error("Location system error:", err);
+        } finally {
+            setIsLocating(false);
+        }
+
+        // Proceed with notification
+        setIsCalling(true);
+        try {
+            addNotification(tableId, 'call_staff', {
+                customerName: customerDetails?.name || 'Guest',
+                customerPhone: customerDetails?.phone || '',
+                sessionId: sessionId
+            });
+            alert("Staff notified! We'll be with you shortly.");
+        } catch (e) {
+            alert("Failed to send notification. Please try again.");
+        } finally {
+            setTimeout(() => setIsCalling(false), 3000);
+        }
+    };
 
     // Track which orders we've already seen as paid to avoid duplicate redirects
     const processedPaidOrders = useRef<Set<string>>(new Set());
@@ -200,7 +273,7 @@ export default function OrderStatusPage() {
                             if (isCalling) return;
                             setIsCalling(true);
                             try {
-                                await callStaff();
+                                await handleCallStaff();
                                 alert("Success! Staff notified. We'll be with you shortly.");
                             } catch (e) {
                                 alert("Failed to call staff. Please try again.");
@@ -225,7 +298,7 @@ export default function OrderStatusPage() {
                     onClick={async () => {
                         if (isCalling) return;
                         setIsCalling(true);
-                        await callStaff();
+                        await handleCallStaff();
                         alert("Staff notified!");
                         setIsCalling(false);
                     }}

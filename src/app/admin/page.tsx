@@ -2098,7 +2098,7 @@ function AdminDashboard() {
                                             <input
                                                 id="call-staff-radius-input"
                                                 type="number"
-                                                defaultValue={useStore.getState().callStaffRadius || 200}
+                                                defaultValue={useStore.getState().callStaffRadius || 100}
                                                 className="bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-900 font-mono text-lg w-32 focus:outline-none focus:border-tashi-accent"
                                             />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">m</span>

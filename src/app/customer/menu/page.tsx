@@ -184,13 +184,15 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
     addToCart,
     removeFromCart,
     getQuantity,
-    setSelectedItem
+    setSelectedItem,
+    isOutOfRange
 }: {
     items: MenuItem[],
     addToCart: (item: MenuItem) => void,
     removeFromCart: (id: string) => void,
     getQuantity: (id: string) => number,
-    setSelectedItem: (item: MenuItem) => void
+    setSelectedItem: (item: MenuItem) => void,
+    isOutOfRange?: boolean
 }) {
     const menuAppearance = useStore((state: any) => state.menuAppearance);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -282,18 +284,18 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
                                             <div onClick={(e) => e.stopPropagation()} className="mb-0.5">
                                                 {getQuantity(item.id) === 0 ? (
                                                     <button
-                                                        onClick={() => isActive && addToCart(item)}
-                                                        disabled={item.available === false}
-                                                        className="text-black px-6 py-2 rounded-xl text-xs font-black hover:opacity-90 transition-all hover:scale-105 shadow-xl active:scale-95"
+                                                        onClick={() => isActive && !isOutOfRange && addToCart(item)}
+                                                        disabled={item.available === false || isOutOfRange}
+                                                        className={`text-black px-6 py-2 rounded-xl text-xs font-black hover:opacity-90 transition-all hover:scale-105 shadow-xl active:scale-95 ${isOutOfRange ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                                                         style={{ backgroundColor: menuAppearance.accentColor }}
                                                     >
-                                                        ADD
+                                                        {isOutOfRange ? 'NO SERVICE' : 'ADD'}
                                                     </button>
                                                 ) : (
-                                                    <div className="flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 h-10 shadow-2xl">
-                                                        <button onClick={() => isActive && removeFromCart(item.id)} className="px-3 h-full text-white hover:bg-white/10 rounded-l-xl font-bold text-xl">-</button>
+                                                    <div className={`flex items-center bg-white/10 backdrop-blur-md rounded-xl border border-white/20 h-10 shadow-2xl ${isOutOfRange ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                        <button onClick={() => isActive && !isOutOfRange && removeFromCart(item.id)} className="px-3 h-full text-white hover:bg-white/10 rounded-l-xl font-bold text-xl">-</button>
                                                         <span className="px-2 text-base font-black text-white min-w-[30px] text-center">{getQuantity(item.id)}</span>
-                                                        <button onClick={() => isActive && addToCart(item)} className="px-3 h-full text-white hover:bg-white/10 rounded-r-xl font-bold text-xl">+</button>
+                                                        <button onClick={() => isActive && !isOutOfRange && addToCart(item)} className="px-3 h-full text-white hover:bg-white/10 rounded-r-xl font-bold text-xl">+</button>
                                                     </div>
                                                 )}
                                             </div>
@@ -326,7 +328,7 @@ const ChefsSpecialSection = memo(function ChefsSpecialSection({
     );
 });
 
-function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect, isOutOfRange }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void; isOutOfRange?: boolean }) {
     const menuAppearance = useStore((state: any) => state.menuAppearance);
     const isAvailable = item.available !== false;
 
@@ -402,10 +404,10 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                         <motion.button
                             whileHover={isAvailable ? { scale: 1.1 } : {}}
                             whileTap={isAvailable ? { scale: 0.9 } : {}}
-                            onClick={isAvailable ? onAdd : undefined}
-                            disabled={!isAvailable}
-                            style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable
+                            onClick={isAvailable && !isOutOfRange ? onAdd : undefined}
+                            disabled={!isAvailable || isOutOfRange}
+                            style={isAvailable && !isOutOfRange ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border border-dashed ${isAvailable && !isOutOfRange
                                 ? 'bg-white/5 cursor-pointer'
                                 : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
                                 }`}
@@ -413,7 +415,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
                             <Plus size={20} />
                         </motion.button>
                     ) : (
-                        <div className="flex items-center rounded-full px-1 py-1 shadow-lg" style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 4px 12px ${menuAppearance.accentColor}4D` }}>
+                        <div className={`flex items-center rounded-full px-1 py-1 shadow-lg ${isOutOfRange ? 'opacity-50 pointer-events-none' : ''}`} style={{ backgroundColor: menuAppearance.accentColor, boxShadow: `0 4px 12px ${menuAppearance.accentColor}4D` }}>
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={onRemove}
@@ -437,7 +439,7 @@ function MenuItemCard({ item, quantity, onAdd, onRemove, onSelect }: { item: Men
     );
 }
 
-function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void }) {
+function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect, isOutOfRange }: { item: MenuItem; quantity: number; onAdd: () => void; onRemove: () => void; onSelect: () => void; isOutOfRange?: boolean }) {
     const menuAppearance = useStore((state: any) => state.menuAppearance);
     const isAvailable = item.available !== false;
 
@@ -477,10 +479,10 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
                     <motion.button
                         whileHover={isAvailable ? { scale: 1.1 } : {}}
                         whileTap={isAvailable ? { scale: 0.9 } : {}}
-                        onClick={isAvailable ? onAdd : undefined}
-                        disabled={!isAvailable}
-                        style={isAvailable ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable
+                        onClick={isAvailable && !isOutOfRange ? onAdd : undefined}
+                        disabled={!isAvailable || isOutOfRange}
+                        style={isAvailable && !isOutOfRange ? { color: menuAppearance.accentColor, borderColor: `${menuAppearance.accentColor}4D` } : {}}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors border ${isAvailable && !isOutOfRange
                             ? 'bg-white/5 cursor-pointer'
                             : 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed'
                             }`}
@@ -488,7 +490,7 @@ function MenuItemListRow({ item, quantity, onAdd, onRemove, onSelect }: { item: 
                         <Plus size={18} />
                     </motion.button>
                 ) : (
-                    <div className="flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30">
+                    <div className={`flex items-center bg-tashi-primary rounded-full px-1 py-1 shadow-lg shadow-tashi-primary/30 ${isOutOfRange ? 'opacity-50 pointer-events-none' : ''}`}>
                         <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={onRemove}
@@ -532,6 +534,64 @@ export default function MenuPage() {
     const categoryOrder = useStore((state: any) => state.categoryOrder);
     const menuAppearance = useStore((state: any) => state.menuAppearance);
     const addReview = useStore((state: any) => state.addReview);
+    const callStaffRadius = useStore((state: any) => state.callStaffRadius) || 100;
+
+    // Geofencing State
+    const [locationStatus, setLocationStatus] = useState<{
+        isChecking: boolean;
+        isOutOfRange: boolean;
+        distanceKm: number | null;
+        error: string | null;
+    }>({
+        isChecking: true,
+        isOutOfRange: false,
+        distanceKm: null,
+        error: null
+    });
+
+    // Check Location for Geofencing
+    useEffect(() => {
+        const checkLocation = async () => {
+            try {
+                let storeCoords = parseCoordinates(contactInfo.mapsLocation);
+                if (!storeCoords) {
+                    // Fallback for TashiZom Kibber if not configured
+                    storeCoords = { lat: 32.2215, lon: 78.0069 };
+                }
+
+                if (!storeCoords) {
+                    setLocationStatus(prev => ({ ...prev, isChecking: false }));
+                    return;
+                }
+
+                const pos = await getCurrentPosition();
+                const distKm = calculateDistanceKm(
+                    pos.coords.latitude,
+                    pos.coords.longitude,
+                    storeCoords.lat,
+                    storeCoords.lon
+                );
+                const outOfRange = (distKm * 1000) > callStaffRadius;
+
+                setLocationStatus({
+                    isChecking: false,
+                    isOutOfRange: outOfRange,
+                    distanceKm: distKm,
+                    error: null
+                });
+            } catch (err) {
+                console.error("Location check failed:", err);
+                setLocationStatus({
+                    isChecking: false,
+                    isOutOfRange: false, // Default to in-range but maybe show location error
+                    distanceKm: null,
+                    error: "Could not verify location"
+                });
+            }
+        };
+
+        checkLocation();
+    }, [contactInfo.mapsLocation, callStaffRadius]);
 
     // Dynamic Categories derived from Menu
     const allCategories = Array.from(new Set(menu.map((item: any) => item.category))) as string[];
@@ -988,9 +1048,9 @@ export default function MenuPage() {
         }
 
         // GEOFENCE CHECK: Only allow in-app "Call Staff" if within configured radius
-        // Enforce minimum 200m to handle GPS drift in valley
-        const configuredRadius = useStore.getState().callStaffRadius || 200;
-        const callStaffRadius = Math.max(configuredRadius, 200);
+        // Enforce a small minimum (50m) to handle extreme GPS drift while respecting user's 100m preference
+        const configuredRadius = useStore.getState().callStaffRadius || 100;
+        const callStaffRadius = Math.max(configuredRadius, 50);
 
         setIsLocating(true); // START LOADING
 
@@ -999,7 +1059,12 @@ export default function MenuPage() {
 
         try {
             // Static import used above - no network request needed here
-            const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+            let storeCoords = parseCoordinates(contactInfo.mapsLocation);
+
+            // Hardcoded fallback for TashiZom Kibber (32.2215, 78.0069)
+            if (!storeCoords) {
+                storeCoords = { lat: 32.2215, lon: 78.0069 };
+            }
 
             if (storeCoords) {
                 try {
@@ -1011,23 +1076,32 @@ export default function MenuPage() {
 
 
                     if (distanceMeters > callStaffRadius) {
-                        // Customer is too far - show phone number for direct call
+                        // Customer is too far - STRICT BLOCK in-app notification
                         const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
-                        if (confirm(`You appear to be ${distanceMeters.toFixed(0)}m away (Limit: ${callStaffRadius}m).\n\nGPS can sometimes be inaccurate in the valley.\n\nIf you are at the homestay, please try moving slightly or call us directly.`)) {
-                            window.location.href = `tel:${phoneNumber}`;
-                        }
+                        alert(`Distance Error: You appear to be ${distanceMeters.toFixed(1)}km away.\n\n"Call Staff" is only available within ${callStaffRadius}m of the homestay. \n\nPlease use the direct call button instead.`);
+                        window.location.href = `tel:${phoneNumber}`;
                         setIsLocating(false);
                         return;
                     }
                 } catch (locError) {
                     console.error("Geolocation Error for Call Staff:", locError);
-                    // Fallback: If location check fails (weak signal/timeout), 
-                    // we AUTOMATICALLY allow the call to proceed.
-                    // This avoids blocking the user if 'confirm' dialogs are disabled/ignored on device.
+                    // REMOVED: Automatic and manual bypasses. 
+                    const phoneNumber = contactInfo.phone || contactInfo.secondaryPhone;
+                    alert("Location Error: We couldn't verify your current location. \n\nFor security, please call us directly on our mobile number.");
+                    window.location.href = `tel:${phoneNumber}`;
+                    setIsLocating(false);
+                    return;
                 }
+            } else {
+                // If NO coordinates found at all, we must block for safety
+                alert("Technical Error: Homestay location not configured. Please call us directly.");
+                setIsLocating(false);
+                return;
             }
         } catch (err) {
             console.error("Location module error:", err);
+            setIsLocating(false);
+            return;
         } finally {
             setIsLocating(false); // STOP LOADING
         }
@@ -1045,14 +1119,14 @@ export default function MenuPage() {
         const lastOrderForCall = myOrdersForCall[0]; // Orders are sorted desc
 
         // Use currentTableId if available, otherwise fallback to last order's table
-        const effectiveTableId = currentTableId || lastOrder?.tableId;
+        const effectiveTableId = currentTableId || lastOrderForCall?.tableId;
 
         // Allow calling even without table (use 'REQUEST' for walk-ins)
         const finalTableId = effectiveTableId || 'REQUEST';
 
         try {
             // Trigger Telegram Alert IMMEDIATELY (Fire and Forget)
-            const customerName = lastOrder?.customerName || 'Guest';
+            const customerName = lastOrderForCall?.customerName || 'Guest';
             // execute async without awaiting to prevent blocking
             sendTelegramAlert(`🔔 <b>STAFF CALLED!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`).catch(err => console.error("TG Error:", err));
 
@@ -1229,7 +1303,7 @@ export default function MenuPage() {
                         {/* Call Staff Button */}
                         <motion.button
                             onClick={handleCallStaff}
-                            disabled={isLocating || isCancelling}
+                            disabled={isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)}
                             animate={isCalling ? {
                                 x: [-4, 4, -4, 4, 0],
                                 transition: {
@@ -1238,13 +1312,11 @@ export default function MenuPage() {
                                     repeatDelay: 1
                                 }
                             } : {}}
-                            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl active:scale-95 transition-transform ${isCalling
-                                ? 'bg-red-500 text-white shadow-lg shadow-red-500/40'
-                                : isCancelling
-                                    ? 'bg-gray-700 text-gray-300 cursor-wait'
-                                    : isLocating
-                                        ? 'bg-gray-100 text-gray-500 cursor-wait'
-                                        : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
+                            className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all active:scale-95 shadow-lg ${isCalling
+                                ? 'bg-red-600 text-white animate-pulse shadow-red-500/50'
+                                : isLocating || isCancelling || (locationStatus.isOutOfRange && !isCalling)
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-black/10'
                                 }`}
                         >
                             {isLocating ? (
@@ -1257,7 +1329,7 @@ export default function MenuPage() {
                                 <Phone size={24} />
                             )}
                             <span className="text-[10px] uppercase tracking-wider font-bold">
-                                {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : 'Call Staff'}
+                                {isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : locationStatus.isOutOfRange ? 'Out of Range' : 'Call Staff'}
                             </span>
                         </motion.button>
 
@@ -1325,6 +1397,33 @@ export default function MenuPage() {
                     </div>
                 </div>
 
+                {/* Geofencing Warning Banner */}
+                <AnimatePresence>
+                    {!locationStatus.isChecking && locationStatus.isOutOfRange && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="mx-1 mt-4 mb-2 overflow-hidden"
+                        >
+                            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col gap-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-amber-500/20 p-2 rounded-full">
+                                        <MapPin className="text-amber-500" size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-amber-600">Location Restricted</p>
+                                        <p className="text-[11px] text-amber-700/80 font-medium">Distance: {locationStatus.distanceKm?.toFixed(1)} km from homestay</p>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                                    Our service is not available at this location. You can browse the menu, but ordering is disabled outside the homestay premises.
+                                </p>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Category Tabs */}
                 <div className="sticky top-[60px] z-40 bg-white/95 backdrop-blur-md -mx-4 px-4 border-b border-black/5 pt-2 pb-4">
                     <div ref={categoryScrollContainerRef} className="flex overflow-x-auto gap-3 hide-scrollbar snap-x">
@@ -1385,6 +1484,7 @@ export default function MenuPage() {
                             removeFromCart={removeFromCart}
                             getQuantity={getQuantity}
                             setSelectedItem={(item) => handleSelectItem(item, chefSpecialItems)}
+                            isOutOfRange={locationStatus.isOutOfRange}
                         />
                     );
                 })()}
@@ -1428,6 +1528,7 @@ export default function MenuPage() {
                                                 onAdd={() => addToCart(item)}
                                                 onRemove={() => removeFromCart(item.id)}
                                                 onSelect={() => handleSelectItem(item, categoryItems)}
+                                                isOutOfRange={locationStatus.isOutOfRange}
                                             />
                                         ))}
                                     </div>
@@ -1444,6 +1545,7 @@ export default function MenuPage() {
                                                 onAdd={() => addToCart(item)}
                                                 onRemove={() => removeFromCart(item.id)}
                                                 onSelect={() => handleSelectItem(item, categoryItems)}
+                                                isOutOfRange={locationStatus.isOutOfRange}
                                             />
                                         ))}
                                     </div>
@@ -1565,13 +1667,11 @@ export default function MenuPage() {
                                                     </span>
                                                 )}
                                                 <button
-                                                    onClick={() => {
-                                                        addToCart(selectedItem);
-                                                    }}
-                                                    disabled={selectedItem.available === false}
-                                                    className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                    onClick={() => !locationStatus.isOutOfRange && addToCart(selectedItem)}
+                                                    disabled={selectedItem.available === false || locationStatus.isOutOfRange}
+                                                    className={`bg-black text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${locationStatus.isOutOfRange ? 'grayscale' : 'hover:bg-gray-800'}`}
                                                 >
-                                                    <Plus size={18} /> Add to Order
+                                                    <Plus size={18} /> {locationStatus.isOutOfRange ? 'Service Unavailable' : 'Add to Order'}
                                                 </button>
                                             </div>
                                         </div>
@@ -2212,16 +2312,16 @@ export default function MenuPage() {
                                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 flex items-center gap-4 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
                                     {getQuantity(selectedItem.id) > 0 ? (
                                         <div className="flex items-center justify-between w-full gap-4">
-                                            <div className="flex items-center bg-gray-100 rounded-xl h-14 px-2 ring-1 ring-black/5 flex-1 max-w-[140px] justify-between">
+                                            <div className={`flex items-center bg-gray-100 rounded-xl h-14 px-2 ring-1 ring-black/5 flex-1 max-w-[140px] justify-between ${locationStatus.isOutOfRange ? 'opacity-50 pointer-events-none' : ''}`}>
                                                 <button
-                                                    onClick={() => removeFromCart(selectedItem.id)}
+                                                    onClick={() => !locationStatus.isOutOfRange && removeFromCart(selectedItem.id)}
                                                     className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-white rounded-lg transition-all"
                                                 >
                                                     <Minus size={20} />
                                                 </button>
                                                 <span className="font-bold text-xl text-gray-900">{getQuantity(selectedItem.id)}</span>
                                                 <button
-                                                    onClick={() => addToCart(selectedItem)}
+                                                    onClick={() => !locationStatus.isOutOfRange && addToCart(selectedItem)}
                                                     className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-black hover:bg-white rounded-lg transition-all"
                                                 >
                                                     <Plus size={20} />
@@ -2237,18 +2337,18 @@ export default function MenuPage() {
                                     ) : (
                                         <button
                                             onClick={() => {
-                                                if (selectedItem.available !== false) {
+                                                if (selectedItem.available !== false && !locationStatus.isOutOfRange) {
                                                     addToCart(selectedItem);
                                                 }
                                             }}
-                                            disabled={selectedItem.available === false}
-                                            className={`w-full h-14 rounded-xl font-bold shadow-xl active:scale-95 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2 ${selectedItem.available === false
+                                            disabled={selectedItem.available === false || locationStatus.isOutOfRange}
+                                            className={`w-full h-14 rounded-xl font-bold shadow-xl active:scale-95 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2 ${selectedItem.available === false || locationStatus.isOutOfRange
                                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                                 : 'text-white'
                                                 }`}
-                                            style={selectedItem.available !== false ? { backgroundColor: menuAppearance.accentColor } : {}}
+                                            style={(selectedItem.available !== false && !locationStatus.isOutOfRange) ? { backgroundColor: menuAppearance.accentColor } : {}}
                                         >
-                                            {selectedItem.available === false ? 'Currently Unavailable' : 'Add to Order'}
+                                            {selectedItem.available === false ? 'Currently Unavailable' : locationStatus.isOutOfRange ? 'Service Unavailable' : 'Add to Order'}
                                         </button>
                                     )}
                                 </div>
@@ -2268,10 +2368,10 @@ export default function MenuPage() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                             {gearItems
-                                .filter(item => {
+                                .filter((item: any) => {
                                     if (item.category) return item.category === 'wear';
                                     // Fallback for older items without category field
-                                    return !['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                                    return !['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some((kw: string) => item.name.toLowerCase().includes(kw));
                                 })
                                 .map((item: any) => (
                                     <GearItemCard key={item.id} {...item} />
@@ -2279,9 +2379,9 @@ export default function MenuPage() {
                         </div>
 
                         {/* 2. Village Harvest / Spices */}
-                        {gearItems.some(item => {
+                        {gearItems.some((item: any) => {
                             if (item.category) return item.category === 'harvest';
-                            return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                            return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some((kw: string) => item.name.toLowerCase().includes(kw));
                         }) && (
                                 <div className="mt-16">
                                     <div className="flex items-center gap-2 mb-6">
@@ -2294,9 +2394,9 @@ export default function MenuPage() {
                                     </p>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {gearItems
-                                            .filter(item => {
+                                            .filter((item: any) => {
                                                 if (item.category) return item.category === 'harvest';
-                                                return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some(kw => item.name.toLowerCase().includes(kw));
+                                                return ['masala', 'spice', 'harvest', 'crop', 'seeds', 'tea', 'ajwain', 'jeera'].some((kw: string) => item.name.toLowerCase().includes(kw));
                                             })
                                             .map((item: any) => (
                                                 <div key={item.id} className="relative group">
