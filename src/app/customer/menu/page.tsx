@@ -637,8 +637,11 @@ export default function MenuPage() {
         return true;
     });
 
+    // Fallback if seasonal filtering removes ALL categories (shouldn't happen, but just in case)
+    const activeCategoriesList = seasonalCategories.length > 0 ? seasonalCategories : allCategories;
+
     // Sort categories: Custom Admin Order -> Preferred -> Alphabetical
-    const CATEGORIES = [...seasonalCategories].sort((a, b) => {
+    const CATEGORIES = [...activeCategoriesList].sort((a, b) => {
         // 1. Check Custom Admin Order
         const aCustom = categoryOrder.indexOf(a);
         const bCustom = categoryOrder.indexOf(b);
@@ -1422,8 +1425,11 @@ export default function MenuPage() {
                                 <span className="relative z-10" style={{ fontSize: menuAppearance.categoryFontSize, color: activeCategory === cat ? (parseInt(menuAppearance.accentColor.replace('#', ''), 16) > 0xffffff / 2 ? '#000' : '#fff') : menuAppearance.categoryColor }}>{cat}</span>
                             </button>
                         ))}
-                        {CATEGORIES.length === 0 && (
+                        {CATEGORIES.length === 0 && menu.length === 0 && (
                             <div className="px-4 py-2 text-gray-500 text-sm italic">Loading categories...</div>
+                        )}
+                        {CATEGORIES.length === 0 && menu.length > 0 && (
+                            <div className="px-4 py-2 text-gray-500 text-sm italic">No categories available.</div>
                         )}
                     </div>
                 </div>
