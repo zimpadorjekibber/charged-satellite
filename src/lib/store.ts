@@ -66,6 +66,7 @@ export interface OrderItem {
     quantity: number;
     name: string;
     price: number;
+    notes?: string;
 }
 
 export interface Order {
@@ -823,7 +824,13 @@ export const useStore = create<AppState>()(
 
             fetchScanStats: async () => {
                 try {
-                    const q = query(collection(db, 'analytics_scans'));
+                    // Optimized: Only fetch the most recent 100 scans to prevent performance hit
+                    const { limit, orderBy } = await import('firebase/firestore');
+                    const q = query(
+                        collection(db, 'analytics_scans'),
+                        orderBy('timestamp', 'desc'),
+                        limit(100)
+                    );
                     const snapshot = await getDocs(q);
                     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                 } catch (e) {
@@ -831,6 +838,7 @@ export const useStore = create<AppState>()(
                     return [];
                 }
             },
+
 
             resolveNotification: async (notificationId) => {
                 await updateDoc(doc(db, 'notifications', notificationId), { status: 'resolved' });
@@ -995,83 +1003,39 @@ export const useStore = create<AppState>()(
             },
 
             uploadImage: async (file: File, saveToGallery = false) => {
-                console.log('🚀 ULTRA JUGAD V2: Compressing & Converting to Base64...');
+                const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
 
                 if (!file.type.startsWith('image/')) {
                     throw new Error('❌ Only image files are allowed');
                 }
 
-                if (file.type === 'image/gif') {
-                    if (file.size > 900 * 1024) {
-                        throw new Error(`GIF too large (${(file.size / 1024).toFixed(0)}KB). Max 900KB allowed for Internal Storage. Use a direct URL instead.`);
+                try {
+                    // Create a unique filename
+                    const timestamp = Date.now();
+                    const cleanName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                    const storageRef = ref(storage, `uploads/${timestamp}_${cleanName}`);
+
+                    // Upload the file
+                    const snapshot = await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(snapshot.ref);
+
+                    if (saveToGallery) {
+                        await addDoc(collection(db, 'settings', 'media', 'library'), {
+                            url: downloadURL,
+                            name: file.name,
+                            path: snapshot.ref.fullPath,
+                            isBase64: false,
+                            createdAt: new Date().toISOString()
+                        });
                     }
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const base64String = e.target?.result as string;
-                            if (saveToGallery) {
-                                addDoc(collection(db, 'settings', 'media', 'library'), {
-                                    url: base64String,
-                                    name: file.name,
-                                    isBase64: true,
-                                    createdAt: new Date().toISOString()
-                                }).catch(err => console.error("Gallery save failed", err));
-                            }
-                            resolve(base64String);
-                        };
-                        reader.onerror = () => reject(new Error('Failed to read GIF'));
-                        reader.readAsDataURL(file);
-                    });
+
+                    return downloadURL;
+                } catch (error) {
+                    console.error("Storage upload failed", error);
+                    throw new Error('Failed to upload image to Firebase Storage');
                 }
-
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        img.src = e.target?.result as string;
-                    };
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        const MAX_DIM = 1000; // Efficient size for mobile/web viewing
-
-                        if (width > height) {
-                            if (width > MAX_DIM) {
-                                height *= MAX_DIM / width;
-                                width = MAX_DIM;
-                            }
-                        } else {
-                            if (height > MAX_DIM) {
-                                width *= MAX_DIM / height;
-                                height = MAX_DIM;
-                            }
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx?.drawImage(img, 0, 0, width, height);
-
-                        // Convert to Base64 with 60% quality to keep strings small
-                        const base64String = canvas.toDataURL('image/jpeg', 0.6);
-                        console.log('✅ ULTRA JUGAD V2: Success! Length:', base64String.length);
-
-                        if (saveToGallery) {
-                            addDoc(collection(db, 'settings', 'media', 'library'), {
-                                url: base64String,
-                                name: file.name,
-                                isBase64: true,
-                                createdAt: new Date().toISOString()
-                            }).catch(err => console.error("Gallery save failed", err));
-                        }
-                        resolve(base64String);
-                    };
-                    img.onerror = () => reject(new Error('Failed to load image'));
-                    reader.onerror = () => reject(new Error('Failed to read file'));
-                    reader.readAsDataURL(file);
-                });
             },
+
 
             addMediaItem: async (url: string, name: string) => {
                 await addDoc(collection(db, 'settings', 'media', 'library'), {

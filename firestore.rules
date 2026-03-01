@@ -1,8 +1,55 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    // Helper: is the user an admin or staff?
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Public Collections (Read only for customers, Write for staff)
+    match /menu/{item} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /valley_updates/{update} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /gear/{item} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /homestays/{item} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Transactional Collections (Customers can create, Staff can manage)
+    match /orders/{order} {
+      allow read: if true; // In Kibber, orders are often open for coordination
+      allow create: if true; 
+      allow update, delete: if isAuthenticated();
+    }
+    match /notifications/{notif} {
+      allow read, create: if true;
+      allow update, delete: if isAuthenticated();
+    }
+    match /reviews/{review} {
+      allow read, create: if true;
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Sensitive Collections (Staff Only)
+    match /analytics_scans/{scan} {
+      allow read, write: if isAuthenticated();
+    }
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Manual setup or cloud function only
     }
   }
 }

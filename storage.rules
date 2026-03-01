@@ -2,7 +2,12 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
-      allow read, write: if true;
+      // allow read: if true; // Public access for images
+      // allow write: if request.auth != null; // Only registered staff can upload/delete
+      
+      // Even better: Allow anyone to READ, but only AUTHENTICATED to WRITE
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
