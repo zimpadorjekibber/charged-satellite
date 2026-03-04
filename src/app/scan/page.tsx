@@ -81,7 +81,7 @@ function ScanPageContent() {
 
 
                 if (dist > geoRadius) {
-                    setError(`You are ${dist.toFixed(2)}km away. Orders are restricted to within ${geoRadius}km of the restaurant.`);
+                    setError(`You are ${dist.toFixed(2)}km away. Order accuracy is best within ${geoRadius}km of the cafe.`);
                     setStatus('');
                 } else {
                     proceed();
@@ -126,10 +126,11 @@ function ScanPageContent() {
 
                     <button
                         onClick={() => proceed()}
-                        className="w-full px-6 py-4 bg-white/5 text-gray-400 rounded-xl font-bold hover:bg-white/10 transition-all text-xs"
+                        className="w-full px-6 py-4 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition-all border border-white/20"
                     >
-                        I am at the Homestay (Skip Check)
+                        Proceed Anyway (Testing/Visitor)
                     </button>
+                    <p className="text-[10px] text-gray-500 mt-2">Note: Real-time orders normally require being near the cafe.</p>
                 </div>
             </div>
         );

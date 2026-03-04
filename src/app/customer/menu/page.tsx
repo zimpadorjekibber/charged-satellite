@@ -1649,12 +1649,13 @@ export default function MenuPage() {
                                                     </span>
                                                 )}
                                                 <button
-                                                    onClick={() => !locationStatus.isOutOfRange && addToCart(selectedItem)}
-                                                    disabled={selectedItem.available === false || locationStatus.isOutOfRange}
-                                                    className={`bg-black text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${locationStatus.isOutOfRange ? 'grayscale' : 'hover:bg-gray-800'}`}
+                                                    onClick={() => addToCart(selectedItem)}
+                                                    disabled={selectedItem.available === false}
+                                                    className={`bg-black text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${locationStatus.isOutOfRange ? 'bg-gray-800' : 'hover:bg-gray-800'}`}
                                                 >
-                                                    <Plus size={18} /> {locationStatus.isOutOfRange ? 'Service Unavailable' : 'Add to Order'}
+                                                    <Plus size={18} /> {locationStatus.isOutOfRange ? 'Add to Order (Remote)' : 'Add to Order'}
                                                 </button>
+                                                {locationStatus.isOutOfRange && <p className="text-[10px] text-orange-500 font-bold text-center mt-1">Remote Access Mode</p>}
                                             </div>
                                         </div>
                                     </div>

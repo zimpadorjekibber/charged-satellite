@@ -35,7 +35,7 @@ export type TabType = 'live' | 'history' | 'analytics' | 'reviews' | 'settings' 
 
 export default function AdminPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="animate-spin text-gray-400" size={32} /></div>}>
+        <Suspense fallback={<div className="min-h-screen flex flex-col items-center justify-center bg-white"><Loader2 className="animate-spin text-tashi-accent" size={48} /><p className="mt-4 text-gray-500 font-serif">Powering up Dashboard...</p></div>}>
             <AdminDashboard />
         </Suspense>
     );

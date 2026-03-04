@@ -176,8 +176,9 @@ interface AppState {
     reviews: Review[];
     valleyUpdates: ValleyUpdate[];
     media: MediaItem[]; // New media gallery
-    geoRadius: number;
-    callStaffRadius: number; // Geofence radius for Call Staff feature (in meters)
+    geoRadius: number; // Max distance for QR scans
+    callStaffRadius: number; // Max distance for service calls
+    isTestMode: boolean; // Bypass geofencing for owner
     contactInfo: ContactSettings;
     categoryOrder: string[]; // New: For custom category ordering
     gearItems: GearItem[]; // New: For local gear e-commerce
@@ -295,8 +296,9 @@ export const useStore = create<AppState>()(
             homestays: [],
             isListening: false,
             unsubscribers: [],
-            geoRadius: 5,
+            geoRadius: 50000,
             callStaffRadius: 100, // Default: 100 meters (reduced from 200 to be stricter per user request)
+            isTestMode: false,
             categoryOrder: [], // Initial empty state
             gearItems: [], // Initial empty state
             menuAppearance: {
@@ -449,8 +451,8 @@ export const useStore = create<AppState>()(
                     if (doc.exists()) {
                         const data = doc.data();
                         set({
-                            geoRadius: data.geoRadius ?? get().geoRadius ?? 5,
-                            callStaffRadius: data.callStaffRadius ?? get().callStaffRadius ?? 100, // Load Call Staff radius
+                            geoRadius: data.geoRadius ?? 50000,
+                            callStaffRadius: data.callStaffRadius ?? 100, // Load Call Staff radius
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }
