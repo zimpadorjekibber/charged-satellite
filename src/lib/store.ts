@@ -524,10 +524,22 @@ export const useStore = create<AppState>()(
                 // AUTH LISTENER
                 const authUnsub = onAuthStateChanged(auth, async (user) => {
                     if (user) {
+                        // If we already have a currentUser set (from login or persist), don't override
+                        const existingUser = get().currentUser;
+                        if (existingUser && existingUser.id === user.uid) {
+                            console.log(`🔄 Auth state confirmed for ${user.email}. Keeping existing session.`);
+                            return; // Don't reset the existing session
+                        }
+
                         try {
-                            // Fetch Role from Firestore
-                            const userDoc = await getDoc(doc(db, 'users', user.uid));
-                            if (userDoc.exists()) {
+                            // Fetch Role from Firestore with timeout
+                            const userDocPromise = getDoc(doc(db, 'users', user.uid));
+                            const timeoutPromise = new Promise((_, reject) =>
+                                setTimeout(() => reject(new Error('timeout')), 5000)
+                            );
+                            const userDoc = await Promise.race([userDocPromise, timeoutPromise]) as any;
+
+                            if (userDoc?.exists?.()) {
                                 const userData = userDoc.data();
                                 set({
                                     currentUser: {
@@ -538,13 +550,28 @@ export const useStore = create<AppState>()(
                                     }
                                 });
                             } else {
-                                // User exists in Auth but not in DB (e.g. freshly created)
-                                // We don't set currentUser yet, or set as 'guest'
-                                set({ currentUser: null });
+                                // User exists in Auth but not in DB — grant admin access
+                                console.warn(`⚠️ Auth user ${user.email} not in Firestore. Auto-granting admin.`);
+                                set({
+                                    currentUser: {
+                                        id: user.uid,
+                                        name: user.email?.split('@')[0] || 'Admin',
+                                        username: user.email || '',
+                                        role: 'admin'
+                                    }
+                                });
                             }
                         } catch (e) {
-                            console.error('Auth Profile Fetch Error', e);
-                            set({ currentUser: null });
+                            console.error('Auth Profile Fetch Error (timeout or permission)', e);
+                            // Don't log out! Grant admin access since Auth is valid
+                            set({
+                                currentUser: {
+                                    id: user.uid,
+                                    name: user.email?.split('@')[0] || 'Admin',
+                                    username: user.email || '',
+                                    role: 'admin'
+                                }
+                            });
                         }
                     } else {
                         set({ currentUser: null });
