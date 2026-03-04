@@ -350,6 +350,8 @@ export const useStore = create<AppState>()(
                 unsubscribers.push(onSnapshot(collection(db, 'menu'), (snap) => {
                     const menu = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MenuItem[];
                     set({ menu });
+                }, (err) => {
+                    console.error("❌ Firestore Menu Listener Error:", err.message);
                 }));
 
                 unsubscribers.push(onSnapshot(collection(db, 'gear'), (snap) => {
@@ -1086,15 +1088,18 @@ export const useStore = create<AppState>()(
                     }
 
                     if (!cred) {
-                        console.error("Login failed for all attempted domains", lastError);
+                        console.error("❌ Login failed: No credentials returned from Firebase Auth");
                         return false;
                     }
 
                     // Fetch role immediately to ensure UI has correct state
                     const user = cred.user;
+                    console.log(`Auth successful for ${user.email}. Fetching role...`);
+
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
+                        console.log(`Firestore user found. Role: ${userData.role}`);
                         set({
                             currentUser: {
                                 id: user.uid,
@@ -1105,9 +1110,8 @@ export const useStore = create<AppState>()(
                         });
                         return true;
                     } else {
-                        // Fallback if no role found (e.g. init page user)
+                        console.error(`❌ User ${user.email} (UID: ${user.uid}) exists in Auth but MISSING in Firestore 'users' collection.`);
                         set({ currentUser: null });
-                        console.error("User has no role assigned");
                         return false;
                     }
                 } catch (error) {

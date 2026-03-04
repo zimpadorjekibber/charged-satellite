@@ -166,7 +166,13 @@ function AdminDashboard() {
                     setError('Access Denied. You do not have admin privileges.');
                 }
             } else {
-                setError('Invalid credentials');
+                // Check if user exists in auth but missing role
+                const user = useStore.getState().currentUser;
+                if (!user) {
+                    setError('Invalid credentials or Database access error.');
+                } else {
+                    setError('Invalid credentials');
+                }
             }
         } catch (err) {
             console.error(err);
