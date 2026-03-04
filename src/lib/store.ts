@@ -1110,13 +1110,32 @@ export const useStore = create<AppState>()(
                         return false;
                     }
 
-                    // Fetch role immediately to ensure UI has correct state
+                    // Fetch role with timeout - if Firestore hangs, grant admin access
                     const user = cred.user;
                     console.log(`Auth successful for ${user.email}. Fetching role...`);
 
+                    const grantAdminAccess = () => {
+                        console.log(`✅ Granting admin access to ${user.email}`);
+                        set({
+                            currentUser: {
+                                id: user.uid,
+                                name: user.email?.split('@')[0] || 'Admin',
+                                username: user.email || '',
+                                role: 'admin'
+                            }
+                        });
+                    };
+
                     try {
-                        const userDoc = await getDoc(doc(db, 'users', user.uid));
-                        if (userDoc.exists()) {
+                        // Race: Firestore read vs 5-second timeout
+                        const userDocPromise = getDoc(doc(db, 'users', user.uid));
+                        const timeoutPromise = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Firestore read timed out after 5s')), 5000)
+                        );
+
+                        const userDoc = await Promise.race([userDocPromise, timeoutPromise]) as any;
+
+                        if (userDoc?.exists?.()) {
                             const userData = userDoc.data();
                             console.log(`Firestore user found. Role: ${userData.role}`);
                             set({
@@ -1129,31 +1148,14 @@ export const useStore = create<AppState>()(
                             });
                             return true;
                         } else {
-                            console.error(`❌ User ${user.email} (UID: ${user.uid}) exists in Auth but MISSING in Firestore 'users' collection.`);
-                            console.log(`💡 Fix: Go to Firebase Console > Firestore > Create document in 'users' collection with ID: ${user.uid} and field role: 'admin'`);
-                            // Still log them in with a default admin role since Auth succeeded
-                            set({
-                                currentUser: {
-                                    id: user.uid,
-                                    name: user.email?.split('@')[0] || 'Admin',
-                                    username: user.email || '',
-                                    role: 'admin'
-                                }
-                            });
+                            console.warn(`⚠️ User doc not found in Firestore. Auto-granting admin role.`);
+                            grantAdminAccess();
                             return true;
                         }
                     } catch (firestoreErr: any) {
-                        console.error(`❌ Firestore read failed: ${firestoreErr.code} - ${firestoreErr.message}`);
-                        console.log(`💡 Auth succeeded but DB read failed. Granting admin access anyway.`);
-                        // Auth succeeded, Firestore rules might be blocking. Grant access.
-                        set({
-                            currentUser: {
-                                id: cred.user.uid,
-                                name: cred.user.email?.split('@')[0] || 'Admin',
-                                username: cred.user.email || '',
-                                role: 'admin'
-                            }
-                        });
+                        console.error(`❌ Firestore read failed/timed out: ${firestoreErr.message}`);
+                        console.log(`💡 Auth succeeded. Granting admin access anyway.`);
+                        grantAdminAccess();
                         return true;
                     }
                 } catch (error: any) {
