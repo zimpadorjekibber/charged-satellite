@@ -46,6 +46,10 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if isAuthenticated();
     }
+    match /calls/{callId} {
+      // Both customers and staff need to read and write to negotiate the WebRTC connection
+      allow read, write: if true; 
+    }
 
     // Sensitive Collections (Staff Only)
     match /analytics_scans/{scan} {

@@ -5,6 +5,7 @@ import { ChefHat, List, BellRing, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { useState, useEffect, useRef } from 'react';
+import StaffCallListener from './components/StaffCallListener';
 
 export default function StaffShell({
     children,
@@ -56,6 +57,7 @@ export default function StaffShell({
     // Layout removed to allow Dashboard to handle full UI.
     return (
         <div className="min-h-screen bg-black">
+            <StaffCallListener />
             {children}
         </div>
     );

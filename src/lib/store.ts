@@ -351,6 +351,7 @@ export const useStore = create<AppState>()(
                 // Menu
                 unsubscribers.push(onSnapshot(collection(db, 'menu'), (snap) => {
                     const menu = snap.docs.map(d => ({ id: d.id, ...d.data() })) as MenuItem[];
+                    console.log(`[STORE DEBUG] menu loaded: ${menu.length} items`, menu);
                     set({ menu });
                 }, (err) => {
                     console.error("❌ Firestore Menu Listener Error:", err.message);
@@ -377,7 +378,10 @@ export const useStore = create<AppState>()(
                 // Tables
                 unsubscribers.push(onSnapshot(collection(db, 'tables'), (snap) => {
                     const tables = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Table[];
+                    console.log(`[STORE DEBUG] tables loaded: ${tables.length} items`);
                     set({ tables: tables.sort((a, b) => a.name.localeCompare(b.name)) });
+                }, (err) => {
+                    console.error("❌ Firestore Tables Listener Error:", err.message);
                 }));
 
                 // Orders

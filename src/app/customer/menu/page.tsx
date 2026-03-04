@@ -9,6 +9,7 @@ import { useState, useEffect, useRef, memo } from 'react';
 import LocalMapGuide from '../components/LocalMapGuide';
 import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '../../../lib/location';
 import { sendTelegramAlert } from '../../../lib/telegram';
+import { useWebRTC } from '@/hooks/useWebRTC';
 
 // Animation Variants
 const containerVariants = {
@@ -932,25 +933,23 @@ export default function MenuPage() {
     );
 
     // Local state for "Calling" visual/audio feedback
-    const [isCalling, setIsCalling] = useState(false);
+    const { callStatus, remoteStream, startCall, endCall } = useWebRTC(currentTableId);
+    const isCalling = callStatus === 'ringing' || callStatus === 'calling' || callStatus === 'connected';
+
+    const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        if (remoteStream && remoteAudioRef.current) {
+            remoteAudioRef.current.srcObject = remoteStream;
+            remoteAudioRef.current.play().catch(console.error);
+        }
+    }, [remoteStream]);
+
     const [callErrorToast, setCallErrorToast] = useState(false); // New Error Toast
     const callSoundRef = useRef<HTMLAudioElement | null>(null);
 
-    // Initialize Audio
-    // Initialize Audio removed - handled by JSX <audio> ref logic
-    // This ensures better compatibility with mobile browsers
-
-
     // Stop ringing if notification is resolved remotely by staff
-    useEffect(() => {
-        if (!hasPendingCall && isCalling) {
-            setIsCalling(false);
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-                callSoundRef.current.currentTime = 0;
-            }
-        }
-    }, [hasPendingCall, isCalling]);
+    // (Deprecated: Handled internally by WebRTC hook matching the ended state)
 
     // Continuous Vibration when Calling
     useEffect(() => {
@@ -981,31 +980,9 @@ export default function MenuPage() {
         if (isCalling) {
             setIsCancelling(true);
             try {
-                // Find any pending call for this session or table
-                const activeCall = notifications.find((n: any) =>
-                    n.status === 'pending' &&
-                    n.type === 'call_staff' &&
-                    (n.sessionId === sessionId || n.tableId === (currentTableId || callLastOrder?.tableId || 'REQUEST'))
-                );
-
-                if (activeCall && !activeCall.id.startsWith('temp_')) {
-                    console.log("Cancelling Call with ID:", activeCall.id);
-                    await resolveNotification(activeCall.id);
-                } else {
-                    // Fallback to table-based cancellation
-                    const tableIdToUse = currentTableId || callLastOrder?.tableId || 'REQUEST';
-                    console.log("Cancelling Call by Table ID:", tableIdToUse);
-                    await cancelNotification(tableIdToUse, 'call_staff');
-                }
-
-                setIsCalling(false);
-                if (callSoundRef.current) {
-                    callSoundRef.current.pause();
-                    callSoundRef.current.currentTime = 0;
-                }
+                await endCall();
             } catch (e) {
                 console.error("Failed to cancel call:", e);
-                setIsCalling(false); // Reset UI anyway
             } finally {
                 setIsCancelling(false);
             }
@@ -1087,13 +1064,6 @@ export default function MenuPage() {
         }
 
         // If we reach here, customer is within 50m - proceed with in-app notification
-        // Play feedback sound for customer
-        // Assuming playCallSound is defined elsewhere or replaced by direct audio control
-        if (callSoundRef.current) {
-            callSoundRef.current.play().catch(e => console.error("Audio play failed", e));
-        }
-        setIsCalling(true);
-
         // Find recent customer details from previous orders
         const myOrdersForCall = orders.filter((o: Order) => o.sessionId === sessionId);
         const lastOrderForCall = myOrdersForCall[0]; // Orders are sorted desc
@@ -1105,35 +1075,26 @@ export default function MenuPage() {
         const finalTableId = effectiveTableId || 'REQUEST';
 
         try {
-            // Trigger Telegram Alert IMMEDIATELY (Fire and Forget)
             const customerName = lastOrderForCall?.customerName || 'Guest';
-            // execute async without awaiting to prevent blocking
-            sendTelegramAlert(`🔔 <b>STAFF CALLED!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`).catch(err => console.error("TG Error:", err));
 
-            console.log("Adding notification for:", finalTableId);
-            addNotification(finalTableId, 'call_staff', {
-                customerName: lastOrderForCall?.customerName || 'Guest',
-                customerPhone: lastOrderForCall?.customerPhone || '',
-                sessionId: sessionId || undefined
-            });
+            // Initiate WebRTC Call Request instead of standard notification
+            await startCall(finalTableId, customerName);
+
+            // Trigger Telegram Alert IMMEDIATELY (Fire and Forget)
+            sendTelegramAlert(`🔔 <b>VOICE CALL INCOMING!</b>\n\n🆔 Table: <b>${finalTableId}</b>\n👤 Customer: ${customerName}\n🕒 Time: ${new Date().toLocaleTimeString()}`).catch(err => console.error("TG Error:", err));
 
             // SUCCESS FEEDBACK
             setLastCallTime(Date.now()); // Update cooldown timer
-            setCallSuccessToast(true);
-            setTimeout(() => setCallSuccessToast(false), 3500); // Hide toast after 3.5 seconds
         } catch (e) {
             console.error("Failed to call staff:", e);
             setCallErrorToast(true); // Show error toast instead of alert
             setTimeout(() => setCallErrorToast(false), 4000);
-            setIsCalling(false);
-            if (callSoundRef.current) {
-                callSoundRef.current.pause();
-            }
         }
     };
 
     return (
         <div className="pb-32 pointer-events-auto min-h-[100dvh] relative bg-white">
+            <audio ref={remoteAudioRef} autoPlay />
             <div className="sticky top-0 z-[150] bg-white/80 backdrop-blur-xl border-b border-black/5 px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Link
@@ -1308,7 +1269,7 @@ export default function MenuPage() {
                                 <Phone size={24} />
                             )}
                             <span className="text-[10px] uppercase tracking-wider font-bold">
-                                {locationStatus.isChecking || isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? 'Cut Call' : locationStatus.isOutOfRange ? 'Out of Range' : 'Call Staff'}
+                                {locationStatus.isChecking || isLocating ? 'Locating...' : isCancelling ? 'Cancelling...' : isCalling ? (callStatus === 'connected' ? 'Live Call' : 'Cut Call') : locationStatus.isOutOfRange ? 'Out of Range' : 'Call Staff'}
                             </span>
                         </motion.button>
 
