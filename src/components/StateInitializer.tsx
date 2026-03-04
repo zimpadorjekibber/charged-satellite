@@ -7,6 +7,7 @@ export function StateInitializer() {
     const initialize = useStore((state) => state.initialize);
 
     useEffect(() => {
+        console.log("🚀 App Initializing...");
         initialize();
 
         // Canvas/Domain Redirect

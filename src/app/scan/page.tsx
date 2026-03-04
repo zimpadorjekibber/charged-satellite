@@ -128,9 +128,9 @@ function ScanPageContent() {
                         onClick={() => proceed()}
                         className="w-full px-6 py-4 bg-white/10 text-white rounded-xl font-bold hover:bg-white/20 transition-all border border-white/20"
                     >
-                        Proceed Anyway (Testing/Visitor)
+                        Browse Menu Only (Remote)
                     </button>
-                    <p className="text-[10px] text-gray-500 mt-2">Note: Real-time orders normally require being near the cafe.</p>
+                    <p className="text-[10px] text-gray-500 mt-2">Note: To place orders or call staff, you must be within {geoRadius}km.</p>
                 </div>
             </div>
         );

@@ -296,9 +296,9 @@ export const useStore = create<AppState>()(
             homestays: [],
             isListening: false,
             unsubscribers: [],
-            geoRadius: 50000,
-            callStaffRadius: 100, // Default: 100 meters (reduced from 200 to be stricter per user request)
-            isTestMode: false,
+            geoRadius: 5,
+            callStaffRadius: 100, // Default: 100 meters
+            isTestMode: false, // Default to false
             categoryOrder: [], // Initial empty state
             gearItems: [], // Initial empty state
             menuAppearance: {
@@ -453,6 +453,7 @@ export const useStore = create<AppState>()(
                         set({
                             geoRadius: data.geoRadius ?? 50000,
                             callStaffRadius: data.callStaffRadius ?? 100, // Load Call Staff radius
+                            isTestMode: data.isTestMode ?? false, // Load isTestMode
                             categoryOrder: data.categoryOrder || [] // Load category order
                         });
                     }
