@@ -11,7 +11,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuthenticated();
     }
-    match /settings/{doc} {
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    match /tables/{table} {
       allow read: if true;
       allow write: if isAuthenticated();
     }

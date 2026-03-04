@@ -1069,11 +1069,26 @@ export const useStore = create<AppState>()(
             login: async (usernameOrEmail, password) => {
                 try {
                     // Auto-append domain if simple username provided
-                    const email = usernameOrEmail.includes('@')
-                        ? usernameOrEmail
-                        : `${usernameOrEmail}@tashizomcafe.in`;
+                    const emailsToTry = usernameOrEmail.includes('@')
+                        ? [usernameOrEmail]
+                        : [`${usernameOrEmail}@tashizomcafe.in`, `${usernameOrEmail}@tashizom.com`];
 
-                    const cred = await signInWithEmailAndPassword(auth, email, password);
+                    let cred = null;
+                    let lastError = null;
+
+                    for (const email of emailsToTry) {
+                        try {
+                            cred = await signInWithEmailAndPassword(auth, email, password);
+                            break; // Success
+                        } catch (err) {
+                            lastError = err;
+                        }
+                    }
+
+                    if (!cred) {
+                        console.error("Login failed for all attempted domains", lastError);
+                        return false;
+                    }
 
                     // Fetch role immediately to ensure UI has correct state
                     const user = cred.user;
@@ -1096,7 +1111,7 @@ export const useStore = create<AppState>()(
                         return false;
                     }
                 } catch (error) {
-                    console.error("Login failed", error);
+                    console.error("Login failed (unexpected)", error);
                     return false;
                 }
             },
