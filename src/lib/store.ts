@@ -184,6 +184,8 @@ interface AppState {
     gearItems: GearItem[]; // New: For local gear e-commerce
     homestays: Homestay[]; // New: For village homestay directory
     menuAppearance: MenuAppearance; // New: For visual customization
+    aiAssistantEnabled: boolean; // Enable/Disable AI Voice Assistant (Tashi)
+    aiAssistantMinDistanceKm: number; // Minimum distance (km) from restaurant to show assistant
     landingPhotos: {
         location: string[];
         climate: string[];
@@ -299,6 +301,8 @@ export const useStore = create<AppState>()(
             geoRadius: 5,
             callStaffRadius: 100, // Default: 100 meters
             isTestMode: false, // Default to false
+            aiAssistantEnabled: false, // Default: OFF (hidden)
+            aiAssistantMinDistanceKm: 5, // Default: show only to users 5+ km away
             categoryOrder: [], // Initial empty state
             gearItems: [], // Initial empty state
             menuAppearance: {
@@ -458,7 +462,9 @@ export const useStore = create<AppState>()(
                             geoRadius: data.geoRadius ?? 50000,
                             callStaffRadius: data.callStaffRadius ?? 100, // Load Call Staff radius
                             isTestMode: data.isTestMode ?? false, // Load isTestMode
-                            categoryOrder: data.categoryOrder || [] // Load category order
+                            categoryOrder: data.categoryOrder || [], // Load category order
+                            aiAssistantEnabled: data.aiAssistantEnabled ?? false, // Load AI toggle
+                            aiAssistantMinDistanceKm: data.aiAssistantMinDistanceKm ?? 5 // Load AI min distance
                         });
                     }
                 }));

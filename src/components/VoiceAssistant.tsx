@@ -1,11 +1,63 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useConversation } from '@elevenlabs/react';
 import { Mic, Square, Loader2 } from 'lucide-react';
+import { useStore } from '@/lib/store';
+import { getCurrentPosition, parseCoordinates, calculateDistanceKm } from '@/lib/location';
 
 export function VoiceAssistant() {
     const [isConnected, setIsConnected] = useState(false);
+    const [shouldShow, setShouldShow] = useState(false);
+    const [checkingLocation, setCheckingLocation] = useState(true);
+
+    // Read admin settings from store
+    const aiAssistantEnabled = useStore((state) => state.aiAssistantEnabled);
+    const aiAssistantMinDistanceKm = useStore((state) => state.aiAssistantMinDistanceKm);
+    const contactInfo = useStore((state) => state.contactInfo);
+
+    // Check geofencing on mount and when settings change
+    useEffect(() => {
+        if (!aiAssistantEnabled) {
+            setShouldShow(false);
+            setCheckingLocation(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        const checkDistance = async () => {
+            try {
+                setCheckingLocation(true);
+                const storeCoords = parseCoordinates(contactInfo.mapsLocation);
+                if (!storeCoords) {
+                    // If no restaurant coordinates, show the assistant by default
+                    if (!cancelled) setShouldShow(true);
+                    return;
+                }
+
+                const position = await getCurrentPosition();
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const distanceKm = calculateDistanceKm(userLat, userLon, storeCoords.lat, storeCoords.lon);
+
+                if (!cancelled) {
+                    // Only show if user is FARTHER than the minimum distance
+                    setShouldShow(distanceKm >= aiAssistantMinDistanceKm);
+                }
+            } catch (error) {
+                // If location access fails, show the assistant (benefit of the doubt for remote users)
+                console.warn('VoiceAssistant: Could not get location, showing by default.', error);
+                if (!cancelled) setShouldShow(true);
+            } finally {
+                if (!cancelled) setCheckingLocation(false);
+            }
+        };
+
+        checkDistance();
+
+        return () => { cancelled = true; };
+    }, [aiAssistantEnabled, aiAssistantMinDistanceKm, contactInfo.mapsLocation]);
 
     const conversation = useConversation({
         onConnect: () => {
@@ -31,7 +83,6 @@ export function VoiceAssistant() {
             await navigator.mediaDevices.getUserMedia({ audio: true });
 
             // Start the conversation with your Agent ID
-            // REPLACE THIS WITH YOUR ACTUAL ELEVENLABS AGENT ID
             await conversation.startSession({
                 agentId: 'agent_4101kjp5w2mwevdv1gsn7jd40f07',
             });
@@ -44,6 +95,11 @@ export function VoiceAssistant() {
     const stopConversation = useCallback(async () => {
         await conversation.endSession();
     }, [conversation]);
+
+    // Don't render anything if disabled, still checking, or user is too close
+    if (!aiAssistantEnabled || checkingLocation || !shouldShow) {
+        return null;
+    }
 
     return (
         <div className="fixed bottom-24 right-4 z-[9999] flex flex-col items-end gap-2">
