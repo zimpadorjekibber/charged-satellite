@@ -73,7 +73,7 @@ export function VoiceAssistant() {
                 onClick={isConnected ? stopConversation : startConversation}
                 disabled={conversation.status === 'connecting'}
                 className={`
-                    group relative flex items-center justify-center p-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.3)] 
+                    group relative flex items-center justify-center p-3 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.3)] 
                     transition-all duration-300 active:scale-95 border-2
                     ${isConnected
                         ? 'bg-red-500 hover:bg-red-600 border-red-400'
@@ -87,16 +87,16 @@ export function VoiceAssistant() {
                 )}
 
                 {conversation.status === 'connecting' ? (
-                    <Loader2 size={32} className="text-white animate-spin" />
+                    <Loader2 size={24} className="text-white animate-spin" />
                 ) : isConnected ? (
-                    <Square size={32} className="text-white fill-white" />
+                    <Square size={24} className="text-white fill-white" />
                 ) : (
-                    <Mic size={32} className="text-tashi-dark group-hover:scale-110 transition-transform" />
+                    <Mic size={24} className="text-tashi-dark group-hover:scale-110 transition-transform" />
                 )}
 
                 {/* Badge text on button hover */}
                 {!isConnected && conversation.status !== 'connecting' && (
-                    <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black/90 text-amber-500 font-bold text-xs whitespace-nowrap px-3 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-white/10 uppercase tracking-widest">
+                    <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black/90 text-amber-500 font-medium text-xs whitespace-nowrap px-3 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-white/10 tracking-wide">
                         Talk to Tashi (AI Assistant)
                     </div>
                 )}
