@@ -6,6 +6,7 @@ import { ShoppingCart, ArrowLeft, Info, Phone, MessageCircle, MapPin, X } from '
 import { useStore } from '@/lib/store';
 import { useState } from 'react';
 import ReviewModal from '@/components/ReviewModal';
+import CustomerCallListener from './components/CustomerCallListener';
 
 export default function CustomerLayout({
     children,
@@ -40,6 +41,7 @@ export default function CustomerLayout({
 
     return (
         <div className="min-h-[100dvh] bg-tashi-darker pb-20">
+            <CustomerCallListener />
             {/* Header */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-tashi-darker/95 backdrop-blur-sm border-b border-white/5 px-4 py-3 flex items-center justify-between" style={{ willChange: 'transform' }}>
                 <div className="flex items-center gap-3">

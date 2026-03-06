@@ -4,32 +4,27 @@ import { useEffect, useState, useRef } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useWebRTC } from '@/hooks/useWebRTC';
-import { Phone, X, PhoneCall, Loader2 } from 'lucide-react';
+import { Phone, X, PhoneCall } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from '@/lib/store';
 
-export default function StaffCallListener() {
+export default function CustomerCallListener() {
+    const currentTableId = useStore((state) => state.currentTableId);
+    const tables = useStore((state) => state.tables);
     const [incomingCall, setIncomingCall] = useState<any | null>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
     const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Get table name for display
+    const tableName = tables.find(t => t.id === currentTableId)?.name || currentTableId;
 
     const {
         callStatus,
         remoteStream,
         answerCall,
-        startCall,
         endCall,
         currentCallId
-    } = useWebRTC(null);
-
-    // Listen for manual call initiation from StaffOrderCard
-    useEffect(() => {
-        const handleManualCall = (e: any) => {
-            const { tableId, customerName } = e.detail;
-            startCall(tableId, customerName);
-        };
-        window.addEventListener('initiate-staff-call', handleManualCall);
-        return () => window.removeEventListener('initiate-staff-call', handleManualCall);
-    }, [startCall]);
+    } = useWebRTC(currentTableId);
 
     // Initial setup for Audio Elements
     useEffect(() => {
@@ -43,11 +38,14 @@ export default function StaffCallListener() {
     }, [remoteStream]);
 
 
-    // Listen for new incoming calls globally
+    // Listen for new incoming calls targeting THIS table
     useEffect(() => {
+        if (!currentTableId) return;
+
         const q = query(
             collection(db, 'calls'),
-            where('status', '==', 'ringing')
+            where('status', '==', 'ringing'),
+            where('tableId', '==', tableName) // Staff uses table name when calling back
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -55,14 +53,16 @@ export default function StaffCallListener() {
                 const docData = change.doc.data();
 
                 if (change.type === 'added') {
-                    // New incoming call!
+                    // New incoming call from staff!
                     setIncomingCall({ id: change.doc.id, ...docData });
-                    if (ringtoneRef.current) {
-                        ringtoneRef.current.play().catch(e => console.error("Ringtone blocked autoplay", e));
+                    if (ringtoneRef.current) ringtoneRef.current.play().catch(e => console.error("Ringtone blocked autoplay", e));
+
+                    // Vibrate
+                    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200, 100, 200]);
                     }
                 }
                 if (change.type === 'removed') {
-                    // Caller ended before pickup
                     setIncomingCall((prev: any) => (prev?.id === change.doc.id ? null : prev));
                     if (ringtoneRef.current) ringtoneRef.current.pause();
                 }
@@ -76,7 +76,7 @@ export default function StaffCallListener() {
         });
 
         return () => unsubscribe();
-    }, []); // Removed incomingCall dependency to fix infinite loop
+    }, [currentTableId, tableName]);
 
     // Handle Call Status changes
     useEffect(() => {
@@ -114,72 +114,70 @@ export default function StaffCallListener() {
 
             <AnimatePresence>
                 {isCallActive && (
-                    <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 touch-none">
+                    <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 touch-none">
 
-                        {/* Call Status UI */}
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="text-center flex flex-col items-center space-y-6 max-w-sm w-full"
+                            className="text-center flex flex-col items-center space-y-8 max-w-sm w-full"
                         >
-
-                            {/* Avatar / Ringing Animation */}
+                            {/* Staff Avatar Animation */}
                             <div className="relative">
-                                {callStatus === 'idle' || callStatus === 'ringing' || incomingCall ? (
-                                    <div className="absolute inset-0 bg-green-500/30 rounded-full animate-ping" />
-                                ) : null}
-                                <div className="relative w-24 h-24 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full border-4 border-gray-800 shadow-2xl flex items-center justify-center text-white z-10">
-                                    <PhoneCall size={40} className={callStatus === 'connected' ? 'text-green-400' : 'text-white animate-pulse'} />
+                                {callStatus !== 'connected' && (
+                                    <div className="absolute inset-0 bg-tashi-accent/30 rounded-full animate-ping" />
+                                )}
+                                <div className="relative w-32 h-32 bg-gradient-to-br from-neutral-800 to-black rounded-full border-4 border-tashi-accent shadow-[0_0_30px_rgba(218,165,32,0.3)] flex items-center justify-center text-tashi-accent z-10">
+                                    <PhoneCall size={50} className={callStatus === 'connected' ? 'text-green-400' : 'animate-pulse'} />
                                 </div>
                             </div>
 
-                            {/* Text Info */}
-                            <div className="space-y-1">
-                                <h2 className="text-3xl font-black text-white font-serif tracking-wide drop-shadow-md">
-                                    Table {incomingCall?.tableId || 'Walk-In'}
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-bold text-white font-serif">
+                                    Staff Calling...
                                 </h2>
-                                <p className="text-lg text-gray-300 font-medium">Customer Voice Call</p>
+                                <p className="text-gray-400 font-medium tracking-wide">Voice Assistance Request</p>
 
-                                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/10">
+                                <div className="mt-6 inline-flex items-center gap-2 px-6 py-2 bg-white/5 rounded-full border border-white/10">
                                     {callStatus === 'connected' ? (
                                         <>
-                                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                                            <span className="text-green-400 font-bold text-sm tracking-widest uppercase">Connected & Live</span>
+                                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+                                            <span className="text-green-400 font-black text-xs uppercase tracking-widest">Live Connection</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="w-2 h-2 rounded-full bg-yellow-500 animate-ping shadow-[0_0_8px_rgba(234,179,8,0.6)]" />
-                                            <span className="text-yellow-400 font-bold text-sm tracking-widest uppercase">Incoming Call...</span>
+                                            <span className="w-2.5 h-2.5 rounded-full bg-tashi-accent animate-ping" />
+                                            <span className="text-tashi-accent font-black text-xs uppercase tracking-widest">Incoming...</span>
                                         </>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-6 pt-6 w-full justify-center">
+                            <div className="flex gap-8 pt-4 w-full justify-center">
                                 {callStatus !== 'connected' && incomingCall && (
                                     <motion.button
                                         whileTap={{ scale: 0.9 }}
                                         onClick={handleAccept}
-                                        className="flex-1 max-w-[140px] flex flex-col items-center justify-center gap-2 bg-gradient-to-b from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white p-4 rounded-3xl shadow-[0_10px_20px_rgba(34,197,94,0.3)] border border-green-400/50 transition-all"
+                                        className="flex-1 max-w-[140px] flex flex-col items-center gap-3 bg-green-600 text-white p-5 rounded-3xl shadow-xl border border-green-500/50"
                                     >
                                         <div className="bg-white/20 p-3 rounded-full">
                                             <Phone size={28} />
                                         </div>
-                                        <span className="font-bold tracking-wider text-sm uppercase text-green-50 drop-shadow-md">Accept</span>
+                                        <span className="font-bold text-xs uppercase tracking-widest">Accept</span>
                                     </motion.button>
                                 )}
 
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handleReject}
-                                    className="flex-1 max-w-[140px] flex flex-col items-center justify-center gap-2 bg-gradient-to-b from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white p-4 rounded-3xl shadow-[0_10px_20px_rgba(239,68,68,0.3)] border border-red-400/50 transition-all"
+                                    className="flex-1 max-w-[140px] flex flex-col items-center gap-3 bg-red-600 text-white p-5 rounded-3xl shadow-xl border border-red-500/50"
                                 >
                                     <div className="bg-white/20 p-3 rounded-full">
                                         <X size={28} />
                                     </div>
-                                    <span className="font-bold tracking-wider text-sm uppercase text-red-50 drop-shadow-md">End Call</span>
+                                    <span className="font-bold text-xs uppercase tracking-widest">
+                                        {callStatus === 'connected' ? 'End' : 'Decline'}
+                                    </span>
                                 </motion.button>
                             </div>
                         </motion.div>
@@ -189,4 +187,3 @@ export default function StaffCallListener() {
         </>
     );
 }
-

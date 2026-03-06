@@ -120,12 +120,30 @@ export default function StaffOrderCard({
                                     {order.customerPhone && (
                                         <div className="flex items-center gap-2 text-sm">
                                             <span className="text-purple-600 font-semibold">📞 Phone:</span>
-                                            <a
-                                                href={`tel:${order.customerPhone}`}
-                                                className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
-                                            >
-                                                {order.customerPhone}
-                                            </a>
+                                            <div className="flex items-center gap-3">
+                                                <a
+                                                    href={`tel:${order.customerPhone}`}
+                                                    className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                                                >
+                                                    {order.customerPhone}
+                                                </a>
+                                                {isTableOrder && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // We'll trigger this via a custom event or a shared state if needed, 
+                                                            // but for now let's assume StaffShell can handle it if we add a hook here.
+                                                            // Actually, let's keep it simple and just use the useWebRTC hook directly if possible.
+                                                            window.dispatchEvent(new CustomEvent('initiate-staff-call', {
+                                                                detail: { tableId: matchedTable.name, customerName: order.customerName || 'Guest' }
+                                                            }));
+                                                        }}
+                                                        className="flex items-center gap-1 bg-green-500 text-white px-2 py-1 rounded text-[10px] font-bold hover:bg-green-600 transition-colors"
+                                                    >
+                                                        <Phone size={12} /> CALL TABLE
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
